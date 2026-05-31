@@ -2645,7 +2645,6 @@
       <nav class="nav" id="dayTabs">
         <button class="tab" data-day="yesterday">אתמול</button>
         <button class="tab active" data-day="today">היום</button>
-        <button class="tab" data-day="tomorrow">מחר</button>
       </nav>
       <nav class="nav" id="sportTabs">
         <button class="tab active" data-sport-tab="football">כדורגל</button>
@@ -2674,9 +2673,9 @@
       <div class="hero-main">
         <div class="hero-content">
           <span class="eyebrow">מקור Winner בלבד · יחסים אמיתיים בלבד · בלי המצאת נתונים</span>
-          <h2>אתמול, היום ומחר. כדורגל וכדורסל. ניתוחי Winner בזמן אמת.</h2>
+          <h2>אתמול והיום. כדורגל וכדורסל. ניתוחי Winner בזמן אמת.</h2>
           <p class="hero-copy">
-            היום ומחר מציגים משחקים עם יתרון סטטיסטי ויחס Winner פעיל כנתון שוק. אתמול בודק תחזיות מול תוצאה רשמית.
+            היום מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל כנתון שוק. אתמול בודק תחזיות מול תוצאה רשמית.
           </p>
           <div class="stats" id="stats"></div>
         </div>
@@ -3076,7 +3075,7 @@
     }
 
     function isOpenDay(day = state.day) {
-      return day === "today" || day === "tomorrow";
+      return day === "today";
     }
 
     function daySportRows(day, sportTab) {
@@ -5590,10 +5589,6 @@
 
     document.querySelectorAll("#dayTabs .tab").forEach(button => {
       button.addEventListener("click", () => {
-        if (button.dataset.day === 'tomorrow' && !state.isPremium) {
-          openPremiumModal();
-          return;
-        }
         state.day = button.dataset.day;
         render();
       });
@@ -6054,7 +6049,7 @@
         <p style="margin:4px 0 0;font-size:13px;background:linear-gradient(90deg,#55d6ff,#e63946);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">מהדורת פרימיום</p>
       </div>
       <ul style="list-style:none;padding:0;margin:0 0 20px;display:grid;gap:10px">
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> כל ניתוחי היום והמחר — ללא הגבלה</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> כל ניתוחי היום — ללא הגבלה</li>
         <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> הפוגע AI ללא הגבלה — שאל כל שאלה</li>
         <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> יחסי Winner בזמן אמת לכל הליגות</li>
         <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> פילטר מוטיבציה — מנועל לחברים בלבד</li>
