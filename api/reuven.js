@@ -1,8 +1,39 @@
 const crypto = require("crypto");
 const { rateLimit, sanitizeInput } = require("./_rate-limit");
 
-const GROQ_API_KEY = process.env.AI_KEY;
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const CLAUDE_MODEL = "claude-sonnet-4-6";
+
+// ── Vercel KV helpers for premium token tracking ─────────────────────────────
+
+const KV_URL = process.env.KV_REST_API_URL;
+const KV_TOKEN_ENV = process.env.KV_REST_API_TOKEN;
+
+async function kvGetJson(key) {
+  if (!KV_URL || !KV_TOKEN_ENV) return null;
+  try {
+    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${KV_TOKEN_ENV}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await res.json().catch(() => null);
+    if (!data?.result) return null;
+    return typeof data.result === "string" ? JSON.parse(data.result) : data.result;
+  } catch { return null; }
+}
+
+async function kvSetJson(key, value, exSeconds) {
+  if (!KV_URL || !KV_TOKEN_ENV) return;
+  const url = exSeconds
+    ? `${KV_URL}/set/${encodeURIComponent(key)}?ex=${exSeconds}`
+    : `${KV_URL}/set/${encodeURIComponent(key)}`;
+  await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${KV_TOKEN_ENV}`, "Content-Type": "application/json" },
+    body: JSON.stringify(value),
+    signal: AbortSignal.timeout(5000),
+  }).catch(() => null);
+}
 
 const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
@@ -495,126 +526,112 @@ function parseQuery(text) {
   return { home, away, dateKey, offset, competition, rawCompetitionFallback, isFinal, hasDateWord };
 }
 
-// ── Groq API call ────────────────────────────────────────────────────────────
+// ── Claude API ────────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are HaPogea's senior analyst and brain — an elite sports intelligence agent specializing in soccer, basketball, and statistics.
+const SYSTEM_PROMPT = `אתה "הפוגע AI" — אנליסט הספורט הכי חד ומעמיק בישראל. אתה בקיא בכל ליגה, כל תחרות, כל קבוצה בעולם: כדורגל, כדורסל, טניס, אמריקאי — הכל.
 
-You think, reason, and communicate like a world-class sports analyst. Your entire world is sports, odds, statistics, fixtures, and predictions.
+אתה יודע סטטיסטיקות לעומק: שיעורי ניצחון היסטוריים, נתוני ראש-מול-ראש, כוח הבית, יחסי אימפליד פרובביליטי, ערך שוק, מגמות עונתיות, ביצועים על מגרשים מסוימים.
 
-## STRICT RESPONSE FORMAT — MANDATORY FOR ALL ANALYSIS
+## אופי התשובות שלך
 
-Every analysis response MUST use this exact structure:
+**שפה:** עברית תקנית ושוטפת, ספורטיבית אבל אנושית. כמו אנליסט מקצועי שמדבר עם חבר.
 
-**ניתוח:** [Professional, punchy, data-driven analysis. Cover team form, H2H, tactical edge, market context.]
+**גיוון מחויב:** כל תשובה חייבת להיות שונה בניסוחה. שנה את:
+- אורך המשפטים (פעם קצר ועוקצני, פעם רחב ומנומק)
+- נקודת הפתיחה (לפעמים התוצאה קודם, לפעמים ההקשר)
+- טון (לפעמים בוטח, לפעמים מנתח בקול, לפעמים שאלתני)
+- מבנה הסעיפים (לא אותו סכמה בכל פעם)
 
-**המלצה:** [Specific, committed recommendation based on the data. Name the pick clearly.]
+**NEVER:** אל תפתח שתי תשובות עוקבות באותה מילה. אל תחזור על אותו ניסוח.
 
-**ביטחון:** [X% — a specific probability number based on your statistical model. Never a range. Commit.]
+## פורמט תשובות ניתוח
 
-**הנימוק:** [One concise sentence explaining the WHY behind the pick.]
+בחר בכל פעם פורמט שמתאים לשאלה ולהקשר — לא אותו תבנית תמיד. אפשרויות:
 
----
-**💬 מה אני באמת חושב:** [1-2 honest, direct sentences. No hedging. No "it depends". Say what you actually believe.]
+**פורמט A — ישיר ותמציתי:**
+**ניתוח:** ...
+**המלצה:** ...
+**ביטחון:** X%
+**הנימוק:** משפט אחד חד.
+💬 **מה אני חושב באמת:** ...
 
-This format is NON-NEGOTIABLE. Every prediction response follows it, every time.
+**פורמט B — נרטיב אנליטי:**
+פסקה עם הניתוח הכולל, ואז:
+→ **הפיק:** ...
+→ **הסתברות מוערכת:** X%
+→ **שורה תחתונה:** ...
 
-## REALITY & VERIFICATION — CRITICAL RULES
+**פורמט C — שאלה–תשובה ישירה:**
+כשהמשתמש שואל שאלה פשוטה ("מי ינצח?", "כמה שערים?"), ענה ישיר וקצר — אל תנפח.
 
-### Match Verification
-Before analyzing ANY match:
-1. Ask yourself: does this match actually exist in any known schedule?
-2. Could the user mean a different competition, date, or round?
-3. Are there multiple possible interpretations?
+## כללים קריטיים
 
-If the match is unclear, calmly ask: "על איזה תחרות או תאריך מדובר?"
+**אמינות:**
+- אל תמציא משחקים שלא קיימים
+- אל תמציא ניקוד חי
+- אם משחק לא קיים: "המשחק הזה לא קיים בלוח שלי — על מה בדיוק מדובר?"
+- לא מספיק נתונים על שחקן ספציפי? אמור את זה, אבל נתח את הקבוצה
 
-You NEVER invent fake games.
-You NEVER hallucinate fixtures or scores.
-If a match does not exist in any known schedule, state clearly: "המשחק הזה לא קיים בלוח המשחקים הידוע לי."
+**כשיש נתוני אודס בזמן אמת:**
+חשב הסתברות גלומה (100÷אודס), זהה Value, השתמש בזה לחיזוק הניתוח.
 
-### Player Analysis
-When asked about a specific player:
-- Focus on recent form, stats, injury status, and impact on their team
-- If you lack sufficient data, state it clearly: "אין לי מספיק נתונים עדכניים על שחקן זה"
-- NEVER speculate about individual players — roster changes happen constantly
-- Name the CLUB, not individuals
+**כשאין נתוני אודס:**
+ציין בקצרה: "⚠️ ניתוח לפי ידע כללי — אין יחסים בזמן אמת."
+אבל המשך לנתח בביטחון — לקבוצות גדולות תמיד יש לך ידע מספיק.
 
-### Team Name Resolution
-If a user says "Arsenal vs City" → understand: Arsenal F.C. vs Manchester City
-If multiple matches are possible → ask for clarification naturally
-You are conversational, smart, adaptive, and human-like.
+**הודעות קצרות:**
+"מחר", "ואם?", "מה הסיכויים?", "כן" — המשך מהקונטקסט. אל תשאל "מי הקבוצות?" אם כבר דיברנו.
 
-## BANNED BEHAVIORS — INSTANT FAIL
+**הימורים:**
+אם שואלים "מה לשים" / "על מה להמר" — ענה: "אני לא נותן הוראות להמר. לפי הנתונים —" ואז המשך לניתוח.
+
+## אסור בהחלט
 - "קשה לתת תחזית" — NEVER
 - "אם היינו צריכים לבחור" — NEVER
-- "לא מספיק נתונים" for top clubs — NEVER
-- Naming individual players — NEVER
-- Vague conclusions without a winner — NEVER
-- Repeating the same sentence over and over — NEVER
+- "אין לי מספיק נתונים" על קבוצות גדולות — NEVER
+- לשם שחקנים ספציפיים כתחזית — NEVER
+- מסקנה עמומה בלי מנצח — NEVER`;
 
-## Language
-Always respond in Hebrew (עברית). Write naturally and fluently, like a professional sports analyst speaking to an Israeli audience.
-
-## When live odds data is provided
-Use the real odds as statistical context — calculate implied probability (1/odds), note market edges, and use them to support your analysis. Never invent odds.
-
-## When NO live data is available
-You ALWAYS have enough knowledge to analyze any top club or national team. No excuses.
-Note briefly: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני אודס בזמן אמת."
-
-## Short follow-up messages
-If the user sends a short/vague message like "מחר", "ומה עם הגמר?", "ואם?", "כן", "מה הסיכויים?" —
-ALWAYS treat it as a follow-up to the previous conversation context.
-Continue naturally — do NOT ask "מי הקבוצות?" if context was already established.
-
-## Betting instruction rule
-If the user asks "מה לשים", "על מה להמר" or similar — respond: "אני לא נותן הוראות להמר. לפי הנתונים הספורטיביים..." and then give your analysis.`;
-
-
-function buildGroqMessages(userMessage, conversationHistory) {
-  // Build history, skipping empty messages and collapsing consecutive same-role messages
+function buildClaudeMessages(userMessage, conversationHistory) {
   const historyMsgs = conversationHistory.slice(-6)
     .map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.text || "" }))
     .filter(h => h.content.trim().length > 0);
 
-  // Deduplicate consecutive same-role entries (keep last)
   const dedupedHistory = historyMsgs.reduce((acc, msg) => {
     if (acc.length > 0 && acc[acc.length - 1].role === msg.role) {
-      acc[acc.length - 1] = msg; // replace with later one
+      acc[acc.length - 1] = msg;
     } else {
       acc.push(msg);
     }
     return acc;
   }, []);
 
-  return [
-    { role: "system", content: SYSTEM_PROMPT },
-    ...dedupedHistory,
-    { role: "user", content: userMessage },
-  ];
+  return [...dedupedHistory, { role: "user", content: userMessage }];
 }
 
-async function callGroq(userMessage, conversationHistory) {
-  if (!GROQ_API_KEY) {
-    return "הפוגע AI לא מופעל — מפתח AI_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.";
+async function callClaude(userMessage, conversationHistory) {
+  if (!ANTHROPIC_API_KEY) {
+    return "הפוגע AI לא מופעל — מפתח ANTHROPIC_API_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.";
   }
 
   const body = {
-    model: GROQ_MODEL,
-    messages: buildGroqMessages(userMessage, conversationHistory),
+    model: CLAUDE_MODEL,
     max_tokens: 2500,
-    temperature: 0.65,
+    temperature: 1,
+    system: SYSTEM_PROMPT,
+    messages: buildClaudeMessages(userMessage, conversationHistory),
   };
 
   const MAX_RETRIES = 3;
   const RETRY_DELAYS = [3000, 6000, 12000];
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(30000),
@@ -622,7 +639,7 @@ async function callGroq(userMessage, conversationHistory) {
 
     if (res.ok) {
       const data = await res.json();
-      return data.choices?.[0]?.message?.content || "לא קיבלתי תגובה.";
+      return data.content?.[0]?.text || "לא קיבלתי תגובה.";
     }
 
     if (res.status === 429 && attempt < MAX_RETRIES - 1) {
@@ -631,48 +648,48 @@ async function callGroq(userMessage, conversationHistory) {
     }
 
     const errText = await res.text().catch(() => "");
-    throw new Error(`Groq API ${res.status}: ${errText.slice(0, 200)}`);
+    throw new Error(`Claude API ${res.status}: ${errText.slice(0, 200)}`);
   }
 }
 
-// Stream the model's tokens straight to the HTTP response as plain UTF-8 text,
-// so the chat reveals the answer live (ChatGPT-style) instead of waiting for the
-// whole completion. Falls back to a single non-streamed write on any failure.
-async function streamGroq(res, userMessage, conversationHistory) {
-  if (!GROQ_API_KEY) {
-    res.write("הפוגע AI לא מופעל — מפתח AI_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.");
+// Streams Claude tokens directly to the HTTP response (ChatGPT-style live typing).
+async function streamClaude(res, userMessage, conversationHistory) {
+  if (!ANTHROPIC_API_KEY) {
+    res.write("הפוגע AI לא מופעל — מפתח ANTHROPIC_API_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.");
     res.end();
     return;
   }
 
   const body = {
-    model: GROQ_MODEL,
-    messages: buildGroqMessages(userMessage, conversationHistory),
+    model: CLAUDE_MODEL,
     max_tokens: 2500,
-    temperature: 0.65,
+    temperature: 1,
+    system: SYSTEM_PROMPT,
+    messages: buildClaudeMessages(userMessage, conversationHistory),
     stream: true,
   };
 
   let upstream;
   try {
-    upstream = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    upstream = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(60000),
     });
   } catch (err) {
-    const fallback = await callGroq(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
+    const fallback = await callClaude(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
     res.write(fallback);
     res.end();
     return;
   }
 
   if (!upstream.ok || !upstream.body || !upstream.body.getReader) {
-    const fallback = await callGroq(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
+    const fallback = await callClaude(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
     res.write(fallback);
     res.end();
     return;
@@ -696,15 +713,41 @@ async function streamGroq(res, userMessage, conversationHistory) {
         if (!payload || payload === "[DONE]") continue;
         try {
           const json = JSON.parse(payload);
-          const token = json.choices?.[0]?.delta?.content;
-          if (token) { res.write(token); wrote = true; }
-        } catch { /* ignore keep-alive / partial frames */ }
+          if (json.type === "content_block_delta" && json.delta?.type === "text_delta") {
+            res.write(json.delta.text);
+            wrote = true;
+          }
+        } catch { /* ignore partial frames */ }
       }
     }
   } catch (err) {
     if (!wrote) res.write(`שגיאה טכנית: ${err.message}. אנא נסה שוב.`);
   }
   res.end();
+}
+
+// ── Premium token validation ──────────────────────────────────────────────────
+
+async function validatePremiumToken(rawToken) {
+  if (!rawToken || rawToken.length < 10 || rawToken.length > 128) return null;
+  const tokenData = await kvGetJson(`premium:${rawToken}`);
+  if (!tokenData || !tokenData.active) return null;
+  const weekStart = new Date(tokenData.weekStart);
+  const daysSince = (Date.now() - weekStart.getTime()) / 86400000;
+  if (daysSince > 7) return null; // expired
+  if (tokenData.messagesUsed >= tokenData.messagesMax) return null; // exhausted
+  return tokenData;
+}
+
+async function consumePremiumMessage(rawToken, tokenData) {
+  tokenData.messagesUsed += 1;
+  tokenData.updatedAt = new Date().toISOString();
+  await kvSetJson(`premium:${rawToken}`, tokenData, 9 * 86400);
+  return {
+    remaining: Math.max(0, tokenData.messagesMax - tokenData.messagesUsed),
+    messagesMax: tokenData.messagesMax,
+    expiresAt: new Date(new Date(tokenData.weekStart).getTime() + 7 * 86400000).toISOString(),
+  };
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
@@ -715,11 +758,11 @@ module.exports = async (req, res) => {
   if (req.method === "OPTIONS") { res.status(200).end(); return; }
   if (req.method !== "POST") { res.status(405).json({ error: "Method not allowed" }); return; }
 
-  if (rateLimit(req, res, { max: 10, windowMs: 60_000 })) return;
-
   const rawQuery = (req.body || {}).query;
   const rawHistory = Array.isArray((req.body || {}).history) ? (req.body || {}).history : [];
   const wantStream = (req.body || {}).stream === true;
+  const rawToken = sanitizeInput((req.body || {}).token, 128);
+
   const query = sanitizeInput(rawQuery, 1000);
   if (!query) {
     res.status(400).json({ error: "Missing query" });
@@ -729,6 +772,18 @@ module.exports = async (req, res) => {
     role: m.role === "user" ? "user" : "assistant",
     text: sanitizeInput(m.text, 500),
   }));
+
+  // Validate premium token — if valid, bypass IP rate limit and track weekly usage
+  const tokenData = rawToken ? await validatePremiumToken(rawToken) : null;
+  let premiumInfo = null;
+  if (tokenData) {
+    // Premium path: higher per-minute limit (still guard against abuse)
+    if (rateLimit(req, res, { max: 30, windowMs: 60_000, message: "נסה שוב בעוד דקה" })) return;
+    premiumInfo = await consumePremiumMessage(rawToken, tokenData);
+  } else {
+    // Free path: strict rate limit
+    if (rateLimit(req, res, { max: 10, windowMs: 60_000 })) return;
+  }
 
   let winnerSection = "";
   let matchInfo = null;
@@ -815,25 +870,30 @@ module.exports = async (req, res) => {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader("Cache-Control", "no-cache, no-transform");
       res.setHeader("X-Accel-Buffering", "no");
+      if (premiumInfo) {
+        res.setHeader("X-Premium-Remaining", String(premiumInfo.remaining));
+        res.setHeader("X-Premium-Expires", premiumInfo.expiresAt);
+        res.setHeader("Access-Control-Expose-Headers", "X-Premium-Remaining, X-Premium-Expires");
+      }
       res.status(200);
-      await streamGroq(res, userMessage, history);
+      await streamClaude(res, userMessage, history);
       return;
     }
 
-    const answer = await callGroq(userMessage, history);
+    const answer = await callClaude(userMessage, history);
 
-    res.status(200).json({ ok: true, answer, matchInfo });
+    res.status(200).json({ ok: true, answer, matchInfo, premiumInfo });
   } catch (err) {
     console.error("Reuven API error:", err);
     // If we've already started streaming bytes, we can only finish the stream.
     if (res.headersSent) { try { res.end(); } catch {} return; }
 
-    const isQuota = /429|quota|rate.?limit/i.test(err.message);
+    const isQuota = /429|quota|rate.?limit|overload/i.test(err.message);
     const quotaText = (() => {
       const hasWinnerData = winnerSection && !winnerSection.startsWith("⚠️") && winnerSection.length > 20;
       return hasWinnerData
-        ? `ה-AI לא זמין כרגע (מכסה יומית מוצתה). הנה נתוני Winner ישירות:\n\n${winnerSection}`
-        : `ה-AI לא זמין כרגע (מכסה יומית מוצתה). ${winnerSection || "נסה שוב מאוחר יותר."}`;
+        ? `ה-AI עמוס כרגע. הנה נתוני Winner ישירות:\n\n${winnerSection}`
+        : `ה-AI עמוס כרגע. ${winnerSection || "נסה שוב בעוד רגע."}`;
     })();
     const errText = isQuota ? quotaText : `שגיאה טכנית: ${err.message}. אנא נסה שוב.`;
 

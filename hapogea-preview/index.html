@@ -2809,6 +2809,38 @@
       document.getElementById('premiumModal').classList.add('hidden');
     }
 
+    async function submitAiToken() {
+      const input = document.getElementById('aiTokenInput');
+      const msg = document.getElementById('aiTokenMsg');
+      const token = (input?.value || "").trim();
+      if (!token) { if (msg) msg.textContent = "הכנס קוד גישה"; return; }
+      if (msg) { msg.style.color = "rgba(255,255,255,.4)"; msg.textContent = "בודק..."; }
+      try {
+        const res = await fetch(`/api/premium-token?action=check&token=${encodeURIComponent(token)}`);
+        const data = await res.json().catch(() => ({}));
+        if (data.ok) {
+          localStorage.setItem('hapogea_ai_token', token);
+          state.reubenToken = token;
+          state.reubenTokenInfo = { remaining: data.remaining, expiresAt: data.expiresAt, messagesMax: data.messagesMax };
+          if (msg) { msg.style.color = "#34d399"; msg.textContent = `✓ גישה אושרה — ${data.remaining} ניתוחים נותרו השבוע`; }
+          setTimeout(() => renderCards(), 800);
+        } else if (data.expired) {
+          if (msg) { msg.style.color = "#f87171"; msg.textContent = "הקוד פג תוקף — חדש את המנוי"; }
+        } else {
+          if (msg) { msg.style.color = "#f87171"; msg.textContent = "קוד שגוי — בדוק ונסה שוב"; }
+        }
+      } catch {
+        if (msg) { msg.style.color = "#f87171"; msg.textContent = "שגיאת חיבור — נסה שוב"; }
+      }
+    }
+
+    function clearAiToken() {
+      localStorage.removeItem('hapogea_ai_token');
+      state.reubenToken = "";
+      state.reubenTokenInfo = null;
+      renderCards();
+    }
+
     const TRACK_KEY = "hapogea_prediction_tracker_today_v1";
     const state = {
       feed: null,
@@ -2830,8 +2862,11 @@
       reubenSidebarOpen: false,
       debugMode: location.pathname.includes("debug"),
       isPremium: localStorage.getItem('hapogea_premium_v2') === 'active',
-      reubenFreeUsed: 0
+      reubenFreeUsed: 0,
+      reubenToken: localStorage.getItem('hapogea_ai_token') || "",
+      reubenTokenInfo: null,
     };
+    window.__hapogea_state = state; // expose for streaming AI component
     let lastLoadTime = 0;
     document.body.classList.toggle("debug-mode", state.debugMode);
 
@@ -4672,7 +4707,8 @@
             content: "\"ארסנל נגד פריז\" · \"ברצלונה נגד ריאל מדריד\" · \"יש פה Value?\" · \"זה מלכודת?\" · \"היית נכנס?\"" }
         ], suggestions: ["ארסנל נגד פריז", "ברצלונה נגד ריאל מדריד", "לייקרס נגד סלטיקס", "מנצ׳סטר סיטי היום"], text: "שלום! אני הפוגע AI." }];
       const loading = state.reubenLoading;
-      const isLocked = !state.isPremium && (state.reubenFreeUsed || 0) >= 1;
+      const hasAiAccess = state.isPremium || !!state.reubenToken;
+      const isLocked = !hasAiAccess && (state.reubenFreeUsed || 0) >= 1;
       const sidebarOpen = state.reubenSidebarOpen ? " open" : "";
 
       // Build history sidebar items from past user messages
@@ -4719,7 +4755,10 @@
                 </div>
               </div>
               <div class="reuben-header-actions">
-                <span class="reuben-badge">BETA</span>
+                ${state.reubenToken && state.reubenTokenInfo
+                  ? `<span style="font-size:11px;font-weight:600;color:rgba(255,200,87,.75);background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.18);padding:3px 9px;border-radius:20px;letter-spacing:.3px">${state.reubenTokenInfo.remaining}/${state.reubenTokenInfo.messagesMax} ניתוחים</span>`
+                  : `<span class="reuben-badge">BETA</span>`
+                }
               </div>
             </div>
 
@@ -4729,10 +4768,23 @@
             </div>
 
             ${isLocked ? `
-            <div style="text-align:center;padding:28px 20px;border-top:1px solid rgba(255,255,255,.06)">
-              <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8)">השתמשת בניתוח החינמי שלך</p>
-              <p style="margin:0 0 18px;font-size:12px;color:rgba(255,255,255,.32)">פרימיום נותן גישה בלתי מוגבלת להפוגע AI</p>
-              <button onclick="openPremiumModal()" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">פתח פרימיום</button>
+            <div style="padding:24px 20px 20px;border-top:1px solid rgba(255,255,255,.06)">
+              <div style="text-align:center;margin-bottom:20px">
+                <p style="margin:0 0 5px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8)">השתמשת בניתוח החינמי שלך</p>
+                <p style="margin:0 0 14px;font-size:12px;color:rgba(255,255,255,.32)">100 ניתוחים בשבוע · Claude AI · 70₪/שבוע</p>
+                <button onclick="openPremiumModal()" style="padding:10px 26px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">שדרג לפרימיום</button>
+              </div>
+              <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:16px">
+                <p style="margin:0 0 10px;font-size:12px;color:rgba(255,255,255,.35);text-align:center">יש לך קוד גישה? הכנס אותו כאן</p>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input id="aiTokenInput" type="text" dir="ltr" placeholder="קוד גישה שקיבלת"
+                    style="flex:1;padding:9px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font:400 13px/1 JetBrains Mono,monospace;outline:none;min-width:0"
+                    onkeydown="if(event.key==='Enter')submitAiToken()">
+                  <button onclick="submitAiToken()"
+                    style="padding:9px 16px;border-radius:7px;border:1px solid rgba(99,102,241,.4);background:rgba(99,102,241,.15);color:#a5b4fc;font:600 12px Heebo,sans-serif;cursor:pointer;white-space:nowrap">אמת</button>
+                </div>
+                <div id="aiTokenMsg" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.4);text-align:center;min-height:18px"></div>
+              </div>
             </div>
             ` : `
             <div class="reuben-input-area">
@@ -5964,13 +6016,18 @@
 
           let aiText = "";
           try {
+            const reqBody = { query: question, history };
+            if (state.reubenToken) reqBody.token = state.reubenToken;
             const response = await fetch("/api/reuven", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query: question, history }),
+              body: JSON.stringify(reqBody),
               signal: timeoutSignal(35000),
             });
             const data = await response.json().catch(() => ({}));
+            if (data.premiumInfo && state.reubenTokenInfo) {
+              state.reubenTokenInfo.remaining = data.premiumInfo.remaining;
+            }
             aiText = data.answer || "לא הצלחתי לקבל ניתוח. תנסה שוב.";
           } catch (err) {
             // Fallback to local analysis if API unavailable
@@ -5980,7 +6037,7 @@
 
           state.reubenMessages.push({ role: "ai", text: aiText });
           state.reubenLoading = false;
-          if (!state.isPremium) {
+          if (!state.isPremium && !state.reubenToken) {
             state.reubenFreeUsed = (state.reubenFreeUsed || 0) + 1;
           }
           renderCards();
@@ -6028,6 +6085,26 @@
     scheduleMidnightShift();
     HapAuth.init();
     wcStartBannerCountdown();
+
+    // Restore premium token from localStorage and verify it
+    (async function restoreAiToken() {
+      const savedToken = state.reubenToken;
+      if (!savedToken) return;
+      try {
+        const res = await fetch(`/api/premium-token?action=check&token=${encodeURIComponent(savedToken)}`);
+        const data = await res.json().catch(() => ({}));
+        if (data.ok) {
+          state.reubenTokenInfo = { remaining: data.remaining, expiresAt: data.expiresAt, messagesMax: data.messagesMax };
+          renderCards();
+        } else {
+          // Token expired or invalid — clear it
+          localStorage.removeItem('hapogea_ai_token');
+          state.reubenToken = "";
+          state.reubenTokenInfo = null;
+          renderCards();
+        }
+      } catch { /* ignore — token check is best-effort */ }
+    })();
 
     // Fix iOS virtual keyboard covering the AI composer
     if (window.visualViewport) {
@@ -6453,7 +6530,7 @@ function AiApp() {
       const resp=await fetch("/api/reuven",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({query:text,history:historySnap,user:user?{name:user.name,plan:user.plan}:null,stream:true}),
+        body:JSON.stringify({query:text,history:historySnap,user:user?{name:user.name,plan:user.plan}:null,stream:true,token:window.__hapogea_state?.reubenToken||localStorage.getItem('hapogea_ai_token')||""}),
         signal:ac.signal,
       });
 
@@ -6472,6 +6549,9 @@ function AiApp() {
         }
         clearTimeout(tid);
         if(run!==runRef.current)return;
+        // Update remaining message counter for premium token users
+        const premRem=resp.headers.get("X-Premium-Remaining");
+        if(premRem!==null&&window.__hapogea_state?.reubenTokenInfo){window.__hapogea_state.reubenTokenInfo.remaining=parseInt(premRem)||0;}
         if(!acc.trim()){const fb="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";patchAi({phase:"streaming",intro:fb,streamLen:fb.length});}
         patchAi({phase:"done"});
         setBusy(false);

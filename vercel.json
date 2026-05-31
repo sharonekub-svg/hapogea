@@ -13,7 +13,8 @@
     "api/recommendation-stats.js": { "maxDuration": 60 },
     "api/debug-odds.js": { "maxDuration": 60 },
     "api/reuven.js": { "maxDuration": 45 },
-    "api/reuven-slip.js": { "maxDuration": 45 }
+    "api/reuven-slip.js": { "maxDuration": 45 },
+    "api/premium-token.js": { "maxDuration": 15 }
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
