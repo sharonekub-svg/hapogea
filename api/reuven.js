@@ -1,8 +1,8 @@
 const crypto = require("crypto");
 const { rateLimit, sanitizeInput } = require("./_rate-limit");
 
-const GROQ_API_KEY = process.env.AI_KEY;
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
 
 const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
@@ -571,37 +571,35 @@ Continue naturally — do NOT ask "מי הקבוצות?" if context was already 
 If the user asks "מה לשים", "על מה להמר" or similar — respond: "אני לא נותן הוראות להמר. לפי הנתונים הספורטיביים..." and then give your analysis.`;
 
 
-function buildGroqMessages(userMessage, conversationHistory) {
-  // Build history, skipping empty messages and collapsing consecutive same-role messages
+function buildMessages(userMessage, conversationHistory) {
   const historyMsgs = conversationHistory.slice(-6)
     .map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.text || "" }))
     .filter(h => h.content.trim().length > 0);
 
-  // Deduplicate consecutive same-role entries (keep last)
   const dedupedHistory = historyMsgs.reduce((acc, msg) => {
     if (acc.length > 0 && acc[acc.length - 1].role === msg.role) {
-      acc[acc.length - 1] = msg; // replace with later one
+      acc[acc.length - 1] = msg;
     } else {
       acc.push(msg);
     }
     return acc;
   }, []);
 
-  return [
-    { role: "system", content: SYSTEM_PROMPT },
-    ...dedupedHistory,
-    { role: "user", content: userMessage },
-  ];
+  // Anthropic requires messages to start with "user" role
+  const withCurrent = [...dedupedHistory, { role: "user", content: userMessage }];
+  const firstUserIdx = withCurrent.findIndex(m => m.role === "user");
+  return firstUserIdx > 0 ? withCurrent.slice(firstUserIdx) : withCurrent;
 }
 
-async function callGroq(userMessage, conversationHistory) {
-  if (!GROQ_API_KEY) {
-    return "הפוגע AI לא מופעל — מפתח AI_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.";
+async function callClaude(userMessage, conversationHistory) {
+  if (!ANTHROPIC_API_KEY) {
+    return "הפוגע AI לא מופעל — מפתח ANTHROPIC_API_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.";
   }
 
   const body = {
-    model: GROQ_MODEL,
-    messages: buildGroqMessages(userMessage, conversationHistory),
+    model: CLAUDE_MODEL,
+    system: SYSTEM_PROMPT,
+    messages: buildMessages(userMessage, conversationHistory),
     max_tokens: 2500,
     temperature: 0.65,
   };
@@ -610,11 +608,12 @@ async function callGroq(userMessage, conversationHistory) {
   const RETRY_DELAYS = [3000, 6000, 12000];
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(30000),
@@ -622,32 +621,30 @@ async function callGroq(userMessage, conversationHistory) {
 
     if (res.ok) {
       const data = await res.json();
-      return data.choices?.[0]?.message?.content || "לא קיבלתי תגובה.";
+      return data.content?.[0]?.text || "לא קיבלתי תגובה.";
     }
 
-    if (res.status === 429 && attempt < MAX_RETRIES - 1) {
+    if (res.status === 529 && attempt < MAX_RETRIES - 1) {
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS[attempt]));
       continue;
     }
 
     const errText = await res.text().catch(() => "");
-    throw new Error(`Groq API ${res.status}: ${errText.slice(0, 200)}`);
+    throw new Error(`Claude API ${res.status}: ${errText.slice(0, 200)}`);
   }
 }
 
-// Stream the model's tokens straight to the HTTP response as plain UTF-8 text,
-// so the chat reveals the answer live (ChatGPT-style) instead of waiting for the
-// whole completion. Falls back to a single non-streamed write on any failure.
-async function streamGroq(res, userMessage, conversationHistory) {
-  if (!GROQ_API_KEY) {
-    res.write("הפוגע AI לא מופעל — מפתח AI_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.");
+async function streamClaude(res, userMessage, conversationHistory) {
+  if (!ANTHROPIC_API_KEY) {
+    res.write("הפוגע AI לא מופעל — מפתח ANTHROPIC_API_KEY חסר. יש להגדיר אותו ב-Vercel environment variables.");
     res.end();
     return;
   }
 
   const body = {
-    model: GROQ_MODEL,
-    messages: buildGroqMessages(userMessage, conversationHistory),
+    model: CLAUDE_MODEL,
+    system: SYSTEM_PROMPT,
+    messages: buildMessages(userMessage, conversationHistory),
     max_tokens: 2500,
     temperature: 0.65,
     stream: true,
@@ -655,24 +652,25 @@ async function streamGroq(res, userMessage, conversationHistory) {
 
   let upstream;
   try {
-    upstream = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    upstream = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(60000),
     });
   } catch (err) {
-    const fallback = await callGroq(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
+    const fallback = await callClaude(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
     res.write(fallback);
     res.end();
     return;
   }
 
   if (!upstream.ok || !upstream.body || !upstream.body.getReader) {
-    const fallback = await callGroq(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
+    const fallback = await callClaude(userMessage, conversationHistory).catch(e => `שגיאה טכנית: ${e.message}`);
     res.write(fallback);
     res.end();
     return;
@@ -696,8 +694,10 @@ async function streamGroq(res, userMessage, conversationHistory) {
         if (!payload || payload === "[DONE]") continue;
         try {
           const json = JSON.parse(payload);
-          const token = json.choices?.[0]?.delta?.content;
-          if (token) { res.write(token); wrote = true; }
+          if (json.type === "content_block_delta" && json.delta?.type === "text_delta") {
+            const token = json.delta.text;
+            if (token) { res.write(token); wrote = true; }
+          }
         } catch { /* ignore keep-alive / partial frames */ }
       }
     }
@@ -816,11 +816,11 @@ module.exports = async (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-transform");
       res.setHeader("X-Accel-Buffering", "no");
       res.status(200);
-      await streamGroq(res, userMessage, history);
+      await streamClaude(res, userMessage, history);
       return;
     }
 
-    const answer = await callGroq(userMessage, history);
+    const answer = await callClaude(userMessage, history);
 
     res.status(200).json({ ok: true, answer, matchInfo });
   } catch (err) {
