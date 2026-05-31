@@ -4889,8 +4889,8 @@
 
     function predictionStatusInfo(value) {
       const raw = String(value || "").trim();
-      if (raw === "hit" || raw === "תפס" || raw === "נתפס") return { key: "hit", label: "תחזית התאימה", cls: "hit" };
-      if (raw === "miss" || raw === "נפל" || raw === "לא נתפס") return { key: "miss", label: "תחזית לא התאימה", cls: "miss" };
+      if (raw === "hit" || raw === "תפס" || raw === "נתפס") return { key: "hit", label: "נתפס ✓", cls: "hit" };
+      if (raw === "miss" || raw === "נפל" || raw === "לא נתפס") return { key: "miss", label: "נפל ✗", cls: "miss" };
       if (raw === "void" || raw === "cancelled" || raw === "בוטל") return { key: "void", label: "בוטל", cls: "unverified" };
       if (raw === "unverified" || raw === "לא אומת" || raw === "החזר") return { key: "unverified", label: "לא אומת", cls: "unverified" };
       if (raw === "closed" || raw === "נסגר") return { key: "closed", label: "נסגר", cls: "closed" };

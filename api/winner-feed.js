@@ -1922,39 +1922,60 @@ function splitBySport(rows) {
 
 function mergeRows(primary, secondary) {
   const PHASE_RANK = { final: 4, cancelled: 3, postponed: 3, ht: 2, live: 1, scheduled: 0, "": 0 };
-  const byEvent = new Map();
-  for (const row of [...primary, ...secondary]) {
-    const key = String(row.resultKey || row.eventId || row.id);
-    const current = byEvent.get(key);
-    if (!current) {
-      byEvent.set(key, row);
-      continue;
-    }
-    // Use the most advanced matchPhase from either row
+  const definitiveStatus = (s) => s && s !== "ממתין";
+  function mergeTwo(current, row) {
     const rankCurrent = PHASE_RANK[current.matchPhase] ?? 0;
     const rankRow = PHASE_RANK[row.matchPhase] ?? 0;
     const mergedPhase = rankCurrent >= rankRow ? current.matchPhase : row.matchPhase;
-    const definitiveStatus = (s) => s && s !== "ממתין";
-    byEvent.set(key, {
+    return {
       ...row,
       ...current,
       liveScore: current.liveScore || row.liveScore || "",
       result: current.result || row.result || "",
       actualWinner: current.actualWinner || row.actualWinner || "",
       matchPhase: mergedPhase || "",
-      // Prefer recommended:true from either row (so snapshot picks keep their recommendation)
       recommended: current.recommended || row.recommended,
       pick: current.pick || row.pick || "",
       pickTeam: current.pickTeam || row.pickTeam || "",
       winnerPick: current.winnerPick || row.winnerPick || "",
-      // Propagate a definitive status (hit/miss/נסגר/בוטל) from either row
       status: definitiveStatus(current.status)
         ? current.status
         : definitiveStatus(row.status)
           ? row.status
           : (current.status || "ממתין"),
-    });
+    };
   }
+
+  const byEvent = new Map();
+  // Pass 1: exact key matching
+  for (const row of [...primary, ...secondary]) {
+    const key = String(row.resultKey || row.eventId || row.id);
+    const current = byEvent.get(key);
+    if (!current) { byEvent.set(key, row); continue; }
+    byEvent.set(key, mergeTwo(current, row));
+  }
+
+  // Pass 2: fuzzy match — pick rows missing actualWinner against result rows that
+  // have actualWinner but no recommendation. Handles Winner vs 365scores name diffs.
+  const unmatchedPicks = [...byEvent.entries()]
+    .filter(([, r]) => r.recommended && r.odds && !r.actualWinner);
+  const unmatchedResults = [...byEvent.entries()]
+    .filter(([, r]) => r.actualWinner && !r.recommended);
+
+  for (const [pickKey, pick] of unmatchedPicks) {
+    let best = null, bestScore = 0, bestKey = null;
+    for (const [resKey, result] of unmatchedResults) {
+      if (String(pick.sportId || "") !== String(result.sportId || "")) continue;
+      if (String(pick.day || "") !== String(result.day || "")) continue;
+      const score = resultMatchScore(pick, result);
+      if (score > bestScore) { best = result; bestScore = score; bestKey = resKey; }
+    }
+    if (bestScore >= 0.55 && best && bestKey) {
+      byEvent.set(pickKey, mergeTwo(pick, best));
+      byEvent.delete(bestKey); // absorb the separate result row into the pick
+    }
+  }
+
   return [...byEvent.values()];
 }
 
