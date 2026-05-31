@@ -1002,14 +1002,22 @@ function scoreOutcome(market, outcome) {
     .sort((a, b) => b - a);
   const closestCompetitor = competitors[0] || 0;
   const marketGap = Math.max(0, normalizedProbability - closestCompetitor);
-  const marginPenalty = Math.min(0.16, oddsBook.overround) * 100;
+  const overround = oddsBook.overround;
+  const marginPenalty = overround > 0.10
+    ? Math.min(0.16, overround) * 60
+    : overround * 25;
   const sourceDepth = Math.min(1, Number(market.count || market.outcomes?.length || 1) / 8);
   const hitProbability = Math.max(0.34, Math.min(0.82, normalizedProbability * reliability));
+  const ev = normalizedProbability * odds - 1;
+  const evBonus = ev > 0 ? Math.min(20, ev * 50) : Math.max(-15, ev * 30);
+  const largeGapBonus = marketGap > 0.15 ? Math.round((marketGap - 0.15) * 40) : 0;
   const score = Math.round(
     normalizedProbability * 70 +
       marketGap * 34 +
+      largeGapBonus +
       reliability * 12 +
-      sourceDepth * 6 -
+      sourceDepth * 6 +
+      evBonus -
       marginPenalty
   );
   return {
@@ -1024,6 +1032,7 @@ function scoreOutcome(market, outcome) {
     overround: oddsBook.overround,
     hitProbability,
     reliability,
+    ev,
     score: Math.max(1, Math.min(100, score)),
     oddsBook,
   };
@@ -1224,15 +1233,35 @@ function scoreBreakdown(row) {
     : 0;
   const isBasketballRow = Number(row.sportId) === WINNER_BASKETBALL_ID;
   const tooLowOddsPenalty = !isBasketballRow && odds <= 1.42 && marketGap < 0.08 ? 10 : 0;
+  // Sweet spot bonus: odds 1.55–1.80 are statistically the most reliable range
+  const sweetSpotBonus = odds >= 1.50 && odds <= 1.85
+    ? Math.round((1 - Math.abs(odds - 1.675) / 0.325) * 14)
+    : 0;
+  // Expected Value bonus: positive EV is the core signal for a genuine value pick
+  const ev = Number(row.ev || 0);
+  const evBonus = ev > 0
+    ? Math.round(Math.min(30, ev * 55))
+    : Math.max(-20, Math.round(ev * 35));
+  // Value indicator bonus: when Winner prices this outcome higher than fair odds
+  const valueIndicatorBonus = row.valueIndicator === "winner_higher" ? 8 : 0;
+  // Large market gap bonus: gap > 15% is a very strong signal
+  const largeGapBonus = marketGap > 0.15 ? Math.round((marketGap - 0.15) * 50) : 0;
+  // Aggressive overround penalty: markets with >10% margin are much less trustworthy
+  const overroundRaw = Number(row.overround || 0);
+  const sharpOverroundPenalty = overroundRaw > 0.10
+    ? Math.round(overroundRaw * 70)
+    : Math.round(overroundRaw * 30);
   const components = {
     hitProbability: Math.round(hit * 72),
-    oddsValue: Math.round(oddsQuality * 18),
-    marketGap: Math.round(marketGap * 34),
+    oddsValue: Math.round(oddsQuality * 14) + sweetSpotBonus,
+    marketGap: Math.round(marketGap * 34) + largeGapBonus,
     reliability: Math.round(reliability * 10),
+    ev: evBonus,
+    valueIndicator: valueIndicatorBonus,
     niche: central ? -40 : 32,
     clearFavorite: clearFavorite ? 18 : -30,
     proximity: proximityBonus,
-    overroundPenalty: -Math.round(overroundPenalty),
+    overroundPenalty: -sharpOverroundPenalty,
     lowOddsPenalty: -tooLowOddsPenalty,
     extremeSpreadPenalty: -extremeSpreadPenalty,
   };
@@ -1242,9 +1271,11 @@ function scoreBreakdown(row) {
     total,
     labels: {
       hitProbability: "הסתברות מודל",
-      oddsValue: "ערך יחס",
+      oddsValue: "ערך יחס + sweet spot",
       marketGap: "פער שוק",
       reliability: "אמינות שוק",
+      ev: "ערך צפוי (EV)",
+      valueIndicator: "Winner מעל שוק הוגן",
       niche: "נישה",
       clearFavorite: "פייבוריטית ברורה",
       proximity: "קרבה לפתיחה",
@@ -1342,7 +1373,11 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     const _verifiedAt = new Date().toISOString();
     const kickMs = kickoffMs(dateKey, market.m_hour);
     const hoursToKickoff = Number.isFinite(kickMs) ? (kickMs - Date.now()) / 3600000 : 99;
-    const proximityBonus = hoursToKickoff >= 0 && hoursToKickoff <= 2 ? 8 : hoursToKickoff >= 0 && hoursToKickoff <= 6 ? 4 : 0;
+    const proximityBonus = hoursToKickoff >= 0 && hoursToKickoff <= 1 ? 14
+      : hoursToKickoff <= 3 ? 10
+      : hoursToKickoff <= 6 ? 6
+      : hoursToKickoff <= 24 ? 2
+      : 0;
     const fairOdds = scored.normalizedProbability > 0 ? 1 / scored.normalizedProbability : null;
     const valueIndicator = fairOdds && scored.odds && scored.odds > fairOdds * 1.03 ? "winner_higher" : null;
     const row = {
@@ -1378,6 +1413,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
       normalizedProbability: scored.normalizedProbability,
       marketGap: scored.marketGap,
       overround: scored.overround,
+      ev: outsideRange ? null : (scored.ev ?? null),
       globalAverageOdds: null,
       valueIndicator,
       fairOdds,
@@ -1396,6 +1432,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
             `אמינות שוק ${Math.round(scored.reliability * 100)} אחוז`,
             `יחס Winner ${scored.odds.toFixed(2)}`,
             `פער מול היריבה הקרובה ${Math.round(scored.marketGap * 100)} אחוז`,
+            ...(scored.ev > 0 ? [`ערך צפוי חיובי (EV +${(scored.ev * 100).toFixed(1)}%) — סיגנל ערך`] : []),
           ],
       allMarkets: eventMarkets,
       explanation: outsideRange
