@@ -5008,7 +5008,7 @@
         const serverSt = String(result.status || "").toLowerCase();
         const pickName = item.pickTeam || item.pick || "";
         const fuzzyHit = samePick(pickName, result.actualWinner)
-          || teamNameScoreLocal(pickName, result.actualWinner) >= 0.60;
+          || teamNameScoreLocal(pickName, result.actualWinner) >= 0.75;
         const hit = (serverSt === "hit") ? true
           : (serverSt === "miss") ? false
           // server said "ממתין" or unknown — use fuzzy name comparison
@@ -5072,7 +5072,7 @@
         else if (serverStatus === "miss" || serverStatus === "נפל" || serverStatus === "לא נתפס") status = "miss";
         else if (isVoidLikeRow(row)) status = serverStatus.includes("בוטל") ? "void" : "unverified";
         else if (!hasSavedPick && (row.matchPhase === "final" || actual)) status = row.verifiedAt ? "closed" : "unverified";
-        else if (row.matchPhase === "final" && actual && guessed !== "לא נשמר") status = (samePick(guessed, actual) || teamNameScoreLocal(guessed, actual) >= 0.60) ? "hit" : "miss";
+        else if (row.matchPhase === "final" && actual && guessed !== "לא נשמר") status = (samePick(guessed, actual) || teamNameScoreLocal(guessed, actual) >= 0.75) ? "hit" : "miss";
         else status = "pending";
       }
       const info = predictionStatusInfo(status);

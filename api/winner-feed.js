@@ -846,7 +846,7 @@ function applyResult(row, event) {
         // marketResults empty (or no match) — fuzzy-compare actual winner with pick
         // handles Winner vs 365scores transliteration differences
         const pick = cleanText(row.winnerPick || row.pickTeam || row.pick);
-        finalStatus = (pick === actualWinner || teamNameScore(pick, actualWinner) >= 0.60) ? "hit" : "miss";
+        finalStatus = (pick === actualWinner || teamNameScore(pick, actualWinner) >= 0.75) ? "hit" : "miss";
       }
     }
   }
@@ -1994,6 +1994,53 @@ function finalOpenRowsByDay(rows) {
   ];
 }
 
+// Compute hit/miss status for merged rows that have actualWinner but no settled status.
+// Called after mergeRows() because applyResult() only runs on live picks, not on
+// yesterday's snapshot picks that get merged with result rows post-hoc.
+function resolvePickStatuses(rows) {
+  return (rows || []).map((row) => {
+    const actualWinner = row.actualWinner;
+    // Only process recommended picks that finished and aren't already settled
+    if (!actualWinner || row.matchPhase !== "final") return row;
+    if (!row.odds && !row.recommended) return row;
+    const alreadySettled = row.status && row.status !== "ממתין" && row.status !== "נסגר";
+    if (alreadySettled) return row;
+
+    // Spread bets: derive status from score + spread
+    const rawSpread = row.spread;
+    if (rawSpread !== null && rawSpread !== undefined && rawSpread !== "") {
+      const spread = Number(rawSpread);
+      if (Number.isFinite(spread)) {
+        const scoreStr = row.result || row.liveScore || "";
+        const parts = scoreStr.split(":");
+        if (parts.length === 2) {
+          const homeScore = Number(parts[0]);
+          const awayScore = Number(parts[1]);
+          if (Number.isFinite(homeScore) && Number.isFinite(awayScore)) {
+            const pick = cleanText(row.pickTeam || row.winnerPick || row.pick);
+            const home = cleanText(row.home);
+            const away = cleanText(row.away);
+            const adjusted = teamNameScore(pick, home) >= 0.75
+              ? homeScore + spread - awayScore
+              : teamNameScore(pick, away) >= 0.75
+                ? awayScore + spread - homeScore
+                : null;
+            if (adjusted !== null) {
+              const spreadSt = adjusted > 0 ? "hit" : adjusted < 0 ? "miss" : "לא אומת";
+              return { ...row, status: spreadSt };
+            }
+          }
+        }
+      }
+    }
+
+    // 1X2 / moneyline: fuzzy-compare pick with actualWinner
+    const pick = cleanText(row.winnerPick || row.pickTeam || row.pick);
+    const hit = pick === actualWinner || teamNameScore(pick, actualWinner) >= 0.75;
+    return { ...row, status: hit ? "hit" : "miss" };
+  });
+}
+
 function finalResultRowsByDay(rows) {
   // Process each sport separately so basketball gets its own quota
   function resultRowsForSport(sportRows) {
@@ -2138,10 +2185,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   // Primary: snapshot picks for yesterday (knows what was recommended + picked team)
   // Secondary: live result rows (have actualWinner + matchPhase:final)
   const snapshotYesterdayPicks = snapshotPicksForDay(yesterday);
-  const yesterdayMerged = mergeRows(
+  const yesterdayMerged = resolvePickStatuses(mergeRows(
     snapshotYesterdayPicks.length > 0 ? snapshotYesterdayPicks : buildResultRows(winnerResultEvents, yesterday),
     yesterdayResultRows
-  );
+  ));
 
   const liveTodayPicks = [
     ...buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365),
@@ -2149,14 +2196,14 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   ];
   // Supplement live picks with snapshot picks for games that fell off the live line (already started)
   const snapshotTodayPicks = snapshotPicksForDay(today);
-  const todayCurrentRows = mergeRows(
+  const todayCurrentRows = resolvePickStatuses(mergeRows(
     [...liveTodayPicks, ...snapshotTodayPicks],
     [
       ...buildResultRows(winnerResultEvents, today),
       ...build365FootballRows(scores365Events, today),
       ...build365BasketballRows(scores365Events, today),
     ]
-  );
+  ));
   const tomorrowCurrentRows = [
     ...buildCurrentPicks(markets, tomorrow, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365),
     ...buildCurrentPicks(markets, tomorrow, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365),
