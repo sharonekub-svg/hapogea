@@ -783,7 +783,10 @@ function isFinalResultEvent(event) {
 }
 
 function spreadStatus(event, row) {
-  const spread = Number(row?.spread);
+  const rawSpread = row?.spread;
+  // null/undefined/empty means no spread — don't run spread logic on 1X2 picks
+  if (rawSpread === null || rawSpread === undefined || rawSpread === "") return "";
+  const spread = Number(rawSpread);
   if (!Number.isFinite(spread)) return "";
   const homeScore = scoreNumber(event?.scoreA);
   const awayScore = scoreNumber(event?.scoreB);
@@ -827,13 +830,26 @@ function applyResult(row, event) {
   const result = scoreText(event.scoreA, event.scoreB, event.noScoreLabel);
   const phase = resultPhase(event);
   const calculatedSpreadStatus = phase === "final" ? spreadStatus(event, row) : "";
-  const finalStatus = phase === "cancelled"
-    ? "בוטל"
-    : phase === "postponed"
-      ? "לא אומת"
-      : phase === "final"
-        ? calculatedSpreadStatus || resultStatus({ markets: event.markets || [] }, row.winnerPick || row.pick)
-        : "ממתין";
+  let finalStatus = "ממתין";
+  if (phase === "cancelled") {
+    finalStatus = "בוטל";
+  } else if (phase === "postponed") {
+    finalStatus = "לא אומת";
+  } else if (phase === "final") {
+    if (calculatedSpreadStatus) {
+      finalStatus = calculatedSpreadStatus;
+    } else {
+      const serverStatus = resultStatus({ markets: event.markets || [] }, row.winnerPick || row.pick);
+      if (serverStatus !== "ממתין") {
+        finalStatus = serverStatus;
+      } else if (actualWinner) {
+        // marketResults empty (or no match) — fuzzy-compare actual winner with pick
+        // handles Winner vs 365scores transliteration differences
+        const pick = cleanText(row.winnerPick || row.pickTeam || row.pick);
+        finalStatus = (pick === actualWinner || teamNameScore(pick, actualWinner) >= 0.60) ? "hit" : "miss";
+      }
+    }
+  }
   return {
     ...row,
     liveScore: result || row.liveScore || "",

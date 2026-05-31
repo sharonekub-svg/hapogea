@@ -5006,9 +5006,13 @@
         if (result.matchPhase !== "final" || !result.actualWinner) return item;
         // Prefer server-computed status for spread picks (spread logic runs on server via spreadStatus)
         const serverSt = String(result.status || "").toLowerCase();
+        const pickName = item.pickTeam || item.pick || "";
+        const fuzzyHit = samePick(pickName, result.actualWinner)
+          || teamNameScoreLocal(pickName, result.actualWinner) >= 0.60;
         const hit = (serverSt === "hit") ? true
           : (serverSt === "miss") ? false
-          : samePick(item.pickTeam || item.pick, result.actualWinner);
+          // server said "ממתין" or unknown — use fuzzy name comparison
+          : fuzzyHit;
         return {
           ...item,
           status: hit ? "hit" : "miss",
@@ -5068,7 +5072,7 @@
         else if (serverStatus === "miss" || serverStatus === "נפל" || serverStatus === "לא נתפס") status = "miss";
         else if (isVoidLikeRow(row)) status = serverStatus.includes("בוטל") ? "void" : "unverified";
         else if (!hasSavedPick && (row.matchPhase === "final" || actual)) status = row.verifiedAt ? "closed" : "unverified";
-        else if (row.matchPhase === "final" && actual && guessed !== "לא נשמר") status = samePick(guessed, actual) ? "hit" : "miss";
+        else if (row.matchPhase === "final" && actual && guessed !== "לא נשמר") status = (samePick(guessed, actual) || teamNameScoreLocal(guessed, actual) >= 0.60) ? "hit" : "miss";
         else status = "pending";
       }
       const info = predictionStatusInfo(status);
