@@ -1779,6 +1779,50 @@
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 12px;
     }
+
+    /* ── League grouping ── */
+    .league-group { grid-column: 1 / -1; margin-bottom: 4px; }
+    .league-group-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 4px; margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .league-group-header .logo-wrap.small { flex-shrink: 0; }
+    .league-group-name {
+      font-weight: 900; font-size: 13px; color: var(--text);
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .league-group-count {
+      font-size: 11px; color: var(--muted); font-weight: 800;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.09);
+      border-radius: 999px; padding: 2px 9px; flex-shrink: 0;
+    }
+    .league-group .league-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    /* ── Card pick indicator ── */
+    .card.has-pick { border-right: 3px solid rgba(49,209,135,.65); }
+    .card.no-pick  { border-right: 3px solid rgba(255,255,255,.08); }
+
+    /* ── Tab count badge ── */
+    .tab-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 900;
+      background: rgba(255,255,255,.12); border-radius: 999px;
+      padding: 1px 6px; margin-right: 4px; min-width: 18px;
+      color: var(--muted);
+    }
+    .tab.active .tab-count { background: rgba(49,209,135,.22); color: #bff8dc; }
+
+    /* ── Mobile improvements ── */
+    @media (max-width: 768px) {
+      .tab { min-height: 40px; padding: 8px 14px; font-size: 13px; }
+      .open-game, .btn-share-link { min-height: 40px; padding: 9px 16px; font-size: 13px; }
+    }
+
     @media (max-width: 620px) {
       .cards { grid-template-columns: 1fr; }
       .card-head, .card-body { padding: 10px; }
@@ -3372,7 +3416,18 @@
         button.classList.toggle("active", button.dataset.day === state.day);
       });
       document.querySelectorAll("#sportTabs .tab").forEach(button => {
-        button.classList.toggle("active", button.dataset.sportTab === state.sportTab);
+        const st = button.dataset.sportTab;
+        button.classList.toggle("active", st === state.sportTab);
+        if (st === "ai") return;
+        const existing = button.querySelector(".tab-count");
+        const countEl = existing || document.createElement("span");
+        countEl.className = "tab-count";
+        const n = st === "all"
+          ? daySportRows(state.day, "football").length + daySportRows(state.day, "basketball").length
+          : daySportRows(state.day, st).length;
+        countEl.textContent = n > 0 ? n : "";
+        countEl.style.display = n > 0 ? "" : "none";
+        if (!existing && n > 0) button.insertBefore(countEl, button.firstChild);
       });
     }
 
@@ -4890,14 +4945,14 @@
           ? sections.map(([, label, sportRows]) => `
               <section class="sport-section">
                 <div class="sport-section-title"><div class="sport-heading"><span class="sport-icon">${label === "כדורסל" ? "🏀" : "⚽"}</span>${label}</div><span>${sportRows.length} משחקים</span></div>
-                <div class="sport-section-grid">${sportRows.map(rowCard).join("")}</div>
+                <div class="sport-section-grid">${leagueGroupHtml(groupByLeague(sportRows))}</div>
               </section>
             `).join("")
           : `<div class="empty">${isOpenDay() ? "No valid games today that match the criteria." : "No finished games loaded for this date."}</div>`);
         return;
       }
       cards.innerHTML = banners + (rows.length
-        ? rows.map(rowCard).join("")
+        ? `<div class="cards">${leagueGroupHtml(groupByLeague(rows))}</div>`
         : `<div class="empty">${isOpenDay() ? "No valid games today that match the criteria." : "No finished games loaded for this date."}</div>`);
 
       // Premium lock: blur/overlay all cards beyond the first for free users
@@ -5279,6 +5334,31 @@
       return `${row.match} | ${explicitPickText(row)}${odds} | הפוגע AI`;
     }
 
+    function groupByLeague(rows) {
+      const groups = new Map();
+      for (const row of rows) {
+        const key = row.league || "ליגה לא ידועה";
+        if (!groups.has(key)) groups.set(key, { row, items: [] });
+        groups.get(key).items.push(row);
+      }
+      return groups;
+    }
+
+    function leagueGroupHtml(groups) {
+      let out = "";
+      for (const [league, { row: firstRow, items }] of groups) {
+        out += `<div class="league-group">
+          <div class="league-group-header">
+            ${leagueLogoMarkup(firstRow)}
+            <span class="league-group-name">${escapeHtml(league)}</span>
+            <span class="league-group-count">${items.length}</span>
+          </div>
+          <div class="league-cards">${items.map(rowCard).join("")}</div>
+        </div>`;
+      }
+      return out;
+    }
+
     function rowCard(row) {
       const hasRecommendation = row.recommended || (!!row.odds && !row.outsideRange);
       const noPickLabel = row.recommendationReason === "rank"
@@ -5288,7 +5368,7 @@
           : "ללא יתרון סטטיסטי";
       const why = (row.explanation || [])[1] || (row.signals || []).slice(0, 2).join(" · ");
       return `
-        <article class="card" data-id="${row.id}">
+        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}">
           <div class="card-head">
             <div class="card-topline" style="width:100%">
               <div class="card-meta-stack">
