@@ -60,9 +60,13 @@ create table if not exists public.daily_stats (
   success_rate numeric not null default 0,
   average_odds numeric not null default 0,
   theoretical_profit_ils integer not null default 0,
+  roi_percent numeric not null default 0,
   settled integer not null default 0,
   generated_at timestamptz not null default now()
 );
+
+-- Migration: add roi_percent if upgrading from older schema
+alter table if exists public.daily_stats add column if not exists roi_percent numeric not null default 0;
 
 create index if not exists recommendations_match_date_idx on public.recommendations(match_date);
 create index if not exists recommendations_status_idx on public.recommendations(status);

@@ -133,7 +133,7 @@
       font: 900 clamp(34px, 6vw, 72px)/.98 Heebo, Assistant, sans-serif;
     }
     .hero-copy { max-width: 780px; color: var(--muted); font-size: 18px; line-height: 1.55; margin-bottom: 0; }
-    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; }
     .stat { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 8px; padding: 12px; min-height: 82px; }
     .stat b { display: block; font-size: 25px; color: #fff; }
     .stat span { color: var(--muted); font-size: 12px; font-weight: 700; }
@@ -2830,7 +2830,8 @@
       reubenSidebarOpen: false,
       debugMode: location.pathname.includes("debug"),
       isPremium: localStorage.getItem('hapogea_premium_v2') === 'active',
-      reubenFreeUsed: 0
+      reubenFreeUsed: 0,
+      backendStats: null,
     };
     let lastLoadTime = 0;
     document.body.classList.toggle("debug-mode", state.debugMode);
@@ -3354,10 +3355,19 @@
       });
     }
 
+    async function fetchBackendStats() {
+      try {
+        const res = await fetch("/api/recommendation-stats", { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.ok) {
+          state.backendStats = data;
+          renderStats();
+        }
+      } catch {}
+    }
+
     function renderStats() {
-      const rows = currentRows();
-      const performance = monthlyPerformance();
-      const leagues = new Set(rows.map(row => row.league)).size;
       if (state.sportTab === "reuben") {
         document.getElementById("stats").innerHTML = [
           ["Agent", "הפוגע AI"],
@@ -3367,10 +3377,58 @@
         ].map(([label, value]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
         return;
       }
-      document.getElementById("stats").innerHTML = [
-        [state.day === "yesterday" ? "נסגרו" : "פתוחים", rows.length],
-        ["ליגות", leagues]
-      ].map(([label, value]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
+
+      let won = 0, lost = 0, pending = 0, hitRate = 0, avgOdds = 0, roiPct = null;
+
+      // Use backend stats (from Supabase) when available
+      const bs = state.backendStats;
+      if (bs) {
+        const dateKey = state.day === "yesterday" ? bs.yesterday : bs.today;
+        const dayStats = (bs.dailyStats || []).find(s => s.stat_date === dateKey);
+        if (dayStats) {
+          won = dayStats.won || 0;
+          lost = dayStats.lost || 0;
+          pending = dayStats.pending || 0;
+          hitRate = dayStats.success_rate || 0;
+          avgOdds = dayStats.average_odds || 0;
+          roiPct = dayStats.roi_percent ?? null;
+        }
+      }
+
+      // Fall back to frontend tracker when no backend data
+      if (!bs) {
+        const rows = currentRows();
+        rows.forEach(row => {
+          const outcome = rowOutcome(row);
+          if (outcome.key === "hit") won++;
+          else if (outcome.key === "miss") lost++;
+          else if (outcome.key === "pending") pending++;
+        });
+        const settled = won + lost;
+        hitRate = settled ? Math.round((won / settled) * 100) : 0;
+      }
+
+      const hitColor = hitRate >= 60 ? "#15803D" : hitRate >= 50 ? "#ca8a04" : hitRate > 0 ? "#DC2626" : "";
+      const roiColor = roiPct !== null ? (roiPct >= 0 ? "#15803D" : "#DC2626") : "";
+
+      const items = [
+        { label: "נתפסו", value: won, style: won > 0 ? "color:#15803D" : "" },
+        { label: "נפלו", value: lost, style: lost > 0 ? "color:#DC2626" : "" },
+        { label: "ממתינים", value: pending, style: "" },
+        { label: "אחוז הצלחה", value: hitRate > 0 ? `${hitRate}%` : "—", style: hitColor ? `color:${hitColor}` : "" },
+      ];
+
+      if (avgOdds > 0) {
+        items.push({ label: "יחס ממוצע", value: avgOdds.toFixed(2), style: "" });
+      }
+      if (roiPct !== null) {
+        items.push({ label: "ROI", value: `${roiPct >= 0 ? "+" : ""}${roiPct}%`, style: roiColor ? `color:${roiColor}` : "" });
+      }
+
+      document.getElementById("stats").innerHTML = items
+        .map(({ label, value, style }) =>
+          `<div class="stat"><b style="${style}">${value}</b><span>${label}</span></div>`
+        ).join("");
     }
 
     function flagImg(code, name) {
@@ -6025,6 +6083,7 @@
     });
 
     loadFeed();
+    fetchBackendStats();
     scheduleMidnightShift();
     HapAuth.init();
     wcStartBannerCountdown();
