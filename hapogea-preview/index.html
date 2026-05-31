@@ -2600,7 +2600,7 @@
   <!-- ══════════ LOGIN GATE — must sign in with Google before entering ══════════ -->
   <div id="loginGate" style="position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 90% 120% at 50% -10%,#15233a,transparent 60%),linear-gradient(160deg,#070d16 0%,#0b1422 55%,#0a1018 100%);backdrop-filter:blur(2px)">
     <div style="text-align:center;max-width:380px;width:90%;padding:40px 30px;background:linear-gradient(145deg,rgba(13,24,32,.85),rgba(21,35,58,.85));border:1px solid rgba(99,102,241,.28);border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 60px rgba(99,102,241,.12)">
-      <div style="font-size:46px;margin-bottom:10px">⚡</div>
+      <div style="margin-bottom:10px"><img src="/logo.svg" alt="הפוגע" style="width:90px;height:90px;border-radius:50%;object-fit:cover"/></div>
       <h1 style="margin:0;font:900 30px/1 Heebo,sans-serif;color:#fff">הפוגע <span style="background:linear-gradient(90deg,#8b5cf6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">AI</span></h1>
       <p style="margin:10px 0 26px;font-size:14px;color:rgba(255,255,255,.6);line-height:1.5">כדי להיכנס לאתר יש להתחבר תחילה עם חשבון Google</p>
       <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()"
@@ -2621,12 +2621,8 @@
 
   <!-- Full-screen loading overlay (first load only) -->
   <div id="loadingOverlay">
-    <div class="loading-logo">
-      <svg width="48" height="48" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="13" cy="13" r="11" stroke="rgba(255,122,69,0.35)" stroke-width="1.5"/>
-        <path d="M15 4L9 14h5l-3 8 9-11h-5.5L15 4Z" fill="url(#lg)"/>
-        <defs><linearGradient id="lg" x1="9" y1="4" x2="18" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#ff7a45"/><stop offset="1" stop-color="#e63946"/></linearGradient></defs>
-      </svg>
+    <div class="loading-logo" style="background:none;box-shadow:none">
+      <img src="/logo.svg" alt="הפוגע" style="width:80px;height:80px;border-radius:50%;object-fit:cover"/>
     </div>
     <div class="loading-title">הפוגע</div>
     <div class="loading-sub">מחפש משחקים ב-Winner...</div>
@@ -2638,41 +2634,8 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="mark" id="siteLogo">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="הפוגע">
-            <defs>
-              <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#1a2a3a"/>
-                <stop offset="100%" stop-color="#0d1820"/>
-              </radialGradient>
-              <linearGradient id="bulletGrad" x1="28" y1="8" x2="18" y2="22" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#85cfff"/>
-                <stop offset="100%" stop-color="#4a9fd4"/>
-              </linearGradient>
-            </defs>
-            <!-- background circle -->
-            <circle cx="22" cy="22" r="21" fill="url(#bgGrad)"/>
-            <!-- neon outer ring blue -->
-            <circle cx="22" cy="22" r="20.5" stroke="#55d6ff" stroke-width="0.8" stroke-opacity=".7"/>
-            <!-- neon inner ring red -->
-            <circle cx="22" cy="22" r="18.5" stroke="#e63946" stroke-width="0.7" stroke-opacity=".55"/>
-            <!-- target: outer -->
-            <circle cx="20" cy="22" r="11" stroke="#e63946" stroke-width="1.8" stroke-opacity=".5" fill="none"/>
-            <!-- target: mid -->
-            <circle cx="20" cy="22" r="7" stroke="#e63946" stroke-width="1.6" stroke-opacity=".65" fill="none"/>
-            <!-- target: inner -->
-            <circle cx="20" cy="22" r="3.5" fill="#e63946" fill-opacity=".8"/>
-            <!-- bullet body -->
-            <rect x="22" y="10" width="5.5" height="11" rx="2.5" fill="url(#bulletGrad)" transform="rotate(-42 22 10)"/>
-            <!-- bullet tip -->
-            <path d="M30 8 L33 12 L28.5 13.5 Z" fill="#c8e8ff"/>
-            <!-- impact sparks -->
-            <line x1="19" y1="22" x2="17" y2="19" stroke="white" stroke-width=".9" stroke-opacity=".8"/>
-            <line x1="21" y1="21" x2="23" y2="18" stroke="white" stroke-width=".9" stroke-opacity=".6"/>
-            <line x1="20" y1="23" x2="17" y2="25" stroke="white" stroke-width=".8" stroke-opacity=".7"/>
-            <line x1="21" y1="23" x2="23" y2="26" stroke="white" stroke-width=".8" stroke-opacity=".5"/>
-            <circle cx="20" cy="22" r="1.2" fill="white" fill-opacity=".9"/>
-          </svg>
+        <div class="mark" id="siteLogo" style="background:none;border:none;box-shadow:none;padding:0">
+          <img src="/logo.svg" alt="הפוגע" width="44" height="44" style="border-radius:50%;display:block"/>
         </div>
         <div>
           <h1>הפוגע</h1>
@@ -4728,7 +4691,7 @@
           <!-- SIDEBAR -->
           <div class="reuben-sidebar${sidebarOpen}" id="reubenSidebar">
             <div class="reuben-sidebar-top">
-              <div class="reuben-avatar-sm">AI</div>
+              <img src="/logo.svg" alt="הפוגע" class="reuben-avatar-sm" style="border-radius:50%;object-fit:cover;padding:0"/>
               <span class="reuben-sidebar-brand-name">הפוגע AI</span>
               <button class="reuben-new-chat" id="reubenNewChat" title="שיחה חדשה" type="button">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -6119,7 +6082,7 @@
       <!-- Auth (signed-out) view -->
       <div id="authFormView">
         <div style="text-align:center;margin-bottom:18px">
-          <div style="font-size:34px;margin-bottom:6px">⚡</div>
+          <div style="margin-bottom:8px"><img src="/logo.svg" alt="הפוגע" style="width:64px;height:64px;border-radius:50%;object-fit:cover"/></div>
           <h2 style="margin:0;font:900 24px/1 Heebo,sans-serif;color:#fff">הפוגע <span style="background:linear-gradient(90deg,#8b5cf6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">AI</span></h2>
           <p id="authSubtitle" style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,.6)">התחבר כדי לשמור שיחות ולקבל ניתוח מותאם</p>
         </div>
@@ -6275,7 +6238,7 @@ function AiSidebar({ collapsed, onNewChat, user }) {
       <div className="ai-sb-inner">
         <div className="ai-sb-head">
           <div className="ai-brand">
-            <div className="ai-brand-mark"><AiIcon name="bolt" size={19}/></div>
+            <div className="ai-brand-mark" style={{background:"none",border:"none",boxShadow:"none",padding:0}}><img src="/logo.svg" alt="הפוגע" style={{width:"34px",height:"34px",borderRadius:"50%",objectFit:"cover",display:"block"}}/></div>
             <div>
               <div className="ai-brand-name">הפוגע <small>AI</small></div>
               <div className="ai-brand-sub">אינטליגנציית ספורט</div>
