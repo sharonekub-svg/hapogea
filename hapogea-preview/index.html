@@ -1873,9 +1873,53 @@
       .toolbar { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 640px) {
+      /* ── Header: compact 2-row grid ── */
+      .topbar-inner {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        grid-template-rows: auto auto;
+        row-gap: 0;
+        column-gap: 8px;
+        min-height: auto;
+        padding: 10px 12px 0;
+      }
+      .brand {
+        grid-column: 1; grid-row: 1;
+        min-width: 0; gap: 8px; padding-bottom: 10px;
+      }
+      .brand p { display: none; }
+      .brand h1 { font-size: 20px; }
+      #premiumHeaderBtn {
+        grid-column: 2; grid-row: 1;
+        padding: 6px 10px; font-size: 11px;
+        align-self: center;
+      }
+      #authHeaderBtn {
+        grid-column: 3; grid-row: 1;
+        padding: 6px 10px; font-size: 11px;
+        align-self: center;
+      }
+      #dayTabs {
+        grid-column: 1; grid-row: 2;
+        margin: 0; width: auto;
+        border-top: 1px solid rgba(255,255,255,.07);
+        padding: 8px 0;
+        flex-shrink: 0;
+        overflow-x: visible;
+      }
+      #sportTabs {
+        grid-column: 2 / 4; grid-row: 2;
+        margin: 0;
+        border-top: 1px solid rgba(255,255,255,.07);
+        padding: 8px 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+        justify-content: flex-end;
+      }
+      #sportTabs::-webkit-scrollbar { display: none; }
+
+      /* ── Content ── */
       .topbar-inner, .shell, .footer { padding-inline: 12px; }
-      .brand { min-width: 0; }
-      .nav { width: 100%; margin-inline-start: 0; }
       .hero-main { padding: 20px; min-height: auto; }
       .stats, .toolbar { grid-template-columns: 1fr; }
       .cards { grid-template-columns: 1fr; }
@@ -1890,6 +1934,26 @@
       .wc-match-grid { grid-template-columns: 1fr; }
       .teams-line { gap: 8px; }
       .debug-row { grid-template-columns: 1fr; }
+
+      /* ── Cards on mobile ── */
+      .card-head, .card-body { padding: 10px; }
+      .pick-summary, .result-line { grid-template-columns: 1fr; }
+      .odds-box, .result-score { width: 100%; }
+      .card-topline { flex-direction: column; gap: 4px; }
+      .card-time-box { justify-items: start; flex-direction: row; gap: 8px; }
+      .league-group .league-cards { grid-template-columns: 1fr; }
+
+      /* ── Modals ── */
+      #gameModal > div { margin: 0 !important; border-radius: 16px 16px 0 0 !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; max-height: 92dvh; overflow-y: auto; }
+      #premiumModal > div, #authModal > div { width: 95% !important; padding: 28px 20px !important; }
+
+      /* ── WC ── */
+      .wc-match-grid { grid-template-columns: 1fr; }
+      .wc-teams { grid-template-columns: 1fr; }
+      .wc-prediction { min-width: 0; padding: 6px 0; }
+      .wc-odds { grid-template-columns: 1fr; }
+      .wc-date-row { grid-template-columns: 1fr; }
+      .wc-datebox { width: 100%; min-height: 50px; }
     }
 
     /* ════════════════════════════════════════════════
@@ -1904,6 +1968,9 @@
       display: none;
       overflow: hidden;
       background: #FAF8F4;
+    }
+    @media (max-width: 640px) {
+      #ai-section { top: 108px; }
     }
     #ai-section.visible { display: flex; flex-direction: column; }
     #ai-root {
