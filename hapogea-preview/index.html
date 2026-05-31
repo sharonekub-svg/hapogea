@@ -2121,6 +2121,11 @@
     @media (max-width: 760px) {
       #ai-root .ai-sidebar { position: absolute; z-index: 30; height: 100%; box-shadow: var(--shadow-lg); }
       #ai-section { top: 60px; }
+      #ai-root { --pad: 14px; --msg-gap: 20px; --font-base: 15px; }
+      #ai-root .ai-topbar { height: 50px; padding: 0 14px; }
+      #ai-root .ai-composer-wrap { padding-inline: 12px; padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+      #ai-root .ai-scroll-btn { bottom: 100px; }
+      #ai-root .ai-scroll { padding-bottom: 100px; }
     }
 
     /* ═══════════════════════════════════════════════════════════
@@ -6061,6 +6066,19 @@
     scheduleMidnightShift();
     HapAuth.init();
     wcStartBannerCountdown();
+
+    // Fix iOS virtual keyboard covering the AI composer
+    if (window.visualViewport) {
+      const vv = window.visualViewport;
+      function adjustForKeyboard() {
+        const el = document.getElementById("ai-section");
+        if (!el) return;
+        const kbHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        el.style.bottom = kbHeight > 10 ? kbHeight + "px" : "";
+      }
+      vv.addEventListener("resize", adjustForKeyboard);
+      vv.addEventListener("scroll", adjustForKeyboard);
+    }
   </script>
 
   <!-- Premium Modal -->
