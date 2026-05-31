@@ -6,12 +6,10 @@
   "installCommand": "echo skip",
   "functions": {
     "api/winner-feed.js": { "maxDuration": 30 },
-    "api/cron.js": { "maxDuration": 30 },
     "api/winner-cron.js": { "maxDuration": 30 },
     "api/winner-cron-midnight.js": { "maxDuration": 30 },
     "api/recommendation-bot.js": { "maxDuration": 60 },
     "api/recommendation-stats.js": { "maxDuration": 60 },
-    "api/debug-odds.js": { "maxDuration": 60 },
     "api/reuven.js": { "maxDuration": 45 },
     "api/reuven-slip.js": { "maxDuration": 45 },
     "api/premium-validate.js": { "maxDuration": 10 },
