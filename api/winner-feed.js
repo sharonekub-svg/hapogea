@@ -69,6 +69,140 @@ const WINNER_FOOTBALL_ID = 240;
 const WINNER_BASKETBALL_ID = 227;
 const SCORES365_FOOTBALL_ID = 1;
 const SCORES365_BASKETBALL_ID = 2;
+
+// English→Hebrew team name translations for Odds API score settlement
+const ODDS_API_TEAM_HE = {
+  // Premier League
+  "Arsenal": "ארסנל", "Aston Villa": "אסטון וילה", "Bournemouth": "בורנמות'",
+  "Brentford": "ברנטפורד", "Brighton": "ברייטון", "Chelsea": "צ'לסי",
+  "Crystal Palace": "קריסטל פאלאס", "Everton": "אברטון", "Fulham": "פולהאם",
+  "Liverpool": "ליברפול", "Manchester City": "מנצ'סטר סיטי",
+  "Manchester United": "מנצ'סטר יונייטד", "Newcastle": "ניוקאסל",
+  "Newcastle United": "ניוקאסל", "Nottingham Forest": "נוטינגהאם פורסט",
+  "Sheffield United": "שפילד יונייטד", "Tottenham": "טוטנהאם",
+  "Tottenham Hotspur": "טוטנהאם", "West Ham": "ווסט הם",
+  "West Ham United": "ווסט הם", "Wolves": "וולברהמפטון",
+  "Wolverhampton Wanderers": "וולברהמפטון", "Ipswich": "איפסוויץ'",
+  "Ipswich Town": "איפסוויץ'", "Leicester": "לסטר", "Leicester City": "לסטר",
+  "Southampton": "סאות'המפטון",
+  // La Liga
+  "Real Madrid": "ריאל מדריד", "Barcelona": "ברצלונה",
+  "Atletico Madrid": "אטלטיקו מדריד", "Athletic Club": "אתלטיק בילבאו",
+  "Real Sociedad": "ריאל סוסיאדד", "Real Betis": "ריאל בטיס",
+  "Sevilla": "סביליה", "Valencia": "ולנסיה", "Villarreal": "ויארריאל",
+  "Osasuna": "אוסאסונה", "Getafe": "חטאפה", "Celta Vigo": "סלטה ביגו",
+  "Rayo Vallecano": "ראיו ואייקאנו", "Girona": "ג'ירונה",
+  "Mallorca": "מיורקה", "Alaves": "אלאוס", "Las Palmas": "לאס פאלמאס",
+  "Leganes": "לגאנס", "Espanol": "ספניול", "RCD Espanol": "ספניול",
+  "Valladolid": "ואיאדוליד",
+  // Bundesliga
+  "Bayern Munich": "באיירן מינכן", "Borussia Dortmund": "בוורוסיה דורטמונד",
+  "Bayer Leverkusen": "בייר לברקוזן", "RB Leipzig": "לייפציג",
+  "Eintracht Frankfurt": "פרנקפורט", "Wolfsburg": "וולפסבורג",
+  "Borussia Monchengladbach": "בוורוסיה מ'גלדבך",
+  "Borussia Mönchengladbach": "בוורוסיה מ'גלדבך",
+  "Union Berlin": "אוניון ברלין", "Freiburg": "פרייבורג",
+  "Bochum": "בוחום", "Augsburg": "אאוגסבורג", "Mainz": "מיינץ",
+  "Mainz 05": "מיינץ", "Hoffenheim": "הופנהיים", "TSG Hoffenheim": "הופנהיים",
+  "Stuttgart": "שטוטגרט", "VfB Stuttgart": "שטוטגרט",
+  "Heidenheim": "היידנהיים", "Werder Bremen": "ורדר ברמן",
+  "Hamburger SV": "המבורג", "Schalke": "שלקה",
+  // Serie A
+  "Inter Milan": "אינטר מילאן", "AC Milan": "מילאן",
+  "Juventus": "יובנטוס", "Napoli": "נאפולי", "AS Roma": "רומא",
+  "Lazio": "לאציו", "Atalanta": "אטלנטה", "Fiorentina": "פיורנטינה",
+  "Bologna": "בולוניה", "Monza": "מונצה", "Torino": "טורינו",
+  "Hellas Verona": "ורונה", "Cagliari": "קאלייארי",
+  "Udinese": "אודינזה", "Genoa": "גנואה", "Empoli": "אמפולי",
+  "Lecce": "לצ'ה", "Sassuolo": "סאסואולו", "Venezia": "ונציה",
+  "Parma": "פארמה", "Como": "קומו", "Sampdoria": "סמפדוריה",
+  // Ligue 1
+  "Paris Saint-Germain": "פריז סן ז'רמן", "PSG": "פריז סן ז'רמן",
+  "Marseille": "מארסיי", "Lyon": "ליון", "Monaco": "מונאקו",
+  "Lille": "ליל", "Nice": "ניס", "Lens": "לנס", "Rennes": "רן",
+  "Toulouse": "טולוז", "Reims": "ריימס", "Montpellier": "מונפליה",
+  "Brest": "ברסט", "Nantes": "נאנט", "Strasbourg": "שטרסבור",
+  "Le Havre": "לה אבר", "Angers": "אנז'ה", "Saint-Etienne": "סנט-אטיין",
+  "Auxerre": "אוקסר",
+  // Netherlands
+  "Ajax": "איי אקס", "PSV": "פ.ס.ו.", "PSV Eindhoven": "פ.ס.ו.",
+  "Feyenoord": "פייאנורד", "AZ": "א.ז.", "AZ Alkmaar": "א.ז.",
+  "Twente": "טוונטה", "FC Twente": "טוונטה",
+  // Portugal
+  "Porto": "פורטו", "Benfica": "בנפיקה", "Sporting CP": "ספורטינג",
+  "Braga": "בראגה", "Vitoria de Guimaraes": "גימאראנש",
+  // Turkey
+  "Galatasaray": "גלטסראי", "Fenerbahce": "פנרבחה",
+  "Besiktas": "בשיקטש", "Trabzonspor": "טרבזונספור",
+  // Scotland
+  "Celtic": "סלטיק", "Rangers": "ריינג'רס",
+  // Belgium
+  "Club Brugge": "קלוב ברוז'", "Anderlecht": "אנדרלכט",
+  "Gent": "גנט", "Union Saint-Gilloise": "יוניון",
+  // European cups
+  "Red Bull Salzburg": "זלצבורג", "Shakhtar Donetsk": "שחטר",
+  "Dynamo Kyiv": "דינמו קייב",
+  // Israel
+  "Maccabi Tel Aviv": "מכבי תל אביב", "Maccabi Haifa": "מכבי חיפה",
+  "Hapoel Beer Sheva": "הפועל באר שבע", "Hapoel Tel Aviv": "הפועל תל אביב",
+  "Beitar Jerusalem": "בית\"ר ירושלים",
+  "Bnei Yehuda": "בני יהודה", "Maccabi Petah Tikva": "מכבי פתח תקווה",
+  // NBA
+  "Atlanta Hawks": "אטלנטה הוקס", "Boston Celtics": "בוסטון סלטיקס",
+  "Brooklyn Nets": "ברוקלין נטס", "Charlotte Hornets": "שרלוט הורנטס",
+  "Chicago Bulls": "שיקגו בולס", "Cleveland Cavaliers": "קליבלנד קאבלייארס",
+  "Dallas Mavericks": "דאלאס מאבריקס", "Denver Nuggets": "דנוור נאגטס",
+  "Detroit Pistons": "דטרויט פיסטונס",
+  "Golden State Warriors": "גולדן סטייט ווריירס",
+  "Houston Rockets": "יוסטון רוקטס", "Indiana Pacers": "אינדיאנה פייסרס",
+  "Los Angeles Clippers": "לוס אנג'לס קליפרס",
+  "Los Angeles Lakers": "לוס אנג'לס לייקרס",
+  "Memphis Grizzlies": "ממפיס גריזליז", "Miami Heat": "מיאמי היט",
+  "Milwaukee Bucks": "מילווקי באקס",
+  "Minnesota Timberwolves": "מינסוטה טימברוולבס",
+  "New Orleans Pelicans": "ניו אורלינס פליקנס",
+  "New York Knicks": "ניו יורק קניקס",
+  "Oklahoma City Thunder": "אוקלהומה סיטי תאנדר",
+  "Orlando Magic": "אורלנדו מאג'יק",
+  "Philadelphia 76ers": "פילדלפיה 76'רס",
+  "Phoenix Suns": "פניקס סאנס",
+  "Portland Trail Blazers": "פורטלנד טרייל בלייזרס",
+  "Sacramento Kings": "סקרמנטו קינגס",
+  "San Antonio Spurs": "סן אנטוניו ספארס",
+  "Toronto Raptors": "טורונטו ראפטורס",
+  "Utah Jazz": "יוטה ג'אז", "Washington Wizards": "וושינגטון ויזרדס",
+  // EuroLeague
+  "Real Madrid Basketball": "ריאל מדריד",
+  "FC Barcelona Basketball": "ברצלונה",
+  "Fenerbahce Basketball": "פנרבחה",
+  "Anadolu Efes": "אנדולו אפס",
+  "CSKA Moscow": "CSKA מוסקבה",
+  "Olympiacos": "אולימפיאקוס",
+  "Panathinaikos": "פנתינאיקוס",
+  "ALBA Berlin": "אלבה ברלין",
+  "Zalgiris": "ז'לגיריס", "Baskonia": "בסקוניה",
+  "AS Monaco Basketball": "מונאקו",
+};
+
+// Sport keys to query for settlement scores (one request each, runs once/day in cron)
+const SCORES_SPORT_KEYS = [
+  { key: "soccer_epl",                             sportId: 240 },
+  { key: "soccer_spain_la_liga",                   sportId: 240 },
+  { key: "soccer_germany_bundesliga",              sportId: 240 },
+  { key: "soccer_italy_serie_a",                   sportId: 240 },
+  { key: "soccer_france_ligue_one",                sportId: 240 },
+  { key: "soccer_netherlands_eredivisie",          sportId: 240 },
+  { key: "soccer_portugal_primeira_liga",          sportId: 240 },
+  { key: "soccer_turkey_super_league",             sportId: 240 },
+  { key: "soccer_belgium_first_div",               sportId: 240 },
+  { key: "soccer_greece_super_league",             sportId: 240 },
+  { key: "soccer_uefa_champs_league",              sportId: 240 },
+  { key: "soccer_uefa_europa_league",              sportId: 240 },
+  { key: "soccer_uefa_europa_conference_league",   sportId: 240 },
+  { key: "soccer_israel_premier_league",           sportId: 240 },
+  { key: "basketball_nba",                         sportId: 227 },
+  { key: "basketball_euroleague",                  sportId: 227 },
+];
 const CACHE_TTL_MS = {
   today: 5 * 60 * 1000,
   tomorrow: 60 * 60 * 1000,
@@ -1801,6 +1935,83 @@ function get365BasketballResults(startDate, endDate) {
   return get365Results(startDate, endDate, SCORES365_BASKETBALL_ID, WINNER_BASKETBALL_ID, "basketball");
 }
 
+function translateEnTeamToHe(name) {
+  if (!name) return name;
+  const direct = ODDS_API_TEAM_HE[name.trim()];
+  if (direct) return direct;
+  // Partial match: check if any known key is a substring (handles "FC Barcelona" → "Barcelona")
+  for (const [en, he] of Object.entries(ODDS_API_TEAM_HE)) {
+    if (name.includes(en) || en.includes(name)) return he;
+  }
+  return name; // fall back to original English name
+}
+
+// Fetch completed match scores from Odds API and return in the internal event format.
+// Only called by the nightly cron — not on every feed build — to preserve API quota.
+async function getOddsApiScores() {
+  if (!ODDS_API_KEY) return [];
+  const yesterday = israelDate(-1);
+  const today = israelDate(0);
+  const rows = [];
+
+  await Promise.allSettled(
+    SCORES_SPORT_KEYS.map(async ({ key, sportId }) => {
+      try {
+        const data = await fetchJson(
+          `${ODDS_API_BASE}/sports/${key}/scores/?apiKey=${ODDS_API_KEY}&daysFrom=3`,
+          { signal: AbortSignal.timeout(8000) }
+        );
+        for (const game of (Array.isArray(data) ? data : [])) {
+          if (!game.completed || !game.scores?.length) continue;
+          const homeEn = game.home_team;
+          const awayEn = game.away_team;
+          const homeScoreEntry = game.scores.find((s) => s.name === homeEn);
+          const awayScoreEntry = game.scores.find((s) => s.name === awayEn);
+          if (!homeScoreEntry || !awayScoreEntry) continue;
+          const homeScore = homeScoreEntry.score;
+          const awayScore = awayScoreEntry.score;
+
+          const startDate = new Date(game.commence_time);
+          const dateKey = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(startDate);
+          if (dateKey !== yesterday && dateKey !== today) continue;
+
+          // Translate English names to Hebrew for cross-match with Winner picks
+          const homeHe = translateEnTeamToHe(homeEn);
+          const awayHe = translateEnTeamToHe(awayEn);
+
+          const hNum = Number(homeScore);
+          const aNum = Number(awayScore);
+          const actualWinner = (Number.isFinite(hNum) && Number.isFinite(aNum))
+            ? (hNum === aNum ? "תיקו" : hNum > aNum ? homeHe : awayHe)
+            : "";
+
+          const timeStr = new Intl.DateTimeFormat("he-IL", {
+            timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false,
+          }).format(startDate);
+
+          rows.push({
+            eventid: `oddsapi-${game.id}`,
+            date: dateKey,
+            time: timeStr,
+            sportid: sportId,
+            league: key.replace(/^(soccer|basketball)_/, "").replace(/_/g, " "),
+            teamA: homeHe,
+            teamB: awayHe,
+            scoreA: String(homeScore),
+            scoreB: String(awayScore),
+            isFinal: true,
+            statusGroup: 4,
+            statusText: "final",
+            markets: actualWinner ? [{ title: "המנצח", marketResults: [actualWinner] }] : [],
+            source: "OddsAPI",
+          });
+        }
+      } catch { /* skip this sport on error */ }
+    })
+  );
+  return rows;
+}
+
 function build365ResultRows(results, dateKey, winnerSportId, marketTitle, signals) {
   return (results || [])
     .filter((event) => String(event.sportid) === String(winnerSportId) && event.date === dateKey)
@@ -2917,4 +3128,5 @@ module.exports = async function handler(req, res) {
 
 module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
+module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;

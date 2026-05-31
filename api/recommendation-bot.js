@@ -1,4 +1,4 @@
-const { buildCachedWinnerFeedPayload } = require("./winner-feed");
+const { buildCachedWinnerFeedPayload, getOddsApiScores } = require("./winner-feed");
 const { runRecommendationBot } = require("../lib/recommendation-tracker");
 
 function isAuthorized(req) {
@@ -40,7 +40,15 @@ module.exports = async function handler(req, res) {
   try {
     const force = String(req.query?.force || "").toLowerCase() === "1";
     const notify = String(req.query?.notify || "").toLowerCase() === "1";
-    const feed = await buildCachedWinnerFeedPayload({ force });
+    const [feed, oddsApiScores] = await Promise.all([
+      buildCachedWinnerFeedPayload({ force }),
+      getOddsApiScores().catch(() => []),
+    ]);
+    // Enrich trackingResults with Odds API scores so pending picks can be settled
+    // even when 365Scores or Winner results API are unavailable
+    if (oddsApiScores.length > 0) {
+      feed.trackingResults = [...(feed.trackingResults || []), ...oddsApiScores];
+    }
     const result = await runRecommendationBot(feed, { notify });
     if (notify && result.report) await sendDailyNotification(result.report);
     res.status(200).json({
