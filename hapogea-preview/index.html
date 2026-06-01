@@ -6744,12 +6744,17 @@
             const { data } = await sb.auth.getSession();
             sbUser = data?.session?.user || null;
           } catch (e) { sbUser = null; }
-          showGate(!sbUser);
-          if (sbUser && typeof enterApp === 'function') enterApp();
+          // On init: if user is already logged in, just close the gate — don't auto-enter app.
+          // The user may be on the landing page and should navigate manually.
+          showGate(false);
           sb.auth.onAuthStateChange((_event, session) => {
             sbUser = session?.user || null;
-            showGate(!sbUser);
-            if (sbUser && typeof enterApp === 'function') enterApp();
+            // Close gate on login; open gate on logout only if user is in the app.
+            if (sbUser) {
+              showGate(false);
+            } else {
+              showGate(document.body.classList.contains('app-mode'));
+            }
             broadcast();
           });
         } else {
