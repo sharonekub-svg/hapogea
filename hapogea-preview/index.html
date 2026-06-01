@@ -6006,11 +6006,22 @@
       if (shell) shell.style.display = isAi ? 'none' : '';
       if (wcSection) wcSection.style.display = isAi ? 'none' : '';
       if (footer) footer.style.display = isAi ? 'none' : '';
-      // Mount React once
+      // Mount React — guard against Babel race: on slow mobile CPUs Babel may
+      // still be compiling when the user taps the AI tab for the first time.
       if (isAi && !window._aiMounted) {
+        if (typeof AiApp !== 'function') {
+          // Not ready yet — show a brief loading placeholder and retry
+          const root = document.getElementById('ai-root');
+          if (root && !root.textContent.trim()) {
+            root.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6E675C;font:500 15px Heebo,sans-serif">טוען AI...</div>';
+          }
+          setTimeout(toggleAiSection, 200);
+          return;
+        }
         window._aiMounted = true;
-        // Babel will have compiled AiApp by now
-        ReactDOM.createRoot(document.getElementById('ai-root')).render(React.createElement(AiApp));
+        const root = document.getElementById('ai-root');
+        if (root) root.innerHTML = '';
+        ReactDOM.createRoot(root).render(React.createElement(AiApp));
       }
     }
     // ══════════════ Account / Authentication ══════════════
@@ -6583,6 +6594,15 @@ const AI_FINAL_LEAN = {
 
 const aiSleep = ms => new Promise(r => setTimeout(r, ms));
 
+// Convert basic markdown (bold + newlines) to safe HTML for dangerouslySetInnerHTML
+function mdToHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
 // Live binding to the device-local account (window.HapAuth / hap:userchange).
 function useHapUser() {
   const [user, setUser] = React.useState(() => (window.HapAuth ? window.HapAuth.current() : (window.HAP_USER || null)));
@@ -6758,7 +6778,7 @@ function AiMessage({m,idx,onToggle}) {
       <div className="ai-avatar-mark"><AiIcon name="bolt" size={18}/></div>
       <div className="ai-body">
         <div className="ai-name">הפוגע <span>· מנתח ספורט</span></div>
-        <div className="ai-intro">{text}{m.phase==="streaming"&&<span className="ai-caret"/>}</div>
+        <div className="ai-intro" dangerouslySetInnerHTML={{__html: mdToHtml(text) + (m.phase==="streaming" ? '<span class="ai-caret"></span>' : '')}}/>
         {m.phase!=="streaming"&&<div className="ai-analysis">{m.analysis.slice(0,m.revealed).map(a=>(
           <AiAnalysisCard key={a.id} data={a} open={!!m.open[a.id]} onToggle={()=>onToggle(idx,a.id)}/>
         ))}</div>}
@@ -6839,9 +6859,12 @@ function AiApp() {
       {role:"user",text},
       {role:"ai",phase:"thinking",thinkStep:0,streamLen:0,intro:"",analysis:[],revealed:0,open:{},showFinal:false},
     ]);
-    // Short, honest "connecting" beat — no scripted theater. As soon as the
-    // first real token lands we switch to live streaming.
-    await aiSleep(280);if(run!==runRef.current)return;
+    // Advance thinking-step indicator every 2 seconds while waiting for the API
+    const stepTimer=setInterval(()=>{
+      if(run!==runRef.current){clearInterval(stepTimer);return;}
+      patchAi(prev=>({thinkStep:Math.min((prev.thinkStep||0)+1, AI_THINKING_STEPS.length-1)}));
+    },2000);
+    await aiSleep(280);if(run!==runRef.current){clearInterval(stepTimer);return;}
 
     const ac=new AbortController();
     const tid=setTimeout(()=>ac.abort(),60000);
@@ -6861,12 +6884,12 @@ function AiApp() {
         while(true){
           const {done,value}=await reader.read();
           if(done)break;
-          if(run!==runRef.current){try{await reader.cancel();}catch{}clearTimeout(tid);return;}
+          if(run!==runRef.current){try{await reader.cancel();}catch{}clearTimeout(tid);clearInterval(stepTimer);return;}
           acc+=decoder.decode(value,{stream:true});
-          if(!started){started=true;patchAi({phase:"streaming",analysis:[]});}
+          if(!started){started=true;clearInterval(stepTimer);patchAi({phase:"streaming",analysis:[]});}
           patchAi({intro:acc,streamLen:acc.length});
         }
-        clearTimeout(tid);
+        clearTimeout(tid);clearInterval(stepTimer);
         if(run!==runRef.current)return;
         if(!acc.trim()){const fb="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";patchAi({phase:"streaming",intro:fb,streamLen:fb.length});}
         patchAi({phase:"done"});
@@ -6875,7 +6898,7 @@ function AiApp() {
       }
 
       // Fallback: non-streaming JSON (older runtime / no stream body).
-      clearTimeout(tid);
+      clearTimeout(tid);clearInterval(stepTimer);
       const data=await resp.json().catch(()=>({}));
       const introText=data.answer||"לא הצלחתי לקבל ניתוח. תנסה שוב.";
       if(run!==runRef.current)return;
@@ -6887,7 +6910,7 @@ function AiApp() {
       patchAi({streamLen:introText.length,phase:"done"});
       setBusy(false);
     }catch(err){
-      clearTimeout(tid);
+      clearTimeout(tid);clearInterval(stepTimer);
       if(run!==runRef.current)return;
       const msg="שגיאה טכנית — ה-AI לא זמין כרגע. תנסה שוב.";
       patchAi({phase:"streaming",intro:msg,streamLen:msg.length});
