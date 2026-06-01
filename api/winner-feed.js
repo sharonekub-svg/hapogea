@@ -5,6 +5,10 @@ const { rateLimit } = require("./_rate-limit");
 // ── The Odds API (fallback when Winner is blocked) ───────────────────────────
 const ODDS_API_KEY  = process.env.ODDS_API_KEY || "";
 const ODDS_API_BASE = "https://api.the-odds-api.com/v4";
+// ── API-Sports (api-sports.io) — comprehensive results source ─────────────────
+const FOOTBALL_API_KEY   = process.env.FOOTBALL_KEY || "";
+const APISPORTS_FOOTBALL = "https://v3.football.api-sports.io";
+const APISPORTS_BBALL    = "https://v1.basketball.api-sports.io";
 // Full league pool — discoverActiveSports() filters to only leagues with upcoming events,
 // so off-season leagues cost 0 extra API requests.
 const ODDS_API_SPORTS = [
@@ -2108,6 +2112,94 @@ async function getOddsApiScores() {
   return rows;
 }
 
+// ── API-Sports results (football + basketball) ────────────────────────────────
+// Cached per-date to stay within the free-plan 100 req/day limit.
+async function getApiSportsFootballResults(dateKey) {
+  if (!FOOTBALL_API_KEY) return [];
+  const cacheKey = `apisports-fb-${dateKey}`;
+  const cached = memoryCache.get(cacheKey);
+  if (cached && Date.now() - cached.ts < 60 * 60 * 1000) return cached.data;
+  const data = await fetchJson(
+    `${APISPORTS_FOOTBALL}/fixtures?date=${dateKey}&status=FT`,
+    { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(8000) }
+  ).catch(() => null);
+  const rows = [];
+  for (const item of (data?.response || [])) {
+    const homeEn = item.teams?.home?.name;
+    const awayEn = item.teams?.away?.name;
+    if (!homeEn || !awayEn) continue;
+    const hNum = Number(item.goals?.home);
+    const aNum = Number(item.goals?.away);
+    if (!Number.isFinite(hNum) || !Number.isFinite(aNum)) continue;
+    const homeHe = translateEnTeamToHe(homeEn);
+    const awayHe = translateEnTeamToHe(awayEn);
+    const actualWinner = hNum === aNum ? "תיקו" : hNum > aNum ? homeHe : awayHe;
+    const startDate = new Date(item.fixture?.date);
+    rows.push({
+      eventid: `apisports-f-${item.fixture?.id}`,
+      date: dateKey,
+      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(startDate),
+      sportid: WINNER_FOOTBALL_ID,
+      league: item.league?.name || "",
+      teamA: homeHe,
+      teamB: awayHe,
+      scoreA: String(item.goals?.home),
+      scoreB: String(item.goals?.away),
+      isFinal: true,
+      statusGroup: 4,
+      statusText: "FT",
+      markets: [{ title: "המנצח", marketResults: [actualWinner] }],
+      source: "API-Sports",
+    });
+  }
+  memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
+  return rows;
+}
+
+async function getApiSportsBasketballResults(dateKey) {
+  if (!FOOTBALL_API_KEY) return [];
+  const cacheKey = `apisports-bk-${dateKey}`;
+  const cached = memoryCache.get(cacheKey);
+  if (cached && Date.now() - cached.ts < 60 * 60 * 1000) return cached.data;
+  const data = await fetchJson(
+    `${APISPORTS_BBALL}/games?date=${dateKey}`,
+    { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(8000) }
+  ).catch(() => null);
+  const rows = [];
+  for (const item of (data?.response || [])) {
+    const status = item.status?.short;
+    if (status !== "FT" && status !== "AOT") continue;
+    const homeEn = item.teams?.home?.name;
+    const awayEn = item.teams?.away?.name;
+    if (!homeEn || !awayEn) continue;
+    const hNum = Number(item.scores?.home?.total);
+    const aNum = Number(item.scores?.away?.total);
+    if (!Number.isFinite(hNum) || !Number.isFinite(aNum) || hNum === aNum) continue;
+    const homeHe = translateEnTeamToHe(homeEn);
+    const awayHe = translateEnTeamToHe(awayEn);
+    const actualWinner = hNum > aNum ? homeHe : awayHe;
+    const startDate = new Date(item.date);
+    rows.push({
+      eventid: `apisports-b-${item.id}`,
+      date: dateKey,
+      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(startDate),
+      sportid: WINNER_BASKETBALL_ID,
+      league: item.league?.name || "",
+      teamA: homeHe,
+      teamB: awayHe,
+      scoreA: String(item.scores?.home?.total),
+      scoreB: String(item.scores?.away?.total),
+      isFinal: true,
+      statusGroup: 4,
+      statusText: "FT",
+      markets: [{ title: "המנצח", marketResults: [actualWinner] }],
+      source: "API-Sports",
+    });
+  }
+  memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
+  return rows;
+}
+
 function build365ResultRows(results, dateKey, winnerSportId, marketTitle, signals) {
   return (results || [])
     .filter((event) => String(event.sportid) === String(winnerSportId) && event.date === dateKey)
@@ -2466,7 +2558,7 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const yesterday = israelDate(-1);
   const today = israelDate(0);
   const tomorrow = israelDate(1);
-  const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores] = await Promise.all([
+  const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores, apiSportsScores] = await Promise.all([
     getWinnerLine(),
     getResults(yesterday, tomorrow).catch((error) => {
       console.warn("Winner results unavailable; continuing with live line only:", error.message);
@@ -2481,8 +2573,14 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
       get365BasketballResults(tomorrow, tomorrow),
     ]).then((items) => items.flat()),
     getOddsApiScores().catch(() => []),
+    Promise.all([
+      getApiSportsFootballResults(yesterday),
+      getApiSportsFootballResults(today),
+      getApiSportsBasketballResults(yesterday),
+      getApiSportsBasketballResults(today),
+    ]).then((items) => items.flat()).catch(() => []),
   ]);
-  const resultEvents = [...winnerResultEvents, ...scores365Events, ...oddsApiScores];
+  const resultEvents = [...winnerResultEvents, ...scores365Events, ...oddsApiScores, ...apiSportsScores];
   const resultsByEvent = resultIndex(resultEvents);
 
   // ── Standings: fetch for competitions appearing in today's / tomorrow's 365scores games
@@ -2521,6 +2619,8 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     ...build365BasketballRows(scores365Events, yesterday),
     ...build365FootballRows(oddsApiScores, yesterday),
     ...build365BasketballRows(oddsApiScores, yesterday),
+    ...build365FootballRows(apiSportsScores, yesterday),
+    ...build365BasketballRows(apiSportsScores, yesterday),
   ];
   // Primary: snapshot picks for yesterday (knows what was recommended + picked team)
   // Secondary: live result rows (have actualWinner + matchPhase:final)
@@ -2544,6 +2644,8 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
       ...build365BasketballRows(scores365Events, today),
       ...build365FootballRows(oddsApiScores, today),
       ...build365BasketballRows(oddsApiScores, today),
+      ...build365FootballRows(apiSportsScores, today),
+      ...build365BasketballRows(apiSportsScores, today),
     ]
   ));
   const tomorrowCurrentRows = [
