@@ -49,12 +49,17 @@
       backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--line);
     }
-    .topbar-inner, .shell, .footer {
+    .topbar-inner, .footer {
       max-width: 1420px;
       margin: 0 auto;
       padding-inline: 18px;
     }
-    .shell { max-width: 100%; }
+    .shell {
+      max-width: 100%;
+      margin: 0 auto;
+      padding-inline: 18px;
+    }
+    .content { margin-inline: -18px; padding-inline: 0; }
     .topbar-inner {
       min-height: 68px;
       display: flex;
