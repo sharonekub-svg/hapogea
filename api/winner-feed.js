@@ -2563,7 +2563,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const today = israelDate(0);
   const tomorrow = israelDate(1);
   const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores, apiSportsScores] = await Promise.all([
-    getWinnerLine(),
+    getWinnerLine().catch((error) => {
+      console.warn("[winner-feed] Winner line unavailable, using snapshot picks only:", error.message);
+      return { hashes: { currentVersion: null }, markets: [] };
+    }),
     getResults(yesterday, tomorrow).catch((error) => {
       console.warn("Winner results unavailable; continuing with live line only:", error.message);
       return [];
