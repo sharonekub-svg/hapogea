@@ -4088,24 +4088,13 @@
 
       let won = 0, lost = 0, pending = 0, hitRate = 0, avgOdds = 0, roiPct = null;
 
-      // Use backend stats (from Supabase) when available
-      const bs = state.backendStats;
-      if (bs) {
-        const dateKey = bs.today;
-        const dayStats = (bs.dailyStats || []).find(s => s.stat_date === dateKey);
-        if (dayStats) {
-          won = dayStats.won || 0;
-          lost = dayStats.lost || 0;
-          pending = dayStats.pending || 0;
-          hitRate = dayStats.success_rate || 0;
-          avgOdds = dayStats.average_odds || 0;
-          roiPct = dayStats.roi_percent ?? null;
-        }
-      }
-
-      // Fall back to frontend tracker when no backend data
-      if (!bs) {
-        const sportRows = currentRows();
+      // Always compute from live feed rows (gives avg odds + counts for today)
+      const sportRows = currentRows();
+      {
+        const oddsRows = sportRows.filter(r => (r.oddsRaw || r.odds) > 1);
+        avgOdds = oddsRows.length > 0
+          ? oddsRows.reduce((s, r) => s + (r.oddsRaw || r.odds || 0), 0) / oddsRows.length
+          : 0;
         sportRows.forEach(row => {
           const outcome = rowOutcome(row);
           if (outcome.key === "hit") won++;
@@ -4114,6 +4103,21 @@
         });
         const settled = won + lost;
         hitRate = settled ? Math.round((won / settled) * 100) : 0;
+      }
+
+      // Override with confirmed backend stats (Supabase) if available for today
+      const bs = state.backendStats;
+      if (bs) {
+        const dateKey = bs.today;
+        const dayStats = (bs.dailyStats || []).find(s => s.stat_date === dateKey);
+        if (dayStats && (dayStats.won || dayStats.lost || dayStats.pending)) {
+          won = dayStats.won || 0;
+          lost = dayStats.lost || 0;
+          pending = dayStats.pending || 0;
+          hitRate = dayStats.success_rate || 0;
+          if (dayStats.average_odds > 0) avgOdds = dayStats.average_odds;
+          roiPct = dayStats.roi_percent ?? null;
+        }
       }
 
       const hitColor = hitRate >= 60 ? "#15803D" : hitRate >= 50 ? "#ca8a04" : hitRate > 0 ? "#DC2626" : "";
@@ -5903,7 +5907,17 @@
         ? (tracked?.pickTeam || tracked?.pick || row.pickTeam || row.winnerPick || row.pick || "לא נשמר")
         : "לא נשמר";
       const result = row.liveScore || row.result || tracked?.result || "";
-      const actual = row.actualWinner || tracked?.actualWinner || "";
+      // Derive actual winner from score string (e.g. "2-1") when API hasn't set it
+      let actual = row.actualWinner || tracked?.actualWinner || "";
+      if (!actual && result && row.matchPhase === "final") {
+        const m = result.match(/^(\d+)\s*[-:]\s*(\d+)$/);
+        if (m) {
+          const hs = parseInt(m[1]), as = parseInt(m[2]);
+          if (hs > as) actual = row.home || "";
+          else if (as > hs) actual = row.away || "";
+          else actual = "תיקו";
+        }
+      }
       let status = tracked?.status || "";
       if (!status || status === "pending") {
         // Also accept direct status from the server row (hit/miss/נתפס/נפל)
