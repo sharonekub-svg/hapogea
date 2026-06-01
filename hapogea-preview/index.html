@@ -6761,10 +6761,10 @@
       // The landing page is the real home — the app hero panel is not shown
       const hero = document.querySelector('.hero');
       if (hero) hero.style.display = 'none';
-      // World Cup section: always visible on sport pages; auto-expanded on worldcup tab
+      // World Cup section: only on the dedicated worldcup tab
       const wcSection = document.getElementById('worldCupSection');
       if (wcSection) {
-        wcSection.style.display = isSport ? '' : 'none';
+        wcSection.style.display = isWC ? '' : 'none';
         if (isWC) {
           state.wcOpen = true;
           wcSection.classList.add('expanded');
