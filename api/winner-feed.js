@@ -2459,7 +2459,7 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const yesterday = israelDate(-1);
   const today = israelDate(0);
   const tomorrow = israelDate(1);
-  const [{ hashes, markets }, winnerResultEvents, scores365Events] = await Promise.all([
+  const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores] = await Promise.all([
     getWinnerLine(),
     getResults(yesterday, tomorrow).catch((error) => {
       console.warn("Winner results unavailable; continuing with live line only:", error.message);
@@ -2473,8 +2473,9 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
       get365BasketballResults(today, today),
       get365BasketballResults(tomorrow, tomorrow),
     ]).then((items) => items.flat()),
+    getOddsApiScores().catch(() => []),
   ]);
-  const resultEvents = [...winnerResultEvents, ...scores365Events];
+  const resultEvents = [...winnerResultEvents, ...scores365Events, ...oddsApiScores];
   const resultsByEvent = resultIndex(resultEvents);
 
   // ── Standings: fetch for competitions appearing in today's / tomorrow's 365scores games
@@ -2511,6 +2512,8 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     ...buildResultRows(winnerResultEvents, yesterday),
     ...build365FootballRows(scores365Events, yesterday),
     ...build365BasketballRows(scores365Events, yesterday),
+    ...build365FootballRows(oddsApiScores, yesterday),
+    ...build365BasketballRows(oddsApiScores, yesterday),
   ];
   // Primary: snapshot picks for yesterday (knows what was recommended + picked team)
   // Secondary: live result rows (have actualWinner + matchPhase:final)
@@ -2532,6 +2535,8 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
       ...buildResultRows(winnerResultEvents, today),
       ...build365FootballRows(scores365Events, today),
       ...build365BasketballRows(scores365Events, today),
+      ...build365FootballRows(oddsApiScores, today),
+      ...build365BasketballRows(oddsApiScores, today),
     ]
   ));
   const tomorrowCurrentRows = [
@@ -2562,6 +2567,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     ...build365BasketballRows(scores365Events, yesterday),
     ...build365BasketballRows(scores365Events, today),
     ...build365BasketballRows(scores365Events, tomorrow),
+    ...build365FootballRows(oddsApiScores, yesterday),
+    ...build365FootballRows(oddsApiScores, today),
+    ...build365BasketballRows(oddsApiScores, yesterday),
+    ...build365BasketballRows(oddsApiScores, today),
   ].map(compactTrackingRow);
   const lineStats = {
     football: {

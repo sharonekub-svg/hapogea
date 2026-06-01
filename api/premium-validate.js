@@ -35,8 +35,13 @@ module.exports = async function handler(req, res) {
   if (rateLimit(req, res, { max: 10, windowMs: 60_000, message: "יותר מדי ניסיונות. נסה שוב בעוד דקה." })) return;
 
   const code = String((req.body || {}).code || "").trim().toUpperCase();
-  if (!code || code.length < 4) {
+  if (!code || code.length < 3) {
     return res.status(200).json({ ok: false, error: "קוד לא תקין" });
+  }
+
+  // Owner permanent code — never expires, never consumed
+  if (code === "HIT") {
+    return res.status(200).json({ ok: true, plan: "premium" });
   }
 
   // Check KV for the code
