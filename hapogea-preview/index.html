@@ -1990,13 +1990,13 @@
       .teams-line { gap: 8px; }
       .debug-row { grid-template-columns: 1fr; }
 
-      /* ── Cards on mobile ── */
-      .card-head, .card-body { padding: 10px; }
+      /* ── Cards on mobile: compact for 2-column grid ── */
+      .card-head, .card-body { padding: 8px; }
       .pick-summary, .result-line { grid-template-columns: 1fr; }
       .odds-box, .result-score { width: 100%; }
-      .card-topline { flex-direction: column; gap: 4px; }
-      .card-time-box { justify-items: start; flex-direction: row; gap: 8px; }
-      .league-group .league-cards { grid-template-columns: 1fr; }
+      .card-topline { flex-direction: column; gap: 3px; }
+      .card-time-box { justify-items: start; flex-direction: row; gap: 6px; }
+      .league-group .league-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
       /* ── Modals ── */
       #gameModal > div { margin: 0 !important; border-radius: 16px 16px 0 0 !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; max-height: 92dvh; overflow-y: auto; }
@@ -2009,6 +2009,12 @@
       .wc-odds { grid-template-columns: 1fr; }
       .wc-date-row { grid-template-columns: 1fr; }
       .wc-datebox { width: 100%; min-height: 50px; }
+    }
+
+    /* Very small phones: 1 column */
+    @media (max-width: 400px) {
+      .league-group .league-cards { grid-template-columns: 1fr !important; gap: 10px !important; }
+      .card-head, .card-body { padding: 10px !important; }
     }
 
     /* ════════════════════════════════════════════════
