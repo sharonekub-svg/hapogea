@@ -2668,9 +2668,64 @@
       border-color: rgba(255,200,87,.36);
       color: #fde68a;
     }
+    /* ── World Cup PAGE: "The Trophy Room" (dedicated page) ── */
+    /* Diagonal pitch-stripe — dark green over navy */
+    body.app-mode.sport-worldcup::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          162deg,
+          transparent 0, transparent 54px,
+          rgba(22,163,74,.022) 54px, rgba(22,163,74,.022) 55px
+        );
+    }
+    /* Gold trophy glow — top-right */
+    body.app-mode.sport-worldcup::after {
+      content: '';
+      position: fixed;
+      top: -80px;
+      right: -80px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,175,55,.09) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Deep navy background with gold and green glows */
+    body.app-mode.sport-worldcup {
+      background:
+        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(16,92,50,.12), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 100% 0%, rgba(212,175,55,.07), transparent 55%),
+        radial-gradient(ellipse 40% 30% at 0% 100%, rgba(37,99,235,.06), transparent 55%),
+        #FAF8F4;
+    }
+    /* WC page header: gold accent */
+    body.app-mode.sport-worldcup #sportPageHeader {
+      padding-top: 14px;
+      border-top: 2px solid rgba(212,175,55,.4);
+    }
+    /* WC page name: gold gradient text */
+    body.app-mode.sport-worldcup .sport-page-name {
+      background: linear-gradient(90deg, #d97706 0%, #f59e0b 50%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 1px 6px rgba(212,175,55,.2));
+    }
+    body.app-mode.sport-worldcup .sport-page-sub { color: #92600A; opacity: .8; }
+    /* On the dedicated WC page — auto-expand and clean up the banner toggle cursor */
+    body.app-mode.sport-worldcup #worldCupSection { cursor: default; }
+    body.app-mode.sport-worldcup .wc-banner { cursor: default; min-height: 120px; }
+    /* Hide the WC section entirely from football/basketball when on WC page — handled by JS */
     @media (max-width: 640px) {
       body.app-mode.sport-football::after,
-      body.app-mode.sport-basketball::after { display: none; }
+      body.app-mode.sport-basketball::after,
+      body.app-mode.sport-worldcup::after { display: none; }
     }
 
     /* Verified */
@@ -3296,6 +3351,7 @@
         <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל</button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();render();syncLpNav();},200)">🏆 מונדיאל</button>
         <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
         <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-features')">תכונות</button>
         <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-how')">איך זה עובד</button>
@@ -4247,6 +4303,7 @@
     }
 
     function renderStats() {
+      if (state.sportTab === "worldcup") return;
       if (state.sportTab === "reuben") {
         document.getElementById("stats").innerHTML = [
           ["Agent", "הפוגע AI"],
@@ -5802,7 +5859,7 @@
       const cards = document.getElementById("cards");
       const title = document.getElementById("listTitle");
       const meta = document.getElementById("resultMeta");
-      if (state.sportTab === "ai") {
+      if (state.sportTab === "ai" || state.sportTab === "worldcup") {
         if (cards) cards.innerHTML = "";
         const bar = document.getElementById("pick-stats");
         if (bar) bar.innerHTML = "";
@@ -6395,6 +6452,7 @@
       const navMap = {
         football: document.getElementById('lpNavFootball'),
         basketball: document.getElementById('lpNavBasketball'),
+        worldcup: document.getElementById('lpNavWorldCup'),
         ai: document.getElementById('lpNavAi'),
       };
       Object.values(navMap).forEach(el => el && el.classList.remove('lp-nav-active'));
@@ -6689,21 +6747,33 @@
 
     function syncPageSections() {
       const isAi = state.sportTab === 'ai';
+      const isWC = state.sportTab === 'worldcup';
       const isSport = !isAi;
       // The landing page is the real home — the app hero panel is not shown
       const hero = document.querySelector('.hero');
       if (hero) hero.style.display = 'none';
-      // World Cup section shows on football and basketball pages
+      // World Cup section: always visible on sport pages; auto-expanded on worldcup tab
       const wcSection = document.getElementById('worldCupSection');
-      if (wcSection) wcSection.style.display = isSport ? '' : 'none';
+      if (wcSection) {
+        wcSection.style.display = isSport ? '' : 'none';
+        if (isWC) {
+          state.wcOpen = true;
+          wcSection.classList.add('expanded');
+          const wcContent = document.getElementById('wcContent');
+          if (wcContent) wcContent.style.display = '';
+        }
+      }
+      // Toolbar (day/filter bar) — hide on worldcup dedicated page
       const toolbar = document.querySelector('.toolbar.panel');
-      if (toolbar) toolbar.style.display = isSport ? '' : 'none';
+      if (toolbar) toolbar.style.display = (isSport && !isWC) ? '' : 'none';
       const sportHeader = document.getElementById('sportPageHeader');
       if (sportHeader) sportHeader.style.display = isSport ? '' : 'none';
+      // Section title box (הימרנו) — hide on worldcup dedicated page
       const sectionTitleBox = document.getElementById('sectionTitleBox');
-      if (sectionTitleBox) sectionTitleBox.style.display = isSport ? '' : 'none';
+      if (sectionTitleBox) sectionTitleBox.style.display = (isSport && !isWC) ? '' : 'none';
+      // Cards content — hide on worldcup dedicated page (WC section IS the content)
       const contentSection = document.querySelector('.content');
-      if (contentSection) contentSection.style.display = isSport ? '' : 'none';
+      if (contentSection) contentSection.style.display = (isSport && !isWC) ? '' : (isWC ? 'none' : 'none');
       const shell = document.querySelector('main.shell');
       if (shell) shell.style.display = isAi ? 'none' : '';
       const footer = document.querySelector('footer.footer');
@@ -6713,17 +6783,19 @@
       if (isSport) {
         const nameEl = document.getElementById('sportPageName');
         const subEl = document.getElementById('sportPageSub');
-        if (nameEl) nameEl.innerHTML = state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל';
-        if (subEl) subEl.textContent = state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום' : 'תחזיות כדורסל ויחסי Winner — היום';
+        if (nameEl) nameEl.innerHTML = isWC ? '🏆 מונדיאל 2026' : (state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל');
+        if (subEl) subEl.textContent = isWC ? 'לוח המשחקים, תחזיות ויחסי Winner' : (state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום' : 'תחזיות כדורסל ויחסי Winner — היום');
       }
+      // Stats bar — hide on worldcup dedicated page
       const statsEl = document.getElementById('stats');
-      if (statsEl) statsEl.style.display = isSport ? '' : 'none';
+      if (statsEl) statsEl.style.display = (isSport && !isWC) ? '' : 'none';
       const cardsEl = document.getElementById('cards');
-      if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport);
+      if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport && !isWC);
       // Sport visual identity — add body class for themed backgrounds/accents
-      document.body.classList.remove('sport-football', 'sport-basketball');
+      document.body.classList.remove('sport-football', 'sport-basketball', 'sport-worldcup');
       if (state.sportTab === 'football') document.body.classList.add('sport-football');
       else if (state.sportTab === 'basketball') document.body.classList.add('sport-basketball');
+      else if (isWC) document.body.classList.add('sport-worldcup');
     }
     function toggleAiSection() {
       syncPageSections();
@@ -7750,6 +7822,10 @@ window.AiApp = AiApp;
       <span class="mbn-icon" aria-hidden="true">🏀</span>
       <span>כדורסל</span>
     </button>
+    <button class="mbn-item" data-page="worldcup" aria-label="מונדיאל">
+      <span class="mbn-icon" aria-hidden="true">🏆</span>
+      <span>מונדיאל</span>
+    </button>
     <button class="mbn-item" data-page="ai" aria-label="AI">
       <span class="mbn-icon" aria-hidden="true">🤖</span>
       <span>AI</span>
@@ -7776,6 +7852,7 @@ window.AiApp = AiApp;
         const page = btn.dataset.page;
         if (page === "home") { if (typeof goToLanding === "function") goToLanding(); return; }
         state.sportTab = page;
+        if (page === "worldcup") state.wcOpen = true;
         if (typeof toggleAiSection === "function") toggleAiSection();
         render();
         syncBottomNav();
