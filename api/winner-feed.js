@@ -8,49 +8,68 @@ const ODDS_API_BASE = "https://api.the-odds-api.com/v4";
 // Full league pool — discoverActiveSports() filters to only leagues with upcoming events,
 // so off-season leagues cost 0 extra API requests.
 const ODDS_API_SPORTS = [
+  // מונדיאל ותחרויות בינלאומיות — קריטי לאזור הזמן יוני 2026
+  { key: "soccer_fifa_world_cup",                label: "מונדיאל 2026",            sportId: 240 },
+  { key: "soccer_conmebol_copa_america",         label: "קופה אמריקה",             sportId: 240 },
+  { key: "soccer_uefa_nations_league",           label: "ליגת האומות (UEFA)",      sportId: 240 },
+  { key: "soccer_conmebol_wc_qualifying",        label: "מוקדמות מונדיאל CONMEBOL", sportId: 240 },
+  { key: "soccer_concacaf_nations_league",       label: "ליגת האומות CONCACAF",    sportId: 240 },
+  { key: "soccer_africa_cup_of_nations",         label: "גביע אפריקה",             sportId: 240 },
+  // 5 ליגות אירופה הגדולות — כולל פלייאוף / סיום עונה
+  { key: "soccer_epl",                           label: "פרמייר ליג",              sportId: 240 },
+  { key: "soccer_spain_la_liga",                 label: "לה ליגה",                 sportId: 240 },
+  { key: "soccer_germany_bundesliga",            label: "בונדסליגה",               sportId: 240 },
+  { key: "soccer_italy_serie_a",                 label: "סרייה א",                 sportId: 240 },
+  { key: "soccer_france_ligue_one",              label: "ליג 1 (צרפת)",           sportId: 240 },
+  { key: "soccer_netherlands_eredivisie",        label: "ארדיוויזי",               sportId: 240 },
+  // אנגליה — ליגות נמוכות עם פלייאוף מאי–יוני
+  { key: "soccer_england_championship",          label: "צ'מפיונשיפ",             sportId: 240 },
+  { key: "soccer_england_league1",               label: "ליג 1 (אנגליה)",         sportId: 240 },
+  // סקוטלנד
+  { key: "soccer_scotland_premiership",          label: "פרמייר ספורט (סקוטלנד)", sportId: 240 },
   // דרום אמריקה — קופות (שלישי/חמישי) וליגות (שוטף כל השנה)
-  { key: "soccer_conmebol_copa_libertadores",    label: "קופה ליברטדורס",      sportId: 240 },
-  { key: "soccer_conmebol_copa_sudamericana",    label: "קופה סודאמריקאנה",    sportId: 240 },
-  { key: "soccer_brazil_campeonato",             label: "ברזילאית ראשונה",      sportId: 240 },
-  { key: "soccer_brazil_serie_b",               label: "ברזילאית שנייה",        sportId: 240 },
-  { key: "soccer_argentina_primera_division",    label: "ארגנטינאית ראשונה",   sportId: 240 },
-  { key: "soccer_colombia_primera_a",           label: "קולומביאנית ראשונה",   sportId: 240 },
-  { key: "soccer_chile_primera_division",       label: "צ'יליאנית ראשונה",     sportId: 240 },
+  { key: "soccer_conmebol_copa_libertadores",    label: "קופה ליברטדורס",          sportId: 240 },
+  { key: "soccer_conmebol_copa_sudamericana",    label: "קופה סודאמריקאנה",        sportId: 240 },
+  { key: "soccer_brazil_campeonato",             label: "ברזילאית ראשונה",          sportId: 240 },
+  { key: "soccer_brazil_serie_b",               label: "ברזילאית שנייה",            sportId: 240 },
+  { key: "soccer_argentina_primera_division",    label: "ארגנטינאית ראשונה",       sportId: 240 },
+  { key: "soccer_colombia_primera_a",           label: "קולומביאנית ראשונה",       sportId: 240 },
+  { key: "soccer_chile_primera_division",       label: "צ'יליאנית ראשונה",         sportId: 240 },
   // צפון אמריקה (אביב–סתיו)
-  { key: "soccer_usa_mls",                       label: "MLS",                   sportId: 240 },
-  { key: "soccer_usa_usl_championship",         label: "USL Championship",      sportId: 240 },
-  { key: "soccer_mexico_ligamx",                label: "ליגה MX",               sportId: 240 },
+  { key: "soccer_usa_mls",                       label: "MLS",                       sportId: 240 },
+  { key: "soccer_usa_usl_championship",         label: "USL Championship",          sportId: 240 },
+  { key: "soccer_mexico_ligamx",                label: "ליגה MX",                   sportId: 240 },
   // אירופה — גביעים ו-UEFA
-  { key: "soccer_uefa_champs_league",            label: "ליגת האלופות",          sportId: 240 },
-  { key: "soccer_uefa_europa_league",            label: "ליגה אירופית",          sportId: 240 },
-  { key: "soccer_uefa_europa_conference_league", label: "ליגת הקונפרנס",        sportId: 240 },
+  { key: "soccer_uefa_champs_league",            label: "ליגת האלופות",              sportId: 240 },
+  { key: "soccer_uefa_europa_league",            label: "ליגה אירופית",              sportId: 240 },
+  { key: "soccer_uefa_europa_conference_league", label: "ליגת הקונפרנס",            sportId: 240 },
   // ליגות אירופאיות שמסיימות/פלייאוף במאי
-  { key: "soccer_turkey_super_league",          label: "טורקית ראשונה",          sportId: 240 },
-  { key: "soccer_greece_super_league",          label: "יוונית ראשונה",          sportId: 240 },
-  { key: "soccer_portugal_primeira_liga",       label: "פורטוגלית ראשונה",      sportId: 240 },
-  { key: "soccer_israel_premier_league",        label: "ליגת העל",               sportId: 240 },
-  { key: "soccer_belgium_first_div",            label: "בלגית ראשונה",           sportId: 240 },
+  { key: "soccer_turkey_super_league",          label: "טורקית ראשונה",              sportId: 240 },
+  { key: "soccer_greece_super_league",          label: "יוונית ראשונה",              sportId: 240 },
+  { key: "soccer_portugal_primeira_liga",       label: "פורטוגלית ראשונה",          sportId: 240 },
+  { key: "soccer_israel_premier_league",        label: "ליגת העל",                   sportId: 240 },
+  { key: "soccer_belgium_first_div",            label: "בלגית ראשונה",               sportId: 240 },
   // סקנדינביה (אפריל–נובמבר — פעיל בימי חול)
-  { key: "soccer_sweden_allsvenskan",           label: "שבדית ראשונה",           sportId: 240 },
-  { key: "soccer_norway_eliteserien",           label: "נורבגית ראשונה",         sportId: 240 },
-  { key: "soccer_denmark_superliga",            label: "דנית ראשונה",            sportId: 240 },
-  { key: "soccer_finland_veikkausliiga",        label: "פינית ראשונה",           sportId: 240 },
+  { key: "soccer_sweden_allsvenskan",           label: "שבדית ראשונה",               sportId: 240 },
+  { key: "soccer_norway_eliteserien",           label: "נורבגית ראשונה",             sportId: 240 },
+  { key: "soccer_denmark_superliga",            label: "דנית ראשונה",                sportId: 240 },
+  { key: "soccer_finland_veikkausliiga",        label: "פינית ראשונה",               sportId: 240 },
   // אסיה (מרץ–נובמבר — לרוב שלישי/שישי)
-  { key: "soccer_south_korea_kleague1",         label: "K-League",              sportId: 240 },
-  { key: "soccer_japan_j_league",               label: "J-League",              sportId: 240 },
-  { key: "soccer_china_superleague",            label: "סינית ראשונה",           sportId: 240 },
-  { key: "soccer_australia_aleague",            label: "A-League",              sportId: 240 },
+  { key: "soccer_south_korea_kleague1",         label: "K-League",                  sportId: 240 },
+  { key: "soccer_japan_j_league",               label: "J-League",                  sportId: 240 },
+  { key: "soccer_china_superleague",            label: "סינית ראשונה",               sportId: 240 },
+  { key: "soccer_australia_aleague",            label: "A-League",                  sportId: 240 },
   // כדורסל
-  { key: "basketball_nba",                       label: "NBA",                   sportId: 227 },
-  { key: "basketball_nbl",                      label: "NBL",                   sportId: 227 },
-  { key: "basketball_euroleague",                label: "יורוליג",               sportId: 227 },
-  { key: "basketball_ncaab",                    label: "NCAA",                  sportId: 227 },
+  { key: "basketball_nba",                       label: "NBA",                       sportId: 227 },
+  { key: "basketball_nbl",                      label: "NBL",                       sportId: 227 },
+  { key: "basketball_euroleague",                label: "יורוליג",                   sportId: 227 },
+  { key: "basketball_ncaab",                    label: "NCAA",                      sportId: 227 },
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ODDS_MIN = 1.4;
 const ODDS_MAX = 1.9;
-const SOFT_ODDS_MIN = 1.30;
+const SOFT_ODDS_MIN = 1.20;
 const SOFT_ODDS_MAX = 2.10;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
@@ -182,16 +201,48 @@ const ODDS_API_TEAM_HE = {
   "ALBA Berlin": "אלבה ברלין",
   "Zalgiris": "ז'לגיריס", "Baskonia": "בסקוניה",
   "AS Monaco Basketball": "מונאקו",
+  // נבחרות לאומיות — מונדיאל 2026 ותחרויות בינלאומיות
+  "Brazil": "ברזיל", "Argentina": "ארגנטינה", "France": "צרפת",
+  "Spain": "ספרד", "England": "אנגליה", "Germany": "גרמניה",
+  "Portugal": "פורטוגל", "Netherlands": "הולנד", "Italy": "איטליה",
+  "Belgium": "בלגיה", "Uruguay": "אורוגוואי", "Colombia": "קולומביה",
+  "Mexico": "מקסיקו", "United States": "ארצות הברית", "USA": "ארצות הברית",
+  "Canada": "קנדה", "Morocco": "מרוקו", "Senegal": "סנגל",
+  "Japan": "יפן", "South Korea": "קוריאה הדרומית", "Australia": "אוסטרליה",
+  "Croatia": "קרואטיה", "Switzerland": "שוויץ", "Denmark": "דנמרק",
+  "Sweden": "שבדיה", "Austria": "אוסטריה", "Poland": "פולין",
+  "Serbia": "סרביה", "Hungary": "הונגריה", "Czech Republic": "צ'כיה",
+  "Slovakia": "סלובקיה", "Ukraine": "אוקראינה", "Turkey": "טורקיה",
+  "Greece": "יוון", "Scotland": "סקוטלנד", "Wales": "וויילס",
+  "Ireland": "אירלנד", "Ecuador": "אקוודור", "Chile": "צ'ילה",
+  "Peru": "פרו", "Bolivia": "בוליביה", "Paraguay": "פרגוואי",
+  "Venezuela": "ונצואלה", "Costa Rica": "קוסטה ריקה", "Honduras": "הונדורס",
+  "Panama": "פנמה", "Jamaica": "ג'מייקה", "Nigeria": "ניגריה",
+  "Ghana": "גאנה", "Ivory Coast": "חוף השנהב", "Cote d'Ivoire": "חוף השנהב",
+  "Cameroon": "קמרון", "Egypt": "מצרים", "Algeria": "אלג'יריה",
+  "Tunisia": "תוניסיה", "Iran": "איראן", "Saudi Arabia": "ערב הסעודית",
+  "Qatar": "קטאר", "New Zealand": "ניו זילנד", "Israel": "ישראל",
+  "Romania": "רומניה", "Norway": "נורווגיה", "Finland": "פינלנד",
+  "Russia": "רוסיה", "China": "סין", "South Africa": "דרום אפריקה",
+  "Uzbekistan": "אוזבקיסטן", "Iraq": "עיראק", "United Arab Emirates": "איחוד האמירויות",
+  "Indonesia": "אינדונזיה", "Vietnam": "וייטנאם",
 };
 
 // Sport keys to query for settlement scores (one request each, runs once/day in cron)
 const SCORES_SPORT_KEYS = [
+  // בינלאומי — קריטי למונדיאל 2026
+  { key: "soccer_fifa_world_cup",                  sportId: 240 },
+  { key: "soccer_conmebol_copa_america",           sportId: 240 },
+  { key: "soccer_uefa_nations_league",             sportId: 240 },
+  // 5 ליגות גדולות + ארדיוויזי
   { key: "soccer_epl",                             sportId: 240 },
   { key: "soccer_spain_la_liga",                   sportId: 240 },
   { key: "soccer_germany_bundesliga",              sportId: 240 },
   { key: "soccer_italy_serie_a",                   sportId: 240 },
   { key: "soccer_france_ligue_one",                sportId: 240 },
   { key: "soccer_netherlands_eredivisie",          sportId: 240 },
+  { key: "soccer_england_championship",            sportId: 240 },
+  { key: "soccer_scotland_premiership",            sportId: 240 },
   { key: "soccer_portugal_primeira_liga",          sportId: 240 },
   { key: "soccer_turkey_super_league",             sportId: 240 },
   { key: "soccer_belgium_first_div",               sportId: 240 },
@@ -200,8 +251,17 @@ const SCORES_SPORT_KEYS = [
   { key: "soccer_uefa_europa_league",              sportId: 240 },
   { key: "soccer_uefa_europa_conference_league",   sportId: 240 },
   { key: "soccer_israel_premier_league",           sportId: 240 },
+  // דרום אמריקה
+  { key: "soccer_brazil_campeonato",               sportId: 240 },
+  { key: "soccer_argentina_primera_division",      sportId: 240 },
+  { key: "soccer_conmebol_copa_libertadores",      sportId: 240 },
+  // צפון אמריקה
+  { key: "soccer_usa_mls",                         sportId: 240 },
+  { key: "soccer_mexico_ligamx",                   sportId: 240 },
+  // כדורסל
   { key: "basketball_nba",                         sportId: 227 },
   { key: "basketball_euroleague",                  sportId: 227 },
+  { key: "basketball_ncaab",                       sportId: 227 },
 ];
 const CACHE_TTL_MS = {
   today: 5 * 60 * 1000,
@@ -1259,6 +1319,17 @@ function describeWinnerPick(market, scored, teams) {
 
 const BOARD_PICK_LIMIT = 60;
 const CENTRAL_LEAGUE_PATTERNS = [
+  // בינלאומי — מונדיאל ותחרויות נבחרות
+  "מונדיאל",
+  "World Cup",
+  "FIFA",
+  "ליגת האומות",
+  "Nations League",
+  "קופה אמריקה",
+  "Copa America",
+  "גביע אפריקה",
+  "CONCACAF",
+  // ליגות מובילות
   "ליגת Winner",
   "פרמייר ליג",
   "אנגלית ראשונה",
@@ -1281,11 +1352,26 @@ const CENTRAL_LEAGUE_PATTERNS = [
   "מחצית ראשונה",
 ];
 const HIGH_PROFILE_TEAM_PATTERNS = [
+  // נבחרות לאומיות גדולות
+  "ברזיל",
+  "ארגנטינה",
+  "צרפת",
+  "ספרד",
+  "אנגליה",
+  "גרמניה",
+  "פורטוגל",
+  "הולנד",
+  "איטליה",
+  "ישראל",
+  "מרוקו",
+  "ארצות הברית",
+  // קבוצות ישראלי
   "בית\"ר ירושלים",
   "הפועל תל אביב",
   "מכבי תל אביב",
   "מכבי חיפה",
   "הפועל באר שבע",
+  // קבוצות אירופה
   "ריאל מדריד",
   "ברצלונה",
   "ליברפול",
@@ -1299,6 +1385,7 @@ const HIGH_PROFILE_TEAM_PATTERNS = [
   "נאפולי",
   "באיירן",
   "דורטמונד",
+  // כדורסל
   "קליבלנד",
   "ניו יורק ניקס",
 ];
@@ -1643,7 +1730,9 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
 
   const candidates = [...events.values()]
     .filter((row) => isOpenDisplayable(row) || row.matchPhase === "final")
-    .filter((row) => row.matchPhase === "final" || hasSingleClearFavorite(row))
+    // outsideRange rows show without a recommendation — don't require hasSingleClearFavorite
+    // so friendlies/playoffs with clear (but out-of-range) favorites aren't silently dropped
+    .filter((row) => row.matchPhase === "final" || row.outsideRange || hasSingleClearFavorite(row))
     // Motivation filter: exclude games where the favourite has no meaningful stake
     .filter((row) => {
       if (!row.motivationRisk) return true;
