@@ -2915,9 +2915,22 @@
       animation: lp-pulse 2s ease-in-out infinite;
     }
     @keyframes lp-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    .lp-brand-display {
+      font: 900 clamp(72px,12vw,140px)/1 Heebo,sans-serif;
+      letter-spacing: -4px; color: #211F1B; margin: 0 0 16px;
+    }
+    .lp-brand-display span {
+      background: linear-gradient(135deg,#2563EB,#6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .lp-sport-btn {
+      font-weight: 800 !important;
+      color: #211F1B !important;
+    }
+    .lp-sport-btn:hover { background: rgba(37,99,235,.08) !important; color: #2563EB !important; }
     .lp-hero h1 {
-      font: 900 clamp(38px,6vw,72px)/1.04 Heebo,sans-serif;
-      color: #211F1B; margin: 0 0 22px; max-width: 820px; letter-spacing: -2px;
+      font: 900 clamp(28px,4.5vw,54px)/1.08 Heebo,sans-serif;
+      color: #211F1B; margin: 0 0 22px; max-width: 820px; letter-spacing: -1.5px;
     }
     .lp-hero h1 span { color: #2563EB; }
     .lp-hero-sub {
@@ -3091,10 +3104,11 @@
         </div>
         <div class="lp-menu" role="navigation">
           <button class="lp-menu-btn" onclick="smoothTo('lp-hero')">בית</button>
+          <button class="lp-menu-btn lp-sport-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();},200)">⚽ כדורגל</button>
+          <button class="lp-menu-btn lp-sport-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();},200)">🏀 כדורסל</button>
           <button class="lp-menu-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();},200)">הפוגע AI</button>
           <button class="lp-menu-btn" onclick="smoothTo('lp-features')">תכונות</button>
           <button class="lp-menu-btn" onclick="smoothTo('lp-how')">איך זה עובד</button>
-          <button class="lp-menu-btn" onclick="enterApp();setTimeout(()=>{state.wcOpen=true;render();},200)">מונדיאל 2026</button>
         </div>
         <button class="lp-enter-btn" onclick="enterApp()">כניסה למנוע <span aria-hidden="true" style="font-size:16px">←</span></button>
       </div>
@@ -3105,6 +3119,7 @@
         <span class="lp-eyebrow-dot"></span>
         נתוני Winner בזמן אמת · כדורגל · כדורסל · מונדיאל 2026
       </div>
+      <div class="lp-brand-display">הפוגע <span>AI</span></div>
       <h1>ניתוחי ספורט <span>חכמים</span><br>בזמן אמת</h1>
       <p class="lp-hero-sub">
         מנוע Winner שמדרג כדורגל וכדורסל לפי יתרון סטטיסטי אמיתי.
@@ -3459,7 +3474,7 @@
     const state = {
       feed: null,
       day: "today",
-      sportTab: "home",
+      sportTab: "football",
       sort: "score",
       search: "",
       loading: true,
@@ -4053,12 +4068,7 @@
 
       // Fall back to frontend tracker when no backend data
       if (!bs) {
-        const sportRows = (state.sportTab === "home")
-          ? [
-              ...(state.feed?.tabs?.today?.sports?.football || []),
-              ...(state.feed?.tabs?.today?.sports?.basketball || [])
-            ]
-          : currentRows();
+        const sportRows = currentRows();
         sportRows.forEach(row => {
           const outcome = rowOutcome(row);
           if (outcome.key === "hit") won++;
@@ -5580,7 +5590,7 @@
       const cards = document.getElementById("cards");
       const title = document.getElementById("listTitle");
       const meta = document.getElementById("resultMeta");
-      if (state.sportTab === "ai" || state.sportTab === "home" || state.sportTab === "about") {
+      if (state.sportTab === "ai") {
         if (cards) cards.innerHTML = "";
         const bar = document.getElementById("pick-stats");
         if (bar) bar.innerHTML = "";
@@ -6418,7 +6428,7 @@
     document.querySelectorAll("#mainNav .tab").forEach(button => {
       button.addEventListener("click", () => {
         const page = button.dataset.page;
-        if (page === "about") { goToLanding(); return; }
+        if (page === "home" || page === "about") { goToLanding(); return; }
         state.sportTab = page;
         toggleAiSection();
         render();
@@ -6433,12 +6443,12 @@
 
     function syncPageSections() {
       const isAi = state.sportTab === 'ai';
-      const isHome = state.sportTab === 'home';
-      const isSport = !isAi && !isHome;
+      const isSport = !isAi;
+      // The landing page is the real home — hero/worldcup are never shown inside the app
       const hero = document.querySelector('.hero');
-      if (hero) hero.style.display = isHome ? '' : 'none';
+      if (hero) hero.style.display = 'none';
       const wcSection = document.getElementById('worldCupSection');
-      if (wcSection) wcSection.style.display = isHome ? '' : 'none';
+      if (wcSection) wcSection.style.display = 'none';
       const toolbar = document.querySelector('.toolbar.panel');
       if (toolbar) toolbar.style.display = isSport ? '' : 'none';
       const sportHeader = document.getElementById('sportPageHeader');
@@ -6446,7 +6456,7 @@
       const sectionTitleBox = document.getElementById('sectionTitleBox');
       if (sectionTitleBox) sectionTitleBox.style.display = isSport ? '' : 'none';
       const contentSection = document.querySelector('.content');
-      if (contentSection) contentSection.style.display = (isSport) ? '' : 'none';
+      if (contentSection) contentSection.style.display = isSport ? '' : 'none';
       const shell = document.querySelector('main.shell');
       if (shell) shell.style.display = isAi ? 'none' : '';
       const footer = document.querySelector('footer.footer');
@@ -7510,6 +7520,7 @@ window.AiApp = AiApp;
     nav.querySelectorAll(".mbn-item[data-page]").forEach(btn => {
       btn.addEventListener("click", () => {
         const page = btn.dataset.page;
+        if (page === "home") { if (typeof goToLanding === "function") goToLanding(); return; }
         state.sportTab = page;
         if (typeof toggleAiSection === "function") toggleAiSection();
         render();
