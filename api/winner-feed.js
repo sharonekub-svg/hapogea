@@ -2113,16 +2113,24 @@ async function getOddsApiScores() {
 }
 
 // ── API-Sports results (football + basketball) ────────────────────────────────
-// Cached per-date to stay within the free-plan 100 req/day limit.
+async function fetchApiSports(url) {
+  const res = await fetch(url, {
+    headers: { "x-apisports-key": FOOTBALL_API_KEY },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    console.error(`[API-Sports] ${res.status} for ${url}`);
+    return null;
+  }
+  return res.json().catch(() => null);
+}
+
 async function getApiSportsFootballResults(dateKey) {
   if (!FOOTBALL_API_KEY) return [];
   const cacheKey = `apisports-fb-${dateKey}`;
   const cached = memoryCache.get(cacheKey);
-  if (cached && Date.now() - cached.ts < 60 * 60 * 1000) return cached.data;
-  const data = await fetchJson(
-    `${APISPORTS_FOOTBALL}/fixtures?date=${dateKey}&status=FT`,
-    { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(8000) }
-  ).catch(() => null);
+  if (cached && Date.now() - cached.ts < 30 * 60 * 1000) return cached.data;
+  const data = await fetchApiSports(`${APISPORTS_FOOTBALL}/fixtures?date=${dateKey}&status=FT`);
   const rows = [];
   for (const item of (data?.response || [])) {
     const homeEn = item.teams?.home?.name;
@@ -2134,11 +2142,10 @@ async function getApiSportsFootballResults(dateKey) {
     const homeHe = translateEnTeamToHe(homeEn);
     const awayHe = translateEnTeamToHe(awayEn);
     const actualWinner = hNum === aNum ? "תיקו" : hNum > aNum ? homeHe : awayHe;
-    const startDate = new Date(item.fixture?.date);
     rows.push({
       eventid: `apisports-f-${item.fixture?.id}`,
       date: dateKey,
-      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(startDate),
+      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(item.fixture?.date)),
       sportid: WINNER_FOOTBALL_ID,
       league: item.league?.name || "",
       teamA: homeHe,
@@ -2152,7 +2159,8 @@ async function getApiSportsFootballResults(dateKey) {
       source: "API-Sports",
     });
   }
-  memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
+  console.log(`[API-Sports] football ${dateKey}: ${rows.length} finished games`);
+  if (rows.length > 0) memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
   return rows;
 }
 
@@ -2160,11 +2168,8 @@ async function getApiSportsBasketballResults(dateKey) {
   if (!FOOTBALL_API_KEY) return [];
   const cacheKey = `apisports-bk-${dateKey}`;
   const cached = memoryCache.get(cacheKey);
-  if (cached && Date.now() - cached.ts < 60 * 60 * 1000) return cached.data;
-  const data = await fetchJson(
-    `${APISPORTS_BBALL}/games?date=${dateKey}`,
-    { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(8000) }
-  ).catch(() => null);
+  if (cached && Date.now() - cached.ts < 30 * 60 * 1000) return cached.data;
+  const data = await fetchApiSports(`${APISPORTS_BBALL}/games?date=${dateKey}`);
   const rows = [];
   for (const item of (data?.response || [])) {
     const status = item.status?.short;
@@ -2177,12 +2182,10 @@ async function getApiSportsBasketballResults(dateKey) {
     if (!Number.isFinite(hNum) || !Number.isFinite(aNum) || hNum === aNum) continue;
     const homeHe = translateEnTeamToHe(homeEn);
     const awayHe = translateEnTeamToHe(awayEn);
-    const actualWinner = hNum > aNum ? homeHe : awayHe;
-    const startDate = new Date(item.date);
     rows.push({
       eventid: `apisports-b-${item.id}`,
       date: dateKey,
-      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(startDate),
+      time: new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(item.date)),
       sportid: WINNER_BASKETBALL_ID,
       league: item.league?.name || "",
       teamA: homeHe,
@@ -2192,11 +2195,12 @@ async function getApiSportsBasketballResults(dateKey) {
       isFinal: true,
       statusGroup: 4,
       statusText: "FT",
-      markets: [{ title: "המנצח", marketResults: [actualWinner] }],
+      markets: [{ title: "המנצח", marketResults: [hNum > aNum ? homeHe : awayHe] }],
       source: "API-Sports",
     });
   }
-  memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
+  console.log(`[API-Sports] basketball ${dateKey}: ${rows.length} finished games`);
+  if (rows.length > 0) memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
   return rows;
 }
 
