@@ -6618,6 +6618,7 @@
       }
 
       async function signOut() {
+        try { sessionStorage.removeItem('hapogea_gate_skipped'); } catch {}
         if (sb && sbUser) { try { await sb.auth.signOut(); } catch (e) {} sbUser = null; }
         localStorage.removeItem(SESSION_KEY);
         broadcast();
@@ -6646,8 +6647,16 @@
         broadcast();
       }
 
-      function skipGate() { showGate(false); if (typeof enterApp === 'function') enterApp(); }
-      function triggerGateCheck() { showGate(!sbUser); }
+      function skipGate() {
+        try { sessionStorage.setItem('hapogea_gate_skipped','1'); } catch {}
+        showGate(false);
+        if (typeof enterApp === 'function') enterApp();
+      }
+      function triggerGateCheck() {
+        let skipped = false;
+        try { skipped = sessionStorage.getItem('hapogea_gate_skipped') === '1'; } catch {}
+        if (!sbUser && !skipped) showGate(true);
+      }
       return { current, openModal, closeModal, openOrMenu, switchTab, submit, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
     })();
     window.HapAuth = HapAuth;
