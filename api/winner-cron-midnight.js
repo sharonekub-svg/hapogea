@@ -1,26 +1,17 @@
 const { buildCachedWinnerFeedPayload } = require("./winner-feed");
 
-function israelTimeParts(date = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Jerusalem",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).formatToParts(date);
-  return Object.fromEntries(parts.map((part) => [part.type, part.value]));
+function isAuthorized(req) {
+  if (req.headers["x-vercel-cron"]) return true;
+  const expected = process.env.CRON_SECRET;
+  if (!expected) return true;
+  const bearer = (req.headers["authorization"] || "").replace(/^Bearer\s+/i, "");
+  const custom = req.headers["x-cron-secret"] || req.query?.secret || "";
+  return bearer === expected || custom === expected;
 }
 
 module.exports = async function handler(req, res) {
-  const expected = process.env.CRON_SECRET;
-  const provided = req.headers["x-cron-secret"] || req.query?.secret || "";
-  if (expected && provided !== expected) {
+  if (!isAuthorized(req)) {
     res.status(401).json({ ok: false, error: "Unauthorized cron request" });
-    return;
-  }
-
-  const now = israelTimeParts();
-  if (now.hour !== "00") {
-    res.status(200).json({ ok: true, skipped: true, reason: "Not midnight in Asia/Jerusalem", now });
     return;
   }
 

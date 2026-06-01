@@ -1,4 +1,5 @@
 const MAX_HTML_CHARS = 900_000;
+const { rateLimit } = require("./_rate-limit");
 
 const USER_AGENTS = [
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -61,6 +62,8 @@ function pickUserAgent(hostname) {
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return sendJson(res, 200, { ok: true });
   if (req.method !== 'POST') return sendJson(res, 405, { error: 'method_not_allowed' });
+  // 10 requests per IP per minute — each request fetches an external HTML page
+  if (rateLimit(req, res, { max: 10, windowMs: 60_000 })) return;
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};

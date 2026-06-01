@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "check": "node --check api/winner-feed.js && node -e \"const fs=require('fs'); const s=fs.readFileSync('hapogea-preview/index.html','utf8'); const start=s.indexOf('<script>'); const end=s.lastIndexOf('</script>'); const js=start>=0&&end>start?s.slice(start+8,end):''; if (js) new Function(js); console.log('preview js ok')\"",
+    "check": "node --check api/winner-feed.js && node --check lib/recommendation-db.js && node --check lib/recommendation-tracker.js && node --check api/recommendation-bot.js && node --check api/recommendation-stats.js && node -e \"const fs=require('fs'); const s=fs.readFileSync('hapogea-preview/index.html','utf8'); const start=s.indexOf('<script>'); const end=s.indexOf('</script>', start); const js=start>=0&&end>start?s.slice(start+8,end):''; if (js) new Function(js); console.log('preview js ok')\"",
     "winner:snapshot": "node scripts/refresh-winner-snapshot.js",
     "deploy": "vercel --prod --yes"
   }

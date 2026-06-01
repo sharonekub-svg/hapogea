@@ -4,8 +4,23 @@
   "outputDirectory": "hapogea-preview",
   "framework": null,
   "installCommand": "echo skip",
+  "functions": {
+    "api/winner-feed.js": { "maxDuration": 30 },
+    "api/winner-cron.js": { "maxDuration": 30 },
+    "api/winner-cron-midnight.js": { "maxDuration": 30 },
+    "api/recommendation-bot.js": { "maxDuration": 60 },
+    "api/recommendation-stats.js": { "maxDuration": 60 },
+    "api/reuven.js": { "maxDuration": 45 },
+    "api/reuven-slip.js": { "maxDuration": 45 },
+    "api/premium-validate.js": { "maxDuration": 10 },
+    "api/premium-create.js": { "maxDuration": 10 }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "crons": [
+    { "path": "/api/winner-cron-midnight", "schedule": "0 21 * * *" },
+    { "path": "/api/recommendation-bot", "schedule": "5 21 * * *" }
   ]
 }
