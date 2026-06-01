@@ -2502,6 +2502,177 @@
     .live-score-main { color:#211F1B; }
     .live-label { color:#6E675C; }
 
+    /* ═══════════════════════════════════════════════════════════════
+       SPORT VISUAL IDENTITY SYSTEM
+       Premium section themes — subtle, immersive, performance-first
+       Football · Basketball · World Cup
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── Football: "The Pitch" ─────────────────────────────────── */
+    /* Diagonal grass-stripe page texture */
+    body.app-mode.sport-football::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          162deg,
+          transparent 0, transparent 54px,
+          rgba(22,163,74,.018) 54px, rgba(22,163,74,.018) 55px
+        );
+    }
+    /* Pitch center-circle watermark — right edge */
+    body.app-mode.sport-football::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      right: -110px;
+      width: 400px;
+      height: 400px;
+      transform: translateY(-50%);
+      border-radius: 50%;
+      border: 52px solid rgba(22,163,74,.025);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Green ambient glow bottom-left */
+    body.app-mode.sport-football {
+      background:
+        radial-gradient(ellipse 60% 45% at -5% 110%, rgba(22,163,74,.05), transparent 65%),
+        radial-gradient(circle at 10% 0%, rgba(37,99,235,.05), transparent 28rem),
+        radial-gradient(circle at 90% 12%, rgba(208,92,26,.04), transparent 25rem),
+        #FAF8F4;
+    }
+    /* Header: green accent strip */
+    body.app-mode.sport-football #sportPageHeader {
+      padding-top: 14px;
+      border-top: 2px solid rgba(22,163,74,.3);
+    }
+    /* Sport name: forest green */
+    body.app-mode.sport-football .sport-page-name { color: #15803d; }
+    body.app-mode.sport-football .sport-page-sub  { color: #166534; opacity: .7; }
+    /* Stat tiles: green-tinted */
+    body.app-mode.sport-football .stat {
+      background: linear-gradient(155deg, #fff 0%, rgba(220,252,231,.45) 100%);
+      border-color: rgba(22,163,74,.14);
+    }
+    /* Pill: green */
+    body.app-mode.sport-football .pill {
+      background: rgba(22,163,74,.09);
+      border-color: rgba(22,163,74,.24);
+      color: #15803d;
+    }
+    /* Cards: green left indicator + hover glow */
+    body.app-mode.sport-football article.card {
+      border-left: 3px solid rgba(22,163,74,.17);
+      transition: border-left-color .2s, box-shadow .2s, transform .18s ease;
+    }
+    body.app-mode.sport-football article.card:hover {
+      border-left-color: rgba(22,163,74,.55);
+      box-shadow: 0 8px 28px rgba(40,33,22,.09), -3px 0 16px rgba(22,163,74,.1);
+    }
+
+    /* ── Basketball: "The Court" ────────────────────────────── */
+    /* Horizontal parquet wood-grain texture */
+    body.app-mode.sport-basketball::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          180deg,
+          transparent 0, transparent 30px,
+          rgba(234,88,12,.013) 30px, rgba(234,88,12,.013) 31px
+        );
+    }
+    /* Free-throw arc watermark — bottom-right corner */
+    body.app-mode.sport-basketball::after {
+      content: '';
+      position: fixed;
+      bottom: -55px;
+      right: -55px;
+      width: 440px;
+      height: 220px;
+      border-radius: 220px 220px 0 0;
+      border: 38px solid rgba(234,88,12,.028);
+      border-bottom: none;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Amber ambient glow bottom-right */
+    body.app-mode.sport-basketball {
+      background:
+        radial-gradient(ellipse 55% 40% at 108% 108%, rgba(234,88,12,.055), transparent 65%),
+        radial-gradient(circle at 10% 0%, rgba(37,99,235,.04), transparent 28rem),
+        radial-gradient(circle at 90% 12%, rgba(234,88,12,.06), transparent 25rem),
+        #FAF8F4;
+    }
+    /* Header: orange accent strip */
+    body.app-mode.sport-basketball #sportPageHeader {
+      padding-top: 14px;
+      border-top: 2px solid rgba(234,88,12,.3);
+    }
+    /* Sport name: burnt orange */
+    body.app-mode.sport-basketball .sport-page-name { color: #c2410c; }
+    body.app-mode.sport-basketball .sport-page-sub  { color: #9a3412; opacity: .7; }
+    /* Stat tiles: orange-tinted */
+    body.app-mode.sport-basketball .stat {
+      background: linear-gradient(155deg, #fff 0%, rgba(255,237,213,.45) 100%);
+      border-color: rgba(234,88,12,.14);
+    }
+    /* Pill: orange */
+    body.app-mode.sport-basketball .pill {
+      background: rgba(234,88,12,.08);
+      border-color: rgba(234,88,12,.24);
+      color: #c2410c;
+    }
+    /* Cards: orange left indicator + hover glow */
+    body.app-mode.sport-basketball article.card {
+      border-left: 3px solid rgba(234,88,12,.17);
+      transition: border-left-color .2s, box-shadow .2s, transform .18s ease;
+    }
+    body.app-mode.sport-basketball article.card:hover {
+      border-left-color: rgba(234,88,12,.55);
+      box-shadow: 0 8px 28px rgba(40,33,22,.09), -3px 0 16px rgba(234,88,12,.1);
+    }
+
+    /* ── World Cup: "The Trophy Room" ──────────────────────── */
+    /* Gold gradient on main title in the WC banner */
+    .wc-banner-copy h3 {
+      background: linear-gradient(90deg, #fef08a 0%, #fcd34d 35%, #f59e0b 65%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(245,158,11,.25));
+    }
+    /* Brighter inner border frame on the WC banner */
+    .wc-banner::before {
+      border-color: rgba(245,168,35,.28) !important;
+    }
+    /* Cards: gold hover glow */
+    .wc-card.compact:hover {
+      border-color: rgba(212,175,55,.42) !important;
+      box-shadow: 0 4px 18px rgba(212,175,55,.1), 0 1px 3px rgba(0,0,0,.2) !important;
+    }
+    /* WC strip top border: thin gold line */
+    .wc-strip {
+      border-top: 1px solid rgba(212,175,55,.2);
+    }
+    /* WC kicker badge: more gold */
+    .wc-kicker {
+      background: rgba(255,200,87,.14);
+      border-color: rgba(255,200,87,.36);
+      color: #fde68a;
+    }
+    @media (max-width: 640px) {
+      body.app-mode.sport-football::after,
+      body.app-mode.sport-basketball::after { display: none; }
+    }
+
     /* Verified */
     .card-verified { color:#A39B8C; border-top-color:rgba(33,31,27,.06); }
     .vdot { background:#15803D; }
@@ -6549,6 +6720,10 @@
       if (statsEl) statsEl.style.display = isSport ? '' : 'none';
       const cardsEl = document.getElementById('cards');
       if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport);
+      // Sport visual identity — add body class for themed backgrounds/accents
+      document.body.classList.remove('sport-football', 'sport-basketball');
+      if (state.sportTab === 'football') document.body.classList.add('sport-football');
+      else if (state.sportTab === 'basketball') document.body.classList.add('sport-basketball');
     }
     function toggleAiSection() {
       syncPageSections();
