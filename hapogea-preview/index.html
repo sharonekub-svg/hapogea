@@ -1838,6 +1838,21 @@
       border-radius: 999px; padding: 2px 9px; flex-shrink: 0;
     }
 
+    /* ── Day toggle (inline in sport pages) ── */
+    .day-toggle { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .dt-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); color:var(--muted); border-radius:8px; padding:7px 16px; font:800 13px Heebo,sans-serif; cursor:pointer; transition:.15s ease; }
+    .dt-btn.active { background:rgba(37,99,235,.15); border-color:rgba(37,99,235,.35); color:#93bbff; }
+    .dt-btn:hover:not(.active) { background:rgba(255,255,255,.09); color:var(--text); }
+
+    /* ── Sport page header ── */
+    .sport-page-header { padding:0; margin-bottom:4px; }
+    .sport-page-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .sport-page-name { font:900 28px/1 Heebo,sans-serif; color:#fff; display:flex; align-items:center; gap:10px; }
+    .sport-page-sub { color:var(--muted); font-size:13px; font-weight:600; margin:6px 0 0; }
+
+    /* ── Flat feed: #cards is the 2-col grid itself ── */
+    #cards.flat-feed { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+
     /* ── Card pick indicator ── */
     .card.has-pick { border-right: 3px solid rgba(49,209,135,.65); }
     .card.no-pick  { border-right: 3px solid rgba(255,255,255,.08); }
@@ -1955,24 +1970,17 @@
         padding: 6px 10px; font-size: 11px;
         align-self: center;
       }
-      #dayTabs {
-        grid-column: 1; grid-row: 2;
-        margin: 0; width: auto;
-        border-top: 1px solid rgba(255,255,255,.07);
-        padding: 8px 0;
-        flex-shrink: 0;
-        overflow-x: visible;
-      }
-      #sportTabs {
-        grid-column: 2 / 4; grid-row: 2;
+      #mainNav {
+        grid-column: 1 / 4; grid-row: 2;
         margin: 0;
         border-top: 1px solid rgba(255,255,255,.07);
         padding: 8px 0;
         overflow-x: auto;
         scrollbar-width: none;
-        justify-content: flex-end;
+        justify-content: flex-start;
       }
-      #sportTabs::-webkit-scrollbar { display: none; }
+      #mainNav::-webkit-scrollbar { display: none; }
+      #cards.flat-feed { grid-template-columns: 1fr; }
 
       /* ── Content ── */
       .topbar-inner, .shell, .footer { padding-inline: 12px; }
@@ -2768,9 +2776,8 @@
         color: #fff;
       }
 
-      /* ── Hide header tabs ── replaced by bottom nav ── */
-      #sportTabs { display: none !important; }
-      #dayTabs   { display: none !important; }
+      /* ── Hide desktop main nav on mobile — replaced by bottom nav ── */
+      #mainNav { display: none !important; }
 
       /* ── Body padding for bottom nav ── */
       body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
@@ -3249,14 +3256,12 @@
         </div>
       </div>
       <button class="lp-home-btn" onclick="goToLanding()" title="חזור לדף הבית" aria-label="דף הבית">⌂ בית</button>
-      <nav class="nav" id="dayTabs">
-        <button class="tab" data-day="yesterday">אתמול</button>
-        <button class="tab active" data-day="today">היום</button>
-      </nav>
-      <nav class="nav" id="sportTabs">
-        <button class="tab active" data-sport-tab="football">כדורגל</button>
-        <button class="tab" data-sport-tab="basketball">כדורסל</button>
-        <button class="tab" data-sport-tab="ai">הפוגע AI ✦</button>
+      <nav class="nav" id="mainNav">
+        <button class="tab active" data-page="home">בית</button>
+        <button class="tab" data-page="football">⚽ כדורגל</button>
+        <button class="tab" data-page="basketball">🏀 כדורסל</button>
+        <button class="tab" data-page="ai">הפוגע AI ✦</button>
+        <button class="tab" data-page="about">אודות</button>
       </nav>
       <button id="premiumHeaderBtn" onclick="isPremiumUser() ? deactivatePremium() : openPremiumModal()"
         style="padding:6px 14px;border-radius:20px;border:none;background:linear-gradient(135deg,#55d6ff,#2196f3);color:#06131a;font:800 12px Heebo,sans-serif;cursor:pointer;white-space:nowrap">
@@ -3280,9 +3285,9 @@
       <div class="hero-main">
         <div class="hero-content">
           <span class="eyebrow">מקור Winner בלבד · יחסים אמיתיים בלבד · בלי המצאת נתונים</span>
-          <h2>אתמול והיום. כדורגל וכדורסל. ניתוחי Winner בזמן אמת.</h2>
+          <h2>ניתוחי Winner בזמן אמת — כדורגל, כדורסל ומונדיאל 2026</h2>
           <p class="hero-copy">
-            היום מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל כנתון שוק. אתמול בודק תחזיות מול תוצאה רשמית.
+            הפוגע מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים. כל נתון מבוסס על Winner בלבד.
           </p>
           <div class="stats" id="stats"></div>
         </div>
@@ -3350,7 +3355,19 @@
 
     <section class="content">
       <section>
-        <div class="section-title">
+        <div id="sportPageHeader" style="display:none" class="sport-page-header">
+          <div class="sport-page-title-row">
+            <div>
+              <div class="sport-page-name" id="sportPageName"></div>
+              <p class="sport-page-sub" id="sportPageSub"></p>
+            </div>
+            <div class="day-toggle" id="dayToggle">
+              <button class="dt-btn active" data-day="today">היום</button>
+              <button class="dt-btn" data-day="yesterday">אתמול</button>
+            </div>
+          </div>
+        </div>
+        <div class="section-title" id="sectionTitleBox" style="display:none">
           <div>
             <h3 id="listTitle">ניתוחים מחושבים</h3>
             <p id="resultMeta">טוען נתונים מווינר</p>
@@ -3442,7 +3459,7 @@
     const state = {
       feed: null,
       day: "today",
-      sportTab: "football",
+      sportTab: "home",
       sort: "score",
       search: "",
       loading: true,
@@ -3976,22 +3993,20 @@
     }
 
     function renderTabs() {
-      document.querySelectorAll("#dayTabs .tab").forEach(button => {
-        button.classList.toggle("active", button.dataset.day === state.day);
-      });
-      document.querySelectorAll("#sportTabs .tab").forEach(button => {
-        const st = button.dataset.sportTab;
-        button.classList.toggle("active", st === state.sportTab);
-        if (st === "ai") return;
+      document.querySelectorAll("#mainNav .tab").forEach(button => {
+        const page = button.dataset.page;
+        button.classList.toggle("active", page === state.sportTab);
+        if (page !== "football" && page !== "basketball") return;
         const existing = button.querySelector(".tab-count");
         const countEl = existing || document.createElement("span");
         countEl.className = "tab-count";
-        const n = st === "all"
-          ? daySportRows(state.day, "football").length + daySportRows(state.day, "basketball").length
-          : daySportRows(state.day, st).length;
+        const n = daySportRows(state.day, page).length;
         countEl.textContent = n > 0 ? n : "";
         countEl.style.display = n > 0 ? "" : "none";
         if (!existing && n > 0) button.insertBefore(countEl, button.firstChild);
+      });
+      document.querySelectorAll("#dayToggle .dt-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.day === state.day);
       });
       if (typeof syncBottomNav === "function") syncBottomNav();
     }
@@ -4038,8 +4053,13 @@
 
       // Fall back to frontend tracker when no backend data
       if (!bs) {
-        const rows = currentRows();
-        rows.forEach(row => {
+        const sportRows = (state.sportTab === "home")
+          ? [
+              ...(state.feed?.tabs?.today?.sports?.football || []),
+              ...(state.feed?.tabs?.today?.sports?.basketball || [])
+            ]
+          : currentRows();
+        sportRows.forEach(row => {
           const outcome = rowOutcome(row);
           if (outcome.key === "hit") won++;
           else if (outcome.key === "miss") lost++;
@@ -5548,18 +5568,25 @@
       `).join("");
     }
 
+    function sortByTime(rows) {
+      return [...rows].sort((a, b) => {
+        const ta = (a.time || "99:99").replace(":", "");
+        const tb = (b.time || "99:99").replace(":", "");
+        return ta < tb ? -1 : ta > tb ? 1 : 0;
+      });
+    }
+
     function renderCards() {
       const cards = document.getElementById("cards");
       const title = document.getElementById("listTitle");
       const meta = document.getElementById("resultMeta");
-      if (state.sportTab === "ai") {
-        title.textContent = "הפוגע AI";
-        meta.textContent = "בינת ספורט";
-        cards.innerHTML = "";
+      if (state.sportTab === "ai" || state.sportTab === "home" || state.sportTab === "about") {
+        if (cards) cards.innerHTML = "";
+        const bar = document.getElementById("pick-stats");
+        if (bar) bar.innerHTML = "";
         return;
       }
-      const tab = state.feed?.tabs?.[state.day];
-      title.textContent = `${tab?.label || ""} · ${tab?.date || ""}`;
+      if (title) title.textContent = state.sportTab === "football" ? "כדורגל" : state.sportTab === "basketball" ? "כדורסל" : "ניתוחים";
       if (state.error) {
         cards.innerHTML = `<div class="error">${state.error}</div>`;
         meta.textContent = "טעינת הנתונים נכשלה";
@@ -5581,25 +5608,11 @@
         (state.feed?.fallback || state.feed?.stale) ? `<div class="fallback-banner">\u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05d9\u05d1\u05d5\u05d9 \u05de\u05d0\u05d5\u05de\u05ea\u05d9\u05dd. Winner Live \u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05db\u05e8\u05d2\u05e2 \u05d1\u05e9\u05e8\u05ea; \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d5\u05d3\u05db\u05e0\u05d5 ${formatShortTime(state.feed.generatedAt || state.localCachedAt)}.</div>` : "",
         state.loadError ? `<div class="stale-banner">\u05d4\u05e8\u05e2\u05e0\u05d5\u05df \u05d4\u05d0\u05d7\u05e8\u05d5\u05df \u05e0\u05db\u05e9\u05dc: ${escapeHtml(state.loadError)}. \u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd \u05e9\u05e0\u05e9\u05de\u05e8\u05d5.</div>` : ""
       ].join("");
-      if (state.sportTab === "all") {
-        const bySport = currentRowsBySport();
-        const sections = [
-          ["football", "כדורגל", bySport.football],
-          ["basketball", "כדורסל", bySport.basketball],
-        ].filter(([, , sportRows]) => sportRows.length);
-        cards.innerHTML = banners + (sections.length
-          ? sections.map(([, label, sportRows]) => `
-              <section class="sport-section">
-                <div class="sport-section-title"><div class="sport-heading"><span class="sport-icon">${label === "כדורסל" ? "🏀" : "⚽"}</span>${label}</div><span>${sportRows.length} משחקים</span></div>
-                <div class="sport-section-grid">${leagueGroupHtml(groupByLeague(sportRows))}</div>
-              </section>
-            `).join("")
-          : `<div class="empty">${isOpenDay() ? "No valid games today that match the criteria." : "No finished games loaded for this date."}</div>`);
-        return;
-      }
-      cards.innerHTML = banners + (rows.length
-        ? leagueGroupHtml(groupByLeague(rows))
-        : `<div class="empty">${isOpenDay() ? "No valid games today that match the criteria." : "No finished games loaded for this date."}</div>`);
+      // Flat continuous feed sorted by time — no league grouping
+      const sortedRows = sortByTime(rows);
+      cards.innerHTML = banners + (sortedRows.length
+        ? sortedRows.map(rowCard).join("")
+        : `<div class="empty">${isOpenDay() ? "אין משחקים עם קריטריונים מתאימים להיום" : "אין משחקים טעונים לתאריך זה"}</div>`);
 
       // Premium lock: blur/overlay all cards beyond the first for free users
       if (!state.isPremium) {
@@ -5625,7 +5638,7 @@
     }
 
     function debugRows() {
-      const audit = state.sportTab === "all"
+      const audit = (state.sportTab === "home" || state.sportTab === "about")
         ? [
             ...(state.feed?.debugAudit?.[state.day]?.football || []),
             ...(state.feed?.debugAudit?.[state.day]?.basketball || []),
@@ -6146,6 +6159,7 @@
     // ─────────────────────────────────────────────────────────────────────────
 
     function render() {
+      syncPageSections();
       renderTabs();
       renderStats();
       renderWorldCup();
@@ -6401,31 +6415,56 @@
     });
     window.addEventListener("focus", loadFeedThrottled);
 
-    document.querySelectorAll("#dayTabs .tab").forEach(button => {
+    document.querySelectorAll("#mainNav .tab").forEach(button => {
       button.addEventListener("click", () => {
-        state.day = button.dataset.day;
-        render();
-      });
-    });
-    document.querySelectorAll("#sportTabs .tab").forEach(button => {
-      button.addEventListener("click", () => {
-        state.sportTab = button.dataset.sportTab;
+        const page = button.dataset.page;
+        if (page === "about") { goToLanding(); return; }
+        state.sportTab = page;
         toggleAiSection();
         render();
       });
     });
+    document.querySelectorAll("#dayToggle .dt-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.day = btn.dataset.day;
+        render();
+      });
+    });
 
-    function toggleAiSection() {
-      const aiSection = document.getElementById('ai-section');
-      const shell = document.querySelector('main.shell');
-      const toolbar = document.querySelector('.toolbar.panel');
-      const wcSection = document.getElementById('worldCupSection');
-      const footer = document.querySelector('footer.footer');
+    function syncPageSections() {
       const isAi = state.sportTab === 'ai';
-      aiSection.classList.toggle('visible', isAi);
+      const isHome = state.sportTab === 'home';
+      const isSport = !isAi && !isHome;
+      const hero = document.querySelector('.hero');
+      if (hero) hero.style.display = isHome ? '' : 'none';
+      const wcSection = document.getElementById('worldCupSection');
+      if (wcSection) wcSection.style.display = isHome ? '' : 'none';
+      const toolbar = document.querySelector('.toolbar.panel');
+      if (toolbar) toolbar.style.display = isSport ? '' : 'none';
+      const sportHeader = document.getElementById('sportPageHeader');
+      if (sportHeader) sportHeader.style.display = isSport ? '' : 'none';
+      const sectionTitleBox = document.getElementById('sectionTitleBox');
+      if (sectionTitleBox) sectionTitleBox.style.display = isSport ? '' : 'none';
+      const contentSection = document.querySelector('.content');
+      if (contentSection) contentSection.style.display = (isSport) ? '' : 'none';
+      const shell = document.querySelector('main.shell');
       if (shell) shell.style.display = isAi ? 'none' : '';
-      if (wcSection) wcSection.style.display = isAi ? 'none' : '';
+      const footer = document.querySelector('footer.footer');
       if (footer) footer.style.display = isAi ? 'none' : '';
+      const aiSection = document.getElementById('ai-section');
+      if (aiSection) aiSection.classList.toggle('visible', isAi);
+      if (isSport) {
+        const nameEl = document.getElementById('sportPageName');
+        const subEl = document.getElementById('sportPageSub');
+        if (nameEl) nameEl.innerHTML = state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל';
+        if (subEl) subEl.textContent = state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום ואתמול' : 'תחזיות כדורסל ויחסי Winner — היום ואתמול';
+      }
+      const cardsEl = document.getElementById('cards');
+      if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport);
+    }
+    function toggleAiSection() {
+      syncPageSections();
+      const isAi = state.sportTab === 'ai';
       // Mount React — guard against Babel race: on slow mobile CPUs Babel may
       // still be compiling when the user taps the AI tab for the first time.
       if (isAi && !window._aiMounted) {
@@ -7430,19 +7469,19 @@ window.AiApp = AiApp;
 
   <!-- ════ Mobile Bottom Navigation ════ -->
   <nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="ניווט">
-    <button class="mbn-item mbn-home" id="mbnHomeBtn" onclick="goToLanding()" aria-label="דף הבית">
+    <button class="mbn-item active" data-page="home" aria-label="בית">
       <span class="mbn-icon" aria-hidden="true">🏠</span>
       <span>בית</span>
     </button>
-    <button class="mbn-item active" data-sport-tab="football" aria-label="כדורגל">
+    <button class="mbn-item" data-page="football" aria-label="כדורגל">
       <span class="mbn-icon" aria-hidden="true">⚽</span>
       <span>כדורגל</span>
     </button>
-    <button class="mbn-item" data-sport-tab="basketball" aria-label="כדורסל">
+    <button class="mbn-item" data-page="basketball" aria-label="כדורסל">
       <span class="mbn-icon" aria-hidden="true">🏀</span>
       <span>כדורסל</span>
     </button>
-    <button class="mbn-item" data-sport-tab="ai" aria-label="AI">
+    <button class="mbn-item" data-page="ai" aria-label="AI">
       <span class="mbn-icon" aria-hidden="true">🤖</span>
       <span>AI</span>
     </button>
@@ -7457,8 +7496,8 @@ window.AiApp = AiApp;
   function syncBottomNav() {
     const nav = document.getElementById("mobileBottomNav");
     if (!nav || typeof state === "undefined") return;
-    nav.querySelectorAll(".mbn-item[data-sport-tab]").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.sportTab === state.sportTab);
+    nav.querySelectorAll(".mbn-item[data-page]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.page === state.sportTab);
     });
     const label = document.getElementById("mbnDayLabel");
     if (label) label.textContent = state.day === "yesterday" ? "אתמול" : "היום";
@@ -7468,9 +7507,10 @@ window.AiApp = AiApp;
     const nav = document.getElementById("mobileBottomNav");
     if (!nav) return;
 
-    nav.querySelectorAll(".mbn-item[data-sport-tab]").forEach(btn => {
+    nav.querySelectorAll(".mbn-item[data-page]").forEach(btn => {
       btn.addEventListener("click", () => {
-        state.sportTab = btn.dataset.sportTab;
+        const page = btn.dataset.page;
+        state.sportTab = page;
         if (typeof toggleAiSection === "function") toggleAiSection();
         render();
         syncBottomNav();
