@@ -4893,6 +4893,63 @@
       return { text: plainText, sections, suggestions };
     }
 
+    // Parses a Claude AI response (which follows the mandatory format) into structured sections.
+    // Returns { sections, text } or { text } if the response doesn't match the expected format.
+    function parseAiTextToSections(rawText) {
+      if (!rawText || rawText.trim().length < 20) return { text: rawText };
+
+      const HEADERS = [
+        { re: /^\*\*ניתוח:\*\*\s*/,                      type: "analysis",   title: "ניתוח" },
+        { re: /^\*\*המלצה:\*\*\s*/,                       type: "verdict",    title: "המלצה" },
+        { re: /^\*\*ביטחון:\*\*\s*/,                      type: "value",      title: "ביטחון" },
+        { re: /^\*\*הנימוק:\*\*\s*/,                      type: "pros",       title: "הנימוק" },
+        { re: /^\*\*💬\s*מה אני באמת חושב:\*\*\s*/,      type: "verdict",    title: "מה אני באמת חושב" },
+        { re: /^\*\*מה אני באמת חושב:\*\*\s*/,           type: "verdict",    title: "מה אני באמת חושב" },
+        { re: /^\*\*Note:\*\*\s*/,                        type: "disclaimer", title: "הערה" },
+        { re: /^\*\*הערה:\*\*\s*/,                        type: "disclaimer", title: "הערה" },
+      ];
+
+      const lines = rawText.split("\n");
+      const sections = [];
+      let cur = null;
+
+      function flush() {
+        if (!cur) return;
+        const content = cur.lines.join("\n").trim();
+        if (content) sections.push({ type: cur.type, title: cur.title, content });
+        cur = null;
+      }
+
+      for (const line of lines) {
+        const t = line.trim();
+        // Separator lines (---, ═══, ━━━ etc.)
+        if (/^[-=━═─]{3,}$/.test(t)) { flush(); continue; }
+
+        let headerMatch = null;
+        for (const h of HEADERS) {
+          if (h.re.test(t)) { headerMatch = h; break; }
+        }
+
+        if (headerMatch) {
+          flush();
+          const inline = t.replace(headerMatch.re, "").trim();
+          cur = { type: headerMatch.type, title: headerMatch.title, lines: inline ? [inline] : [] };
+        } else if (cur) {
+          cur.lines.push(line);
+        } else if (t.startsWith("⚠️")) {
+          sections.push({ type: "disclaimer", title: "הערה", content: t.replace(/^⚠️\s*/, "") });
+        } else if (t) {
+          // Leading text before first known section header — treat as analysis
+          cur = { type: "analysis", title: "ניתוח", lines: [line] };
+        }
+      }
+      flush();
+
+      const meaningful = sections.filter(s => s.content && s.content.length > 3);
+      if (meaningful.length < 2) return { text: rawText };
+      return { sections: meaningful, text: rawText };
+    }
+
     function renderChatMessage(message) {
       if (message.role === "user") {
         const image = message.image
@@ -4923,7 +4980,10 @@
           : "";
         return `<div class="chat-msg ai"><div class="chat-msg-label">הפוגע AI</div><div class="chat-bubble-ai"><div class="ai-sections">${sectionsHtml}</div>${chipsHtml}</div></div>`;
       }
-      return `<div class="chat-msg ai"><div class="chat-msg-label">הפוגע AI</div><div class="chat-bubble-user" style="background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.08);border-radius:14px 14px 14px 4px;max-width:100%;color:rgba(255,255,255,.78)">${escapeHtml(stripEmoji(message.text || ""))}</div></div>`;
+      const aiPlain = escapeHtml(stripEmoji(message.text || ""))
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+      return `<div class="chat-msg ai"><div class="chat-msg-label">הפוגע AI</div><div class="chat-bubble-user" style="background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.08);border-radius:14px 14px 14px 4px;max-width:100%;color:rgba(255,255,255,.78)">${aiPlain}</div></div>`;
     }
 
     function renderAiThinking() {
@@ -6308,7 +6368,8 @@
             aiText = typeof fallback === "string" ? fallback : (fallback.text || "שגיאה טכנית. תנסה שוב.");
           }
 
-          state.reubenMessages.push({ role: "ai", text: aiText });
+          const aiMsg = parseAiTextToSections(aiText);
+          state.reubenMessages.push({ role: "ai", ...aiMsg });
           state.reubenLoading = false;
           if (!state.isPremium) {
             state.reubenFreeUsed = (state.reubenFreeUsed || 0) + 1;
