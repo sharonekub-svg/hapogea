@@ -3335,7 +3335,7 @@
           <p class="hero-copy">
             הפוגע מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים. כל נתון מבוסס על Winner בלבד.
           </p>
-          <div class="stats" id="stats"></div>
+          <div class="stats"></div>
         </div>
       </div>
       <aside class="hero-side" id="dailyTip"></aside>
@@ -3407,12 +3407,12 @@
               <div class="sport-page-name" id="sportPageName"></div>
               <p class="sport-page-sub" id="sportPageSub"></p>
             </div>
-            <div class="day-toggle" id="dayToggle">
+            <div class="day-toggle" id="dayToggle" style="display:none">
               <button class="dt-btn active" data-day="today">היום</button>
-              <button class="dt-btn" data-day="yesterday">אתמול</button>
             </div>
           </div>
         </div>
+        <div class="stats" id="stats" style="margin-bottom:12px"></div>
         <div class="section-title" id="sectionTitleBox" style="display:none">
           <div>
             <h3 id="listTitle">ניתוחים מחושבים</h3>
@@ -4085,7 +4085,7 @@
       // Use backend stats (from Supabase) when available
       const bs = state.backendStats;
       if (bs) {
-        const dateKey = state.day === "yesterday" ? bs.yesterday : bs.today;
+        const dateKey = bs.today;
         const dayStats = (bs.dailyStats || []).find(s => s.stat_date === dateKey);
         if (dayStats) {
           won = dayStats.won || 0;
@@ -6366,9 +6366,7 @@
         const currentIsraelDay = israelDayString();
         const feedDay = activeTodayDate();
         if (feedDay && currentIsraelDay !== feedDay) {
-          // Rotate day tab: tomorrow → today, today → yesterday
-          if (state.day === "tomorrow") state.day = "today";
-          else if (state.day === "today") state.day = "yesterday";
+          state.day = "today";
           localStorage.removeItem(FEED_LS_KEY);
           loadFeed().finally(scheduleMidnightShift);
         } else {
@@ -6491,12 +6489,7 @@
         render();
       });
     });
-    document.querySelectorAll("#dayToggle .dt-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        state.day = btn.dataset.day;
-        render();
-      });
-    });
+    // Day always stays "today" — no toggle needed
 
     function syncPageSections() {
       const isAi = state.sportTab === 'ai';
@@ -6525,8 +6518,10 @@
         const nameEl = document.getElementById('sportPageName');
         const subEl = document.getElementById('sportPageSub');
         if (nameEl) nameEl.innerHTML = state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל';
-        if (subEl) subEl.textContent = state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום ואתמול' : 'תחזיות כדורסל ויחסי Winner — היום ואתמול';
+        if (subEl) subEl.textContent = state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום' : 'תחזיות כדורסל ויחסי Winner — היום';
       }
+      const statsEl = document.getElementById('stats');
+      if (statsEl) statsEl.style.display = isSport ? '' : 'none';
       const cardsEl = document.getElementById('cards');
       if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport);
     }
@@ -6989,7 +6984,7 @@
     // ── Landing page / App mode toggle ───────────────────────────────────────
     function enterApp() {
       document.body.classList.add('app-mode');
-      try { localStorage.setItem('hapogea_app_mode','1'); } catch {}
+      if (typeof syncPageSections === 'function') syncPageSections();
       if (typeof syncLpNav === 'function') syncLpNav();
       // Trigger auth gate if not logged in
       if (typeof HapAuth !== 'undefined' && typeof HapAuth.triggerGateCheck === 'function') {
@@ -7012,14 +7007,7 @@
     document.addEventListener('hap:userchange', () => {
       if (typeof syncLpNav === 'function') syncLpNav();
     });
-    // Restore app mode on return visits (already entered before)
-    (function() {
-      try {
-        if (localStorage.getItem('hapogea_app_mode') === '1') {
-          document.body.classList.add('app-mode');
-        }
-      } catch {}
-    })();
+    // Always start on landing page — no auto-restore of app mode
   </script>
 
   <!-- Premium Modal -->
@@ -7559,10 +7547,6 @@ window.AiApp = AiApp;
       <span class="mbn-icon" aria-hidden="true">🤖</span>
       <span>AI</span>
     </button>
-    <button class="mbn-item" id="mbnDayBtn" aria-label="החלף יום">
-      <span class="mbn-icon" aria-hidden="true">📅</span>
-      <span id="mbnDayLabel">היום</span>
-    </button>
   </nav>
 
   <script>
@@ -7573,8 +7557,7 @@ window.AiApp = AiApp;
     nav.querySelectorAll(".mbn-item[data-page]").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.page === state.sportTab);
     });
-    const label = document.getElementById("mbnDayLabel");
-    if (label) label.textContent = state.day === "yesterday" ? "אתמול" : "היום";
+    // Day always "today" — no label needed
   }
 
   (function() {
@@ -7592,25 +7575,6 @@ window.AiApp = AiApp;
       });
     });
 
-    document.getElementById("mbnDayBtn")?.addEventListener("click", () => {
-      state.day = state.day === "today" ? "yesterday" : "today";
-      render();
-      syncBottomNav();
-    });
-
-    // Swipe left = go to today, swipe right = go to yesterday
-    let _tx = 0;
-    const shell = document.querySelector("main.shell");
-    if (shell) {
-      shell.addEventListener("touchstart", e => { _tx = e.touches[0].clientX; }, { passive: true });
-      shell.addEventListener("touchend", e => {
-        const dx = e.changedTouches[0].clientX - _tx;
-        if (Math.abs(dx) < 55 || state.sportTab === "ai") return;
-        state.day = dx > 0 ? "yesterday" : "today";
-        render();
-        syncBottomNav();
-      }, { passive: true });
-    }
 
     syncBottomNav();
   })();
