@@ -920,10 +920,17 @@ function teamNameScore(a, b) {
 
 function resultMatchScore(row, event) {
   if (!row || !event) return 0;
-  if (String(row.sportId || row.sportid) !== String(event.sportid)) return 0;
-  if (String(row.day || row.date) !== String(event.date)) return 0;
-  const direct = (teamNameScore(row.home, event.teamA) + teamNameScore(row.away, event.teamB)) / 2;
-  const swapped = (teamNameScore(row.home, event.teamB) + teamNameScore(row.away, event.teamA)) / 2;
+  // Support both raw API events (sportid/date/teamA/teamB) and processed rows (sportId/day/home/away)
+  const rowSportId = String(row.sportId || row.sportid || "");
+  const evtSportId = String(event.sportId || event.sportid || "");
+  if (rowSportId !== evtSportId) return 0;
+  const rowDay = String(row.day || row.date || "");
+  const evtDay = String(event.day || event.date || "");
+  if (rowDay !== evtDay) return 0;
+  const evtHome = event.home || event.teamA;
+  const evtAway = event.away || event.teamB;
+  const direct = (teamNameScore(row.home, evtHome) + teamNameScore(row.away, evtAway)) / 2;
+  const swapped = (teamNameScore(row.home, evtAway) + teamNameScore(row.away, evtHome)) / 2;
   return Math.max(direct, swapped);
 }
 
