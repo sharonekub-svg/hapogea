@@ -8,6 +8,27 @@ const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
 const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
 
+// ── In-process AI response cache (prevents duplicate Claude calls) ────────────
+// Keyed by SHA-256 of (query + winnerData). TTL: 4 minutes.
+const _aiCache = new Map();
+const AI_CACHE_TTL_MS = 4 * 60 * 1000;
+function aiCacheKey(query, winnerSection) {
+  return crypto.createHash("sha256").update(`${query}|${(winnerSection || "").slice(0, 500)}`).digest("hex").slice(0, 16);
+}
+function aiCacheGet(key) {
+  const entry = _aiCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.exp) { _aiCache.delete(key); return null; }
+  return entry.value;
+}
+function aiCacheSet(key, value) {
+  if (_aiCache.size > 500) {
+    const oldest = _aiCache.keys().next().value;
+    _aiCache.delete(oldest);
+  }
+  _aiCache.set(key, { value, exp: Date.now() + AI_CACHE_TTL_MS });
+}
+
 // ── Winner API helpers ────────────────────────────────────────────────────────
 
 function winnerHeaders(extra = {}) {
@@ -811,18 +832,23 @@ module.exports = async (req, res) => {
       : "אין נתוני אודס בזמן אמת — בצע ניתוח מעמיק לפי ידע כללי. חמישה סעיפים, תחזית ברורה עם מנצח ותוצאה מוצעת.";
     const userMessage = `שאלת המשתמש: ${safeQuery}\n\n--- נתוני Winner / APIs בזמן אמת ---\n${winnerSection || "(לא נמצאו נתוני אודס בזמן אמת)"}\n-----------------------------\n\nענה בעברית. ${dataInstruction} אל תיתן הוראות הימור.`;
 
-    if (wantStream) {
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      res.setHeader("Cache-Control", "no-cache, no-transform");
-      res.setHeader("X-Accel-Buffering", "no");
-      res.status(200);
-      await streamClaude(res, userMessage, history);
-      return;
+    // Non-streaming path: check cache first (streaming is always live)
+    if (!wantStream) {
+      const cacheKey = aiCacheKey(safeQuery, winnerSection);
+      const cached = aiCacheGet(cacheKey);
+      if (cached) {
+        return res.status(200).json({ ok: true, answer: cached, matchInfo, cached: true });
+      }
+      const answer = await callClaude(userMessage, history);
+      aiCacheSet(cacheKey, answer);
+      return res.status(200).json({ ok: true, answer, matchInfo });
     }
 
-    const answer = await callClaude(userMessage, history);
-
-    res.status(200).json({ ok: true, answer, matchInfo });
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.status(200);
+    await streamClaude(res, userMessage, history);
   } catch (err) {
     console.error("Reuven API error:", err);
     // If we've already started streaming bytes, we can only finish the stream.

@@ -1175,31 +1175,52 @@
       align-items: center;
       gap: 10px;
     }
-    .pick-summary-main { display: grid; gap: 4px; min-width: 0; }
+    .pick-summary-main { display: grid; gap: 3px; min-width: 0; }
     .pick-summary-main span,
     .result-detail span {
       color: var(--soft);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
     .pick-summary-main strong {
       color: var(--text);
-      font-size: 17px;
+      font-size: 18px;
+      font-weight: 900;
       line-height: 1.2;
+    }
+    .pick-label-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pick-market-chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 4px;
+      padding: 2px 6px;
     }
     .odds-box {
       display: grid;
-      gap: 2px;
+      gap: 1px;
       place-items: center;
-      min-width: 64px;
-      border-radius: 8px;
-      padding: 8px 10px;
+      min-width: 68px;
+      border-radius: 10px;
+      padding: 10px 12px;
       background: rgba(49,209,135,.10);
       border: 1px solid rgba(49,209,135,.28);
       color: #bff8dc;
       font-weight: 900;
     }
-    .odds-box small { color: var(--muted); font-size: 10px; }
+    .odds-box small { color: rgba(191,248,220,.6); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
+    .odds-box b { font-size: 22px; line-height: 1; }
     .why-line {
       color: var(--muted);
       font-size: 12px;
@@ -2633,6 +2654,83 @@
       .wc-count-sep { display: none; }
     }
 
+    /* ════════════════════════════════════════════════
+       Mobile Bottom Navigation
+       ════════════════════════════════════════════════ */
+    .mobile-bottom-nav { display: none; }
+
+    @media (max-width: 640px) {
+      /* ── Nav bar ── */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 1200;
+        background: rgba(5,8,11,.97);
+        border-top: 1px solid rgba(255,255,255,.09);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        box-shadow: 0 -6px 28px rgba(0,0,0,.42);
+      }
+      .mbn-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 8px 4px 10px;
+        background: none;
+        border: none;
+        color: rgba(255,255,255,.32);
+        font: 800 10px/1 Heebo, sans-serif;
+        cursor: pointer;
+        transition: color .15s ease;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .mbn-item.active { color: #31d187; }
+      .mbn-item.active .mbn-icon {
+        filter: drop-shadow(0 0 8px rgba(49,209,135,.55));
+      }
+      .mbn-icon { font-size: 22px; display: block; line-height: 1; }
+
+      /* ── Day pill (shown in content area on mobile) ── */
+      .mobile-day-pill {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 12px;
+        padding: 4px;
+      }
+      .mobile-day-pill button {
+        flex: 1;
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: rgba(255,255,255,.45);
+        font: 800 13px Heebo, sans-serif;
+        cursor: pointer;
+        transition: background .15s, color .15s;
+      }
+      .mobile-day-pill button.active {
+        background: rgba(255,255,255,.10);
+        color: #fff;
+      }
+
+      /* ── Hide header tabs ── replaced by bottom nav ── */
+      #sportTabs { display: none !important; }
+      #dayTabs   { display: none !important; }
+
+      /* ── Body padding for bottom nav ── */
+      body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+      #ai-section { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+    }
+
     /* ============ WORLD CUP BANNER — design polish ============ */
     .wc-banner { transition: transform .28s ease, box-shadow .28s ease; }
     .wc-banner:hover { transform: translateY(-2px); box-shadow: 0 24px 60px rgba(0,0,0,.30); }
@@ -3496,6 +3594,7 @@
         countEl.style.display = n > 0 ? "" : "none";
         if (!existing && n > 0) button.insertBefore(countEl, button.firstChild);
       });
+      if (typeof syncBottomNav === "function") syncBottomNav();
     }
 
     async function fetchBackendStats() {
@@ -5461,18 +5560,23 @@
               ${hasRecommendation
                 ? `<div class="pick-summary">
                      <div class="pick-summary-main">
-                       <span>הצד שנבחר</span>
+                       <span>הצד שנבחר ✦</span>
                        <strong>${explicitPickText(row)}</strong>
-                       <span>${marketLabelText(row)} · ${pickActionText(row)}</span>
+                       <div class="pick-label-row">
+                         <span class="pick-market-chip">${marketLabelText(row)}</span>
+                       </div>
                      </div>
-                     <div class="odds-box"><small>יחס</small>${row.odds ? formatOdds(row.odds) : "תוצאה"}</div>
+                     <div class="odds-box">
+                       <small>יחס</small>
+                       <b>${row.odds ? formatOdds(row.odds) : "—"}</b>
+                     </div>
                    </div>
                    ${why ? `<div class="why-line">${why}</div>` : ""}
                    ${oddsMovementMarkup(row)}`
-                : `<div class="pick-summary" style="opacity:.72">
+                : `<div class="pick-summary" style="opacity:.55">
                      <div class="pick-summary-main">
                        <span>ללא יתרון סטטיסטי</span>
-                       <strong>${explicitPickText(row)}${row.oddsRaw ? ` · ${formatOdds(row.oddsRaw)}` : ""}</strong>
+                       <strong style="font-size:15px">${explicitPickText(row)}${row.oddsRaw ? ` · ${formatOdds(row.oddsRaw)}` : ""}</strong>
                        <span>${noPickLabel}</span>
                      </div>
                    </div>`}
@@ -6772,6 +6876,75 @@ function AiApp() {
 }
 
 window.AiApp = AiApp;
+  </script>
+
+  <!-- ════ Mobile Bottom Navigation ════ -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="ניווט">
+    <button class="mbn-item active" data-sport-tab="football" aria-label="כדורגל">
+      <span class="mbn-icon" aria-hidden="true">⚽</span>
+      <span>כדורגל</span>
+    </button>
+    <button class="mbn-item" data-sport-tab="basketball" aria-label="כדורסל">
+      <span class="mbn-icon" aria-hidden="true">🏀</span>
+      <span>כדורסל</span>
+    </button>
+    <button class="mbn-item" data-sport-tab="ai" aria-label="AI">
+      <span class="mbn-icon" aria-hidden="true">🤖</span>
+      <span>AI</span>
+    </button>
+    <button class="mbn-item" id="mbnDayBtn" aria-label="החלף יום">
+      <span class="mbn-icon" aria-hidden="true">📅</span>
+      <span id="mbnDayLabel">היום</span>
+    </button>
+  </nav>
+
+  <script>
+  // ── Mobile bottom nav ─────────────────────────────────────────────────────
+  function syncBottomNav() {
+    const nav = document.getElementById("mobileBottomNav");
+    if (!nav || typeof state === "undefined") return;
+    nav.querySelectorAll(".mbn-item[data-sport-tab]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.sportTab === state.sportTab);
+    });
+    const label = document.getElementById("mbnDayLabel");
+    if (label) label.textContent = state.day === "yesterday" ? "אתמול" : "היום";
+  }
+
+  (function() {
+    const nav = document.getElementById("mobileBottomNav");
+    if (!nav) return;
+
+    nav.querySelectorAll(".mbn-item[data-sport-tab]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.sportTab = btn.dataset.sportTab;
+        if (typeof toggleAiSection === "function") toggleAiSection();
+        render();
+        syncBottomNav();
+      });
+    });
+
+    document.getElementById("mbnDayBtn")?.addEventListener("click", () => {
+      state.day = state.day === "today" ? "yesterday" : "today";
+      render();
+      syncBottomNav();
+    });
+
+    // Swipe left = go to today, swipe right = go to yesterday
+    let _tx = 0;
+    const shell = document.querySelector("main.shell");
+    if (shell) {
+      shell.addEventListener("touchstart", e => { _tx = e.touches[0].clientX; }, { passive: true });
+      shell.addEventListener("touchend", e => {
+        const dx = e.changedTouches[0].clientX - _tx;
+        if (Math.abs(dx) < 55 || state.sportTab === "ai") return;
+        state.day = dx > 0 ? "yesterday" : "today";
+        render();
+        syncBottomNav();
+      }, { passive: true });
+    }
+
+    syncBottomNav();
+  })();
   </script>
 
 </body>
