@@ -2042,9 +2042,6 @@
       overflow: hidden;
       background: #FAF8F4;
     }
-    @media (max-width: 640px) {
-      #ai-section { top: 108px; }
-    }
     #ai-section.visible { display: flex; flex-direction: column; }
     #ai-root {
       flex: 1;
@@ -2886,6 +2883,32 @@
       transition: color .15s, background .15s; white-space: nowrap;
     }
     .lp-menu-btn:hover { color: #211F1B; background: rgba(33,31,27,.05); }
+    .lp-menu-btn.lp-nav-active { color: #2563EB !important; background: rgba(37,99,235,.09) !important; font-weight: 800; }
+    /* Hide landing-only items in app, and app-only items on landing */
+    body.app-mode .lp-landing-only { display: none !important; }
+    body:not(.app-mode) .lp-app-only { display: none !important; }
+    /* App-mode nav buttons */
+    .lp-nav-premium-btn {
+      padding:7px 14px; border-radius:8px; border:none;
+      background:linear-gradient(135deg,#55d6ff,#2196f3);
+      color:#06131a; font:800 12px Heebo,sans-serif; cursor:pointer; white-space:nowrap;
+    }
+    .lp-nav-auth-btn {
+      padding:7px 14px; border-radius:8px;
+      border:1px solid rgba(33,31,27,.18); background:transparent;
+      color:#211F1B; font:800 12px Heebo,sans-serif; cursor:pointer; white-space:nowrap;
+      display:inline-flex; align-items:center; gap:7px;
+    }
+    /* Always hide the dark app topbar — lp-nav is the single navigation */
+    .topbar { display: none !important; }
+    /* Shell padding to clear the fixed lp-nav (68px) */
+    body.app-mode .shell { padding-top: 86px; }
+    /* Mobile: hide lp-nav menu in app mode (bottom nav handles sport switching) */
+    @media (max-width: 640px) {
+      body.app-mode .lp-menu { display: none !important; }
+      body.app-mode .lp-enter-btn { display: none !important; }
+      body.app-mode .lp-nav-premium-btn, body.app-mode .lp-nav-auth-btn { font-size: 11px; padding: 6px 10px; }
+    }
     .lp-enter-btn {
       padding: 9px 20px; border-radius: 10px; border: none;
       background: #211F1B; color: #FAF8F4;
@@ -3091,28 +3114,36 @@
 </head>
 <body>
 
+  <!-- ════════ Unified navigation — always visible ════════ -->
+  <nav class="lp-nav" id="lpNav" aria-label="ניווט ראשי">
+    <div class="lp-nav-inner">
+      <div class="lp-brand" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')" style="cursor:pointer">
+        <img src="/logo.svg" alt="הפוגע" width="34" height="34" style="border-radius:50%;display:block">
+        הפוגע
+      </div>
+      <div class="lp-menu" role="navigation">
+        <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל</button>
+        <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
+        <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-features')">תכונות</button>
+        <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-how')">איך זה עובד</button>
+      </div>
+      <!-- Landing: enter button -->
+      <button class="lp-enter-btn lp-landing-only" onclick="enterApp()">כניסה למנוע <span aria-hidden="true" style="font-size:16px">←</span></button>
+      <!-- App: premium + auth buttons -->
+      <button id="premiumNavBtn" class="lp-nav-premium-btn lp-app-only" onclick="isPremiumUser() ? deactivatePremium() : openPremiumModal()">🔒 פרימיום</button>
+      <button id="authNavBtn" class="lp-nav-auth-btn lp-app-only" onclick="HapAuth.openOrMenu()">
+        <span id="authNavAvatar" style="display:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font:800 10px/1 Heebo,sans-serif;align-items:center;justify-content:center"></span>
+        <span id="authNavLabel">התחבר</span>
+      </button>
+    </div>
+  </nav>
+
   <!-- ══════════════════════════════════════════════════════
        LANDING PAGE — shown on first visit, hidden in app-mode
        ══════════════════════════════════════════════════════ -->
   <div id="landing-page">
-
-    <nav class="lp-nav" aria-label="ניווט ראשי">
-      <div class="lp-nav-inner">
-        <div class="lp-brand">
-          <img src="/logo.svg" alt="הפוגע" width="34" height="34" style="border-radius:50%;display:block">
-          הפוגע
-        </div>
-        <div class="lp-menu" role="navigation">
-          <button class="lp-menu-btn" onclick="smoothTo('lp-hero')">בית</button>
-          <button class="lp-menu-btn lp-sport-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();},200)">⚽ כדורגל</button>
-          <button class="lp-menu-btn lp-sport-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();},200)">🏀 כדורסל</button>
-          <button class="lp-menu-btn" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();},200)">הפוגע AI</button>
-          <button class="lp-menu-btn" onclick="smoothTo('lp-features')">תכונות</button>
-          <button class="lp-menu-btn" onclick="smoothTo('lp-how')">איך זה עובד</button>
-        </div>
-        <button class="lp-enter-btn" onclick="enterApp()">כניסה למנוע <span aria-hidden="true" style="font-size:16px">←</span></button>
-      </div>
-    </nav>
 
     <section class="lp-hero" id="lp-hero">
       <div class="lp-eyebrow">
@@ -6168,8 +6199,34 @@
     }
     // ─────────────────────────────────────────────────────────────────────────
 
+    function syncLpNav() {
+      const isApp = document.body.classList.contains('app-mode');
+      const navMap = {
+        football: document.getElementById('lpNavFootball'),
+        basketball: document.getElementById('lpNavBasketball'),
+        ai: document.getElementById('lpNavAi'),
+      };
+      Object.values(navMap).forEach(el => el && el.classList.remove('lp-nav-active'));
+      if (isApp && state && navMap[state.sportTab]) navMap[state.sportTab].classList.add('lp-nav-active');
+      const premBtn = document.getElementById('premiumNavBtn');
+      if (premBtn) premBtn.textContent = (typeof isPremiumUser === 'function' && isPremiumUser()) ? '✓ פרימיום' : '🔒 פרימיום';
+      const user = window.HAP_USER;
+      const label = document.getElementById('authNavLabel');
+      const avatar = document.getElementById('authNavAvatar');
+      if (label) {
+        if (user) {
+          label.textContent = (user.name || '').split(' ')[0] || 'חשבון';
+          if (avatar) { avatar.textContent = ((user.name || '?')[0] || '?').toUpperCase(); avatar.style.display = 'flex'; }
+        } else {
+          label.textContent = 'התחבר';
+          if (avatar) avatar.style.display = 'none';
+        }
+      }
+    }
+
     function render() {
       syncPageSections();
+      syncLpNav();
       renderTabs();
       renderStats();
       renderWorldCup();
@@ -6444,11 +6501,12 @@
     function syncPageSections() {
       const isAi = state.sportTab === 'ai';
       const isSport = !isAi;
-      // The landing page is the real home — hero/worldcup are never shown inside the app
+      // The landing page is the real home — the app hero panel is not shown
       const hero = document.querySelector('.hero');
       if (hero) hero.style.display = 'none';
+      // World Cup section shows on football and basketball pages
       const wcSection = document.getElementById('worldCupSection');
-      if (wcSection) wcSection.style.display = 'none';
+      if (wcSection) wcSection.style.display = isSport ? '' : 'none';
       const toolbar = document.querySelector('.toolbar.panel');
       if (toolbar) toolbar.style.display = isSport ? '' : 'none';
       const sportHeader = document.getElementById('sportPageHeader');
@@ -6932,6 +6990,7 @@
     function enterApp() {
       document.body.classList.add('app-mode');
       try { localStorage.setItem('hapogea_app_mode','1'); } catch {}
+      if (typeof syncLpNav === 'function') syncLpNav();
       // Trigger auth gate if not logged in
       if (typeof HapAuth !== 'undefined' && typeof HapAuth.triggerGateCheck === 'function') {
         HapAuth.triggerGateCheck();
@@ -6939,6 +6998,7 @@
     }
     function goToLanding() {
       document.body.classList.remove('app-mode');
+      if (typeof syncLpNav === 'function') syncLpNav();
       // scroll landing page to top
       const lp = document.getElementById('landing-page');
       if (lp) lp.scrollTop = 0;
@@ -6948,6 +7008,10 @@
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
+    // Keep lp-nav auth state in sync
+    document.addEventListener('hap:userchange', () => {
+      if (typeof syncLpNav === 'function') syncLpNav();
+    });
     // Restore app mode on return visits (already entered before)
     (function() {
       try {
