@@ -2449,6 +2449,7 @@
     /* Result line */
     .result-line { background: #F9F6F1; border-color: rgba(33,31,27,.09); color: #6E675C; }
     .result-line b { color: #211F1B; }
+    .result-line-pre { opacity: .75; }
     .result-score { color: #92600A; }
     .result-detail b { color: #211F1B; }
     .result-detail span { color: #A39B8C; }
@@ -6206,11 +6207,15 @@
 
     function resultMarkup(row) {
       const outcome = rowOutcome(row);
-      if (row.matchPhase === "scheduled" && outcome.key === "pending") return "";
+      // Always show pick status on every card — so users see נתפס/נפל/ממתין
+      if (!row.recommended && !(!!row.odds && !row.outsideRange)) return "";
+      const isPreMatch = (row.matchPhase === "scheduled" || !row.matchPhase) && outcome.key === "pending";
       const resultTime = outcome.resultVerifiedAt ? formatShortTime(outcome.resultVerifiedAt) : "";
       const oddsTime = outcome.oddsVerifiedAt ? formatShortTime(outcome.oddsVerifiedAt) : "";
       let verifyLabel;
-      if (outcome.key === "void") {
+      if (isPreMatch) {
+        verifyLabel = row.time ? `משחק מתחיל ב-${row.time}` : "ממתין להתחלת המשחק";
+      } else if (outcome.key === "void") {
         verifyLabel = oddsTime
           ? `\u05d1\u05d5\u05d8\u05dc / \u05e0\u05d3\u05d7\u05d4 \u00b7 \u05d9\u05d7\u05e1\u05d9 Winner \u05d0\u05d5\u05de\u05ea\u05d5 ${oddsTime}`
           : "\u05d1\u05d5\u05d8\u05dc / \u05dc\u05d0 \u05e0\u05de\u05e6\u05d0 \u05de\u05e7\u05d5\u05e8 Winner";
@@ -6228,9 +6233,9 @@
         verifyLabel = "\u05de\u05de\u05ea\u05d9\u05df \u05dc\u05d0\u05d9\u05de\u05d5\u05ea \u05de-Winner";
       }
       return `
-        <div class="result-line">
+        <div class="result-line${isPreMatch ? " result-line-pre" : ""}">
           <div class="result-detail">
-            <span>בדיקת תחזית סטטיסטית</span>
+            <span>${isPreMatch ? "סטטוס הימור" : "בדיקת תחזית סטטיסטית"}</span>
             <b>${outcome.label}${outcome.actual ? ` · בפועל: ${outcome.actual}` : ""}</b>
             <span>${verifyLabel}</span>
           </div>
