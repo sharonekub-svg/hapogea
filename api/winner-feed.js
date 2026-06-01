@@ -2279,6 +2279,15 @@ function mergeRows(primary, secondary) {
   return [...byEvent.values()];
 }
 
+function capPerLeague(rows, max = 5) {
+  const counts = {};
+  return rows.filter((row) => {
+    const key = String(row.league || "").trim().toLowerCase();
+    counts[key] = (counts[key] || 0) + 1;
+    return counts[key] <= max;
+  });
+}
+
 function finalOpenRows(rows) {
   const sorted = (rows || [])
     .filter((row) => row.recommended && row.odds && (row.status === "ממתין" || row.matchPhase === "final" || row.matchPhase === "live" || row.matchPhase === "ht"))
@@ -2296,7 +2305,7 @@ function finalOpenRows(rows) {
       const hardReasons = rejectionReasons(row).filter((reason) => !reason.includes("לוגו"));
       return hardReasons.length === 0;
     });
-  return [...strict, ...logoFill]
+  return capPerLeague([...strict, ...logoFill])
     .slice(0, TARGET_PICKS_PER_SPORT)
     .map((row) => ({
       ...row,
@@ -2375,7 +2384,7 @@ function finalResultRowsByDay(rows) {
       });
     const strict = sorted.filter((row) => hasVerifiedTeamLogos(row));
     const strictIds = new Set(strict.map((row) => row.id));
-    return [...strict, ...sorted.filter((row) => !strictIds.has(row.id))]
+    return capPerLeague([...strict, ...sorted.filter((row) => !strictIds.has(row.id))])
       .slice(0, TARGET_PICKS_PER_SPORT)
       .map((row) => ({ ...row, logoVerified: hasVerifiedTeamLogos(row) }));
   }
