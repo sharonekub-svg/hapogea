@@ -1810,7 +1810,18 @@
     }
 
     /* ── League grouping ── */
-    .league-group { grid-column: 1 / -1; margin-bottom: 4px; }
+    .league-group {
+      grid-column: 1 / -1;
+      margin-bottom: 4px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .league-group-header {
+      grid-column: 1 / -1;
+    }
+    .league-group .league-cards { display: contents; }
+    /* original header styles below */
     .league-group-header {
       display: flex; align-items: center; gap: 10px;
       padding: 7px 4px; margin-bottom: 10px;
@@ -1825,11 +1836,6 @@
       font-size: 11px; color: var(--muted); font-weight: 800;
       background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.09);
       border-radius: 999px; padding: 2px 9px; flex-shrink: 0;
-    }
-    .league-group .league-cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
     }
 
     /* ── Card pick indicator ── */
@@ -1996,7 +2002,6 @@
       .odds-box, .result-score { width: 100%; }
       .card-topline { flex-direction: column; gap: 3px; }
       .card-time-box { justify-items: start; flex-direction: row; gap: 6px; }
-      .league-group .league-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
       /* ── Modals ── */
       #gameModal > div { margin: 0 !important; border-radius: 16px 16px 0 0 !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; max-height: 92dvh; overflow-y: auto; }
@@ -2013,7 +2018,6 @@
 
     /* Very small phones: 1 column */
     @media (max-width: 400px) {
-      .league-group .league-cards { grid-template-columns: 1fr !important; gap: 10px !important; }
       .card-head, .card-body { padding: 10px !important; }
     }
 
