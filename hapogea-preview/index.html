@@ -1828,6 +1828,27 @@
     .card.has-pick { border-right: 3px solid rgba(49,209,135,.65); }
     .card.no-pick  { border-right: 3px solid rgba(255,255,255,.08); }
 
+    /* ── Pick stats bar (above cards) ── */
+    .pick-stats-bar {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+      padding: 10px 14px; margin-bottom: 12px;
+      background: rgba(255,255,255,.04); border: 1px solid var(--line);
+      border-radius: 10px; min-height: 0;
+    }
+    .pick-stats-bar:empty { display: none; }
+    .psb-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px; border-radius: 999px;
+      font-size: 13px; font-weight: 700; white-space: nowrap;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+    }
+    .psb-chip.hit  { background: rgba(21,128,61,.18); border-color: rgba(21,128,61,.35); color: #4ade80; }
+    .psb-chip.miss { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.30); color: #f87171; }
+    .psb-chip.wait { background: rgba(202,138,4,.12); border-color: rgba(202,138,4,.25); color: #fbbf24; }
+    .psb-chip.rate { background: rgba(85,214,255,.10); border-color: rgba(85,214,255,.22); color: #55d6ff; font-size: 14px; }
+    .psb-label { font-size: 11px; font-weight: 600; color: var(--muted); opacity: .75; }
+
     /* ── Tab count badge ── */
     .tab-count {
       display: inline-flex; align-items: center; justify-content: center;
@@ -2959,6 +2980,7 @@
           </div>
           <span class="pill">מקור: Winner</span>
         </div>
+        <div id="pick-stats" class="pick-stats-bar" aria-live="polite"></div>
         <div class="cards" id="cards">
           <div class="empty" style="visibility:hidden">טוען...</div>
         </div>
@@ -3671,6 +3693,25 @@
         .map(({ label, value, style }) =>
           `<div class="stat"><b style="${style}">${value}</b><span>${label}</span></div>`
         ).join("");
+
+      // Also populate the pick-stats bar above the cards
+      const bar = document.getElementById("pick-stats");
+      if (bar) {
+        const total = won + lost + pending;
+        if (total === 0) {
+          bar.innerHTML = "";
+        } else {
+          const rateLabel = hitRate > 0 ? `${hitRate}%` : (won + lost > 0 ? "0%" : "—");
+          bar.innerHTML = [
+            won > 0     ? `<span class="psb-chip hit">✓&nbsp;<b>${won}</b><span class="psb-label">נתפס</span></span>` : "",
+            lost > 0    ? `<span class="psb-chip miss">✗&nbsp;<b>${lost}</b><span class="psb-label">נפל</span></span>` : "",
+            pending > 0 ? `<span class="psb-chip wait">⏳&nbsp;<b>${pending}</b><span class="psb-label">ממתין</span></span>` : "",
+            (won + lost) > 0
+              ? `<span class="psb-chip rate"><b>${rateLabel}</b><span class="psb-label">&nbsp;אחוז פגיעה</span></span>`
+              : "",
+          ].filter(Boolean).join("");
+        }
+      }
     }
 
     function flagImg(code, name) {
