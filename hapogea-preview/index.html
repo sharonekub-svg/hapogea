@@ -5904,7 +5904,11 @@
           if (!card.querySelector('.premium-lock-overlay')) {
             const overlay = document.createElement('div');
             overlay.className = 'premium-lock-overlay';
-            overlay.innerHTML = '<span class="lock-icon">🔒</span><span class="lock-label">זמין למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">קנה פרימיום</button>';
+            const outcome = card.dataset.outcome || 'pending';
+            const outcomeLabel = card.dataset.outcomeLabel || 'ממתין לתוצאה';
+            const clsMap = { hit: 'hit', miss: 'miss', pending: 'wait', closed: 'closed' };
+            const outcomeCls = clsMap[outcome] || 'wait';
+            overlay.innerHTML = `<span class="verdict ${outcomeCls}" style="margin-bottom:10px;font-size:13px;padding:5px 14px">${outcomeLabel}</span><span class="lock-icon">🔒</span><span class="lock-label">זמין למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">קנה פרימיום</button>`;
             card.appendChild(overlay);
           }
         });
@@ -6321,7 +6325,7 @@
           : "ללא יתרון סטטיסטי";
       const why = (row.explanation || [])[1] || (row.signals || []).slice(0, 2).join(" · ");
       return `
-        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}">
+        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${rowOutcome(row).key}" data-outcome-label="${escapeHtml(rowOutcome(row).label)}">
           <div class="card-head">
             <div class="card-topline" style="width:100%">
               <div class="card-meta-stack">
