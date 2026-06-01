@@ -60,6 +60,7 @@
       padding-inline: 18px;
     }
     .content { margin-inline: -18px; padding-inline: 0; }
+    section.content > section { padding-inline: 18px; }
     .topbar-inner {
       min-height: 68px;
       display: flex;
@@ -1126,6 +1127,7 @@
 
     /* Cleaner prediction cards */
     .cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    #cards { margin-inline: -18px; }
     .card {
       border-radius: 8px;
       background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
@@ -1968,6 +1970,9 @@
 
       /* ── Content ── */
       .topbar-inner, .shell, .footer { padding-inline: 12px; }
+      .content { margin-inline: -12px; }
+      section.content > section { padding-inline: 12px; }
+      #cards { margin-inline: -12px; }
       .hero-main { padding: 20px; min-height: auto; }
       .stats, .toolbar { grid-template-columns: 1fr; }
       .cards { grid-template-columns: 1fr; }
@@ -5225,7 +5230,7 @@
         return;
       }
       cards.innerHTML = banners + (rows.length
-        ? `<div class="cards">${leagueGroupHtml(groupByLeague(rows))}</div>`
+        ? leagueGroupHtml(groupByLeague(rows))
         : `<div class="empty">${isOpenDay() ? "No valid games today that match the criteria." : "No finished games loaded for this date."}</div>`);
 
       // Premium lock: blur/overlay all cards beyond the first for free users
