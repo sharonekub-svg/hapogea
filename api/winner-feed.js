@@ -1495,7 +1495,7 @@ function scoreBreakdown(row) {
     reliability: Math.round(reliability * 10),
     ev: evBonus,
     valueIndicator: valueIndicatorBonus,
-    niche: central ? -40 : 32,
+    niche: 0,
     clearFavorite: clearFavorite ? 18 : -30,
     proximity: proximityBonus,
     overroundPenalty: -sharpOverroundPenalty,
