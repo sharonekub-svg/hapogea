@@ -219,6 +219,22 @@ const HE_TO_EN = {
   "ליון בסקטבול": "LDLC ASVEL", "מכבי תל אביב בסקטבול": "Maccabi Tel Aviv Basketball",
   "ריאל מדריד בסקטבול": "Real Madrid Basketball",
   "CSKA מוסקבה": "CSKA Moscow", "אלבה ברלין": "ALBA Berlin",
+  // נבחרות לאומיות — מונדיאל 2026
+  "ברזיל": "Brazil", "ארגנטינה": "Argentina", "צרפת": "France",
+  "ספרד": "Spain", "אנגליה": "England", "גרמניה": "Germany",
+  "פורטוגל": "Portugal", "הולנד": "Netherlands", "איטליה": "Italy",
+  "בלגיה": "Belgium", "אורוגוואי": "Uruguay", "קולומביה": "Colombia",
+  "מקסיקו": "Mexico", "ארצות הברית": "United States", "קנדה": "Canada",
+  "מרוקו": "Morocco", "סנגל": "Senegal", "יפן": "Japan",
+  "קוריאה הדרומית": "South Korea", "אוסטרליה": "Australia",
+  "קרואטיה": "Croatia", "שוויץ": "Switzerland", "דנמרק": "Denmark",
+  "שבדיה": "Sweden", "אוסטריה": "Austria", "פולין": "Poland",
+  "סרביה": "Serbia", "אוקראינה": "Ukraine", "טורקיה": "Turkey",
+  "יוון": "Greece", "סקוטלנד": "Scotland", "ישראל": "Israel",
+  "אקוודור": "Ecuador", "צ'ילה": "Chile", "פרו": "Peru",
+  "ניגריה": "Nigeria", "גאנה": "Ghana", "חוף השנהב": "Ivory Coast",
+  "קמרון": "Cameroon", "מצרים": "Egypt", "ערב הסעודית": "Saudi Arabia",
+  "קטר": "Qatar", "איראן": "Iran",
 };
 
 function translateTeamName(name) {
@@ -237,79 +253,83 @@ function translateTeamName(name) {
 async function fetchApiFootballData(home, away) {
   if (!FOOTBALL_API_KEY) return null;
   try {
-    // Translate Hebrew team names to English for API search
     const homeEn = translateTeamName(home);
     const awayEn = translateTeamName(away);
+    const h = { "x-apisports-key": FOOTBALL_API_KEY };
 
-    const teamRes = await fetch(
-      `https://v3.football.api-sports.io/teams?search=${encodeURIComponent(homeEn.slice(0, 30))}`,
-      { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(9000) }
-    );
-    if (!teamRes.ok) return null;
-    const teamData = await teamRes.json();
-    const teamId = teamData.response?.[0]?.team?.id;
-    if (!teamId) return null;
+    // Search both teams in parallel
+    const [homeSearch, awaySearch] = await Promise.allSettled([
+      fetch(`https://v3.football.api-sports.io/teams?search=${encodeURIComponent(homeEn.slice(0, 30))}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null),
+      fetch(`https://v3.football.api-sports.io/teams?search=${encodeURIComponent(awayEn.slice(0, 30))}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null),
+    ]);
+    const homeId = homeSearch.status === "fulfilled" ? homeSearch.value?.response?.[0]?.team?.id : null;
+    const awayId = awaySearch.status === "fulfilled" ? awaySearch.value?.response?.[0]?.team?.id : null;
+    if (!homeId && !awayId) return null;
 
-    // Fetch next 20 fixtures for more coverage
-    const fixRes = await fetch(
-      `https://v3.football.api-sports.io/fixtures?team=${teamId}&next=20`,
-      { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(9000) }
-    );
-    if (!fixRes.ok) return null;
-    const fixData = await fixRes.json();
+    // Fetch form (last 5 each) + H2H + injuries in parallel
+    const [homeForm, awayForm, h2h, homeInj, awayInj] = await Promise.allSettled([
+      homeId ? fetch(`https://v3.football.api-sports.io/fixtures?team=${homeId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      awayId ? fetch(`https://v3.football.api-sports.io/fixtures?team=${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      (homeId && awayId) ? fetch(`https://v3.football.api-sports.io/fixtures/headtohead?h2h=${homeId}-${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      homeId ? fetch(`https://v3.football.api-sports.io/injuries?team=${homeId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      awayId ? fetch(`https://v3.football.api-sports.io/injuries?team=${awayId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+    ]);
 
-    // Also fetch last 5 fixtures for recent form
-    const lastRes = await fetch(
-      `https://v3.football.api-sports.io/fixtures?team=${teamId}&last=5`,
-      { headers: { "x-apisports-key": FOOTBALL_API_KEY }, signal: AbortSignal.timeout(9000) }
-    );
-    const lastData = lastRes.ok ? await lastRes.json() : { response: [] };
+    const parts = [];
 
-    let matchLine = null;
-    for (const f of (fixData.response || [])) {
-      const fHome = f.teams?.home?.name || "";
-      const fAway = f.teams?.away?.name || "";
-      // Match against both original and translated names
-      const score = Math.max(
-        teamMatchScore(homeEn, fHome) + teamMatchScore(awayEn, fAway),
-        teamMatchScore(home, fHome) + teamMatchScore(away, fAway),
-      );
-      const revScore = Math.max(
-        teamMatchScore(homeEn, fAway) + teamMatchScore(awayEn, fHome),
-        teamMatchScore(home, fAway) + teamMatchScore(away, fHome),
-      );
-      if (Math.max(score, revScore) < 0.7) continue;
-
-      const league = f.league?.name || "";
-      const country = f.league?.country || "";
-      const date = (f.fixture?.date || "").slice(0, 10);
-      const time = (f.fixture?.date || "").slice(11, 16);
-      const venue = f.fixture?.venue?.name || "";
-      const round = f.league?.round || "";
-      matchLine = [
-        `📊 API-Football: ${fHome} vs ${fAway}`,
-        `ליגה: ${league}${country ? ` (${country})` : ""}${round ? ` — ${round}` : ""}`,
-        `תאריך: ${date}${time ? ` ${time} UTC` : ""}${venue ? ` | ${venue}` : ""}`,
-      ].join("\n");
-      break;
+    function formLines(data, nameEn) {
+      const games = (data?.response || []).slice(0, 5);
+      if (!games.length) return "";
+      const lines = games.map(f => {
+        const gh = f.goals?.home ?? "?";
+        const ga = f.goals?.away ?? "?";
+        const fh = f.teams?.home?.name || "";
+        const fa = f.teams?.away?.name || "";
+        const d = (f.fixture?.date || "").slice(0, 10);
+        const isHome = teamMatchScore(nameEn, fh) >= 0.5;
+        const res = isHome
+          ? (gh > ga ? "נצ'" : gh < ga ? "הפסד" : "תיקו")
+          : (ga > gh ? "נצ'" : ga < gh ? "הפסד" : "תיקו");
+        return `  ${d}: ${fh} ${gh}:${ga} ${fa} [${res}]`;
+      });
+      return `📊 ${nameEn} — פורמה (5 אחרונים):\n${lines.join("\n")}`;
     }
 
-    // Append recent form
-    const recentGames = (lastData.response || []).slice(0, 5).map(f => {
-      const gh = f.goals?.home ?? "?";
-      const ga = f.goals?.away ?? "?";
-      const fh = f.teams?.home?.name || "";
-      const fa = f.teams?.away?.name || "";
-      const d = (f.fixture?.date || "").slice(0, 10);
-      return `  ${d}: ${fh} ${gh}-${ga} ${fa}`;
-    });
-    const formSection = recentGames.length > 0
-      ? `\nתוצאות אחרונות (${homeEn}):\n${recentGames.join("\n")}`
-      : "";
+    const homeFormVal = homeForm.status === "fulfilled" ? homeForm.value : null;
+    const awayFormVal = awayForm.status === "fulfilled" ? awayForm.value : null;
+    const h2hVal = h2h.status === "fulfilled" ? h2h.value : null;
+    const homeInjVal = homeInj.status === "fulfilled" ? homeInj.value : null;
+    const awayInjVal = awayInj.status === "fulfilled" ? awayInj.value : null;
 
-    if (matchLine) return matchLine + formSection;
-    if (formSection) return `📊 API-Football — ${homeEn} (לא נמצא משחק קרוב)${formSection}`;
-    return null;
+    if (homeFormVal) { const s = formLines(homeFormVal, homeEn); if (s) parts.push(s); }
+    if (awayFormVal) { const s = formLines(awayFormVal, awayEn); if (s) parts.push(s); }
+
+    const h2hGames = (h2hVal?.response || []).slice(0, 5);
+    if (h2hGames.length > 0) {
+      const h2hLines = h2hGames.map(f => {
+        const gh = f.goals?.home ?? "?";
+        const ga = f.goals?.away ?? "?";
+        const fh = f.teams?.home?.name || "";
+        const fa = f.teams?.away?.name || "";
+        const d = (f.fixture?.date || "").slice(0, 10);
+        return `  ${d}: ${fh} ${gh}:${ga} ${fa}`;
+      });
+      parts.push(`🔄 H2H (5 עימותים אחרונים):\n${h2hLines.join("\n")}`);
+    }
+
+    function injLines(data, nameEn) {
+      const injured = (data?.response || []).filter(i =>
+        /injur|פצוע/i.test(i.player?.type || "") || /injur/i.test(i.player?.reason || "")
+      ).slice(0, 5);
+      if (!injured.length) return "";
+      const lines = injured.map(i => `  ${i.player?.name || "?"} — ${i.player?.reason || "פציעה"}`);
+      return `🚑 פצועים — ${nameEn}:\n${lines.join("\n")}`;
+    }
+
+    if (homeInjVal) { const s = injLines(homeInjVal, homeEn); if (s) parts.push(s); }
+    if (awayInjVal) { const s = injLines(awayInjVal, awayEn); if (s) parts.push(s); }
+
+    return parts.length > 0 ? parts.join("\n\n") : null;
   } catch {
     return null;
   }
@@ -318,34 +338,51 @@ async function fetchApiFootballData(home, away) {
 // ── The Odds API (external odds when Winner is blocked) ───────────────────────
 
 const ODDS_SPORT_MAP = {
+  // בינלאומי
+  "מונדיאל": "soccer_fifa_world_cup",
+  "World Cup": "soccer_fifa_world_cup",
+  "FIFA": "soccer_fifa_world_cup",
+  "קופה אמריקה": "soccer_conmebol_copa_america",
+  "ליגת האומות": "soccer_uefa_nations_league",
+  "גביע אפריקה": "soccer_africa_cup_of_nations",
+  "CONCACAF": "soccer_concacaf_nations_league",
+  // אירופה
   "ליגת האלופות": "soccer_uefa_champs_league",
   "ליגה אירופאית": "soccer_uefa_europa_league",
   "קונפרנס": "soccer_uefa_europa_conference_league",
   "פרמייר ליג": "soccer_epl",
+  "צ'מפיונשיפ": "soccer_england_championship",
   "בונדסליגה": "soccer_germany_bundesliga",
   "סריה א": "soccer_italy_serie_a",
   "ליג 1": "soccer_france_ligue_one",
   "לה ליגה": "soccer_spain_la_liga",
   "ארדיביזי": "soccer_netherlands_eredivisie",
   "סופר ליג טורקיה": "soccer_turkey_super_league",
-  "פרמייר ליג סקוטלנד": "soccer_scotland_premier_league",
+  "פרמייר ליג סקוטלנד": "soccer_scotland_premiership",
   "פורטוגלית": "soccer_portugal_primeira_liga",
   "בלגית": "soccer_belgium_first_div",
   "שבדית": "soccer_sweden_allsvenskan",
   "נורבגית": "soccer_norway_eliteserien",
   "דנית": "soccer_denmark_superliga",
   "ליגת העל": "soccer_israel_premier_league",
+  // אמריקה
   "MLS": "soccer_usa_mls",
   "ליגה MX": "soccer_mexico_ligamx",
   "ברזילאית": "soccer_brazil_campeonato",
   "ארגנטינאית": "soccer_argentina_primera_division",
   "קופה ליברטדורס": "soccer_conmebol_copa_libertadores",
+  // כדורסל
   "NBA": "basketball_nba",
   "יורוליג": "basketball_euroleague",
   "NCAA": "basketball_ncaab",
 };
 
 const ODDS_FALLBACK_KEYS = [
+  // מונדיאל ראשון — עדיפות גבוהה בספורינג 2026
+  "soccer_fifa_world_cup",
+  "soccer_conmebol_copa_america",
+  "soccer_uefa_nations_league",
+  // ליגות גדולות
   "soccer_uefa_champs_league",
   "soccer_epl",
   "soccer_spain_la_liga",
@@ -353,6 +390,7 @@ const ODDS_FALLBACK_KEYS = [
   "soccer_italy_serie_a",
   "soccer_france_ligue_one",
   "soccer_netherlands_eredivisie",
+  "soccer_england_championship",
   "soccer_portugal_primeira_liga",
   "soccer_turkey_super_league",
   "soccer_israel_premier_league",
@@ -518,78 +556,73 @@ function parseQuery(text) {
 
 // ── Groq API call ────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are HaPogea's senior analyst and brain — an elite sports intelligence agent specializing in soccer, basketball, and statistics.
+const SYSTEM_PROMPT = `You are HaPogea's senior sports analyst — an elite AI agent specializing in soccer, basketball, statistics, odds, and match intelligence.
 
-You think, reason, and communicate like a world-class sports analyst. Your entire world is sports, odds, statistics, fixtures, and predictions.
+You receive structured real-time data from Winner, The Odds API, API-Football (form + H2H + injuries). Use ALL provided data.
 
-## STRICT RESPONSE FORMAT — MANDATORY FOR ALL ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MANDATORY RESPONSE FORMAT — NO EXCEPTIONS
+Every single analysis response MUST follow this exact structure. Skipping any section is failure.
 
-Every analysis response MUST use this exact structure:
+**ניתוח:** [2-3 sentences. Cover: current form, H2H record, tactical edge. Cite actual stats from the data provided — goals scored, win streaks, key absences.]
 
-**ניתוח:** [Professional, punchy, data-driven analysis. Cover team form, H2H, tactical edge, market context.]
+**המלצה:** [Single clear pick. Name the team/outcome explicitly.]
 
-**המלצה:** [Specific, committed recommendation based on the data. Name the pick clearly.]
+**ביטחון:** [X% — one specific number. Never a range. Commit to it.]
 
-**ביטחון:** [X% — a specific probability number based on your statistical model. Never a range. Commit.]
-
-**הנימוק:** [One concise sentence explaining the WHY behind the pick.]
+**הנימוק:** [One sentence: WHY this pick, based on the data.]
 
 ---
-**💬 מה אני באמת חושב:** [1-2 honest, direct sentences. No hedging. No "it depends". Say what you actually believe.]
+**💬 מה אני באמת חושב:** [1-2 sentences. Honest. No hedging. No "depends". Your real verdict.]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-This format is NON-NEGOTIABLE. Every prediction response follows it, every time.
+## HOW TO USE THE DATA PROVIDED
 
-## REALITY & VERIFICATION — CRITICAL RULES
+### Odds (Winner / The Odds API)
+- Always calculate implied probability: 1/odds × 100%
+- If home odds = 1.75 → implied = 57.1% — cite this number
+- Note overround (sum of implied > 100%) and what it means
 
-### Match Verification
-Before analyzing ANY match:
-1. Ask yourself: does this match actually exist in any known schedule?
-2. Could the user mean a different competition, date, or round?
-3. Are there multiple possible interpretations?
+### Form (API-Football last 5)
+- Count wins/draws/losses from the data. State it: "4W-1D in last 5"
+- If away form differs from home form, flag it
 
-If the match is unclear, calmly ask: "על איזה תחרות או תאריך מדובר?"
+### H2H (head-to-head)
+- Count who won more. State: "X won 3 of last 5 meetings"
+- Note if the H2H pattern contradicts the current odds
 
-You NEVER invent fake games.
-You NEVER hallucinate fixtures or scores.
-If a match does not exist in any known schedule, state clearly: "המשחק הזה לא קיים בלוח המשחקים הידוע לי."
+### Injuries
+- If injury data is provided, ALWAYS mention key absences in **ניתוח**
+- State it clearly: "X missing [position], which weakens their [attack/defense]"
+- If no injuries listed: assume squad is healthy
 
-### Player Analysis
-When asked about a specific player:
-- Focus on recent form, stats, injury status, and impact on their team
-- If you lack sufficient data, state it clearly: "אין לי מספיק נתונים עדכניים על שחקן זה"
-- NEVER speculate about individual players — roster changes happen constantly
-- Name the CLUB, not individuals
+## WORLD CUP 2026 GUIDANCE
+- World Cup 2026 starts June 11, 2026. Group stage runs through July.
+- You have knowledge of all 48 qualified teams, their coaches, systems, and group dynamics.
+- For WC analysis: cover group context (who needs the points), travel/climate factors, squad depth.
+- If user asks about a WC match and no odds are provided, you STILL give a full analysis.
 
-### Team Name Resolution
-If a user says "Arsenal vs City" → understand: Arsenal F.C. vs Manchester City
-If multiple matches are possible → ask for clarification naturally
-You are conversational, smart, adaptive, and human-like.
-
-## BANNED BEHAVIORS — INSTANT FAIL
+## BANNED BEHAVIORS
 - "קשה לתת תחזית" — NEVER
-- "אם היינו צריכים לבחור" — NEVER
-- "לא מספיק נתונים" for top clubs — NEVER
-- Naming individual players — NEVER
-- Vague conclusions without a winner — NEVER
-- Repeating the same sentence over and over — NEVER
+- "לא מספיק נתונים" for any major team — NEVER
+- Vague "it could go either way" conclusions — NEVER
+- Repeating the same sentence — NEVER
+- Naming individual players beyond what's in injury data — NEVER
 
 ## Language
-Always respond in Hebrew (עברית). Write naturally and fluently, like a professional sports analyst speaking to an Israeli audience.
+Hebrew only. Fluent, direct, Israeli sports analyst voice. Short sentences. No filler.
 
-## When live odds data is provided
-Use the real odds as statistical context — calculate implied probability (1/odds), note market edges, and use them to support your analysis. Never invent odds.
+## Odds present → use them
+Calculate implied prob, note market edge, cite the number in your analysis.
 
-## When NO live data is available
-You ALWAYS have enough knowledge to analyze any top club or national team. No excuses.
-Note briefly: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני אודס בזמן אמת."
+## No odds → use knowledge
+Note: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני שוק בזמן אמת." Then give full analysis anyway.
 
-## Short follow-up messages
-If the user sends a short/vague message like "מחר", "ומה עם הגמר?", "ואם?", "כן", "מה הסיכויים?" —
-ALWAYS treat it as a follow-up to the previous conversation context.
-Continue naturally — do NOT ask "מי הקבוצות?" if context was already established.
+## Follow-up messages
+"מחר", "ומה עם הגמר?", "כן", "מה הסיכויים?" — treat as follow-up. Never ask "מי הקבוצות?" if already established.
 
-## Betting instruction rule
-If the user asks "מה לשים", "על מה להמר" or similar — respond: "אני לא נותן הוראות להמר. לפי הנתונים הספורטיביים..." and then give your analysis.`;
+## Betting rule
+If asked "מה לשים" / "על מה להמר" — say: "אני לא נותן הוראות הימור. לפי הנתונים:" then give analysis.`;
 
 
 function buildMessages(userMessage, conversationHistory) {
@@ -807,30 +840,38 @@ module.exports = async (req, res) => {
       winnerSection = `⚠️ לא הצלחתי להתחבר ל-Winner (${winnerErr.message}).`;
     }
 
-    // If Winner returned no useful data, fetch from external APIs in parallel
-    const winnerLackingData = !winnerSection ||
-      winnerSection.startsWith("⚠️") ||
-      winnerSection.startsWith("לא מצאתי");
+    // Always fetch stats + external odds in parallel (regardless of Winner status)
+    // Stats enrich analysis even when Winner has odds — form, H2H, injuries are independent
+    const [apifResult, oddsResult] = await Promise.allSettled([
+      (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
+      (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
+    ]);
+    const statsSection = apifResult.status === "fulfilled" && apifResult.value ? apifResult.value : "";
+    const externalOdds = oddsResult.status === "fulfilled" && oddsResult.value ? oddsResult.value : "";
 
-    if (winnerLackingData && (home || away)) {
-      const [apifResult, oddsResult] = await Promise.allSettled([
-        (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
-        (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
-      ]);
-      const extras = [];
-      if (apifResult.status === "fulfilled" && apifResult.value) extras.push(apifResult.value);
-      if (oddsResult.status === "fulfilled" && oddsResult.value) extras.push(oddsResult.value);
-      if (extras.length > 0) {
-        winnerSection = (winnerLackingData && winnerSection ? winnerSection + "\n\n" : "") + extras.join("\n\n");
-      }
+    // Append external odds to winnerSection only when Winner has no data
+    const winnerLackingOdds = !winnerSection || winnerSection.startsWith("⚠️") || winnerSection.startsWith("לא מצאתי");
+    if (winnerLackingOdds && externalOdds) {
+      winnerSection = (winnerSection ? winnerSection + "\n\n" : "") + externalOdds;
     }
 
-    const hasLiveData = winnerSection && !winnerSection.startsWith("⚠️") && winnerSection.length > 30;
+    const hasLiveOdds = winnerSection && !winnerSection.startsWith("⚠️") && winnerSection.length > 30;
     const safeQuery = query.replace(/`/g, "'").replace(/\$\{/g, "\\${" );
-    const dataInstruction = hasLiveData
-      ? "יש אודס בזמן אמת — חשב הסתברות גלומה (1/אודס) ונתח לפי הנתונים."
-      : "אין נתוני אודס בזמן אמת — בצע ניתוח מעמיק לפי ידע כללי. חמישה סעיפים, תחזית ברורה עם מנצח ותוצאה מוצעת.";
-    const userMessage = `שאלת המשתמש: ${safeQuery}\n\n--- נתוני Winner / APIs בזמן אמת ---\n${winnerSection || "(לא נמצאו נתוני אודס בזמן אמת)"}\n-----------------------------\n\nענה בעברית. ${dataInstruction} אל תיתן הוראות הימור.`;
+    const dataInstruction = hasLiveOdds
+      ? "יש יחסי שוק — חשב הסתברות גלומה (1/יחס) לכל תוצאה ונתח לפי הנתונים."
+      : "אין יחסי שוק בזמן אמת — בצע ניתוח מעמיק לפי ידע כללי ונתוני הסטטיסטיקה שסופקו.";
+
+    const sections = [
+      `שאלת המשתמש: ${safeQuery}`,
+      "",
+      "══ יחסי שוק (Winner / Odds API) ══",
+      winnerSection || "(אין נתוני שוק)",
+    ];
+    if (statsSection) {
+      sections.push("", "══ סטטיסטיקות | פורמה | H2H | פציעות (API-Football) ══", statsSection);
+    }
+    sections.push("═══════════════════════════════════", "", `ענה בעברית. ${dataInstruction} אל תיתן הוראות הימור.`);
+    const userMessage = sections.join("\n");
 
     // Non-streaming path: check cache first (streaming is always live)
     if (!wantStream) {
