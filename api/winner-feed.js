@@ -3106,23 +3106,30 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     payload = await buildWinnerFeedPayload({ withLogos: true });
   } catch (winnerError) {
     console.error("[winner-feed] buildWinnerFeedPayload threw:", winnerError?.message, winnerError?.stack?.split("\n")[1]);
-    // Winner blocked — try The Odds API before falling back to a local snapshot.
-    try {
-      payload = await buildOddsApiFeed();
-    } catch (oddsError) {
-      console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
-      const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
-      const snapshot = payloadMatchesIsraelDates(snapshotNorm1)
-        ? snapshotNorm1
-        : markStaleDatePayload(snapshotNorm1, "טעינת Winner ו-The Odds API נכשלה וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום.");
+    // Winner blocked — prefer the local snapshot (real Winner data) over Odds API.
+    const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
+    if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = {
-        ...snapshot,
+        ...snapshotNorm1,
         ok: true,
-        fallback: true,
-        fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
+        oddsSource: "Winner Snapshot",
         liveError: winnerError.message,
-        oddsError: oddsError.message,
       };
+    } else {
+      // Snapshot is stale — fall back to Odds API.
+      try {
+        payload = await buildOddsApiFeed();
+      } catch (oddsError) {
+        console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
+        payload = {
+          ...markStaleDatePayload(snapshotNorm1, "טעינת Winner ו-The Odds API נכשלה וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום."),
+          ok: true,
+          fallback: true,
+          fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
+          liveError: winnerError.message,
+          oddsError: oddsError.message,
+        };
+      }
     }
   }
 
