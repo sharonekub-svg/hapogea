@@ -3914,6 +3914,17 @@
         המשך עם Google
       </button>
       <p id="gateError" class="gate-error"></p>
+      <div class="auth-divider" style="margin:14px 0 12px"><span>או קוד חד-פעמי לאימייל</span></div>
+      <div id="gateOtpStep1">
+        <input id="gateOtpEmail" type="email" placeholder="כתובת אימייל" autocomplete="email" class="auth-input auth-input-ltr" style="margin-bottom:10px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')HapAuth.gateSendOtp()"/>
+        <button id="gateSendOtpBtn" onclick="HapAuth.gateSendOtp()" class="gate-google-btn gate-otp-submit" style="background:rgba(99,102,241,.8);border-color:rgba(99,102,241,.5)">שלח קוד לאימייל</button>
+      </div>
+      <div id="gateOtpStep2" style="display:none">
+        <p class="auth-otp-hint" style="margin-bottom:10px">קוד נשלח ל<br><strong id="gateOtpEmailDisplay"></strong></p>
+        <input id="gateOtpCode" type="text" inputmode="numeric" placeholder="00000000" maxlength="8" class="auth-input auth-input-ltr auth-otp-input" style="margin-bottom:10px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')HapAuth.gateVerifyOtp()"/>
+        <button onclick="HapAuth.gateVerifyOtp()" class="gate-google-btn gate-otp-submit" style="background:rgba(99,102,241,.8);border-color:rgba(99,102,241,.5)">כניסה</button>
+        <button onclick="HapAuth.gateBackToEmail()" class="gate-skip" style="display:block;margin:8px auto 0">← שנה כתובת</button>
+      </div>
       <button onclick="HapAuth.skipGate()" class="gate-skip">כניסה ללא התחברות</button>
       <p class="gate-security">🔒 ההתחברות מאובטחת דרך Supabase · Winner odds</p>
     </div>
@@ -7926,7 +7937,7 @@
     const HapAuth = (() => {
       const USERS_KEY = "hapogea_users_v1";
       const SESSION_KEY = "hapogea_session_v1";
-      let _otpPendingEmail = "";
+      let _otpPendingEmail = "", _gateOtpPendingEmail = "";
 
       // ── Supabase Google auth (gate before entering the site) ──
       const SUPABASE_URL = "https://qhqpooyczcxrckthwnue.supabase.co";
@@ -8112,6 +8123,60 @@
 
       function submit() { sendOtp(); }
 
+      async function gateSendOtp() {
+        if (!sb) return gateError("Supabase לא נטען — רענן את הדף");
+        const email = normEmail(document.getElementById("gateOtpEmail")?.value || "");
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return gateError("כתובת אימייל לא תקינה");
+        const btn = document.getElementById("gateSendOtpBtn");
+        if (btn) { btn.disabled = true; btn.textContent = "שולח..."; }
+        gateError("");
+        try {
+          const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+          if (error) {
+            gateError("שגיאה: " + error.message);
+            if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+            return;
+          }
+          _gateOtpPendingEmail = email;
+          document.getElementById("gateOtpStep1").style.display = "none";
+          document.getElementById("gateOtpStep2").style.display = "";
+          const disp = document.getElementById("gateOtpEmailDisplay"); if (disp) disp.textContent = email;
+          setTimeout(() => { const f = document.getElementById("gateOtpCode"); if (f) f.focus(); }, 60);
+        } catch (e) {
+          gateError("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+        }
+      }
+
+      async function gateVerifyOtp() {
+        if (!sb) return gateError("Supabase לא נטען");
+        const token = (document.getElementById("gateOtpCode")?.value || "").trim().replace(/\s/g, "");
+        if (!token || token.length < 8) return gateError("נא להזין קוד בן 8 ספרות");
+        const btn = document.querySelector("#gateOtpStep2 .gate-otp-submit");
+        if (btn) { btn.disabled = true; btn.textContent = "מאמת..."; }
+        gateError("");
+        try {
+          const { error } = await sb.auth.verifyOtp({ email: _gateOtpPendingEmail, token, type: "email" });
+          if (error) {
+            gateError("קוד שגוי או פג תוקף — נסה שנית");
+            if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+          }
+        } catch (e) {
+          gateError("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+        }
+      }
+
+      function gateBackToEmail() {
+        _gateOtpPendingEmail = "";
+        const s1 = document.getElementById("gateOtpStep1"); if (s1) s1.style.display = "";
+        const s2 = document.getElementById("gateOtpStep2"); if (s2) s2.style.display = "none";
+        const codeEl = document.getElementById("gateOtpCode"); if (codeEl) codeEl.value = "";
+        gateError("");
+        const btn = document.getElementById("gateSendOtpBtn");
+        if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+      }
+
       async function signOut() {
         try { sessionStorage.removeItem('hapogea_gate_skipped'); } catch {}
         if (sb && sbUser) { try { await sb.auth.signOut(); } catch (e) {} sbUser = null; }
@@ -8158,7 +8223,7 @@
         try { if (sessionStorage.getItem('hapogea_gate_skipped') === '1') { _gateSkipped = true; return; } } catch {}
         showGate(true);
       }
-      return { current, openModal, closeModal, openOrMenu, switchTab, submit, sendOtp, verifyOtp, backToEmail, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
+      return { current, openModal, closeModal, openOrMenu, switchTab, submit, sendOtp, verifyOtp, backToEmail, gateSendOtp, gateVerifyOtp, gateBackToEmail, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
     })();
     window.HapAuth = HapAuth;
 
