@@ -1328,6 +1328,52 @@ function describeWinnerPick(market, scored, teams) {
   return `${pickText} מסומנת כי היא עדיין צד מנצח פתוח ב-Winner בתוך הטווח המבוקש. ${venueReason} ${favorite ? `חשוב: הפייבוריט הראשי לפי Winner הוא ${favorite.desc}, לכן זה צד מסוכן יותר.` : ""}`.replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Rich explanation for a basketball pick, incorporating the confidence score
+ * and the moneyline-vs-spread rationale.
+ */
+function describeBasketballPick(market, scored, teams, confidence, rationale) {
+  const isSpread = cleanText(market.mp).includes("הימור יתרון");
+  const pick = isSpread
+    ? `${scored.pickTeam || scored.pick}${scored.spread != null ? ` (${scored.spread > 0 ? "+" : ""}${scored.spread})` : ""}`
+    : scored.pickTeam || scored.pick;
+  const prob    = Math.round((scored.normalizedProbability || 0) * 100);
+  const gap     = Math.round((scored.marketGap || 0) * 100);
+  const band    = confidenceBand(confidence);
+  const conf    = confidence || 0;
+
+  const oddsBook = scored.oddsBook;
+  const opponent = (oddsBook?.outcomes || [])
+    .filter((o) => cleanText(o.team || o.desc) !== cleanText(scored.pickTeam || scored.pick))
+    .sort((a, b) => (b.noVigProbability || 0) - (a.noVigProbability || 0))[0];
+  const oppOdds = opponent?.odds?.toFixed(2);
+  const oppPct  = opponent?.noVigProbability ? Math.round(opponent.noVigProbability * 100) : null;
+
+  const confLine = conf >= 90
+    ? `ביטחון גבוה מאוד (${conf}/100 — ${band}): האלגוריתם מזהה יתרון ברור בשוק המנצח.`
+    : conf >= 80
+    ? `ביטחון גבוה (${conf}/100 — ${band}): ניתוח מונילין מועדף; ספרד רק אם הפער מצדיק זאת.`
+    : `ביטחון מספיק (${conf}/100 — ${band}): המודל ממליץ על שוק המנצח בלבד.`;
+
+  const marketLine = isSpread
+    ? `שוק יתרון (ספרד): הבחירה בליין ${scored.spread != null ? scored.spread : "?"} נבחרה כי יתרון השוק (${gap}%) גבוה מספיק על פני המונילין לאותו משחק.`
+    : `שוק מנצח (מונילין): ניתוח ישיר מי ינצח — פחות מסוכן מהימור ספרד, בעל שיעור הצלחה גבוה יותר לאורך זמן.`;
+
+  const probLine = `הסתברות מנוכת מרווח לטובת "${pick}": ${prob}%.`;
+  const gapLine  = oppOdds && oppPct
+    ? `פער מהיריב: ${gap}% — ${opponent.team || opponent.desc} מתומחר ב-${oppOdds} (${oppPct}%).`
+    : `פער שוק: ${gap}%.`;
+
+  const rationaleLine = {
+    "strong-moneyline": "הניתוח בחר ישירות במונילין — ביטחון 90+ מוביל לבחירה מכוונת בשוק הבטוח יותר.",
+    "moneyline-preferred": "המונילין נבחר כברירת מחדל; ספרד לא הגיע לפער מינימלי של 15 נקודות ביטחון.",
+    "moneyline-only": "ביטחון 75–79: האלגוריתם מגביל את הניתוח לשוק המנצח בלבד.",
+    "spread-edge": "ספרד נבחר רק כי הציון שלו גבוה ב-15+ נקודות מהמונילין — יתרון שוק יוצא דופן.",
+  }[rationale] || "";
+
+  return [confLine, marketLine, probLine, gapLine, rationaleLine].filter(Boolean).join(" ");
+}
+
 const BOARD_PICK_LIMIT = 60;
 const CENTRAL_LEAGUE_PATTERNS = [
   // בינלאומי — מונדיאל ותחרויות נבחרות
@@ -1463,6 +1509,51 @@ function hasSingleClearFavorite(row) {
   );
 }
 
+/**
+ * Basketball-specific confidence score (0–100).
+ * Drives moneyline-vs-spread decision and minimum pick threshold.
+ *
+ * Factors (all derived from live Winner odds data):
+ *   • Normalized win probability (market-implied, vig-stripped)   → up to 60 pts
+ *   • Market gap vs closest opponent                              → up to 22 pts
+ *   • Odds sweet-spot 1.50–1.80                                   → up to 10 pts
+ *   • Overround penalty (sharp markets score higher)              → up to −18 pts
+ *   • Spread/handicap market inherent risk penalty                → −12 pts
+ *
+ * Decision thresholds:
+ *   ≥ 90 → Strong Moneyline
+ *   80–89 → Moneyline preferred; Spread only if edge ≥ 15 pts higher
+ *   75–79 → Moneyline only
+ *   < 75  → No recommendation
+ */
+function basketballConfidence(row) {
+  if (Number(row.sportId) !== WINNER_BASKETBALL_ID) return 0;
+  const prob = Number(row.normalizedProbability || row.probability || 0);
+  const gap  = Number(row.marketGap || 0);
+  const over = Number(row.overround || 0);
+  const odds = Number(row.odds || row.oddsRaw || 0);
+  const isSpread = row.marketTier === "spread";
+
+  let conf = Math.round(prob * 60);                          // 0–60
+  conf += Math.min(22, Math.round(gap * 90));                // market gap
+  if (odds >= 1.45 && odds <= 1.85) {
+    conf += Math.round((1 - Math.abs(odds - 1.65) / 0.4) * 10); // sweet-spot
+  }
+  conf -= Math.round(Math.min(18, over * 90));               // overround penalty
+  if (isSpread) conf -= 12;                                  // spread risk penalty
+  return Math.max(0, Math.min(100, conf));
+}
+
+/**
+ * Returns a human-readable label for the confidence band.
+ */
+function confidenceBand(conf) {
+  if (conf >= 90) return "חזק מאוד";
+  if (conf >= 80) return "גבוה";
+  if (conf >= 75) return "בינוני-גבוה";
+  return "נמוך";
+}
+
 function scoreBreakdown(row) {
   const odds = Number(row.odds || row.oddsRaw || 0);
   const oddsQuality = odds
@@ -1476,10 +1567,12 @@ function scoreBreakdown(row) {
   const central = isCentralEvent(row);
   const spread = Number(row.spread);
   const proximityBonus = Number(row.proximityBonus || 0);
-  const extremeSpreadPenalty = Number(row.sportId) === WINNER_BASKETBALL_ID && Number.isFinite(spread) && Math.abs(spread) > 12
-    ? 18
-    : 0;
   const isBasketballRow = Number(row.sportId) === WINNER_BASKETBALL_ID;
+  // For basketball spread picks: large lines are riskier; also apply a base spread penalty
+  const isBballSpread = isBasketballRow && row.marketTier === "spread";
+  const extremeSpreadPenalty = isBasketballRow && Number.isFinite(spread) && Math.abs(spread) > 12
+    ? 24
+    : isBballSpread ? 10 : 0;
   const tooLowOddsPenalty = !isBasketballRow && odds <= 1.42 && marketGap < 0.08 ? 10 : 0;
   // Sweet spot bonus: odds 1.55–1.80 are statistically the most reliable range
   const sweetSpotBonus = odds >= 1.50 && odds <= 1.85
@@ -1731,9 +1824,31 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
       ? { ...enrichedRow, motivationInfo, motivationRisk: !motivationInfo.hasStake }
       : enrichedRow;
 
-    const shouldReplace = !current
-      || (currentOutside && !newOutside)
-      || (!currentOutside && !newOutside && (enrichedWithMotivation.score > current.score || (enrichedWithMotivation.score === current.score && (enrichedWithMotivation.oddsRaw || 0) < (current.oddsRaw || 0))));
+    // Basketball-specific replacement logic: moneyline > spread unless spread edge ≥ 15 conf pts
+    const isBball = Number(market.sId) === WINNER_BASKETBALL_ID;
+    const newIsSpread  = enrichedWithMotivation.marketTier === "spread";
+    const currIsSpread = current?.marketTier === "spread";
+    let shouldReplace;
+    if (!current) {
+      shouldReplace = true;
+    } else if (currentOutside && !newOutside) {
+      shouldReplace = true;
+    } else if (!currentOutside && !newOutside) {
+      if (isBball && currIsSpread && !newIsSpread) {
+        // Always prefer moneyline over a spread that's already stored
+        shouldReplace = true;
+      } else if (isBball && !currIsSpread && newIsSpread) {
+        // Replace moneyline with spread only when spread confidence clearly dominates
+        const mlConf = basketballConfidence(current);
+        const spConf = basketballConfidence(enrichedWithMotivation);
+        shouldReplace = spConf >= 75 && (spConf - mlConf) >= 15;
+      } else {
+        shouldReplace = enrichedWithMotivation.score > current.score
+          || (enrichedWithMotivation.score === current.score && (enrichedWithMotivation.oddsRaw || 0) < (current.oddsRaw || 0));
+      }
+    } else {
+      shouldReplace = false;
+    }
     if (shouldReplace) {
       events.set(market.eId, enrichedWithMotivation);
     }
@@ -1744,6 +1859,17 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     // outsideRange rows show without a recommendation — don't require hasSingleClearFavorite
     // so friendlies/playoffs with clear (but out-of-range) favorites aren't silently dropped
     .filter((row) => row.matchPhase === "final" || row.outsideRange || hasSingleClearFavorite(row))
+    // Basketball confidence gate: below 75 = no recommendation
+    .filter((row) => {
+      if (Number(row.sportId) !== WINNER_BASKETBALL_ID) return true;
+      if (row.outsideRange || row.matchPhase === "final") return true;
+      const conf = basketballConfidence(row);
+      if (conf < 75) {
+        console.info(`[bball-confidence] Excluded: ${row.match} — conf ${conf}/100`);
+        return false;
+      }
+      return true;
+    })
     // Motivation filter: exclude games where the favourite has no meaningful stake
     .filter((row) => {
       if (!row.motivationRisk) return true;
@@ -1793,17 +1919,49 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     .slice(0, limit)
     .map((row) => {
       const sc = row.recommendationScore || row.score || 0;
+      const isBball = Number(row.sportId) === WINNER_BASKETBALL_ID;
+      const conf = isBball ? basketballConfidence(row) : null;
+      const band = conf !== null ? confidenceBand(conf) : null;
+
+      // Basketball pick rationale based on confidence band
+      let rationale = null;
+      if (isBball && conf !== null) {
+        if (conf >= 90) rationale = "strong-moneyline";
+        else if (conf >= 80) rationale = row.marketTier === "spread" ? "spread-edge" : "moneyline-preferred";
+        else rationale = "moneyline-only";
+      }
+
+      // Explanation: richer for basketball
+      const explanation = isBball && !row.outsideRange
+        ? [describeBasketballPick(row._market || { mp: row.market, outcomes: row.oddsBook?.outcomes }, row, { home: row.home, away: row.away }, conf, rationale)]
+        : row.explanation;
+
       return {
         ...row,
         score: Math.max(1, Math.min(100, sc)),
         recommended: true,
         recommendationReason: "top-20",
-        riskLevel: sc >= 70 ? "נמוך" : sc >= 50 ? "בינוני" : "גבוה",
-        signals: [
-          `סבירות פגיעה ${Math.round((row.probability || 0) * 100)} אחוז`,
-          `יחס Winner ${Number(row.odds).toFixed(2)}`,
-          `ציון משולב ${sc}`,
-        ],
+        confidence: conf,
+        confidenceBand: band,
+        pickRationale: rationale,
+        riskLevel: isBball && conf !== null
+          ? (conf >= 85 ? "נמוך" : conf >= 75 ? "בינוני" : "גבוה")
+          : (sc >= 70 ? "נמוך" : sc >= 50 ? "בינוני" : "גבוה"),
+        signals: isBball && conf !== null
+          ? [
+              `ביטחון ${conf}/100 — ${band}`,
+              `סבירות פגיעה ${Math.round((row.probability || 0) * 100)}%`,
+              `יחס Winner ${Number(row.odds).toFixed(2)}`,
+              row.marketTier === "spread"
+                ? `ספרד: ליין ${row.spread != null ? row.spread : "?"}`
+                : "שוק מנצח (מונילין)",
+            ]
+          : [
+              `סבירות פגיעה ${Math.round((row.probability || 0) * 100)} אחוז`,
+              `יחס Winner ${Number(row.odds).toFixed(2)}`,
+              `ציון משולב ${sc}`,
+            ],
+        explanation,
       };
     });
 }
