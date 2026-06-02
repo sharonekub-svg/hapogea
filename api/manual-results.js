@@ -98,6 +98,7 @@ async function fetchSheet(url) {
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "s-maxage=30, stale-while-revalidate=60");
 
   const url = process.env.RESULTS_SHEET_URL;
   if (!url) {
