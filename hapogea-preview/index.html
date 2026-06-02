@@ -6537,6 +6537,15 @@
         else if (row.matchPhase === "final" && actual && guessed !== "לא נשמר") status = (samePick(guessed, actual) || teamNameScoreLocal(guessed, actual) >= 0.75) ? "hit" : "miss";
         else status = "pending";
       }
+      // Manual results override (admin panel / Supabase)
+      if (typeof _mrFindRow === "function" && _MR?.rows?.length) {
+        const mr = _mrFindRow(row.home || "", row.away || "");
+        if (mr) {
+          if (mr.status === "פגע") status = "hit";
+          else if (mr.status === "נפל") status = "miss";
+          else if (mr.status === "נסגר") status = "closed";
+        }
+      }
       const info = predictionStatusInfo(status);
       return {
         result: result || (row.matchPhase === "scheduled" ? "טרם התחיל" : "אין תוצאה מאומתת"),
@@ -7143,6 +7152,7 @@
           _MR.ts   = Date.now();
           applyManualResults();
           _mrUpdateIndicator();
+          if (typeof renderStats === "function") renderStats();
         }
       } catch (_) { /* silent */ }
       finally { _MR.pending = false; }
