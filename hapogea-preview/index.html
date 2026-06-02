@@ -4761,7 +4761,10 @@
 
       let won = 0, lost = 0, pending = 0, hitRate = 0, avgOdds = 0, roiPct = null;
 
-      // Always compute from live feed rows (gives avg odds + counts for today)
+      // Clear per-render MR cache so manual results (פגע/נפל) are reflected correctly
+      if (typeof _mrRowCache !== "undefined") _mrRowCache = null;
+
+      // Compute from live feed rows, respecting sport tab and manual results
       const sportRows = currentRows();
       {
         const oddsRows = sportRows.filter(r => (r.oddsRaw || r.odds) > 1);
@@ -4776,21 +4779,6 @@
         });
         const settled = won + lost;
         hitRate = settled ? Math.round((won / settled) * 100) : 0;
-      }
-
-      // Override with confirmed backend stats (Supabase) if available for today
-      const bs = state.backendStats;
-      if (bs) {
-        const dateKey = bs.today;
-        const dayStats = (bs.dailyStats || []).find(s => s.stat_date === dateKey);
-        if (dayStats && (dayStats.won || dayStats.lost || dayStats.pending)) {
-          won = dayStats.won || 0;
-          lost = dayStats.lost || 0;
-          pending = dayStats.pending || 0;
-          hitRate = dayStats.success_rate || 0;
-          if (dayStats.average_odds > 0) avgOdds = dayStats.average_odds;
-          roiPct = dayStats.roi_percent ?? null;
-        }
       }
 
       const hitColor = hitRate >= 60 ? "#15803D" : hitRate >= 50 ? "#ca8a04" : hitRate > 0 ? "#DC2626" : "";
