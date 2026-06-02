@@ -6979,17 +6979,27 @@
     }
     // ─────────────────────────────────────────────────────────────────────────
 
-    // ── Manual results from Google Sheet (polling every 60 s) ─────────────────
-    // Admin fills a published Google Sheet. /api/manual-results fetches and
-    // caches the CSV. We fuzzy-match team names to live game cards and apply
-    // the status (פגע/נפל/ממתין/נסגר) instantly — no page reload needed.
+    // ── Manual results via Supabase (real-time, no Google Sheets needed) ────────
+    // Admin opens the site with ?admin in URL → sees every game with פגע/נפל buttons.
+    // Results saved to Supabase manual_results table → all visitors see badges live.
 
     const _MR = {
-      rows:    [],        // latest parsed rows from the sheet
-      ts:      0,         // last successful fetch timestamp
+      rows:    [],
+      ts:      0,
       pending: false,
       INTERVAL_MS: 60_000,
+      SB_URL:  "https://qhqpooyczcxrckthwnue.supabase.co",
+      SB_KEY:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocXBvb3ljemN4cmNrdGh3bnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTMzODUsImV4cCI6MjA5NTc4OTM4NX0.y9UuFGJoaFzb8MjcLUoUX9Hh2Ptou6VcPg9Tdh4unTA",
+      client:  null,
+      isAdmin: new URLSearchParams(location.search).has("admin"),
     };
+
+    function _mrSbClient() {
+      if (!_MR.client && window.supabase) {
+        _MR.client = window.supabase.createClient(_MR.SB_URL, _MR.SB_KEY);
+      }
+      return _MR.client;
+    }
 
     function _mrNorm(s) {
       return String(s || "")
@@ -7017,9 +7027,9 @@
     function _mrFindRow(home, away) {
       let best = null, bestScore = 0;
       for (const row of _MR.rows) {
-        const s = Math.min(
+        const s = Math.max(
           (_mrSim(row.home, home) + _mrSim(row.away, away)) / 2,
-          (_mrSim(row.home, away) + _mrSim(row.away, home)) / 2 // reversed
+          (_mrSim(row.home, away) + _mrSim(row.away, home)) / 2
         );
         if (s > bestScore) { bestScore = s; best = row; }
       }
@@ -7060,70 +7070,225 @@
     }
 
     async function _mrFetch() {
-      if (_MR.pending) return;
+      const sb = _mrSbClient();
+      if (!sb || _MR.pending) return;
       _MR.pending = true;
       try {
-        const res = await fetch("/api/manual-results", { signal: AbortSignal.timeout(10_000) });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.rows) && data.rows.length >= 0) {
-          _MR.rows = data.rows;
-          _MR.ts   = data.ts || Date.now();
+        const today = new Date().toISOString().split("T")[0];
+        const { data, error } = await sb.from("manual_results").select("*").eq("game_date", today);
+        if (!error && Array.isArray(data)) {
+          _MR.rows = data;
+          _MR.ts   = Date.now();
           applyManualResults();
-          // Update floating indicator
-          const ind = document.getElementById("mrIndicator");
-          if (ind) {
-            const t = new Date(_MR.ts);
-            ind.title = `עודכן: ${t.toLocaleTimeString("he-IL")}`;
-            ind.style.display = _MR.rows.length ? "flex" : "none";
-            ind.querySelector(".mr-ind-count").textContent = _MR.rows.length;
-          }
+          _mrUpdateIndicator();
         }
       } catch (_) { /* silent */ }
       finally { _MR.pending = false; }
     }
 
+    async function _mrSave(home, away, sport, status, score) {
+      const sb = _mrSbClient();
+      if (!sb) return;
+      const today = new Date().toISOString().split("T")[0];
+      await sb.from("manual_results").upsert(
+        { home, away, sport, status, score, game_date: today, updated_at: new Date().toISOString() },
+        { onConflict: "home,away,game_date" }
+      );
+      await _mrFetch();
+    }
+
+    function _mrUpdateIndicator() {
+      const ind = document.getElementById("mrIndicator");
+      if (!ind) return;
+      const t = new Date(_MR.ts);
+      ind.title = `עודכן: ${t.toLocaleTimeString("he-IL")}`;
+      ind.style.display = _MR.rows.length ? "flex" : "none";
+      ind.querySelector(".mr-ind-count").textContent = _MR.rows.length;
+    }
+
+    function _mrBuildAdminModal() {
+      // Remove existing
+      const old = document.getElementById("mrAdminModal");
+      if (old) old.remove();
+
+      const games = [];
+      if (window.state && state.feed?.tabs?.today) {
+        for (const rows of Object.values(state.feed.tabs.today.sports || {})) {
+          for (const item of (rows || [])) {
+            if (item.home && item.away) games.push(item);
+          }
+        }
+      }
+
+      const modal = document.createElement("div");
+      modal.id = "mrAdminModal";
+      modal.innerHTML = `
+        <div class="mr-admin-backdrop" onclick="document.getElementById('mrAdminModal').style.display='none'"></div>
+        <div class="mr-admin-card">
+          <div class="mr-admin-header">
+            <span>🔧 ניהול תוצאות</span>
+            <button class="mr-admin-close" onclick="document.getElementById('mrAdminModal').style.display='none'">✕</button>
+          </div>
+          <div class="mr-admin-body" id="mrAdminBody">
+            ${games.length === 0
+              ? `<p style="text-align:center;color:#94a3b8;padding:24px">אין משחקים בפיד כרגע</p>`
+              : games.map(g => `
+                <div class="mr-admin-row" data-home="${escapeHtml(g.home)}" data-away="${escapeHtml(g.away)}" data-sport="${escapeHtml(g.sportId||'football')}">
+                  <div class="mr-admin-teams">${escapeHtml(g.home)} <span style="color:#64748b">vs</span> ${escapeHtml(g.away)}</div>
+                  <div class="mr-admin-actions">
+                    <button class="mr-ab mr-ab-hit"  onclick="_mrAdminSet(this,'פגע')">✓ פגע</button>
+                    <button class="mr-ab mr-ab-miss" onclick="_mrAdminSet(this,'נפל')">✗ נפל</button>
+                    <button class="mr-ab mr-ab-wait" onclick="_mrAdminSet(this,'ממתין')">⏳</button>
+                    <button class="mr-ab mr-ab-lock" onclick="_mrAdminSet(this,'נסגר')">🔒</button>
+                    <input class="mr-ab-score" placeholder="תוצאה" maxlength="12">
+                  </div>
+                </div>`).join("")
+            }
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      // Pre-fill current statuses
+      for (const rowEl of modal.querySelectorAll(".mr-admin-row")) {
+        const existing = _mrFindRow(rowEl.dataset.home, rowEl.dataset.away);
+        if (existing) {
+          rowEl.querySelector(".mr-ab-score").value = existing.score || "";
+          const cls = { "פגע":"mr-ab-hit","נפל":"mr-ab-miss","ממתין":"mr-ab-wait","נסגר":"mr-ab-lock" }[existing.status];
+          if (cls) rowEl.querySelector(`.${cls}`).classList.add("mr-ab-active");
+        }
+      }
+    }
+
+    window._mrAdminSet = async function(btn, status) {
+      const row = btn.closest(".mr-admin-row");
+      if (!row) return;
+      row.querySelectorAll(".mr-ab").forEach(b => b.classList.remove("mr-ab-active"));
+      btn.classList.add("mr-ab-active");
+      const score = row.querySelector(".mr-ab-score").value.trim();
+      btn.textContent = "⏳";
+      btn.disabled = true;
+      await _mrSave(row.dataset.home, row.dataset.away, row.dataset.sport, status, score);
+      btn.disabled = false;
+      btn.textContent = { "פגע":"✓ פגע","נפל":"✗ נפל","ממתין":"⏳","נסגר":"🔒" }[status] || status;
+    };
+
     function initManualResults() {
-      // Inject CSS for badge + indicator
       const style = document.createElement("style");
       style.textContent = `
         .mr-badge {
-          display: inline-flex; align-items: center; gap: 4px;
-          padding: 4px 10px; border-radius: 20px; font: 800 12px Heebo,sans-serif;
-          margin: 6px 8px 2px; cursor: default;
+          display:inline-flex;align-items:center;gap:4px;
+          padding:4px 10px;border-radius:20px;font:800 12px Heebo,sans-serif;
+          margin:6px 8px 2px;cursor:default;
         }
-        .mr-badge.mr-hit    { background: rgba(21,128,61,.18); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
-        .mr-badge.mr-miss   { background: rgba(220,38,38,.15); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
-        .mr-badge.mr-wait   { background: rgba(245,168,35,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
-        .mr-badge.mr-closed { background: rgba(100,116,139,.14); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+        .mr-badge.mr-hit    { background:rgba(21,128,61,.18);color:#4ade80;border:1px solid rgba(74,222,128,.3); }
+        .mr-badge.mr-miss   { background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(248,113,113,.3); }
+        .mr-badge.mr-wait   { background:rgba(245,168,35,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3); }
+        .mr-badge.mr-closed { background:rgba(100,116,139,.14);color:#94a3b8;border:1px solid rgba(148,163,184,.25); }
         #mrIndicator {
-          position: fixed; bottom: 18px; left: 18px; z-index: 900;
-          background: rgba(13,24,42,.92); border: 1px solid rgba(99,102,241,.3);
-          border-radius: 22px; padding: 7px 14px; display: none;
-          align-items: center; gap: 8px; font: 700 12px Heebo,sans-serif;
-          color: rgba(255,255,255,.75); backdrop-filter: blur(8px);
-          box-shadow: 0 4px 20px rgba(0,0,0,.4);
-          cursor: default;
+          position:fixed;bottom:18px;left:18px;z-index:900;
+          background:rgba(13,24,42,.92);border:1px solid rgba(99,102,241,.3);
+          border-radius:22px;padding:7px 14px;display:none;
+          align-items:center;gap:8px;font:700 12px Heebo,sans-serif;
+          color:rgba(255,255,255,.75);backdrop-filter:blur(8px);
+          box-shadow:0 4px 20px rgba(0,0,0,.4);cursor:pointer;
         }
         #mrIndicator .mr-ind-dot {
-          width: 7px; height: 7px; border-radius: 50%;
-          background: #4ade80;
-          animation: mr-blink 2s ease-in-out infinite;
+          width:7px;height:7px;border-radius:50%;background:#4ade80;
+          animation:mr-blink 2s ease-in-out infinite;
         }
-        @keyframes mr-blink {
-          0%,100% { opacity: 1; } 50% { opacity: .35; }
+        @keyframes mr-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+        #mrAdminBtn {
+          position:fixed;bottom:18px;left:18px;z-index:901;
+          background:linear-gradient(135deg,#6366f1,#8b5cf6);
+          border:none;border-radius:22px;padding:8px 16px;
+          font:700 13px Heebo,sans-serif;color:#fff;cursor:pointer;
+          box-shadow:0 4px 20px rgba(99,102,241,.4);
+          display:flex;align-items:center;gap:8px;
         }
+        #mrAdminModal {
+          position:fixed;inset:0;z-index:9999;display:flex;
+          align-items:center;justify-content:center;
+        }
+        .mr-admin-backdrop {
+          position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);
+        }
+        .mr-admin-card {
+          position:relative;z-index:1;
+          background:#0f1923;border:1px solid rgba(99,102,241,.35);
+          border-radius:20px;width:min(92vw,540px);max-height:80vh;
+          display:flex;flex-direction:column;overflow:hidden;
+          box-shadow:0 24px 64px rgba(0,0,0,.6);
+        }
+        .mr-admin-header {
+          display:flex;justify-content:space-between;align-items:center;
+          padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07);
+          font:700 16px Heebo,sans-serif;color:#e2e8f0;
+        }
+        .mr-admin-close {
+          background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;
+          padding:4px 8px;border-radius:8px;transition:color .2s;
+        }
+        .mr-admin-close:hover { color:#e2e8f0; }
+        .mr-admin-body {
+          overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;
+        }
+        .mr-admin-row {
+          background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+          border-radius:12px;padding:12px 14px;display:flex;
+          flex-direction:column;gap:8px;
+        }
+        .mr-admin-teams {
+          font:600 13px Heebo,sans-serif;color:#cbd5e1;
+          direction:rtl;text-align:right;
+        }
+        .mr-admin-actions {
+          display:flex;gap:6px;align-items:center;flex-wrap:wrap;
+        }
+        .mr-ab {
+          border:none;border-radius:10px;padding:5px 12px;
+          font:700 12px Heebo,sans-serif;cursor:pointer;transition:all .2s;opacity:.7;
+        }
+        .mr-ab:hover { opacity:1; }
+        .mr-ab.mr-ab-active { opacity:1;box-shadow:0 0 0 2px rgba(255,255,255,.3); }
+        .mr-ab-hit  { background:rgba(21,128,61,.3);color:#4ade80; }
+        .mr-ab-miss { background:rgba(220,38,38,.3);color:#f87171; }
+        .mr-ab-wait { background:rgba(245,168,35,.2);color:#fbbf24; }
+        .mr-ab-lock { background:rgba(100,116,139,.2);color:#94a3b8; }
+        .mr-ab-score {
+          flex:1;min-width:80px;background:rgba(255,255,255,.06);
+          border:1px solid rgba(255,255,255,.12);border-radius:8px;
+          padding:5px 10px;color:#e2e8f0;font:600 12px Heebo,sans-serif;
+          direction:rtl;outline:none;
+        }
+        .mr-ab-score:focus { border-color:rgba(99,102,241,.5); }
       `;
       document.head.appendChild(style);
 
-      // Floating indicator chip
-      const ind = document.createElement("div");
-      ind.id = "mrIndicator";
-      ind.innerHTML = `<span class="mr-ind-dot"></span>📋 שיטס: <span class="mr-ind-count">0</span> שורות`;
-      ind.title = "תוצאות ידניות מ-Google Sheet";
-      document.body.appendChild(ind);
+      // Floating result count indicator (for non-admin)
+      if (!_MR.isAdmin) {
+        const ind = document.createElement("div");
+        ind.id = "mrIndicator";
+        ind.innerHTML = `<span class="mr-ind-dot"></span>📋 <span class="mr-ind-count">0</span> תוצאות`;
+        ind.title = "תוצאות ידניות";
+        document.body.appendChild(ind);
+      }
 
-      // First fetch immediately, then every 60 s
+      // Admin button (only when ?admin in URL)
+      if (_MR.isAdmin) {
+        const btn = document.createElement("button");
+        btn.id = "mrAdminBtn";
+        btn.innerHTML = `🔧 ניהול תוצאות`;
+        btn.onclick = () => {
+          const existing = document.getElementById("mrAdminModal");
+          if (existing && existing.style.display !== "none") {
+            existing.style.display = "none";
+          } else {
+            _mrBuildAdminModal();
+          }
+        };
+        document.body.appendChild(btn);
+      }
+
       _mrFetch();
       setInterval(_mrFetch, _MR.INTERVAL_MS);
     }
