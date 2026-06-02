@@ -6687,7 +6687,7 @@
           : "ללא יתרון סטטיסטי";
       const why = (row.explanation || [])[1] || (row.signals || []).slice(0, 2).join(" · ");
       return `
-        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${rowOutcome(row).key}" data-outcome-label="${escapeHtml(rowOutcome(row).label)}">
+        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${rowOutcome(row).key}" data-outcome-label="${escapeHtml(rowOutcome(row).label)}" data-home="${escapeHtml(row.home || "")}" data-away="${escapeHtml(row.away || "")}" data-sport="${escapeHtml(row.sportId || "football")}">
           <div class="card-head">
             <div class="card-topline" style="width:100%">
               <div class="card-meta-stack">
@@ -6979,7 +6979,162 @@
     }
     // ─────────────────────────────────────────────────────────────────────────
 
-    function syncLpNav() {
+    // ── Manual results from Google Sheet (polling every 60 s) ─────────────────
+    // Admin fills a published Google Sheet. /api/manual-results fetches and
+    // caches the CSV. We fuzzy-match team names to live game cards and apply
+    // the status (פגע/נפל/ממתין/נסגר) instantly — no page reload needed.
+
+    const _MR = {
+      rows:    [],        // latest parsed rows from the sheet
+      ts:      0,         // last successful fetch timestamp
+      pending: false,
+      INTERVAL_MS: 60_000,
+    };
+
+    function _mrNorm(s) {
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .replace(/["""''`]/g, "")
+        .replace(/\s+/g, " ")
+        .replace(/\b(fc|sc|ac|cf|bc|bk|מכבי|הפועל|בני|עירוני|ביתר|בית"ר|אל|al|the|de|la|los)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function _mrSim(a, b) {
+      const na = _mrNorm(a), nb = _mrNorm(b);
+      if (!na || !nb) return 0;
+      if (na === nb) return 1;
+      if (na.includes(nb) || nb.includes(na)) return 0.85;
+      const ta = new Set(na.split(/\s+/).filter(t => t.length >= 2));
+      const tb = new Set(nb.split(/\s+/).filter(t => t.length >= 2));
+      if (!ta.size || !tb.size) return 0;
+      const common = [...ta].filter(t => tb.has(t)).length;
+      return common / Math.max(ta.size, tb.size);
+    }
+
+    function _mrFindRow(home, away) {
+      let best = null, bestScore = 0;
+      for (const row of _MR.rows) {
+        const s = Math.min(
+          (_mrSim(row.home, home) + _mrSim(row.away, away)) / 2,
+          (_mrSim(row.home, away) + _mrSim(row.away, home)) / 2 // reversed
+        );
+        if (s > bestScore) { bestScore = s; best = row; }
+      }
+      return bestScore >= 0.65 ? best : null;
+    }
+
+    // Status display labels
+    const _MR_LABELS = {
+      "פגע": { text: "✓ פגע", cls: "mr-hit" },
+      "נפל": { text: "✗ נפל", cls: "mr-miss" },
+      "ממתין": { text: "⏳ ממתין", cls: "mr-wait" },
+      "נסגר": { text: "🔒 נסגר", cls: "mr-closed" },
+    };
+
+    function applyManualResults() {
+      if (!_MR.rows.length) return;
+      const cards = document.querySelectorAll(".card[data-home][data-away]");
+      for (const card of cards) {
+        const home = card.dataset.home || "";
+        const away = card.dataset.away || "";
+        const row = _mrFindRow(home, away);
+        if (!row) continue;
+        const lbl = _MR_LABELS[row.status] || { text: row.status, cls: "mr-wait" };
+        // Find or create the manual-result badge
+        let badge = card.querySelector(".mr-badge");
+        if (!badge) {
+          badge = document.createElement("div");
+          badge.className = "mr-badge";
+          // Insert after .card-body if exists, otherwise append
+          const body = card.querySelector(".card-body") || card;
+          body.appendChild(badge);
+        }
+        badge.className = `mr-badge ${lbl.cls}`;
+        badge.textContent = lbl.text;
+        if (row.score) badge.title = `תוצאה: ${row.score}`;
+        badge.dataset.source = "manual";
+      }
+    }
+
+    async function _mrFetch() {
+      if (_MR.pending) return;
+      _MR.pending = true;
+      try {
+        const res = await fetch("/api/manual-results", { signal: AbortSignal.timeout(10_000) });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.rows) && data.rows.length >= 0) {
+          _MR.rows = data.rows;
+          _MR.ts   = data.ts || Date.now();
+          applyManualResults();
+          // Update floating indicator
+          const ind = document.getElementById("mrIndicator");
+          if (ind) {
+            const t = new Date(_MR.ts);
+            ind.title = `עודכן: ${t.toLocaleTimeString("he-IL")}`;
+            ind.style.display = _MR.rows.length ? "flex" : "none";
+            ind.querySelector(".mr-ind-count").textContent = _MR.rows.length;
+          }
+        }
+      } catch (_) { /* silent */ }
+      finally { _MR.pending = false; }
+    }
+
+    function initManualResults() {
+      // Inject CSS for badge + indicator
+      const style = document.createElement("style");
+      style.textContent = `
+        .mr-badge {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 4px 10px; border-radius: 20px; font: 800 12px Heebo,sans-serif;
+          margin: 6px 8px 2px; cursor: default;
+        }
+        .mr-badge.mr-hit    { background: rgba(21,128,61,.18); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
+        .mr-badge.mr-miss   { background: rgba(220,38,38,.15); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
+        .mr-badge.mr-wait   { background: rgba(245,168,35,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
+        .mr-badge.mr-closed { background: rgba(100,116,139,.14); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+        #mrIndicator {
+          position: fixed; bottom: 18px; left: 18px; z-index: 900;
+          background: rgba(13,24,42,.92); border: 1px solid rgba(99,102,241,.3);
+          border-radius: 22px; padding: 7px 14px; display: none;
+          align-items: center; gap: 8px; font: 700 12px Heebo,sans-serif;
+          color: rgba(255,255,255,.75); backdrop-filter: blur(8px);
+          box-shadow: 0 4px 20px rgba(0,0,0,.4);
+          cursor: default;
+        }
+        #mrIndicator .mr-ind-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #4ade80;
+          animation: mr-blink 2s ease-in-out infinite;
+        }
+        @keyframes mr-blink {
+          0%,100% { opacity: 1; } 50% { opacity: .35; }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Floating indicator chip
+      const ind = document.createElement("div");
+      ind.id = "mrIndicator";
+      ind.innerHTML = `<span class="mr-ind-dot"></span>📋 שיטס: <span class="mr-ind-count">0</span> שורות`;
+      ind.title = "תוצאות ידניות מ-Google Sheet";
+      document.body.appendChild(ind);
+
+      // First fetch immediately, then every 60 s
+      _mrFetch();
+      setInterval(_mrFetch, _MR.INTERVAL_MS);
+    }
+
+    // Start after page loads
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initManualResults);
+    } else {
+      setTimeout(initManualResults, 1500);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
       const isApp = document.body.classList.contains('app-mode');
       const navMap = {
         football: document.getElementById('lpNavFootball'),
@@ -7020,6 +7175,7 @@
       renderCards();
       renderDebug();
       applyLogosToCards();
+      if (typeof applyManualResults === "function") applyManualResults();
       const premBtn = document.getElementById('premiumHeaderBtn');
       if (premBtn) premBtn.textContent = state.isPremium ? '✓ פרימיום' : '🔒 פרימיום';
     }
