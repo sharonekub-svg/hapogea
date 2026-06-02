@@ -7067,6 +7067,13 @@
       "נסגר": { text: "🔒 נסגר", cls: "mr-closed" },
     };
 
+    const _MR_VERDICT_MAP = {
+      "פגע":   { text: "✓ פגע",           cls: "hit",    key: "hit"     },
+      "נפל":   { text: "✗ נפל",           cls: "miss",   key: "miss"    },
+      "ממתין": { text: "ממתין לתוצאה",    cls: "wait",   key: "pending" },
+      "נסגר":  { text: "נסגר",            cls: "closed", key: "closed"  },
+    };
+
     function applyManualResults() {
       if (!_MR.rows.length) return;
       const cards = document.querySelectorAll(".card[data-home][data-away]");
@@ -7076,12 +7083,31 @@
         const row = _mrFindRow(home, away);
         if (!row) continue;
         const lbl = _MR_LABELS[row.status] || { text: row.status, cls: "mr-wait" };
+        const vrd = _MR_VERDICT_MAP[row.status];
+
+        // Update card data attributes
+        if (vrd) {
+          card.dataset.outcome = vrd.key;
+          card.dataset.outcomeLabel = vrd.text;
+        }
+
+        // Update existing .verdict span (the big colored label inside result-line)
+        if (vrd) {
+          const verdictEl = card.querySelector(".verdict");
+          if (verdictEl) {
+            verdictEl.className = `verdict ${vrd.cls}`;
+            verdictEl.textContent = vrd.text;
+          }
+          // Also update the bold text in result-detail
+          const detailB = card.querySelector(".result-detail b");
+          if (detailB) detailB.textContent = vrd.text;
+        }
+
         // Find or create the manual-result badge
         let badge = card.querySelector(".mr-badge");
         if (!badge) {
           badge = document.createElement("div");
           badge.className = "mr-badge";
-          // Insert after .card-body if exists, otherwise append
           const body = card.querySelector(".card-body") || card;
           body.appendChild(badge);
         }
