@@ -7004,8 +7004,18 @@
       SB_URL:  "https://qhqpooyczcxrckthwnue.supabase.co",
       SB_KEY:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocXBvb3ljemN4cmNrdGh3bnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTMzODUsImV4cCI6MjA5NTc4OTM4NX0.y9UuFGJoaFzb8MjcLUoUX9Hh2Ptou6VcPg9Tdh4unTA",
       client:  null,
-      isAdmin: new URLSearchParams(location.search).has("admin"),
+      ADMIN_EMAIL: "sharonekub@gmail.com",
     };
+
+    function _mrIsAdmin() {
+      return new URLSearchParams(location.search).has("admin") &&
+             window.HAP_USER?.email === _MR.ADMIN_EMAIL;
+    }
+
+    function _mrSyncAdminBtn() {
+      const btn = document.getElementById("mrNavAdminBtn");
+      if (btn) btn.style.display = _mrIsAdmin() ? "" : "none";
+    }
 
     function _mrSbClient() {
       if (!_MR.client && window.supabase) {
@@ -7100,6 +7110,7 @@
     }
 
     async function _mrSave(home, away, sport, status, score) {
+      if (!_mrIsAdmin()) return;
       const sb = _mrSbClient();
       if (!sb) return;
       const today = new Date().toISOString().split("T")[0];
@@ -7120,6 +7131,7 @@
     }
 
     function _mrBuildAdminModal() {
+      if (!_mrIsAdmin()) return;
       // Remove existing
       const old = document.getElementById("mrAdminModal");
       if (old) old.remove();
@@ -7329,19 +7341,15 @@
       document.head.appendChild(style);
 
       // Floating result count indicator (for non-admin)
-      if (!_MR.isAdmin) {
-        const ind = document.createElement("div");
-        ind.id = "mrIndicator";
-        ind.innerHTML = `<span class="mr-ind-dot"></span>📋 <span class="mr-ind-count">0</span> תוצאות`;
-        ind.title = "תוצאות ידניות";
-        document.body.appendChild(ind);
-      }
+      const ind = document.createElement("div");
+      ind.id = "mrIndicator";
+      ind.innerHTML = `<span class="mr-ind-dot"></span>📋 <span class="mr-ind-count">0</span> תוצאות`;
+      ind.title = "תוצאות ידניות";
+      document.body.appendChild(ind);
 
-      // Admin: show nav button and wire toggle
-      if (_MR.isAdmin) {
-        const navBtn = document.getElementById("mrNavAdminBtn");
-        if (navBtn) navBtn.style.display = "";
-      }
+      // Show/hide admin button whenever auth state changes
+      _mrSyncAdminBtn();
+      document.addEventListener("hap:userchange", _mrSyncAdminBtn);
 
       _mrFetch();
       setInterval(_mrFetch, _MR.INTERVAL_MS);
