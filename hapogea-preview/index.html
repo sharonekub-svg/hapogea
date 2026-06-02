@@ -68,7 +68,7 @@
       gap: 14px;
       flex-wrap: wrap;
     }
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 240px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .mark {
       width: 44px;
       height: 44px;
@@ -495,7 +495,7 @@
       border: 1px solid var(--line-strong);
       background: rgba(255,255,255,.04);
       color: var(--text);
-      min-height: 40px;
+      min-height: 44px;
       border-radius: 7px;
       font-weight: 900;
     }
@@ -2128,6 +2128,17 @@
       .card-head, .card-body { padding: 10px !important; }
     }
 
+    /* Mobile share strip & card footer */
+    @media (max-width: 480px) {
+      .share-strip { flex-wrap: wrap; gap: 5px; }
+      .btn-share-wa, .btn-share-tg, .btn-share-link { font-size: 10px; padding: 6px 9px; }
+      .card-footer-actions { grid-template-columns: 1fr; }
+      .share-strip { width: 100%; }
+      .stats { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .stat b { font-size: 18px; }
+      .mr-nav-admin-btn { font-size: 11px; padding: 6px 9px; }
+    }
+
     /* ════════════════════════════════════════════════
        הפוגע AI section — scoped to #ai-root
        ════════════════════════════════════════════════ */
@@ -3035,6 +3046,8 @@
     .mobile-bottom-nav { display: none; }
 
     @media (max-width: 640px) {
+      /* Ensure content doesn't hide behind fixed bottom nav */
+      body.app-mode .shell { padding-bottom: 72px; }
       /* ── Nav bar ── */
       .mobile-bottom-nav {
         display: flex;
