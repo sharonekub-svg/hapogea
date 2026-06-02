@@ -8090,7 +8090,7 @@
       async function verifyOtp() {
         if (!sb) return setError2("Supabase לא נטען");
         const token = (document.getElementById("authOtpCode")?.value || "").trim().replace(/\s/g, "");
-        if (!token || token.length < 6) return setError2("נא להזין קוד בן 6 ספרות");
+        if (!token || token.length < 8) return setError2("נא להזין קוד בן 8 ספרות");
         const btn = document.querySelector("#authOtpStep2 .auth-submit-btn");
         if (btn) { btn.disabled = true; btn.textContent = "מאמת..."; }
         setError2("");
@@ -8473,7 +8473,7 @@
         <div id="authOtpStep2" style="display:none">
           <p class="auth-otp-hint">קוד נשלח לכתובת<br><strong id="authOtpEmailDisplay"></strong></p>
           <div class="auth-field">
-            <input id="authOtpCode" type="text" inputmode="numeric" placeholder="000000" maxlength="6" class="auth-input auth-input-ltr auth-otp-input" onkeydown="if(event.key==='Enter')HapAuth.verifyOtp()"/>
+            <input id="authOtpCode" type="text" inputmode="numeric" placeholder="00000000" maxlength="8" class="auth-input auth-input-ltr auth-otp-input" onkeydown="if(event.key==='Enter')HapAuth.verifyOtp()"/>
           </div>
           <p id="authError2" class="auth-error"></p>
           <button onclick="HapAuth.verifyOtp()" class="auth-submit-btn">כניסה</button>
