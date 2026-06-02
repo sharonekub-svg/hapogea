@@ -7238,7 +7238,7 @@
         let rows = null;
         if (sb) {
           const today = new Date().toISOString().split("T")[0];
-          const { data, error } = await sb.from("manual_results").select("*").eq("game_date", today);
+          const { data, error } = await sb.from("manual_results").select("id,home,away,sport,status,score,game_date").eq("game_date", today);
           if (!error && Array.isArray(data) && data.length > 0) rows = data;
         }
         // 2. Fall back to Google Sheet if Supabase has nothing

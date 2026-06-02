@@ -786,35 +786,38 @@ async function resolveLogoRow(table, kind, name) {
   try {
     row = await Promise.race([
       (async () => {
-        for (const term of logoSearchTerms(cleanText(name), kind)) {
-          // 1. Supabase cache (fastest, has both Hebrew and English names)
-          const supabaseRow = await supabaseSearch(table, term);
-          if (supabaseRow?.logo_url) return supabaseRow;
+        const terms = logoSearchTerms(cleanText(name), kind);
 
-          // 2. Run SofaScore + Wikidata in parallel — both accept Hebrew natively.
-          //    SofaScore has direct CDN logos; Wikidata returns logo + English label.
-          const [sofaRes, wdRes] = await Promise.allSettled([
-            sofascoreLogoSearch(term, kind),
-            wikidataLogoSearch(term, kind),
-          ]);
-          if (sofaRes.status === "fulfilled" && sofaRes.value?.logo_url) return sofaRes.value;
-          if (wdRes.status === "fulfilled" && wdRes.value?.logo_url) return wdRes.value;
+        // 1. All Supabase lookups in parallel — eliminates N+1 serial DB calls
+        const sbResults = await Promise.allSettled(terms.map(t => supabaseSearch(table, t)));
+        const sbHit = sbResults.find(r => r.status === "fulfilled" && r.value?.logo_url)?.value;
+        if (sbHit?.logo_url) return sbHit;
 
-          // 3. If Wikidata gave us the English name, use it for TheSportsDB + Wikipedia.
-          //    Otherwise fall back to the raw term (works when it's already Latin).
-          const englishName = (wdRes.status === "fulfilled" && wdRes.value?.englishName) || null;
-          const lookupTerm = englishName || term;
-
-          const [sdbRes, wpRes, wsRes] = await Promise.allSettled([
-            sportsDbSearch(kind, lookupTerm),
-            wikipediaLogoSearch(lookupTerm, kind),
-            wikipediaSearchLogo(lookupTerm, kind),
-          ]);
-          const found = [sdbRes, wpRes, wsRes]
-            .find(r => r.status === "fulfilled" && r.value?.logo_url)?.value || null;
-          if (found?.logo_url) return found;
+        // 2. SofaScore + Wikidata for ALL terms in parallel
+        const extResults = await Promise.allSettled(
+          terms.flatMap(t => [sofascoreLogoSearch(t, kind), wikidataLogoSearch(t, kind)])
+        );
+        // Prefer SofaScore (even-indexed), then Wikidata (odd-indexed)
+        for (let i = 0; i < extResults.length; i += 2) {
+          if (extResults[i].status === "fulfilled" && extResults[i].value?.logo_url)
+            return extResults[i].value;
         }
-        return null;
+        let englishName = null;
+        for (let i = 1; i < extResults.length; i += 2) {
+          const r = extResults[i];
+          if (r.status === "fulfilled" && r.value?.logo_url) return r.value;
+          if (r.status === "fulfilled" && r.value?.englishName && !englishName)
+            englishName = r.value.englishName;
+        }
+
+        // 3. TheSportsDB + Wikipedia in parallel using best term
+        const lookupTerm = englishName || terms[0];
+        const fallbackResults = await Promise.allSettled([
+          sportsDbSearch(kind, lookupTerm),
+          wikipediaLogoSearch(lookupTerm, kind),
+          wikipediaSearchLogo(lookupTerm, kind),
+        ]);
+        return fallbackResults.find(r => r.status === "fulfilled" && r.value?.logo_url)?.value || null;
       })(),
       new Promise(resolve => setTimeout(() => resolve(null), 5000)),
     ]);
