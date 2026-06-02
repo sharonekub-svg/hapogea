@@ -1383,6 +1383,19 @@
       grid-template-columns: 1fr auto;
       gap: 8px;
     }
+    .share-strip { display: flex; gap: 6px; align-items: center; }
+    .btn-share-wa, .btn-share-tg {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,.035);
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .btn-share-wa:hover { background: rgba(37,211,102,.15); border-color: rgba(37,211,102,.4); }
+    .btn-share-tg:hover { background: rgba(41,182,246,.15); border-color: rgba(41,182,246,.4); }
     .btn-share-link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -3726,7 +3739,10 @@
       </div>
       <div class="lp-stats-row">
         <div class="lp-stat-box"><div class="lp-stat-num">20</div><div class="lp-stat-lbl">משחקים ביום</div></div>
-        <div class="lp-stat-box"><div class="lp-stat-num">2</div><div class="lp-stat-lbl">ליגות ספורט</div></div>
+        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(255,200,87,.12),rgba(255,160,0,.08));border-color:rgba(255,200,87,.3)">
+          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#fbbf24">9</div>
+          <div class="lp-stat-lbl" style="color:#fbbf24">ימים למונדיאל 🏆</div>
+        </div>
         <div class="lp-stat-box"><div class="lp-stat-num">48</div><div class="lp-stat-lbl">נבחרות מונדיאל</div></div>
         <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">נתוני Winner</div></div>
       </div>
@@ -4679,7 +4695,21 @@
     }
 
     function renderStats() {
-      if (state.sportTab === "worldcup") return;
+      if (state.sportTab === "worldcup") {
+        const statsEl = document.getElementById("stats");
+        if (!statsEl) return;
+        const todayStr = new Date().toISOString().split("T")[0];
+        const todayGames = WC2026_FIXTURES.filter(f => f.date === todayStr).length;
+        const daysLeft = Math.max(0, Math.ceil((new Date("2026-06-11T19:00:00Z") - new Date()) / 86400000));
+        const liveOdds = WC2026_FIXTURES.filter(f => f.date === todayStr && f.odds).length;
+        statsEl.innerHTML = [
+          { label: "משחקי מונדיאל היום", value: todayGames || "—" },
+          { label: daysLeft > 0 ? "ימים לפתיחה" : "מונדיאל פתוח!", value: daysLeft > 0 ? daysLeft : "🏆" },
+          { label: "יחסי Winner חיים", value: liveOdds || "—" },
+          { label: "סה\"כ משחקים", value: "104" },
+        ].map(({ label, value }) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
+        return;
+      }
       if (state.sportTab === "reuben") {
         document.getElementById("stats").innerHTML = [
           ["Agent", "הפוגע AI"],
@@ -4999,7 +5029,26 @@
       window._wcBannerTimer = setInterval(wcUpdateBannerCountdown, 60 * 1000);
     }
 
+    function wcEnrichFromFeed() {
+      const feedGames = state.feed?.tabs?.today?.sports?.football || [];
+      if (!feedGames.length) return;
+      const todayStr = new Date().toISOString().split("T")[0];
+      for (const item of WC2026_FIXTURES) {
+        if (item.odds || item.date !== todayStr) continue;
+        const match = feedGames.find(fg =>
+          typeof _mrSim === "function" &&
+          _mrSim(fg.home || "", item.home) > 0.55 &&
+          _mrSim(fg.away || "", item.away) > 0.55
+        );
+        if (match && (match.oddsRaw || match.odds) > 1 && match.pick) {
+          item.odds = { [match.pick]: +(match.oddsRaw || match.odds).toFixed(2) };
+          item.pick = match.pick;
+        }
+      }
+    }
+
     function renderWorldCup() {
+      wcEnrichFromFeed();
       const target = document.getElementById("wc2026");
       if (!target) return;
       const banner = document.getElementById("wcToggle");
@@ -6760,7 +6809,11 @@
             ${cardVerifiedMarkup(row)}
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
-              <button class="btn-share-link" type="button" data-share-text="${escapeHtml(shareTextForRow(row))}">שתף</button>
+              <div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
+                <button class="btn-share-wa" data-share-wa="1" title="שתף בווטסאפ">📱</button>
+                <button class="btn-share-tg" data-share-tg="1" title="שתף בטלגרם">✈️</button>
+                <button class="btn-share-link" data-share-copy="1" title="העתק">שתף</button>
+              </div>
             </div>
           </div>
         </article>
@@ -7751,9 +7804,9 @@
         if (nameEl) nameEl.innerHTML = isWC ? '🏆 מונדיאל 2026' : (state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל');
         if (subEl) subEl.textContent = isWC ? 'לוח המשחקים, תחזיות ויחסי Winner' : (state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי Winner — היום' : 'תחזיות כדורסל ויחסי Winner — היום');
       }
-      // Stats bar — hide on worldcup dedicated page
+      // Stats bar — show on all sport tabs including worldcup
       const statsEl = document.getElementById('stats');
-      if (statsEl) statsEl.style.display = (isSport && !isWC) ? '' : 'none';
+      if (statsEl) statsEl.style.display = isSport ? '' : 'none';
       const cardsEl = document.getElementById('cards');
       if (cardsEl) cardsEl.classList.toggle('flat-feed', isSport && !isWC);
       // Sport visual identity — add body class for themed backgrounds/accents
@@ -8051,11 +8104,18 @@
       document.getElementById("worldCupSection").scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.getElementById("cards").addEventListener("click", event => {
-      const share = event.target.closest("[data-share-text]");
-      if (share) {
-        const text = share.dataset.shareText || "";
-        if (navigator.share) navigator.share({ text }).catch(() => {});
-        else navigator.clipboard?.writeText(text);
+      const shareStrip = event.target.closest(".share-strip[data-share-text]");
+      if (shareStrip) {
+        const text = shareStrip.dataset.shareText || "";
+        const btn = event.target.closest("button");
+        if (btn?.dataset.shareWa) {
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+        } else if (btn?.dataset.shareTg) {
+          window.open(`https://t.me/share/url?url=${encodeURIComponent("https://hit-alpha.vercel.app")}&text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+        } else {
+          if (navigator.share) navigator.share({ text }).catch(() => {});
+          else { navigator.clipboard?.writeText(text); }
+        }
         return;
       }
       const chip = event.target.closest(".suggestion-chip, .reuben-sidebar-item");
@@ -8216,6 +8276,14 @@
     scheduleMidnightShift();
     HapAuth.init();
     wcStartBannerCountdown();
+    // Update LP countdown box
+    (function updateLpWCDays() {
+      const el = document.getElementById("lpWCDaysNum");
+      if (!el) return;
+      const diff = new Date("2026-06-11T19:00:00Z") - new Date();
+      const days = Math.max(0, Math.ceil(diff / 86400000));
+      el.textContent = days > 0 ? days : "🏆";
+    })();
 
     // Fix iOS virtual keyboard covering the AI composer
     if (window.visualViewport) {
