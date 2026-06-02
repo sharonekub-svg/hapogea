@@ -4825,11 +4825,12 @@
     function wcFixtureOdds(item) {
       if (!item.odds) return `<div class="wc-why neutral"><b>יחסי Winner</b><br>אין יחס Winner פתוח כרגע. לא מוצג יחס מומצא ולא מוצגת תחזית לפני שיש נתון אמיתי. בדיקת AI מלאה נפתחת 48 שעות לפני המשחק עם פציעות, סגלים, מאמנים וכושר.</div>`;
       const selected = item.pick || "";
+      const fmt = v => (v != null ? (+v).toFixed(2) : "—");
       return `
         <div class="wc-odds">
-          <div class="wc-odd ${selected === "home" ? "selected" : ""}"><span>${item.home}</span><b>${item.odds.home.toFixed(2)}</b></div>
-          <div class="wc-odd ${selected === "draw" ? "selected" : ""}"><span>תיקו</span><b>${item.odds.draw.toFixed(2)}</b></div>
-          <div class="wc-odd ${selected === "away" ? "selected" : ""}"><span>${item.away}</span><b>${item.odds.away.toFixed(2)}</b></div>
+          <div class="wc-odd ${selected === "home" ? "selected" : ""}"><span>${item.home}</span><b>${fmt(item.odds.home)}</b></div>
+          <div class="wc-odd ${selected === "draw" ? "selected" : ""}"><span>תיקו</span><b>${fmt(item.odds.draw)}</b></div>
+          <div class="wc-odd ${selected === "away" ? "selected" : ""}"><span>${item.away}</span><b>${fmt(item.odds.away)}</b></div>
         </div>
       `;
     }
@@ -6266,7 +6267,17 @@
       });
     }
 
+    // Per-render cache for _mrFindRow — cleared at start of each renderCards()
+    let _mrRowCache = null;
+    function _mrFindRowCached(home, away) {
+      if (!_mrRowCache) _mrRowCache = new Map();
+      const key = `${home}|||${away}`;
+      if (!_mrRowCache.has(key)) _mrRowCache.set(key, _mrFindRow(home, away));
+      return _mrRowCache.get(key);
+    }
+
     function renderCards() {
+      _mrRowCache = null; // clear per-render cache
       const cards = document.getElementById("cards");
       const title = document.getElementById("listTitle");
       const meta = document.getElementById("resultMeta");
@@ -6574,7 +6585,7 @@
       }
       // Manual results override (admin panel / Supabase)
       if (typeof _mrFindRow === "function" && _MR?.rows?.length) {
-        const mr = _mrFindRow(row.home || "", row.away || "");
+        const mr = _mrFindRowCached(row.home || "", row.away || "");
         if (mr) {
           if (mr.status === "פגע") status = "hit";
           else if (mr.status === "נפל") status = "miss";
@@ -8061,15 +8072,6 @@
     })();
     window.HapAuth = HapAuth;
 
-    document.getElementById("search").addEventListener("input", event => {
-      state.search = event.target.value;
-      renderCards();
-    });
-    document.getElementById("sort").addEventListener("change", event => {
-      state.sort = event.target.value;
-      renderCards();
-    });
-    document.getElementById("refresh").addEventListener("click", loadFeed);
     document.getElementById("worldCupSection").addEventListener("click", event => {
       if (event.target.closest("[data-wc-close]")) {
         state.wcOpen = false;
