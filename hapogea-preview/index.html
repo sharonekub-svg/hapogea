@@ -7093,14 +7093,27 @@
     }
 
     async function _mrFetch() {
-      const sb = _mrSbClient();
-      if (!sb || _MR.pending) return;
+      if (_MR.pending) return;
       _MR.pending = true;
       try {
-        const today = new Date().toISOString().split("T")[0];
-        const { data, error } = await sb.from("manual_results").select("*").eq("game_date", today);
-        if (!error && Array.isArray(data)) {
-          _MR.rows = data;
+        // 1. Try Supabase (admin panel writes here)
+        const sb = _mrSbClient();
+        let rows = null;
+        if (sb) {
+          const today = new Date().toISOString().split("T")[0];
+          const { data, error } = await sb.from("manual_results").select("*").eq("game_date", today);
+          if (!error && Array.isArray(data) && data.length > 0) rows = data;
+        }
+        // 2. Fall back to Google Sheet if Supabase has nothing
+        if (!rows || rows.length === 0) {
+          try {
+            const res = await fetch("/api/manual-results", { signal: AbortSignal.timeout(10_000) });
+            const d = await res.json();
+            if (d.ok && Array.isArray(d.rows) && d.rows.length > 0) rows = d.rows;
+          } catch (_) {}
+        }
+        if (rows && rows.length > 0) {
+          _MR.rows = rows;
           _MR.ts   = Date.now();
           applyManualResults();
           _mrUpdateIndicator();
