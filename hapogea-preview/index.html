@@ -7004,12 +7004,12 @@
       SB_URL:  "https://qhqpooyczcxrckthwnue.supabase.co",
       SB_KEY:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocXBvb3ljemN4cmNrdGh3bnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTMzODUsImV4cCI6MjA5NTc4OTM4NX0.y9UuFGJoaFzb8MjcLUoUX9Hh2Ptou6VcPg9Tdh4unTA",
       client:  null,
-      ADMIN_EMAIL: "sharonekub@gmail.com",
+      ADMIN_EMAILS: ["sharonekub@gmail.com", "liorkiro85@gmail.com"],
     };
 
     function _mrIsAdmin() {
       return new URLSearchParams(location.search).has("admin") &&
-             window.HAP_USER?.email === _MR.ADMIN_EMAIL;
+             _MR.ADMIN_EMAILS.includes(window.HAP_USER?.email?.toLowerCase());
     }
 
     function _mrSyncAdminBtn() {
