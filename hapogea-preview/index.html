@@ -596,12 +596,13 @@
     .hidden { display: none !important; }
     .empty, .error {
       border: 1px dashed var(--line-strong);
-      border-radius: 8px;
-      padding: 34px 18px;
+      border-radius: 12px;
+      padding: 52px 24px;
       text-align: center;
       color: var(--muted);
       background: rgba(255,255,255,.025);
       grid-column: 1 / -1;
+      font-size: 14px; line-height: 1.7;
     }
     .error { color: #ffc5c3; border-color: rgba(239,83,80,.36); }
 
@@ -1387,15 +1388,16 @@
     .btn-share-wa, .btn-share-tg {
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 7px 10px;
+      padding: 7px 11px;
       background: rgba(255,255,255,.035);
       color: var(--text);
-      font-size: 15px;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
       line-height: 1;
     }
-    .btn-share-wa:hover { background: rgba(37,211,102,.15); border-color: rgba(37,211,102,.4); }
-    .btn-share-tg:hover { background: rgba(41,182,246,.15); border-color: rgba(41,182,246,.4); }
+    .btn-share-wa:hover { background: rgba(37,211,102,.15); border-color: rgba(37,211,102,.4); color: #15803d; }
+    .btn-share-tg:hover { background: rgba(41,182,246,.15); border-color: rgba(41,182,246,.4); color: #0369a1; }
     .btn-share-link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -1950,6 +1952,11 @@
     .card.no-pick  { border-right: 3px solid rgba(255,255,255,.08); }
 
     /* ── Pick stats bar (above cards) ── */
+    .stats-header {
+      font: 700 11px Heebo, sans-serif; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em;
+      padding: 0 2px 6px; opacity: .65;
+    }
     .pick-stats-bar {
       display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
       padding: 10px 14px; margin-bottom: 12px;
@@ -3219,13 +3226,22 @@
       display:inline-flex; align-items:center; gap:7px;
     }
     .mr-nav-admin-btn {
-      padding: 8px 16px; border-radius: 10px; border: none;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff; font: 800 13px Heebo, sans-serif; cursor: pointer;
-      white-space: nowrap; box-shadow: 0 2px 12px rgba(99,102,241,.35);
-      transition: opacity .2s, box-shadow .2s;
+      padding: 7px 13px; border-radius: 8px; border: 1px solid rgba(33,31,27,.13);
+      background: rgba(255,255,255,.7);
+      color: #444; font: 700 12px Heebo, sans-serif; cursor: pointer;
+      white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: background .18s, box-shadow .18s;
     }
-    .mr-nav-admin-btn:hover { opacity: .88; box-shadow: 0 4px 18px rgba(99,102,241,.5); }
+    .mr-nav-admin-btn:hover { background: rgba(99,102,241,.1); border-color: rgba(99,102,241,.3); color: #4f46e5; }
+    /* Toast notification */
+    #hapToast {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: #1e293b; color: #fff; font: 700 13px Heebo,sans-serif;
+      padding: 10px 22px; border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,.22);
+      z-index: 999999; opacity: 0; pointer-events: none;
+      transition: opacity .22s, transform .22s;
+    }
+    #hapToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     @media (max-width: 640px) {
       .mr-nav-admin-btn { font-size: 12px; padding: 7px 12px; }
     }
@@ -3839,6 +3855,8 @@
   </div>
   <!-- /landing-page -->
 
+  <div id="hapToast" role="status" aria-live="polite"></div>
+
   <!-- ══════════ LOGIN GATE — must sign in with Google before entering ══════════ -->
   <div id="loginGate" class="gate-overlay">
     <div class="gate-bg" aria-hidden="true">
@@ -4031,6 +4049,7 @@
           </div>
           <span class="pill">מקור: Winner</span>
         </div>
+        <div id="stats-header" class="stats-header" style="display:none">ביצועי היום</div>
         <div id="pick-stats" class="pick-stats-bar" aria-live="polite"></div>
         <div class="cards" id="cards">
           <div class="empty" style="visibility:hidden">טוען...</div>
@@ -4766,10 +4785,12 @@
 
       // Also populate the pick-stats bar above the cards
       const bar = document.getElementById("pick-stats");
+      const statsHdr = document.getElementById("stats-header");
       if (bar) {
         const total = won + lost + pending;
         if (total === 0) {
           bar.innerHTML = "";
+          if (statsHdr) statsHdr.style.display = "none";
         } else {
           const rateLabel = hitRate > 0 ? `${hitRate}%` : (won + lost > 0 ? "0%" : "—");
           bar.innerHTML = [
@@ -4780,6 +4801,7 @@
               ? `<span class="psb-chip rate"><b>${rateLabel}</b><span class="psb-label">&nbsp;אחוז פגיעה</span></span>`
               : "",
           ].filter(Boolean).join("");
+          if (statsHdr) statsHdr.style.display = "";
         }
       }
     }
@@ -6313,7 +6335,10 @@
       const sortedRows = sortByTime(rows);
       cards.innerHTML = banners + (sortedRows.length
         ? sortedRows.map(rowCard).join("")
-        : `<div class="empty">${isOpenDay() ? "אין משחקים עם קריטריונים מתאימים להיום" : "אין משחקים טעונים לתאריך זה"}</div>`);
+        : `<div class="empty">${isOpenDay()
+            ? `<div style="font-size:28px;margin-bottom:10px">⚽</div><b>אין המלצות כרגע</b><br><span style="font-size:13px">Winner לא פרסם עדיין משחקים עם יחסים פתוחים להיום.<br>בדרך כלל הם מופיעים אחר הצהריים.</span>`
+            : `<div style="font-size:28px;margin-bottom:10px">📅</div><b>אין משחקים בתאריך זה</b>`
+          }</div>`);
 
       // Premium lock: blur/overlay all cards beyond the first for free users
       if (!state.isPremium) {
@@ -6807,9 +6832,9 @@
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
               <div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
-                <button class="btn-share-wa" data-share-wa="1" title="שתף בווטסאפ">📱</button>
-                <button class="btn-share-tg" data-share-tg="1" title="שתף בטלגרם">✈️</button>
-                <button class="btn-share-link" data-share-copy="1" title="העתק">שתף</button>
+                <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
+                <button class="btn-share-tg" data-share-tg="1">Telegram</button>
+                <button class="btn-share-link" data-share-copy="1">העתק</button>
               </div>
             </div>
           </div>
@@ -7297,6 +7322,16 @@
       }
     };
 
+    let _toastTimer = null;
+    function showToast(msg, durationMs = 2200) {
+      const el = document.getElementById("hapToast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => el.classList.remove("show"), durationMs);
+    }
+
     window._mrAdminSet = async function(btn, status) {
       const row = btn.closest(".mr-admin-row");
       if (!row) return;
@@ -7308,6 +7343,7 @@
       await _mrSave(row.dataset.home, row.dataset.away, row.dataset.sport, status, score);
       btn.disabled = false;
       btn.textContent = { "פגע":"✓ פגע","נפל":"✗ נפל","ממתין":"⏳","נסגר":"🔒" }[status] || status;
+      showToast({ "פגע":"✅ נשמר — פגע", "נפל":"✅ נשמר — נפל", "ממתין":"✅ נשמר — ממתין", "נסגר":"✅ נשמר — נסגר" }[status] || "✅ נשמר");
     };
 
     window._mrAiUpdate = async function(btn) {
