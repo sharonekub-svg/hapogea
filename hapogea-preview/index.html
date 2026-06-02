@@ -7127,14 +7127,19 @@
         <div class="mr-admin-card">
           <div class="mr-admin-header">
             <span>🔧 ניהול תוצאות</span>
-            <button class="mr-admin-close" onclick="document.getElementById('mrAdminModal').style.display='none'">✕</button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="mr-admin-ai-btn" id="mrAiBtn" onclick="_mrAiUpdate(this)">🤖 AI תוצאות</button>
+              <button class="mr-admin-close" onclick="document.getElementById('mrAdminModal').style.display='none'">✕</button>
+            </div>
           </div>
           <div class="mr-admin-body" id="mrAdminBody">
             ${games.length === 0
               ? `<p style="text-align:center;color:#94a3b8;padding:24px">אין משחקים בפיד כרגע</p>`
-              : games.map(g => `
-                <div class="mr-admin-row" data-home="${escapeHtml(g.home)}" data-away="${escapeHtml(g.away)}" data-sport="${escapeHtml(g.sportId||'football')}">
-                  <div class="mr-admin-teams">${escapeHtml(g.home)} <span style="color:#64748b">vs</span> ${escapeHtml(g.away)}</div>
+              : games.map(g => {
+                  const sport = g.sportId === 227 ? "basketball" : "football";
+                  return `
+                <div class="mr-admin-row" data-home="${escapeHtml(g.home)}" data-away="${escapeHtml(g.away)}" data-sport="${escapeHtml(sport)}" data-pick="${escapeHtml(g.pick||'')}" data-pick-team="${escapeHtml(g.pickTeam||'')}">
+                  <div class="mr-admin-teams">${escapeHtml(g.home)} <span style="color:#64748b">vs</span> ${escapeHtml(g.away)}<span style="color:#475569;font-size:11px;margin-right:6px">${g.pick==='draw'?'תיקו':escapeHtml(g.pickTeam||g.pick||'')}</span></div>
                   <div class="mr-admin-actions">
                     <button class="mr-ab mr-ab-hit"  onclick="_mrAdminSet(this,'פגע')">✓ פגע</button>
                     <button class="mr-ab mr-ab-miss" onclick="_mrAdminSet(this,'נפל')">✗ נפל</button>
@@ -7142,7 +7147,7 @@
                     <button class="mr-ab mr-ab-lock" onclick="_mrAdminSet(this,'נסגר')">🔒</button>
                     <input class="mr-ab-score" placeholder="תוצאה" maxlength="12">
                   </div>
-                </div>`).join("")
+                </div>`;}).join("")
             }
           </div>
         </div>`;
@@ -7170,6 +7175,44 @@
       await _mrSave(row.dataset.home, row.dataset.away, row.dataset.sport, status, score);
       btn.disabled = false;
       btn.textContent = { "פגע":"✓ פגע","נפל":"✗ נפל","ממתין":"⏳","נסגר":"🔒" }[status] || status;
+    };
+
+    window._mrAiUpdate = async function(btn) {
+      const modal = document.getElementById("mrAdminModal");
+      if (!modal) return;
+      const rows = [...modal.querySelectorAll(".mr-admin-row")];
+      if (!rows.length) return;
+      const games = rows.map(r => ({
+        home:     r.dataset.home,
+        away:     r.dataset.away,
+        sport:    r.dataset.sport,
+        pick:     r.dataset.pick,
+        pickTeam: r.dataset.pickTeam || "",
+      }));
+      if (btn) { btn.disabled = true; btn.textContent = "⏳ AI מחפש..."; }
+      try {
+        const res = await fetch("/api/results-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ games }),
+          signal: AbortSignal.timeout(35_000),
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "AI failed");
+        for (const r of (data.results || [])) {
+          if (r.home && r.away) {
+            await _mrSave(r.home, r.away, r.sport || "football", r.status, r.score || "");
+          }
+        }
+        _mrBuildAdminModal();
+        const hits   = (data.results || []).filter(r => r.status === "פגע").length;
+        const misses = (data.results || []).filter(r => r.status === "נפל").length;
+        const wait   = (data.results || []).filter(r => r.status === "ממתין").length;
+        const aiBtnNew = document.getElementById("mrAiBtn");
+        if (aiBtnNew) { aiBtnNew.disabled = false; aiBtnNew.textContent = `✅ ${hits}פ / ${misses}נ / ${wait}מ`; }
+      } catch (e) {
+        if (btn) { btn.disabled = false; btn.textContent = "❌ " + (e.message || "שגיאה"); }
+      }
     };
 
     function initManualResults() {
@@ -7229,6 +7272,13 @@
           padding:4px 8px;border-radius:8px;transition:color .2s;
         }
         .mr-admin-close:hover { color:#e2e8f0; }
+        .mr-admin-ai-btn {
+          background:linear-gradient(135deg,#059669,#0ea5e9);border:none;
+          border-radius:10px;padding:6px 12px;color:#fff;font:700 12px Heebo,sans-serif;
+          cursor:pointer;transition:opacity .2s;
+        }
+        .mr-admin-ai-btn:disabled { opacity:.5;cursor:default; }
+        .mr-admin-ai-btn:not(:disabled):hover { opacity:.85; }
         .mr-admin-body {
           overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;
         }
