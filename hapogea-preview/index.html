@@ -3692,6 +3692,15 @@
     .auth-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(99,102,241,.42); }
     .auth-submit-btn:active { transform: translateY(0); }
     .auth-footnote { text-align: center; margin: 14px 0 0; font-size: 11px; color: rgba(255,255,255,.24); font-family: Assistant, sans-serif; line-height: 1.5; }
+    .auth-google-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: #fff; font: 700 14px Assistant, sans-serif; cursor: pointer; transition: background .2s, border-color .2s, transform .15s; margin-bottom: 16px; }
+    .auth-google-btn:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.25); transform: translateY(-1px); }
+    .auth-divider { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: rgba(255,255,255,.3); font: 500 12px Assistant, sans-serif; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+    .auth-otp-input { font-size: 26px !important; letter-spacing: 10px; text-align: center !important; font-family: 'JetBrains Mono', monospace !important; font-weight: 600 !important; padding-left: 20px !important; }
+    .auth-otp-hint { text-align: center; font-size: 13px; color: rgba(255,255,255,.55); font-family: Assistant, sans-serif; margin: 0 0 14px; line-height: 1.6; direction: ltr; }
+    .auth-otp-hint strong { color: rgba(255,255,255,.85); display: block; }
+    .auth-back-btn { width: 100%; padding: 10px; border: none; background: none; color: rgba(255,255,255,.35); font: 500 13px Assistant, sans-serif; cursor: pointer; margin-top: 4px; transition: color .2s; }
+    .auth-back-btn:hover { color: rgba(255,255,255,.65); }
     .auth-account-header { text-align: center; margin-bottom: 20px; }
     .auth-big-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; font: 900 26px/1 Heebo, sans-serif; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; box-shadow: 0 0 22px rgba(99,102,241,.35); }
     .auth-account-name { margin: 0; font: 900 22px/1.1 Heebo, sans-serif; color: #fff; }
@@ -3770,10 +3779,10 @@
         <button class="lp-btn-secondary" onclick="smoothTo('lp-features')">למד עוד</button>
       </div>
       <div class="lp-stats-row">
-        <div class="lp-stat-box"><div class="lp-stat-num">20</div><div class="lp-stat-lbl">משחקים ביום</div></div>
-        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(255,200,87,.12),rgba(255,160,0,.08));border-color:rgba(255,200,87,.3)">
-          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#fbbf24">9</div>
-          <div class="lp-stat-lbl" style="color:#fbbf24">ימים למונדיאל 🏆</div>
+        <div class="lp-stat-box"><div class="lp-stat-num">40</div><div class="lp-stat-lbl">משחקים ביום</div></div>
+        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(220,38,38,.18),rgba(185,28,28,.12));border-color:rgba(220,38,38,.45)">
+          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#DC2626">9</div>
+          <div class="lp-stat-lbl" style="color:#DC2626">ימים למונדיאל 🏆</div>
         </div>
         <div class="lp-stat-box"><div class="lp-stat-num">48</div><div class="lp-stat-lbl">נבחרות מונדיאל</div></div>
         <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">נתוני Winner</div></div>
@@ -3905,6 +3914,17 @@
         המשך עם Google
       </button>
       <p id="gateError" class="gate-error"></p>
+      <div class="auth-divider" style="margin:14px 0 12px"><span>או קוד חד-פעמי לאימייל</span></div>
+      <div id="gateOtpStep1">
+        <input id="gateOtpEmail" type="email" placeholder="כתובת אימייל" autocomplete="email" class="auth-input auth-input-ltr" style="margin-bottom:10px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')HapAuth.gateSendOtp()"/>
+        <button id="gateSendOtpBtn" onclick="HapAuth.gateSendOtp()" class="gate-google-btn gate-otp-submit" style="background:rgba(99,102,241,.8);border-color:rgba(99,102,241,.5)">שלח קוד לאימייל</button>
+      </div>
+      <div id="gateOtpStep2" style="display:none">
+        <p class="auth-otp-hint" style="margin-bottom:10px">קוד נשלח ל<br><strong id="gateOtpEmailDisplay"></strong></p>
+        <input id="gateOtpCode" type="text" inputmode="numeric" placeholder="00000000" maxlength="8" class="auth-input auth-input-ltr auth-otp-input" style="margin-bottom:10px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')HapAuth.gateVerifyOtp()"/>
+        <button onclick="HapAuth.gateVerifyOtp()" class="gate-google-btn gate-otp-submit" style="background:rgba(99,102,241,.8);border-color:rgba(99,102,241,.5)">כניסה</button>
+        <button onclick="HapAuth.gateBackToEmail()" class="gate-skip" style="display:block;margin:8px auto 0">← שנה כתובת</button>
+      </div>
       <button onclick="HapAuth.skipGate()" class="gate-skip">כניסה ללא התחברות</button>
       <p class="gate-security">🔒 ההתחברות מאובטחת דרך Supabase · Winner odds</p>
     </div>
@@ -4129,6 +4149,12 @@
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'פתח פרימיום 🔓'; }
       }
+    }
+    function premiumDaysLeft() {
+      if (!isPremiumUser()) return null;
+      const exp = Number(localStorage.getItem(PREMIUM_EXP_KEY) || 0);
+      if (!exp) return null;
+      return Math.max(1, Math.ceil((exp - Date.now()) / 86400000));
     }
     function deactivatePremium() {
       localStorage.removeItem(PREMIUM_LS_KEY);
@@ -4716,15 +4742,21 @@
       if (state.sportTab === "worldcup") {
         const statsEl = document.getElementById("stats");
         if (!statsEl) return;
-        const todayStr = new Date().toISOString().split("T")[0];
-        const todayGames = WC2026_FIXTURES.filter(f => f.date === todayStr).length;
-        const daysLeft = Math.max(0, Math.ceil((new Date("2026-06-11T19:00:00Z") - new Date()) / 86400000));
-        const liveOdds = WC2026_FIXTURES.filter(f => f.date === todayStr && f.odds).length;
+        const now = new Date();
+        const wcStart = new Date("2026-06-11T19:00:00Z");
+        const daysLeft = Math.max(0, Math.ceil((wcStart - now) / 86400000));
+        const todayStr = now.toISOString().split("T")[0];
+        const upcomingFixtures = WC2026_FIXTURES.filter(f => f.date >= todayStr);
+        const weekEnd = new Date(now.getTime() + 7 * 86400000).toISOString().split("T")[0];
+        const weekGames = WC2026_FIXTURES.filter(f => f.date >= todayStr && f.date <= weekEnd).length;
+        const nextFixture = upcomingFixtures[0];
+        const nextDateLabel = nextFixture ? wcDateLabel(nextFixture.date).date : "11.06";
+        const liveOdds = WC2026_FIXTURES.filter(f => f.odds && f.date >= todayStr).length;
         statsEl.innerHTML = [
-          { label: "משחקי מונדיאל היום", value: todayGames || "—" },
           { label: daysLeft > 0 ? "ימים לפתיחה" : "מונדיאל פתוח!", value: daysLeft > 0 ? daysLeft : "🏆" },
-          { label: "יחסי Winner חיים", value: liveOdds || "—" },
-          { label: "סה\"כ משחקים", value: "104" },
+          { label: "פתיחה", value: nextDateLabel },
+          { label: "משחקים השבוע", value: weekGames || "—" },
+          { label: 'סה"כ משחקים', value: WC2026_FIXTURES.length },
         ].map(({ label, value }) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join("");
         return;
       }
@@ -4801,9 +4833,14 @@
       const statsHdr = document.getElementById("stats-header");
       if (bar) {
         const total = won + lost + pending;
-        if (total === 0) {
+        const hasSportRows = sportRows.length > 0;
+        if (!hasSportRows) {
           bar.innerHTML = "";
           if (statsHdr) statsHdr.style.display = "none";
+        } else if (total === 0) {
+          // picks exist but none settled/pending — show neutral state
+          bar.innerHTML = `<span class="psb-chip wait">⏳&nbsp;<b>${sportRows.length}</b><span class="psb-label">הימורים ממתינים לתוצאות</span></span>`;
+          if (statsHdr) statsHdr.style.display = "";
         } else {
           const rateLabel = hitRate > 0 ? `${hitRate}%` : (won + lost > 0 ? "0%" : "—");
           bar.innerHTML = [
@@ -7521,7 +7558,12 @@
       Object.values(navMap).forEach(el => el && el.classList.remove('lp-nav-active'));
       if (isApp && state && navMap[state.sportTab]) navMap[state.sportTab].classList.add('lp-nav-active');
       const premBtn = document.getElementById('premiumNavBtn');
-      if (premBtn) premBtn.textContent = (typeof isPremiumUser === 'function' && isPremiumUser()) ? '✓ פרימיום' : '🔒 פרימיום';
+      if (premBtn) {
+        const days = typeof premiumDaysLeft === 'function' ? premiumDaysLeft() : null;
+        premBtn.textContent = (typeof isPremiumUser === 'function' && isPremiumUser())
+          ? (days != null ? `✓ פרימיום · ${days}ד'` : '✓ פרימיום')
+          : '🔒 פרימיום';
+      }
       const user = window.HAP_USER;
       const label = document.getElementById('authNavLabel');
       const avatar = document.getElementById('authNavAvatar');
@@ -7553,7 +7595,12 @@
       applyLogosToCards();
       if (typeof applyManualResults === "function") applyManualResults();
       const premBtn = document.getElementById('premiumHeaderBtn');
-      if (premBtn) premBtn.textContent = state.isPremium ? '✓ פרימיום' : '🔒 פרימיום';
+      if (premBtn) {
+        const days = premiumDaysLeft();
+        premBtn.textContent = state.isPremium
+          ? (days != null ? `✓ פרימיום · ${days}ד'` : '✓ פרימיום')
+          : '🔒 פרימיום';
+      }
     }
 
     function scrollReuvenOutput() {
@@ -7890,7 +7937,7 @@
     const HapAuth = (() => {
       const USERS_KEY = "hapogea_users_v1";
       const SESSION_KEY = "hapogea_session_v1";
-      let authTab = "signin";
+      let _otpPendingEmail = "", _gateOtpPendingEmail = "";
 
       // ── Supabase Google auth (gate before entering the site) ──
       const SUPABASE_URL = "https://qhqpooyczcxrckthwnue.supabase.co";
@@ -7936,26 +7983,7 @@
       }
 
       const readUsers = () => { try { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); } catch { return []; } };
-      const writeUsers = (u) => localStorage.setItem(USERS_KEY, JSON.stringify(u));
       const normEmail = (e) => String(e || "").trim().toLowerCase();
-
-      function randomSalt() {
-        if (window.crypto && crypto.getRandomValues) {
-          const a = new Uint8Array(16); crypto.getRandomValues(a);
-          return [...a].map(b => b.toString(16).padStart(2, "0")).join("");
-        }
-        return String(Math.random()).slice(2) + Date.now().toString(16);
-      }
-      async function hashPw(password, salt) {
-        const data = new TextEncoder().encode(salt + "|" + password);
-        if (window.crypto && crypto.subtle && crypto.subtle.digest) {
-          const buf = await crypto.subtle.digest("SHA-256", data);
-          return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
-        }
-        let h = 0x811c9dc5; const s = salt + "|" + password;
-        for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; }
-        return "f" + h.toString(16);
-      }
 
       function current() {
         if (sbUser) {
@@ -8003,20 +8031,11 @@
 
       // ── Modal control ──
       const modal = () => document.getElementById("authModal");
-      function setError(msg) { const e = document.getElementById("authError"); if (e) e.textContent = msg || ""; }
-      function switchTab(tab) {
-        authTab = tab;
-        const isUp = tab === "signup";
-        document.getElementById("authNameRow").style.display = isUp ? "block" : "none";
-        document.getElementById("authTabSignin").classList.toggle("auth-tab-active", !isUp);
-        document.getElementById("authTabSignup").classList.toggle("auth-tab-active", isUp);
-        document.getElementById("authSubmit").textContent = isUp ? "צור חשבון" : "התחבר";
-        document.getElementById("authSubtitle").textContent = isUp
-          ? "פתח חשבון כדי לשמור שיחות ולקבל ניתוח מותאם"
-          : "התחבר כדי לשמור שיחות ולקבל ניתוח מותאם";
-        document.getElementById("authPassword").setAttribute("autocomplete", isUp ? "new-password" : "current-password");
-        setError("");
+      function setError(msg) {
+        const e = document.getElementById("authError"); if (e) e.textContent = msg || "";
       }
+      function setError2(msg) { const e = document.getElementById("authError2"); if (e) e.textContent = msg || ""; }
+      function switchTab() {}
       function showView(signedIn) {
         document.getElementById("authFormView").style.display = signedIn ? "none" : "block";
         document.getElementById("authAccountView").style.display = signedIn ? "block" : "none";
@@ -8025,50 +8044,137 @@
           document.getElementById("authBigAvatar").textContent = initials(u.name);
           document.getElementById("authAccountName").textContent = u.name;
           document.getElementById("authAccountEmail").textContent = u.email;
+          const _premDays = premiumDaysLeft();
           document.getElementById("authAccountPlan").textContent =
-            (isPremiumUser() ? "מנוי פרימיום ✦" : "תוכנית " + (u.plan || "Free"));
+            (isPremiumUser()
+              ? (_premDays != null ? `מנוי פרימיום ✦ · נותרו ${_premDays} ימים` : "מנוי פרימיום ✦")
+              : "תוכנית " + (u.plan || "Free"));
         }
       }
-      function openModal(tab) {
+      function _resetOtpForm() {
+        _otpPendingEmail = "";
+        const s1 = document.getElementById("authOtpStep1"); if (s1) s1.style.display = "";
+        const s2 = document.getElementById("authOtpStep2"); if (s2) s2.style.display = "none";
+        const emailEl = document.getElementById("authEmail"); if (emailEl) emailEl.value = "";
+        const codeEl = document.getElementById("authOtpCode"); if (codeEl) codeEl.value = "";
+        setError(""); setError2("");
+        const btn = document.getElementById("authSendOtpBtn");
+        if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+      }
+      function openModal() {
         modal().classList.remove("hidden");
         showView(false);
-        switchTab(tab || "signin");
-        setError("");
-        ["authName", "authEmail", "authPassword"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
-        setTimeout(() => { const f = document.getElementById(tab === "signup" ? "authName" : "authEmail"); if (f) f.focus(); }, 60);
+        _resetOtpForm();
+        setTimeout(() => { const f = document.getElementById("authEmail"); if (f) f.focus(); }, 60);
       }
       function closeModal() { modal().classList.add("hidden"); }
       function openOrMenu() {
         if (current()) { modal().classList.remove("hidden"); showView(true); }
-        else openModal("signin");
+        else openModal();
       }
 
-      async function submit() {
-        const email = normEmail(document.getElementById("authEmail").value);
-        const password = document.getElementById("authPassword").value;
-        const name = document.getElementById("authName").value.trim();
+      async function sendOtp() {
+        if (!sb) return setError("Supabase לא נטען — רענן את הדף");
+        const email = normEmail(document.getElementById("authEmail")?.value || "");
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return setError("כתובת אימייל לא תקינה");
-        if (!password || password.length < 6) return setError("הסיסמה חייבת לפחות 6 תווים");
-        const users = readUsers();
-
-        if (authTab === "signup") {
-          if (!name) return setError("נא להזין שם מלא");
-          if (users.some(u => u.email === email)) return setError("כבר קיים חשבון עם האימייל הזה");
-          const salt = randomSalt();
-          const hash = await hashPw(password, salt);
-          const user = { id: "u_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-            name, email, salt, hash, plan: "Free", createdAt: new Date().toISOString() };
-          users.push(user); writeUsers(users);
-          localStorage.setItem(SESSION_KEY, user.id);
-        } else {
-          const user = users.find(u => u.email === email);
-          if (!user) return setError("לא נמצא חשבון עם האימייל הזה");
-          const hash = await hashPw(password, user.salt);
-          if (hash !== user.hash) return setError("סיסמה שגויה");
-          localStorage.setItem(SESSION_KEY, user.id);
+        const btn = document.getElementById("authSendOtpBtn");
+        if (btn) { btn.disabled = true; btn.textContent = "שולח..."; }
+        setError("");
+        try {
+          const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+          if (error) {
+            setError("שגיאה: " + error.message);
+            if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+            return;
+          }
+          _otpPendingEmail = email;
+          document.getElementById("authOtpStep1").style.display = "none";
+          document.getElementById("authOtpStep2").style.display = "";
+          const disp = document.getElementById("authOtpEmailDisplay"); if (disp) disp.textContent = email;
+          setTimeout(() => { const f = document.getElementById("authOtpCode"); if (f) f.focus(); }, 60);
+        } catch (e) {
+          setError("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
         }
-        broadcast();
-        closeModal();
+      }
+
+      async function verifyOtp() {
+        if (!sb) return setError2("Supabase לא נטען");
+        const token = (document.getElementById("authOtpCode")?.value || "").trim().replace(/\s/g, "");
+        if (!token || token.length < 8) return setError2("נא להזין קוד בן 8 ספרות");
+        const btn = document.querySelector("#authOtpStep2 .auth-submit-btn");
+        if (btn) { btn.disabled = true; btn.textContent = "מאמת..."; }
+        setError2("");
+        try {
+          const { error } = await sb.auth.verifyOtp({ email: _otpPendingEmail, token, type: "email" });
+          if (error) {
+            setError2("קוד שגוי או פג תוקף — נסה שנית");
+            if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+            return;
+          }
+          closeModal();
+        } catch (e) {
+          setError2("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+        }
+      }
+
+      function backToEmail() { _resetOtpForm(); }
+
+      function submit() { sendOtp(); }
+
+      async function gateSendOtp() {
+        if (!sb) return gateError("Supabase לא נטען — רענן את הדף");
+        const email = normEmail(document.getElementById("gateOtpEmail")?.value || "");
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return gateError("כתובת אימייל לא תקינה");
+        const btn = document.getElementById("gateSendOtpBtn");
+        if (btn) { btn.disabled = true; btn.textContent = "שולח..."; }
+        gateError("");
+        try {
+          const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+          if (error) {
+            gateError("שגיאה: " + error.message);
+            if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+            return;
+          }
+          _gateOtpPendingEmail = email;
+          document.getElementById("gateOtpStep1").style.display = "none";
+          document.getElementById("gateOtpStep2").style.display = "";
+          const disp = document.getElementById("gateOtpEmailDisplay"); if (disp) disp.textContent = email;
+          setTimeout(() => { const f = document.getElementById("gateOtpCode"); if (f) f.focus(); }, 60);
+        } catch (e) {
+          gateError("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
+        }
+      }
+
+      async function gateVerifyOtp() {
+        if (!sb) return gateError("Supabase לא נטען");
+        const token = (document.getElementById("gateOtpCode")?.value || "").trim().replace(/\s/g, "");
+        if (!token || token.length < 8) return gateError("נא להזין קוד בן 8 ספרות");
+        const btn = document.querySelector("#gateOtpStep2 .gate-otp-submit");
+        if (btn) { btn.disabled = true; btn.textContent = "מאמת..."; }
+        gateError("");
+        try {
+          const { error } = await sb.auth.verifyOtp({ email: _gateOtpPendingEmail, token, type: "email" });
+          if (error) {
+            gateError("קוד שגוי או פג תוקף — נסה שנית");
+            if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+          }
+        } catch (e) {
+          gateError("שגיאה: " + e.message);
+          if (btn) { btn.disabled = false; btn.textContent = "כניסה"; }
+        }
+      }
+
+      function gateBackToEmail() {
+        _gateOtpPendingEmail = "";
+        const s1 = document.getElementById("gateOtpStep1"); if (s1) s1.style.display = "";
+        const s2 = document.getElementById("gateOtpStep2"); if (s2) s2.style.display = "none";
+        const codeEl = document.getElementById("gateOtpCode"); if (codeEl) codeEl.value = "";
+        gateError("");
+        const btn = document.getElementById("gateSendOtpBtn");
+        if (btn) { btn.disabled = false; btn.textContent = "שלח קוד לאימייל"; }
       }
 
       async function signOut() {
@@ -8117,7 +8223,7 @@
         try { if (sessionStorage.getItem('hapogea_gate_skipped') === '1') { _gateSkipped = true; return; } } catch {}
         showGate(true);
       }
-      return { current, openModal, closeModal, openOrMenu, switchTab, submit, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
+      return { current, openModal, closeModal, openOrMenu, switchTab, submit, sendOtp, verifyOtp, backToEmail, gateSendOtp, gateVerifyOtp, gateBackToEmail, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
     })();
     window.HapAuth = HapAuth;
 
@@ -8316,10 +8422,12 @@
     // Update LP countdown box
     (function updateLpWCDays() {
       const el = document.getElementById("lpWCDaysNum");
+      const lbl = el && el.parentElement && el.parentElement.querySelector(".lp-stat-lbl");
       if (!el) return;
       const diff = new Date("2026-06-11T19:00:00Z") - new Date();
       const days = Math.max(0, Math.ceil(diff / 86400000));
       el.textContent = days > 0 ? days : "🏆";
+      if (lbl) lbl.textContent = days > 0 ? `ימים לפתיחת המונדיאל 🏆` : "מונדיאל 2026 פתוח!";
     })();
 
     // Fix iOS virtual keyboard covering the AI composer
@@ -8413,24 +8521,30 @@
         <div class="auth-header">
           <img src="/logo.svg" alt="הפוגע" class="auth-header-logo"/>
           <h2 class="auth-header-title">הפוגע <span class="auth-ai-badge">AI</span></h2>
-          <p id="authSubtitle" class="auth-header-sub">התחבר כדי לשמור שיחות ולקבל ניתוח מותאם</p>
+          <p class="auth-header-sub">כניסה לחשבון</p>
         </div>
-        <div class="auth-tabs">
-          <button id="authTabSignin" onclick="HapAuth.switchTab('signin')" class="auth-tab auth-tab-active">התחברות</button>
-          <button id="authTabSignup" onclick="HapAuth.switchTab('signup')" class="auth-tab">הרשמה</button>
+        <button onclick="HapAuth.signInWithGoogle()" class="auth-google-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+          המשך עם Google
+        </button>
+        <div class="auth-divider"><span>או קוד חד-פעמי לאימייל</span></div>
+        <div id="authOtpStep1">
+          <div class="auth-field">
+            <input id="authEmail" type="email" placeholder="כתובת אימייל" autocomplete="email" class="auth-input auth-input-ltr" onkeydown="if(event.key==='Enter')HapAuth.sendOtp()"/>
+          </div>
+          <p id="authError" class="auth-error"></p>
+          <button id="authSendOtpBtn" onclick="HapAuth.sendOtp()" class="auth-submit-btn">שלח קוד לאימייל</button>
         </div>
-        <div id="authNameRow" class="auth-field" style="display:none">
-          <input id="authName" type="text" placeholder="שם מלא" autocomplete="name" class="auth-input"/>
+        <div id="authOtpStep2" style="display:none">
+          <p class="auth-otp-hint">קוד נשלח לכתובת<br><strong id="authOtpEmailDisplay"></strong></p>
+          <div class="auth-field">
+            <input id="authOtpCode" type="text" inputmode="numeric" placeholder="00000000" maxlength="8" class="auth-input auth-input-ltr auth-otp-input" onkeydown="if(event.key==='Enter')HapAuth.verifyOtp()"/>
+          </div>
+          <p id="authError2" class="auth-error"></p>
+          <button onclick="HapAuth.verifyOtp()" class="auth-submit-btn">כניסה</button>
+          <button onclick="HapAuth.backToEmail()" class="auth-back-btn">← שנה כתובת אימייל</button>
         </div>
-        <div class="auth-field">
-          <input id="authEmail" type="email" placeholder="אימייל" autocomplete="email" class="auth-input auth-input-ltr"/>
-        </div>
-        <div class="auth-field">
-          <input id="authPassword" type="password" placeholder="סיסמה" autocomplete="current-password" class="auth-input auth-input-ltr"/>
-        </div>
-        <p id="authError" class="auth-error"></p>
-        <button id="authSubmit" onclick="HapAuth.submit()" class="auth-submit-btn">התחבר</button>
-        <p class="auth-footnote">החשבון נשמר במכשיר זה בלבד · הסיסמה נשמרת מוצפנת (SHA-256)</p>
+        <p class="auth-footnote">כניסה מאובטחת · לא נדרשת סיסמה</p>
       </div>
 
       <!-- Account (signed-in) view -->
