@@ -1,5 +1,6 @@
 // /api/logo?q=<team or league name>&type=team|league
 // Main resilient logo resolver. It never returns a broken image:
+// 0. football-logos.cc (SVG, transparent, best quality — browser follows redirect)
 // 1. 365Scores search
 // 2. SofaScore search
 // 3. Wikidata official logo (P154/P18)
@@ -8,6 +9,63 @@
 
 const { rateLimit } = require("./_rate-limit");
 const logoCache = globalThis.__HAPOGEA_LOGO_API_CACHE__ || (globalThis.__HAPOGEA_LOGO_API_CACHE__ = new Map());
+
+// Hebrew team name → English football-logos.cc slug overrides
+const HE_TO_SLUG = {
+  "מכבי תל אביב": "maccabi-tel-aviv",
+  "הפועל תל אביב": "hapoel-tel-aviv",
+  "מכבי חיפה": "maccabi-haifa",
+  "הפועל חיפה": "hapoel-haifa",
+  "בית\"ר ירושלים": "beitar-jerusalem",
+  "ביתר ירושלים": "beitar-jerusalem",
+  "הפועל באר שבע": "hapoel-beer-sheva",
+  "מכבי פתח תקווה": "maccabi-petah-tikva",
+  "עירוני קריית שמונה": "ironi-kiryat-shmona",
+  "הפועל ירושלים": "hapoel-jerusalem",
+  "בני יהודה": "bnei-yehuda",
+  "מכבי נתניה": "maccabi-netanya",
+  "בני סכנין": "bnei-sakhnin",
+  "הפועל נצרת": "hapoel-nazareth",
+  "עירוני אשדוד": "ironi-ashdod",
+  "מ.ס. אשדוד": "ms-ashdod",
+  "הפועל חדרה": "hapoel-hadera",
+  "הפועל רמת גן": "hapoel-ramat-gan",
+  "הפועל עכו": "hapoel-akko",
+  "מכבי אשדוד": "maccabi-ashdod",
+  "הפועל עפולה": "hapoel-afula",
+  "הפועל כפר שלם": "hapoel-kfar-shalem",
+  "מכבי פת\"ת": "maccabi-petah-tikva",
+  "הפועל ראשל\"צ": "hapoel-rishon-lezion",
+  "הפועל ראשון לציון": "hapoel-rishon-lezion",
+  "מכבי יפו": "maccabi-jaffa",
+  "עירוני כפר סבא": "ironi-kfar-saba",
+  "מ.ס. כפר קאסם": "ms-kfar-kasem",
+  "בני ריינה": "bnei-reina",
+  "הפועל כתב": "hapoel-katav",
+};
+
+function toFLSlug(name) {
+  const he = HE_TO_SLUG[name.trim()];
+  if (he) return he;
+  return name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[ʼ''`']/g, "")
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+async function tryFootballLogos(name, type) {
+  if (type !== "team") return null;
+  const slug = toFLSlug(name);
+  if (!slug || slug.length < 2) return null;
+  // Return the SVG URL — server does 302 redirect, browser fetches from football-logos.cc
+  return { url: `https://football-logos.cc/logos/${slug}.svg`, source: "football-logos.cc" };
+}
 
 function cleanText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -169,6 +227,7 @@ async function resolveLogo(name, type) {
   if (logoCache.has(key)) return logoCache.get(key);
   const pending = (async () => {
     const resolvers = [
+      () => tryFootballLogos(name, type),
       () => try365Scores(name, type),
       () => trySofaScore(name, type),
       () => tryWikidata(name, type),
