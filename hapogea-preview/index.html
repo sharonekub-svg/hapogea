@@ -7150,7 +7150,7 @@
       if (old) old.remove();
 
       const games = [];
-      if (window.state && state.feed?.tabs?.today) {
+      if (state.feed?.tabs?.today) {
         for (const rows of Object.values(state.feed.tabs.today.sports || {})) {
           for (const item of (rows || [])) {
             if (item.home && item.away) games.push(item);
