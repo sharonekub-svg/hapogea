@@ -6746,12 +6746,161 @@
     }
 
     // ── Client-side logo loader ───────────────────────────────────────────────
-    // Server-side (winner-feed.js) already seeds 365Scores logo URLs into the
-    // feed JSON. Remaining placeholder logos are upgraded through /api/logo,
-    // the same main resolver used for every team and league.
+    // football-logos.cc is the primary source (SVG, transparent background).
+    // Browsers can access football-logos.cc directly; remaining logos fall
+    // through to /api/logo (365Scores → SofaScore → Wikidata → TheSportsDB).
+
+    // Hebrew → football-logos.cc slug (Israeli league teams)
+    const _FL_HE = {
+      "מכבי תל אביב":"maccabi-tel-aviv","הפועל תל אביב":"hapoel-tel-aviv",
+      "מכבי חיפה":"maccabi-haifa","הפועל חיפה":"hapoel-haifa",
+      'בית"ר ירושלים':"beitar-jerusalem","ביתר ירושלים":"beitar-jerusalem",
+      "הפועל באר שבע":"hapoel-beer-sheva","מכבי פתח תקווה":"maccabi-petah-tikva",
+      "עירוני קריית שמונה":"ironi-kiryat-shmona","הפועל ירושלים":"hapoel-jerusalem",
+      "בני יהודה":"bnei-yehuda","מכבי נתניה":"maccabi-netanya",
+      "בני סכנין":"bnei-sakhnin","הפועל נצרת":"hapoel-nazareth",
+      "עירוני אשדוד":"ironi-ashdod","מ.ס. אשדוד":"ms-ashdod",
+      "הפועל חדרה":"hapoel-hadera","הפועל רמת גן":"hapoel-ramat-gan",
+      "הפועל עכו":"hapoel-akko","מכבי אשדוד":"maccabi-ashdod",
+      "הפועל עפולה":"hapoel-afula","הפועל ראשון לציון":"hapoel-rishon-lezion",
+      'הפועל ראשל"צ':"hapoel-rishon-lezion","עירוני כפר סבא":"ironi-kfar-saba",
+      "בני ריינה":"bnei-reina","הפועל כפר שלם":"hapoel-kfar-shalem",
+    };
+
+    // English name → football-logos.cc slug overrides for common name variants
+    const _FL_EN = {
+      // England
+      "arsenal":"arsenal","chelsea":"chelsea","liverpool":"liverpool",
+      "manchester city":"manchester-city","man city":"manchester-city",
+      "manchester united":"manchester-united","man utd":"manchester-united","man united":"manchester-united",
+      "tottenham":"tottenham-hotspur","tottenham hotspur":"tottenham-hotspur","spurs":"tottenham-hotspur",
+      "newcastle":"newcastle-united","newcastle united":"newcastle-united",
+      "aston villa":"aston-villa","west ham":"west-ham-united","west ham united":"west-ham-united",
+      "brighton":"brighton","brighton & hove albion":"brighton","brighton and hove albion":"brighton",
+      "wolves":"wolverhampton-wanderers","wolverhampton":"wolverhampton-wanderers","wolverhampton wanderers":"wolverhampton-wanderers",
+      "everton":"everton","brentford":"brentford","crystal palace":"crystal-palace",
+      "fulham":"fulham","nottingham forest":"nottingham-forest","bournemouth":"bournemouth",
+      "ipswich":"ipswich-town","ipswich town":"ipswich-town","leicester":"leicester-city","leicester city":"leicester-city",
+      "southampton":"southampton","luton":"luton-town","luton town":"luton-town",
+      "burnley":"burnley","sheffield united":"sheffield-united","sheffield wednesday":"sheffield-wednesday",
+      "leeds":"leeds-united","leeds united":"leeds-united",
+      // Spain
+      "barcelona":"barcelona","real madrid":"real-madrid","atletico madrid":"atletico-madrid",
+      "atlético madrid":"atletico-madrid","atlético de madrid":"atletico-madrid",
+      "sevilla":"sevilla","real sociedad":"real-sociedad","real betis":"real-betis",
+      "athletic bilbao":"athletic-bilbao","athletic club":"athletic-bilbao",
+      "villarreal":"villarreal","valencia":"valencia","osasuna":"osasuna",
+      "getafe":"getafe","celta vigo":"celta-vigo","girona":"girona",
+      "rayo vallecano":"rayo-vallecano","mallorca":"mallorca","cadiz":"cadiz",
+      "granada":"granada","almeria":"almeria","las palmas":"las-palmas",
+      "deportivo alaves":"deportivo-alaves","alaves":"deportivo-alaves",
+      "espanyol":"espanyol","leganes":"leganes","valladolid":"real-valladolid","real valladolid":"real-valladolid",
+      // Italy
+      "juventus":"juventus","inter milan":"inter-milan","inter":"inter-milan",
+      "ac milan":"ac-milan","milan":"ac-milan","as roma":"as-roma","roma":"as-roma",
+      "napoli":"napoli","lazio":"lazio","atalanta":"atalanta","fiorentina":"fiorentina",
+      "torino":"torino","bologna":"bologna","monza":"monza","udinese":"udinese",
+      "genoa":"genoa","lecce":"lecce","sassuolo":"sassuolo","empoli":"empoli",
+      "frosinone":"frosinone","hellas verona":"hellas-verona","verona":"hellas-verona",
+      "cagliari":"cagliari","venezia":"venezia","parma":"parma","como":"como",
+      // Germany
+      "bayern munich":"bayern-munich","bayern münchen":"bayern-munich","fc bayern":"bayern-munich",
+      "borussia dortmund":"borussia-dortmund","dortmund":"borussia-dortmund","bvb":"borussia-dortmund",
+      "bayer leverkusen":"bayer-leverkusen","leverkusen":"bayer-leverkusen",
+      "rb leipzig":"rb-leipzig","leipzig":"rb-leipzig",
+      "borussia mönchengladbach":"borussia-monchengladbach","gladbach":"borussia-monchengladbach",
+      "eintracht frankfurt":"eintracht-frankfurt","frankfurt":"eintracht-frankfurt",
+      "wolfsburg":"wolfsburg","vfl wolfsburg":"wolfsburg",
+      "union berlin":"union-berlin","1. fc union berlin":"union-berlin",
+      "sc freiburg":"freiburg","freiburg":"freiburg",
+      "hoffenheim":"hoffenheim","tsg hoffenheim":"hoffenheim",
+      "mainz":"mainz","mainz 05":"mainz","1. fsv mainz 05":"mainz",
+      "augsburg":"augsburg","fc augsburg":"augsburg",
+      "hertha berlin":"hertha-berlin","werder bremen":"werder-bremen","bremen":"werder-bremen",
+      "cologne":"cologne","fc koln":"cologne","köln":"cologne",
+      "stuttgart":"stuttgart","vfb stuttgart":"stuttgart",
+      "heidenheim":"heidenheim","darmstadt":"darmstadt",
+      "hamburger sv":"hamburger-sv","hamburg":"hamburger-sv",
+      // France
+      "paris saint-germain":"paris-saint-germain","psg":"paris-saint-germain","paris sg":"paris-saint-germain",
+      "marseille":"marseille","lyon":"lyon","monaco":"monaco",
+      "nice":"nice","lens":"lens","rennes":"rennes","lille":"lille",
+      "strasbourg":"strasbourg","nantes":"nantes","montpellier":"montpellier",
+      "toulouse":"toulouse","lorient":"lorient","reims":"reims",
+      "metz":"metz","brest":"brest","clermont":"clermont",
+      "ajaccio":"ajaccio","angers":"angers","bordeaux":"bordeaux",
+      // Portugal
+      "benfica":"benfica","sl benfica":"benfica","porto":"porto","fc porto":"porto",
+      "sporting cp":"sporting-cp","sporting":"sporting-cp","sporting lisbon":"sporting-cp",
+      "braga":"braga","sc braga":"braga","vitoria de guimaraes":"vitoria-guimaraes",
+      "casa pia":"casa-pia","boavista":"boavista","famalicao":"famalicao",
+      // Netherlands
+      "ajax":"ajax","psv eindhoven":"psv-eindhoven","psv":"psv-eindhoven",
+      "feyenoord":"feyenoord","az":"az-alkmaar","az alkmaar":"az-alkmaar",
+      "twente":"fc-twente","fc twente":"fc-twente","vitesse":"vitesse",
+      "utrecht":"fc-utrecht","fc utrecht":"fc-utrecht",
+      // Turkey
+      "galatasaray":"galatasaray","fenerbahce":"fenerbahce","fenerbahçe":"fenerbahce",
+      "besiktas":"besiktas","beşiktaş":"besiktas","trabzonspor":"trabzonspor",
+      "basaksehir":"istanbul-basaksehir","istanbul basaksehir":"istanbul-basaksehir",
+      // Scotland
+      "celtic":"celtic","rangers":"rangers","hearts":"heart-of-midlothian",
+      "heart of midlothian":"heart-of-midlothian","hibernian":"hibernian","aberdeen":"aberdeen",
+      // Belgium
+      "anderlecht":"rsc-anderlecht","club brugge":"club-brugge","brugge":"club-brugge",
+      "gent":"kaa-gent","kaa gent":"kaa-gent","standard liege":"standard-liege",
+      // Greece
+      "olympiacos":"olympiacos","panathinaikos":"panathinaikos","aek athens":"aek-athens","aek":"aek-athens",
+      "paok":"paok","aris":"aris",
+      // Champions League / Europa teams
+      "real madrid cf":"real-madrid","fc barcelona":"barcelona",
+      "red bull salzburg":"red-bull-salzburg","salzburg":"red-bull-salzburg",
+      "shakhtar donetsk":"shakhtar-donetsk","shakhtar":"shakhtar-donetsk",
+      "dinamo zagreb":"dinamo-zagreb","red star belgrade":"red-star-belgrade",
+      "young boys":"young-boys","bsyb":"young-boys",
+      "celtic fc":"celtic","rangers fc":"rangers",
+      "cska moscow":"cska-moscow","zenit":"zenit-st-petersburg","zenit st. petersburg":"zenit-st-petersburg",
+      "slavia prague":"slavia-prague","sparta prague":"sparta-prague",
+      "vitoria sc":"vitoria-sc","vikingur":"vikingur",
+      "hammarby":"hammarby","malmo":"malmo-ff","malmö ff":"malmo-ff",
+      "rosenborg":"rosenborg","djurgarden":"djurgarden",
+      "midtjylland":"fc-midtjylland","fc midtjylland":"fc-midtjylland",
+      "brondby":"brondby-if","brøndby":"brondby-if",
+      "shamrock rovers":"shamrock-rovers",
+      // USA/MLS
+      "inter miami":"inter-miami","la galaxy":"la-galaxy","seattle sounders":"seattle-sounders",
+      "new york city":"new-york-city-fc","nycfc":"new-york-city-fc",
+      "portland timbers":"portland-timbers","atlanta united":"atlanta-united",
+      "new england revolution":"new-england-revolution",
+      // Argentina
+      "river plate":"river-plate","boca juniors":"boca-juniors","racing club":"racing-club",
+      "independiente":"independiente","san lorenzo":"san-lorenzo","velez sarsfield":"velez-sarsfield",
+      // Brazil
+      "flamengo":"flamengo","palmeiras":"palmeiras","corinthians":"corinthians",
+      "sao paulo":"sao-paulo","são paulo":"sao-paulo","atletico mineiro":"atletico-mineiro",
+      "atlético mineiro":"atletico-mineiro","internacional":"internacional","gremio":"gremio",
+      "fluminense":"fluminense","botafogo":"botafogo","vasco da gama":"vasco-da-gama",
+    };
+
+    // Generate football-logos.cc SVG URL for any team name
+    function _flUrl(name) {
+      const n = (name || "").trim();
+      const heSlug = _FL_HE[n];
+      if (heSlug) return `https://football-logos.cc/logos/${heSlug}.svg`;
+      const enSlug = _FL_EN[n.toLowerCase()];
+      if (enSlug) return `https://football-logos.cc/logos/${enSlug}.svg`;
+      // Auto-generate slug from English name
+      const slug = n.toLowerCase()
+        .normalize("NFKD").replace(/[̀-ͯ]/g, "")
+        .replace(/[ʼ''`]/g, "").replace(/[^a-z0-9\s-]/g, " ")
+        .trim().replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+      // Only generate for Latin-script names (skip Hebrew/Arabic chars)
+      if (!/^[a-z0-9-]+$/.test(slug) || slug.length < 2) return null;
+      return `https://football-logos.cc/logos/${slug}.svg`;
+    }
 
     const _logoMem = new Map();        // session memory
-    const _LSKEY   = "hapogea_lg_v4";  // localStorage key
+    const _LSKEY   = "hapogea_lg_v5";  // localStorage key (bumped from v4)
 
     (function seedFromStorage() {
       try {
@@ -6778,18 +6927,30 @@
       return ac.signal;
     }
 
+    // Probe a football-logos.cc SVG URL to see if it resolves (no-cors mode)
+    function _probeFLUrl(url) {
+      return fetch(url, { method: "HEAD", mode: "no-cors", signal: timeoutSignal(4000) })
+        .then(() => url)   // no-cors succeeds → likely reachable
+        .catch(() => null);
+    }
+
     async function _resolveLogo(name) {
       if (_logoMem.has(name)) {
         const v = _logoMem.get(name);
         return (v instanceof Promise) ? null : v;
       }
-      const p = fetch(`/api/logo?q=${encodeURIComponent(name)}&type=team`, { signal: timeoutSignal(7000) })
-        .then(response => response.ok ? response.url : null)
-        .then(url => {
-        if (url) _saveLogo(name, url);
-        else _logoMem.set(name, null);
-        return url;
-      }).catch(() => null);
+      // Try football-logos.cc directly from browser first (fast, no API call)
+      const flUrl = _flUrl(name);
+      const p = (flUrl ? _probeFLUrl(flUrl).then(u => u || null) : Promise.resolve(null))
+        .then(async (flResult) => {
+          if (flResult) { _saveLogo(name, flResult); return flResult; }
+          // Fall back to /api/logo (365Scores → SofaScore → Wikidata → TheSportsDB)
+          const apiUrl = await fetch(`/api/logo?q=${encodeURIComponent(name)}&type=team`, { signal: timeoutSignal(8000) })
+            .then(r => r.ok ? r.url : null).catch(() => null);
+          if (apiUrl) _saveLogo(name, apiUrl);
+          else _logoMem.set(name, null);
+          return apiUrl;
+        }).catch(() => null);
       _logoMem.set(name, p);
       return p;
     }
