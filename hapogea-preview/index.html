@@ -3444,14 +3444,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(160deg, #070d16 0%, #0c1628 55%, #080e18 100%);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(37,99,235,.06), transparent 28rem),
+        radial-gradient(circle at 90% 12%, rgba(208,92,26,.05), transparent 25rem),
+        #FAF8F4;
       overflow: hidden;
     }
     .gate-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
     .gate-orb { position: absolute; border-radius: 50%; filter: blur(90px); }
-    .gate-orb-1 { width: 600px; height: 600px; top: -200px; left: -150px; background: radial-gradient(circle, rgba(99,102,241,.26), transparent 70%); animation: gate-orb-drift 9s ease-in-out infinite; }
-    .gate-orb-2 { width: 500px; height: 500px; bottom: -150px; right: -100px; background: radial-gradient(circle, rgba(37,99,235,.2), transparent 70%); animation: gate-orb-drift 11s ease-in-out infinite reverse; animation-delay: 2s; }
-    .gate-orb-3 { width: 360px; height: 360px; top: 38%; left: 38%; background: radial-gradient(circle, rgba(245,168,35,.12), transparent 70%); animation: gate-orb-drift 13s ease-in-out infinite; animation-delay: 4s; }
+    .gate-orb-1 { width: 600px; height: 600px; top: -200px; left: -150px; background: radial-gradient(circle, rgba(99,102,241,.12), transparent 70%); animation: gate-orb-drift 9s ease-in-out infinite; }
+    .gate-orb-2 { width: 500px; height: 500px; bottom: -150px; right: -100px; background: radial-gradient(circle, rgba(37,99,235,.09), transparent 70%); animation: gate-orb-drift 11s ease-in-out infinite reverse; animation-delay: 2s; }
+    .gate-orb-3 { width: 360px; height: 360px; top: 38%; left: 38%; background: radial-gradient(circle, rgba(245,168,35,.07), transparent 70%); animation: gate-orb-drift 13s ease-in-out infinite; animation-delay: 4s; }
     @keyframes gate-orb-drift {
       0%,100% { transform: translate(0,0) scale(1); }
       33% { transform: translate(22px,-26px) scale(1.06); }
@@ -3460,10 +3463,10 @@
     .gate-float {
       position: absolute;
       font-size: 48px;
-      opacity: .045;
+      opacity: .09;
       pointer-events: none;
       animation: gate-sport-float 15s ease-in-out infinite;
-      filter: blur(1.5px);
+      filter: blur(1px);
     }
     .gate-float-1 { top: 11%; left: 6%; animation-delay: 0s; font-size: 58px; }
     .gate-float-2 { top: 54%; right: 5%; animation-delay: 4s; animation-duration: 13s; }
@@ -3478,7 +3481,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px);
       background-size: 52px 52px;
     }
     .gate-card {
