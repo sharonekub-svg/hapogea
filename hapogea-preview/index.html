@@ -3205,6 +3205,17 @@
       color:#211F1B; font:800 12px Heebo,sans-serif; cursor:pointer; white-space:nowrap;
       display:inline-flex; align-items:center; gap:7px;
     }
+    .mr-nav-admin-btn {
+      padding: 8px 16px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font: 800 13px Heebo, sans-serif; cursor: pointer;
+      white-space: nowrap; box-shadow: 0 2px 12px rgba(99,102,241,.35);
+      transition: opacity .2s, box-shadow .2s;
+    }
+    .mr-nav-admin-btn:hover { opacity: .88; box-shadow: 0 4px 18px rgba(99,102,241,.5); }
+    @media (max-width: 640px) {
+      .mr-nav-admin-btn { font-size: 12px; padding: 7px 12px; }
+    }
     /* Always hide the dark app topbar — lp-nav is the single navigation */
     .topbar { display: none !important; }
     /* Shell padding to clear the fixed lp-nav (68px) */
@@ -3682,6 +3693,8 @@
         </button>
         <button class="lp-enter-btn" onclick="enterApp()">כניסה למנוע <span aria-hidden="true" style="font-size:16px">←</span></button>
       </div>
+      <!-- Admin: results management (visible only when ?admin in URL) -->
+      <button id="mrNavAdminBtn" class="mr-nav-admin-btn lp-app-only" style="display:none" onclick="_mrToggleAdminModal()">🔧 ניהול תוצאות</button>
       <!-- App: premium + auth buttons -->
       <button id="premiumNavBtn" class="lp-nav-premium-btn lp-app-only" onclick="isPremiumUser() ? deactivatePremium() : openPremiumModal()">🔒 פרימיום</button>
       <button id="authNavBtn" class="lp-nav-auth-btn lp-app-only" onclick="HapAuth.openOrMenu()">
@@ -7164,6 +7177,15 @@
       }
     }
 
+    window._mrToggleAdminModal = function() {
+      const existing = document.getElementById("mrAdminModal");
+      if (existing && existing.style.display !== "none") {
+        existing.style.display = "none";
+      } else {
+        _mrBuildAdminModal();
+      }
+    };
+
     window._mrAdminSet = async function(btn, status) {
       const row = btn.closest(".mr-admin-row");
       if (!row) return;
@@ -7240,14 +7262,6 @@
           animation:mr-blink 2s ease-in-out infinite;
         }
         @keyframes mr-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-        #mrAdminBtn {
-          position:fixed;bottom:18px;left:18px;z-index:901;
-          background:linear-gradient(135deg,#6366f1,#8b5cf6);
-          border:none;border-radius:22px;padding:8px 16px;
-          font:700 13px Heebo,sans-serif;color:#fff;cursor:pointer;
-          box-shadow:0 4px 20px rgba(99,102,241,.4);
-          display:flex;align-items:center;gap:8px;
-        }
         #mrAdminModal {
           position:fixed;inset:0;z-index:9999;display:flex;
           align-items:center;justify-content:center;
@@ -7323,20 +7337,10 @@
         document.body.appendChild(ind);
       }
 
-      // Admin button (only when ?admin in URL)
+      // Admin: show nav button and wire toggle
       if (_MR.isAdmin) {
-        const btn = document.createElement("button");
-        btn.id = "mrAdminBtn";
-        btn.innerHTML = `🔧 ניהול תוצאות`;
-        btn.onclick = () => {
-          const existing = document.getElementById("mrAdminModal");
-          if (existing && existing.style.display !== "none") {
-            existing.style.display = "none";
-          } else {
-            _mrBuildAdminModal();
-          }
-        };
-        document.body.appendChild(btn);
+        const navBtn = document.getElementById("mrNavAdminBtn");
+        if (navBtn) navBtn.style.display = "";
       }
 
       _mrFetch();
