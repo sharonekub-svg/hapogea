@@ -1199,8 +1199,7 @@ function allowedMarket(market) {
   if (Number(market.sId) === WINNER_FOOTBALL_ID) {
     const primary = title.includes("1X2") && title.includes("תוצאת סיום");
     const doubleChance = title.includes("סיכוי כפול") || title.includes("Double Chance");
-    const overUnder = title.includes("מעל/מתחת") && !title.includes("מחצית");
-    return primary || doubleChance || overUnder;
+    return primary || doubleChance;
   }
   if (Number(market.sId) === WINNER_BASKETBALL_ID) {
     // Accept any "winner / moneyline" style basketball market
