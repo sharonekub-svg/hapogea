@@ -2477,6 +2477,62 @@ function build365BasketballRows(results, dateKey) {
   );
 }
 
+// Build noOddsYet display rows from 365Scores scheduled events when Winner has no open markets
+function build365ScheduledRows(results, dateKey, winnerSportId) {
+  const now = new Date().toISOString();
+  return (results || [])
+    .filter((event) => {
+      if (String(event.sportid) !== String(winnerSportId)) return false;
+      if (event.date !== dateKey) return false;
+      const phase = resultPhase(event);
+      return phase === "scheduled" || phase === "pre";
+    })
+    .map((event) => {
+      const teams = { home: cleanText(event.teamA), away: cleanText(event.teamB) };
+      return {
+        id: `sched-365-${event.eventid}`,
+        eventId: String(event.eventid),
+        eventId365: event.eventid365 || String(event.eventid).replace(/^365-/, ""),
+        source: "365Scores",
+        verifiedAt: now,
+        bettingStatus: "available",
+        day: dateKey,
+        time: String(event.time || "").slice(0, 5),
+        sport: SPORTS[winnerSportId],
+        sportId: winnerSportId,
+        league: cleanText(event.league),
+        country: "",
+        match: `${teams.home} - ${teams.away}`,
+        home: teams.home,
+        away: teams.away,
+        homeLogoUrl: event.homeLogoUrl || null,
+        awayLogoUrl: event.awayLogoUrl || null,
+        leagueLogoUrl: event.leagueLogoUrl || null,
+        resultKey: resultKeyFor({ day: dateKey, sportId: winnerSportId, home: teams.home, away: teams.away }),
+        market: "",
+        pick: "",
+        pickTeam: "",
+        winnerPick: "",
+        odds: null,
+        oddsRaw: null,
+        outsideRange: true,
+        noOddsYet: true,
+        probability: null,
+        normalizedProbability: null,
+        score: 0,
+        status: "ממתין",
+        matchPhase: "scheduled",
+        result: "",
+        liveScore: "",
+        signals: ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
+        explanation: [
+          "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+          "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
+        ],
+      };
+    });
+}
+
 function compactTrackingRow(row) {
   return {
     id: row.id,
@@ -2610,9 +2666,14 @@ function finalOpenRowsByDay(rows) {
   // No combined cap here — football and basketball render in separate tabs on the frontend.
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID);
+  // noOddsYet rows bypass the normal pick filter — they're display-only scheduled games
+  const noOddsFootball   = football.filter((r) => r.noOddsYet);
+  const noOddsBasketball = basketball.filter((r) => r.noOddsYet);
   return [
-    ...finalOpenRows(football),
-    ...finalOpenRows(basketball),
+    ...finalOpenRows(football.filter((r) => !r.noOddsYet)),
+    ...noOddsFootball,
+    ...finalOpenRows(basketball.filter((r) => !r.noOddsYet)),
+    ...noOddsBasketball,
   ];
 }
 
@@ -2826,10 +2887,16 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     yesterdayResultRows
   ));
 
-  const liveTodayPicks = [
-    ...buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365),
-    ...buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365),
-  ];
+  const liveFootballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365);
+  const liveBasketballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365);
+  // When Winner has no open markets for today, show 365Scores scheduled games as "ממתין לקווים" cards
+  const fallbackFootball = liveFootballToday.length === 0
+    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID).slice(0, BOARD_PICK_LIMIT)
+    : [];
+  const fallbackBasketball = liveBasketballToday.length === 0
+    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID).slice(0, BOARD_PICK_LIMIT)
+    : [];
+  const liveTodayPicks = [...liveFootballToday, ...liveBasketballToday, ...fallbackFootball, ...fallbackBasketball];
   // Supplement live picks with snapshot picks for games that fell off the live line (already started)
   const snapshotTodayPicks = snapshotPicksForDay(today);
   const todayCurrentRows = resolvePickStatuses(mergeRows(
