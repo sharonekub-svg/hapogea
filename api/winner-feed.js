@@ -3133,23 +3133,22 @@ function getTeamStakeFromStandings(standings, competitorId) {
 
 // In-process cache for the /sports discovery result (6-hour TTL across warm lambdas)
 const oddsDiscoveryCache = globalThis.__ODDS_DISCOVERY_CACHE__ ||
-  (globalThis.__ODDS_DISCOVERY_CACHE__ = { at: 0, keys: null });
+  (globalThis.__ODDS_DISCOVERY_CACHE__ = { at: 0, sports: null });
 
-// Returns a Set of currently-active sport keys (1 API request), or null on failure.
-// Callers fall back to querying the full candidate pool when null is returned.
+// Returns array of all active sport objects {key, title, active} or null on failure.
 async function discoverActiveSports() {
-  if (oddsDiscoveryCache.keys && Date.now() - oddsDiscoveryCache.at < 6 * 60 * 60 * 1000) {
-    return oddsDiscoveryCache.keys;
+  if (oddsDiscoveryCache.sports && Date.now() - oddsDiscoveryCache.at < 6 * 60 * 60 * 1000) {
+    return oddsDiscoveryCache.sports;
   }
   try {
     const data = await fetchJson(`${ODDS_API_BASE}/sports/?apiKey=${ODDS_API_KEY}`, {
       retryAttempts: 1, retryBaseDelay: 500,
     });
     if (!Array.isArray(data)) return null;
-    const keys = new Set(data.map((s) => s.key));
-    oddsDiscoveryCache.keys = keys;
-    oddsDiscoveryCache.at   = Date.now();
-    return keys;
+    const active = data.filter((s) => s.active);
+    oddsDiscoveryCache.sports = active;
+    oddsDiscoveryCache.at     = Date.now();
+    return active;
   } catch {
     return null;
   }
@@ -3270,12 +3269,27 @@ function oddsApiEventToRow(event, sportMeta) {
 async function buildOddsApiFeed() {
   if (!ODDS_API_KEY) throw new Error("ODDS_API_KEY not set");
 
-  // Discover which leagues currently have upcoming events (1 API request).
-  // This prevents wasting quota on dead/off-season leagues.
-  const activeSportKeys = await discoverActiveSports();
-  const sportsToQuery = activeSportKeys
-    ? ODDS_API_SPORTS.filter((s) => activeSportKeys.has(s.key))
-    : ODDS_API_SPORTS;
+  // Discover ALL active sports from The Odds API (1 request).
+  // Merge with our curated list (for Hebrew labels), then add any
+  // active soccer/basketball sports not in the list — friendlies,
+  // playoffs, qualifications, etc.
+  const activeSports = await discoverActiveSports();
+  let sportsToQuery;
+  if (activeSports) {
+    const activeKeys = new Set(activeSports.map((s) => s.key));
+    const fromList   = ODDS_API_SPORTS.filter((s) => activeKeys.has(s.key));
+    const listKeys   = new Set(fromList.map((s) => s.key));
+    const extra = activeSports
+      .filter((s) => (s.key.startsWith("soccer_") || s.key.startsWith("basketball_")) && !listKeys.has(s.key))
+      .map((s) => ({
+        key:      s.key,
+        label:    s.title || s.key.replace(/^(soccer|basketball)_/, "").replace(/_/g, " "),
+        sportId:  s.key.startsWith("basketball_") ? WINNER_BASKETBALL_ID : WINNER_FOOTBALL_ID,
+      }));
+    sportsToQuery = [...fromList, ...extra];
+  } else {
+    sportsToQuery = ODDS_API_SPORTS;
+  }
 
   const today    = israelDate(0);
   const tomorrow = israelDate(1);
