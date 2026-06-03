@@ -3313,37 +3313,8 @@ async function buildOddsApiFeed() {
   const sortByScore = (rows) =>
     [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
 
-  const FOOTBALL_MIN = 15;
-
   const todayRows    = allRows.filter((r) => r.day === today);
   const tomorrowRows = allRows.filter((r) => r.day === tomorrow);
-
-  // Fill today: if recommended football < FOOTBALL_MIN, pull from nearest future days.
-  // Rows keep their original `day` so the UI shows the real date.
-  const todayFootballRec = todayRows.filter(
-    (r) => Number(r.sportId) === WINNER_FOOTBALL_ID && r.recommended
-  );
-  if (todayFootballRec.length < FOOTBALL_MIN) {
-    const todayIds = new Set(todayRows.map((r) => r.id));
-    const fill = allRows
-      .filter((r) => r.day > today && Number(r.sportId) === WINNER_FOOTBALL_ID && r.recommended && !todayIds.has(r.id))
-      .sort((a, b) => a.day.localeCompare(b.day) || (b.recommendationScore || 0) - (a.recommendationScore || 0))
-      .slice(0, FOOTBALL_MIN - todayFootballRec.length);
-    for (const row of fill) todayRows.push(row);
-  }
-
-  // Fill tomorrow similarly
-  const tomorrowFootballRec = tomorrowRows.filter(
-    (r) => Number(r.sportId) === WINNER_FOOTBALL_ID && r.recommended
-  );
-  if (tomorrowFootballRec.length < FOOTBALL_MIN) {
-    const tomorrowIds = new Set(tomorrowRows.map((r) => r.id));
-    const fill = allRows
-      .filter((r) => r.day > tomorrow && Number(r.sportId) === WINNER_FOOTBALL_ID && r.recommended && !tomorrowIds.has(r.id))
-      .sort((a, b) => a.day.localeCompare(b.day) || (b.recommendationScore || 0) - (a.recommendationScore || 0))
-      .slice(0, FOOTBALL_MIN - tomorrowFootballRec.length);
-    for (const row of fill) tomorrowRows.push(row);
-  }
 
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
