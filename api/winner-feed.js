@@ -2890,12 +2890,15 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const liveFootballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365);
   const liveBasketballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365);
   // When Winner has no open markets for today, show 365Scores scheduled games as "ממתין לקווים" cards
+  const s365today = (scores365Events || []).filter(e => e.date === today);
+  console.info(`[today-fallback] live football=${liveFootballToday.length} basketball=${liveBasketballToday.length} scores365today=${s365today.length}`);
   const fallbackFootball = liveFootballToday.length === 0
     ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID).slice(0, BOARD_PICK_LIMIT)
     : [];
   const fallbackBasketball = liveBasketballToday.length === 0
     ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID).slice(0, BOARD_PICK_LIMIT)
     : [];
+  console.info(`[today-fallback] fallbackFootball=${fallbackFootball.length} fallbackBasketball=${fallbackBasketball.length}`);
   const liveTodayPicks = [...liveFootballToday, ...liveBasketballToday, ...fallbackFootball, ...fallbackBasketball];
   // Supplement live picks with snapshot picks for games that fell off the live line (already started)
   const snapshotTodayPicks = snapshotPicksForDay(today);
