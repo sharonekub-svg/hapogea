@@ -1468,6 +1468,9 @@
     }
     .odds-down { color: var(--red); }
     .odds-up { color: var(--green); }
+    .odds-arrow { font-size: 10px; font-weight: 900; line-height: 1; margin-inline-start: 2px; }
+    .odds-arrow-up { color: #31d187; }
+    .odds-arrow-dn { color: #ef5350; }
     .card-footer-actions {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -1487,6 +1490,16 @@
     }
     .btn-share-wa:hover { background: rgba(37,211,102,.15); border-color: rgba(37,211,102,.4); color: #15803d; }
     .btn-share-tg:hover { background: rgba(41,182,246,.15); border-color: rgba(41,182,246,.4); color: #0369a1; }
+    .btn-wa-card {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 7px;
+      border: 1px solid rgba(37,211,102,.3);
+      background: rgba(37,211,102,.07);
+      color: #25d366; font-size: 11px; font-weight: 800;
+      text-decoration: none; transition: all .15s; white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn-wa-card:hover { background: rgba(37,211,102,.18); border-color: rgba(37,211,102,.55); }
     .btn-share-link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -2075,6 +2088,17 @@
       color: var(--muted);
     }
     .tab.active .tab-count { background: rgba(49,209,135,.22); color: #bff8dc; }
+    .tab-hot-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: #31d187; margin-right: 5px;
+      animation: hotdot-pulse 1.4s ease-out infinite;
+      vertical-align: middle; flex-shrink: 0;
+    }
+    @keyframes hotdot-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(49,209,135,.7); }
+      70%  { box-shadow: 0 0 0 6px rgba(49,209,135,0); }
+      100% { box-shadow: 0 0 0 0 rgba(49,209,135,0); }
+    }
 
     /* ── Mobile improvements ── */
     @media (max-width: 768px) {
@@ -2587,6 +2611,19 @@
     .wc-odd.selected { background: rgba(21,128,61,.07); border-color: rgba(21,128,61,.22); color: #15803D; }
     .wc-why { background: rgba(146,96,10,.05); border-color: rgba(146,96,10,.14); color: #6E675C; }
     .wc-why.neutral { background: rgba(37,99,235,.04); border-color: rgba(37,99,235,.12); }
+    .wc-group-table { background: #FDFCFB; border-color: rgba(33,31,27,.10); }
+    .wc-group-head { background: rgba(37,99,235,.08); border-bottom-color: rgba(33,31,27,.08); color: #2563EB; }
+    .wc-group-row { border-bottom-color: rgba(33,31,27,.06); }
+    .wc-group-header-row { color: #A39B8C; }
+    .wc-group-num { color: #A39B8C; }
+    .wc-group-pts { color: #211F1B; }
+    .wc-group-team { color: #211F1B; }
+    .wc-groups-heading { color: #211F1B; }
+    .wc-outrights-strip { background: rgba(146,96,10,.06); border-color: rgba(146,96,10,.22); }
+    .wc-outrights-label { color: #92600A; }
+    .wc-outrights-sub { color: #A39B8C; }
+    .btn-wa-card { color: #15803D; background: rgba(21,128,61,.07); border-color: rgba(21,128,61,.28); }
+    .btn-wa-card:hover { background: rgba(21,128,61,.14); border-color: rgba(21,128,61,.45); }
 
     /* Toolbar */
     .toolbar { background: #FFFFFF; border-color: rgba(33,31,27,.09); }
@@ -3067,11 +3104,47 @@
       border: 1px solid rgba(255,255,255,.22);
       backdrop-filter: blur(6px);
     }
-    .wc-count-cell b { font: 900 26px/1 JetBrains Mono, monospace; font-variant-numeric: tabular-nums; }
+    .wc-count-cell b { font: 900 42px/1 JetBrains Mono, monospace; font-variant-numeric: tabular-nums; }
     .wc-count-cell span { font-size: 10px; letter-spacing: 1px; opacity: .85; }
-    .wc-count-sep { font: 900 22px/1 JetBrains Mono, monospace; opacity: .5; align-self: flex-start; margin-top: 12px; }
+    .wc-count-sep { font: 900 34px/1 JetBrains Mono, monospace; opacity: 1; align-self: flex-start; margin-top: 18px; animation: wc-sep-blink 1s step-start infinite; }
+    @keyframes wc-sep-blink { 0%,100%{opacity:.85}50%{opacity:.15} }
     .wc-count.wc-count-live .wc-count-cell { background: rgba(21,128,61,.4); border-color: rgba(255,255,255,.4); }
+    .wc-count.wc-count-live { display: none; }
+    .wc-count-live-display {
+      display: none; align-items: center; justify-content: center; gap: 10px;
+      padding: 20px 18px; border-radius: 16px;
+      background: rgba(21,128,61,.18); border: 1.5px solid rgba(49,209,135,.5);
+      font: 900 clamp(20px,4vw,28px)/1.3 Heebo, sans-serif; color: #bff8dc;
+      animation: wc-live-glow 2s ease-in-out infinite;
+    }
+    @keyframes wc-live-glow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(49,209,135,.35); }
+      50% { box-shadow: 0 0 24px 4px rgba(49,209,135,.18); }
+    }
     .wc-count-cap { font-size: 12.5px; opacity: .9; margin-top: 4px; }
+    /* WC outrights placeholder strip */
+    .wc-outrights-strip {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 14px 18px; border-radius: 12px;
+      background: rgba(255,200,87,.07); border: 1px solid rgba(255,200,87,.26);
+      margin-bottom: 16px;
+    }
+    .wc-outrights-icon { font-size: 22px; flex-shrink: 0; }
+    .wc-outrights-label { font: 800 14px Heebo, sans-serif; color: #ffe3a0; }
+    .wc-outrights-sub { font-size: 12px; color: rgba(255,235,150,.55); margin-top: 2px; }
+    /* WC group standings */
+    .wc-groups-wrap { margin: 16px 0 20px; }
+    .wc-groups-heading { font: 800 15px/1.2 Heebo, sans-serif; color: rgba(255,255,255,.75); margin-bottom: 10px; }
+    .wc-groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 10px; }
+    .wc-group-table { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; overflow: hidden; }
+    .wc-group-head { background: rgba(37,99,235,.22); border-bottom: 1px solid rgba(255,255,255,.1); padding: 8px 12px; font: 800 13px Heebo, sans-serif; color: #93c5fd; }
+    .wc-group-row { display: grid; grid-template-columns: 1fr 24px 24px 24px 28px; gap: 4px; align-items: center; padding: 6px 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .wc-group-row:last-child { border-bottom: none; }
+    .wc-group-header-row { color: rgba(255,255,255,.35); font-weight: 800; font-size: 10px; letter-spacing: .5px; text-transform: uppercase; }
+    .wc-group-team { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+    .wc-group-team img { width: 18px; height: 13px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+    .wc-group-num { text-align: center; color: rgba(255,255,255,.38); }
+    .wc-group-pts { text-align: center; font-weight: 900; color: #fff; }
     .wc-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .wc-fact {
       text-align: center;
@@ -4476,7 +4549,23 @@
       const item = oddsForSide(row, side);
       if (!item?.odds) return "";
       const spread = item.spread != null && Number.isFinite(Number(item.spread)) ? ` ${Number(item.spread) > 0 ? "+" : ""}${item.spread}` : "";
-      return `<div class="team-odd"><small>${label}${spread}</small>${formatOdds(item.odds)}</div>`;
+      let arrowHtml = "";
+      try {
+        const ssKey = `ho_${row.id || row.eventId || ""}:${side}`;
+        const stored = sessionStorage.getItem(ssKey);
+        const curr = Number(item.odds);
+        if (stored !== null) {
+          const prev = parseFloat(stored);
+          if (Number.isFinite(prev) && Number.isFinite(curr) && Math.abs(curr - prev) > 0.009) {
+            arrowHtml = curr > prev
+              ? `<span class="odds-arrow odds-arrow-up" title="יחס עלה">↑</span>`
+              : `<span class="odds-arrow odds-arrow-dn" title="יחס ירד">↓</span>`;
+          }
+        } else if (Number.isFinite(curr)) {
+          sessionStorage.setItem(ssKey, String(curr));
+        }
+      } catch (_) {}
+      return `<div class="team-odd"><small>${label}${spread}</small>${formatOdds(item.odds)}${arrowHtml}</div>`;
     }
 
     function teamsMarkup(row) {
@@ -4846,6 +4935,21 @@
         countEl.textContent = n > 0 ? n : "";
         countEl.style.display = n > 0 ? "" : "none";
         if (!existing && n > 0) button.insertBefore(countEl, button.firstChild);
+        // Pulsing dot: show if >2 recommended picks today
+        const hotCount = daySportRows("today", page).filter(r =>
+          !r.noOddsYet && (r.recommended || (!!r.odds && !r.outsideRange))
+        ).length;
+        let dotEl = button.querySelector(".tab-hot-dot");
+        if (hotCount > 2) {
+          if (!dotEl) {
+            dotEl = document.createElement("span");
+            dotEl.className = "tab-hot-dot";
+            dotEl.title = `${hotCount} המלצות היום`;
+            button.insertBefore(dotEl, button.firstChild);
+          }
+        } else if (dotEl) {
+          dotEl.remove();
+        }
       });
       document.querySelectorAll("#dayToggle .dt-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.day === state.day);
@@ -5126,6 +5230,7 @@
               <div class="wc-count-sep">:</div>
               <div class="wc-count-cell"><b data-c="s">--</b><span>שניות</span></div>
             </div>
+            <div class="wc-count-live-display" id="wcLiveMsg">🏆 המונדיאל בעיצומו!</div>
             <div class="wc-count-cap">${escapeHtml(f.kickoffLabel)}</div>
           </div>
           <div class="wc-facts">${facts}</div>
@@ -5145,7 +5250,12 @@
       const s = Math.floor(diff / 1000);
       const set = (k, v) => { const n = el.querySelector('[data-c="' + k + '"]'); if (n) n.textContent = String(v).padStart(2, "0"); };
       set("d", d); set("h", h); set("m", m); set("s", s);
-      if (target - Date.now() <= 0) el.classList.add("wc-count-live");
+      if (target - Date.now() <= 0) {
+        el.classList.add("wc-count-live");
+        const liveMsg = document.getElementById("wcLiveMsg");
+        if (liveMsg) liveMsg.style.display = "flex";
+        return true;
+      }
       return true;
     }
 
@@ -5159,6 +5269,54 @@
 
     function wcStopCountdown() {
       if (wcCountdownTimer) { clearInterval(wcCountdownTimer); wcCountdownTimer = null; }
+    }
+
+    function wcOutrightsStripMarkup() {
+      return `<div class="wc-outrights-strip">
+        <span class="wc-outrights-icon">🏆</span>
+        <div>
+          <div class="wc-outrights-label">יחסי Winner מונדיאל · אאוטריטס</div>
+          <div class="wc-outrights-sub">יחסים יתעדכנו עם פתיחת Winner-Line למונדיאל</div>
+        </div>
+        <span class="pill" style="margin-inline-start:auto;white-space:nowrap">בקרוב</span>
+      </div>`;
+    }
+
+    function wcGroupStandingsMarkup() {
+      const groupMap = new Map();
+      WC2026_FIXTURES.forEach(f => {
+        const g = f.stage;
+        if (!groupMap.has(g)) groupMap.set(g, []);
+        const arr = groupMap.get(g);
+        if (!arr.find(t => t.name === f.home)) arr.push({ name: f.home, code: f.hc });
+        if (!arr.find(t => t.name === f.away)) arr.push({ name: f.away, code: f.ac });
+      });
+      const groups = [...groupMap.entries()].sort((a, b) => a[0].localeCompare(b[0], "he"));
+      const tables = groups.map(([stage, teams]) => `
+        <div class="wc-group-table">
+          <div class="wc-group-head">${escapeHtml(stage)}</div>
+          <div class="wc-group-row wc-group-header-row">
+            <span>קבוצה</span>
+            <span class="wc-group-num">מ'</span>
+            <span class="wc-group-num">נ</span>
+            <span class="wc-group-num">ת</span>
+            <span class="wc-group-pts">נק'</span>
+          </div>
+          ${teams.map(t => `<div class="wc-group-row">
+            <span class="wc-group-team">
+              <img src="https://flagcdn.com/w40/${escapeHtml(t.code)}.png" alt="${escapeHtml(t.name)}" loading="lazy">
+              ${escapeHtml(t.name)}
+            </span>
+            <span class="wc-group-num">0</span>
+            <span class="wc-group-num">0</span>
+            <span class="wc-group-num">0</span>
+            <span class="wc-group-pts">0</span>
+          </div>`).join("")}
+        </div>`).join("");
+      return `<div class="wc-groups-wrap">
+        <div class="wc-groups-heading">טבלאות הבתים · כל הקבוצות</div>
+        <div class="wc-groups-grid">${tables}</div>
+      </div>`;
     }
 
     // Live countdown shown inside the collapsed banner "mark" (replaces the
@@ -5274,7 +5432,9 @@
         </section>`).join("");
 
       target.innerHTML = `
+        ${wcOutrightsStripMarkup()}
         ${worldCupHubMarkup()}
+        ${wcGroupStandingsMarkup()}
         <div class="wc-head wc-head-open">
           <div>
             <span class="wc-kicker">World Cup 2026 · Premium Tournament View</span>
@@ -7007,6 +7167,7 @@
             ${row.noOddsYet ? "" : cardVerifiedMarkup(row)}
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
+              ${hasRecommendation && !row.noOddsYet ? `<a class="btn-wa-card" href="https://wa.me/?text=${encodeURIComponent(shareTextForRow(row))}" target="_blank" rel="noopener noreferrer">שלח ל-WhatsApp 📲</a>` : ""}
               ${row.noOddsYet ? "" : `<div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
                 <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
                 <button class="btn-share-tg" data-share-tg="1">Telegram</button>
