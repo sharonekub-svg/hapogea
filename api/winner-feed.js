@@ -2838,9 +2838,11 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const yesterday = israelDate(-1);
   const today = israelDate(0);
   const tomorrow = israelDate(1);
+  let _winnerBlockedError = null;
   const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores, apiSportsScores] = await Promise.all([
     getWinnerLine().catch((error) => {
       console.warn("[winner-feed] Winner line unavailable, using snapshot picks only:", error.message);
+      _winnerBlockedError = error;
       return { hashes: { currentVersion: null }, markets: [] };
     }),
     getResults(yesterday, tomorrow).catch((error) => {
@@ -2992,6 +2994,8 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     ok: true,
     generatedAt: new Date().toISOString(),
     serverVersion: hashes.currentVersion,
+    _winnerBlocked: !!_winnerBlockedError,
+    _winnerBlockedReason: _winnerBlockedError?.message || null,
     oddsRange: { min: ODDS_MIN, max: ODDS_MAX },
     targetPicksPerSport: TARGET_PICKS_PER_SPORT,
     lineStats,
@@ -3501,15 +3505,29 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     payload = await buildWinnerFeedPayload({ withLogos: true });
   } catch (winnerError) {
     console.error("[winner-feed] buildWinnerFeedPayload threw:", winnerError?.message, winnerError?.stack?.split("\n")[1]);
-    // Winner blocked — prefer the local snapshot (real Winner data) over Odds API.
+    payload = null;
+  }
+
+  // If Winner API was blocked (returned no markets due to IP restriction), prefer the local snapshot
+  // which contains real Winner odds refreshed from an Israeli IP.
+  if (payload?._winnerBlocked) {
+    console.info("[winner-feed] Winner blocked — checking snapshot for today's picks");
+    const snapshotNorm0 = normalizeFallbackRows(SNAPSHOT);
+    const snapshotCountReal = (tab) =>
+      [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
+    const snapshotHasPicks = payloadMatchesIsraelDates(snapshotNorm0) &&
+      (snapshotCountReal(snapshotNorm0.tabs?.today) > 0 || snapshotCountReal(snapshotNorm0.tabs?.tomorrow) > 0);
+    if (snapshotHasPicks) {
+      console.info("[winner-feed] Using snapshot with real Winner picks");
+      payload = { ...snapshotNorm0, ok: true, oddsSource: "Winner Snapshot", liveError: payload._winnerBlockedReason };
+    }
+  }
+
+  if (!payload) {
+    // buildWinnerFeedPayload threw — prefer the local snapshot (real Winner data) over Odds API.
     const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
-      payload = {
-        ...snapshotNorm1,
-        ok: true,
-        oddsSource: "Winner Snapshot",
-        liveError: winnerError.message,
-      };
+      payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
       // Snapshot is stale — fall back to Odds API.
       try {
@@ -3521,7 +3539,6 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
           ok: true,
           fallback: true,
           fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
-          liveError: winnerError.message,
           oddsError: oddsError.message,
         };
       }
