@@ -286,7 +286,7 @@ const CACHE_TTL_MS = {
   tomorrow: 60 * 60 * 1000,
   full: 5 * 60 * 1000,
 };
-const memoryCache = globalThis.__WINNER_FEED_CACHE_V2__ || (globalThis.__WINNER_FEED_CACHE_V2__ = new Map());
+const memoryCache = globalThis.__WINNER_FEED_CACHE_V3__ || (globalThis.__WINNER_FEED_CACHE_V3__ = new Map());
 // Persists across warm Lambda invocations — avoids re-fetching logos for the same teams
 const globalLogoCache = globalThis.__LOGO_CACHE__ || (globalThis.__LOGO_CACHE__ = new Map());
 
@@ -2680,13 +2680,25 @@ function finalOpenRowsByDay(rows) {
   // No combined cap here — football and basketball render in separate tabs on the frontend.
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID);
-  // noOddsYet rows bypass the normal pick filter — they're display-only scheduled games
-  const noOddsFootball   = football.filter((r) => r.noOddsYet);
-  const noOddsBasketball = basketball.filter((r) => r.noOddsYet);
+
+  const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
+  const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
+
+  // noOddsYet rows are display-only placeholders — only show them when the algorithm
+  // found no real picks for that sport, capped at TARGET_PICKS_PER_SPORT and sorted by time.
+  const sortedNoOdds = (sport) =>
+    sport
+      .filter((r) => r.noOddsYet)
+      .sort((a, b) => String(a.time || "99:99").localeCompare(String(b.time || "99:99")))
+      .slice(0, TARGET_PICKS_PER_SPORT);
+
+  const noOddsFootball   = pickedFootball.length   === 0 ? sortedNoOdds(football)   : [];
+  const noOddsBasketball = pickedBasketball.length === 0 ? sortedNoOdds(basketball) : [];
+
   return [
-    ...finalOpenRows(football.filter((r) => !r.noOddsYet)),
+    ...pickedFootball,
     ...noOddsFootball,
-    ...finalOpenRows(basketball.filter((r) => !r.noOddsYet)),
+    ...pickedBasketball,
     ...noOddsBasketball,
   ];
 }
