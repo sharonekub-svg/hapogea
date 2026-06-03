@@ -6679,7 +6679,8 @@
         badges.push('<span class="badge badge-no-odds">ממתין לקווים</span>');
         return badges.join("");
       }
-      if (row.recommended) badges.push(`<span class="badge ${outcome.cls === "hit" ? "badge-won" : outcome.cls === "miss" ? "badge-lost" : outcome.cls === "unverified" ? "badge-unverified" : outcome.cls === "closed" ? "badge-closed" : "badge-pending"}">${outcome.label}</span>`);
+      const showOutcomeBadge = row.recommended || (row.matchPhase === "final" && !!(row.pick || row.winnerPick));
+      if (showOutcomeBadge) badges.push(`<span class="badge ${outcome.cls === "hit" ? "badge-won" : outcome.cls === "miss" ? "badge-lost" : outcome.cls === "unverified" ? "badge-unverified" : outcome.cls === "closed" ? "badge-closed" : "badge-pending"}">${outcome.label}</span>`);
       if (row.isAlternativeMarket) badges.push('<span class="badge badge-odds-changed">שוק חלופי</span>');
       if (row.marketTier === "spread") badges.push('<span class="badge badge-pending">ליין כדורסל</span>');
       if (row.valueIndicator === "winner_higher") badges.push('<span class="badge badge-won">ערך</span>');
@@ -6710,8 +6711,8 @@
 
     function resultMarkup(row) {
       const outcome = rowOutcome(row);
-      // Always show pick status on every card — so users see נתפס/נפל/ממתין
-      if (!row.recommended && !(!!row.odds && !row.outsideRange)) return "";
+      const hasFinishedResult = row.matchPhase === "final" && !!(row.pick || row.winnerPick);
+      if (!row.recommended && !(!!row.odds && !row.outsideRange) && !hasFinishedResult) return "";
       const isPreMatch = (row.matchPhase === "scheduled" || !row.matchPhase) && outcome.key === "pending";
       const resultTime = outcome.resultVerifiedAt ? formatShortTime(outcome.resultVerifiedAt) : "";
       const oddsTime = outcome.oddsVerifiedAt ? formatShortTime(outcome.oddsVerifiedAt) : "";
