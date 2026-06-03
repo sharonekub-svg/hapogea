@@ -336,7 +336,7 @@
       font-weight: 800;
       text-align: center;
     }
-    .logo-wrap.no-logo { display: none; }
+    .logo-wrap.no-logo { visibility: hidden; }
     .logo-wrap.no-logo + .team-name {
       font-size: 15px;
       font-weight: 900;
@@ -344,6 +344,17 @@
       white-space: normal;
       line-height: 1.25;
       color: var(--text);
+    }
+    .team-side.selected .logo-wrap.no-logo {
+      visibility: visible;
+    }
+    .team-side.selected .logo-wrap.no-logo::before {
+      content: "המנצח";
+      font-size: 9px;
+      font-weight: 900;
+      color: #06100c;
+      text-align: center;
+      line-height: 1.2;
     }
     .team-side.selected .logo-wrap.no-logo + .team-name {
       color: #bff8dc;
