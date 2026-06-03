@@ -347,6 +347,22 @@
       font-weight: 800;
       text-align: center;
     }
+    .logo-wrap.team-color-logo {
+      font-family: Heebo, Assistant, sans-serif;
+      font-weight: 900;
+      letter-spacing: .5px;
+      position: relative;
+      border-width: 2px;
+      text-transform: uppercase;
+    }
+    .logo-wrap.team-color-logo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(255,255,255,.20) 0%, transparent 55%);
+      pointer-events: none;
+    }
     .logo-wrap.no-logo { visibility: hidden; }
     .logo-wrap.no-logo + .team-name {
       font-size: 15px;
@@ -4743,8 +4759,15 @@
       const tcBg = _TC[tName] || _TC[tName.replace(/\s*\([^)]*\)/g,"").trim()];
       if (tcBg) {
         const fg = _tcFg(tcBg);
-        const initial = ([...tName])[0] || "?";
-        return `<div class="logo-wrap team-color-logo" style="background:${tcBg};color:${fg};border-color:rgba(0,0,0,.14);font-size:18px">${initial}</div>`;
+        const words = tName.trim().split(/\s+/).filter(Boolean);
+        const initials = words.length === 1
+          ? [...words[0]].slice(0, 2).join("")
+          : words.slice(0, 2).map(w => ([...w][0] || "")).join("");
+        const badge = initials || ([...tName][0] || "?");
+        const isLight = fg === "#1a1816";
+        const borderCol = isLight ? "rgba(0,0,0,.20)" : "rgba(255,255,255,.25)";
+        const fontSize = badge.length > 1 ? "14px" : "18px";
+        return `<div class="logo-wrap team-color-logo" style="background:${tcBg};color:${fg};border-color:${borderCol};font-size:${fontSize}">${badge}</div>`;
       }
       return `<div class="logo-wrap no-logo" aria-hidden="true"></div>`;
     }
