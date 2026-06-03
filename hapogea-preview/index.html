@@ -9,23 +9,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #FAF8F4;
+      --bg: #F7F5F1;
       --panel: #FFFFFF;
-      --panel-soft: #F9F6F1;
-      --line: rgba(33,31,27,.09);
-      --line-strong: rgba(33,31,27,.16);
-      --text: #211F1B;
-      --muted: #6E675C;
-      --soft: #A39B8C;
+      --panel-soft: #F4F1EC;
+      --line: rgba(33,31,27,.08);
+      --line-strong: rgba(33,31,27,.14);
+      --text: #1A1816;
+      --muted: #6B6357;
+      --soft: #9E9689;
       --green: #15803D;
       --red: #DC2626;
       --gold: #92600A;
       --cyan: #2563EB;
       --orange: #D05C1A;
-      --shadow: 0 4px 20px rgba(40,33,22,.08),0 1px 3px rgba(40,33,22,.04);
+      --shadow: 0 2px 12px rgba(40,33,22,.07), 0 1px 3px rgba(40,33,22,.04);
+      --shadow-md: 0 4px 24px rgba(40,33,22,.09), 0 1px 5px rgba(40,33,22,.05);
+      --shadow-lg: 0 8px 40px rgba(40,33,22,.12), 0 2px 8px rgba(40,33,22,.06);
       --accent: #2563EB;
       --accent-soft: rgba(37,99,235,.10);
       --accent-line: rgba(37,99,235,.22);
+      --radius: 14px;
+      --radius-sm: 9px;
     }
     * { box-sizing: border-box; }
     body {
@@ -86,15 +90,22 @@
     .nav { display: flex; gap: 6px; margin-inline-start: auto; overflow-x: auto; padding-bottom: 2px; }
     .tab {
       border: 1px solid transparent;
-      color: var(--muted);
+      color: rgba(255,255,255,.48);
       background: transparent;
-      border-radius: 7px;
-      padding: 9px 13px;
+      border-radius: 8px;
+      padding: 9px 15px;
       white-space: nowrap;
       font-weight: 800;
+      font-size: 13px;
+      transition: all .15s ease;
     }
-    .tab.active { color: #06100c; background: var(--green); border-color: rgba(49,209,135,.65); }
-    .tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.06); }
+    .tab.active {
+      color: #fff;
+      background: rgba(21,128,61,.90);
+      border-color: rgba(49,209,135,.50);
+      box-shadow: 0 2px 14px rgba(21,128,61,.35);
+    }
+    .tab:hover:not(.active) { color: rgba(255,255,255,.80); background: rgba(255,255,255,.08); }
     .shell { padding-top: 18px; }
     .hero {
       display: grid;
@@ -105,7 +116,7 @@
       background: rgba(16,21,26,.84);
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
-      border-radius: 8px;
+      border-radius: var(--radius);
     }
     .hero-main {
       min-height: 360px;
@@ -254,8 +265,8 @@
       border-bottom: 1px solid var(--line);
       background: rgba(255,255,255,.025);
     }
-    .league { font-weight: 900; }
-    .time { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .league { font-weight: 900; font-size: 13px; }
+    .time { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .2px; }
     .card-body { padding: 10px; display: grid; gap: 8px; }
     .teams-line {
       display: grid;
@@ -411,13 +422,13 @@
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       border: 2px solid rgba(49,209,135,.75);
-      border-radius: 10px;
-      padding: 10px 11px;
-      background: rgba(49,209,135,.13);
+      border-radius: 12px;
+      padding: 12px 13px;
+      background: rgba(49,209,135,.12);
       color: var(--text);
-      box-shadow: 0 0 0 1px rgba(49,209,135,.15), 0 8px 28px rgba(49,209,135,.12);
+      box-shadow: 0 0 0 1px rgba(49,209,135,.14), 0 6px 22px rgba(49,209,135,.12);
     }
     .picked-bet .label {
       color: var(--green);
@@ -1225,21 +1236,26 @@
     }
 
     /* Cleaner prediction cards */
-    .cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .cards { grid-template-columns: repeat(2, 1fr); gap: 14px; }
     #cards { margin-inline: -18px; }
     .card {
-      border-radius: 8px;
-      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
-      border-color: rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: linear-gradient(175deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
+      border-color: rgba(255,255,255,.11);
+      box-shadow: 0 2px 14px rgba(0,0,0,.20), 0 1px 3px rgba(0,0,0,.12);
     }
-    .card:hover { transform: translateY(-1px); }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(0,0,0,.26), 0 2px 6px rgba(0,0,0,.14);
+      border-color: rgba(255,255,255,.18);
+    }
     .card-head {
       align-items: flex-start;
       gap: 10px;
-      padding: 12px 12px 10px;
-      border-bottom-color: rgba(255,255,255,.075);
+      padding: 13px 14px 11px;
+      border-bottom-color: rgba(255,255,255,.07);
     }
-    .card-body { padding: 12px; gap: 10px; }
+    .card-body { padding: 14px; gap: 12px; }
     .card-topline {
       display: flex;
       justify-content: space-between;
@@ -1258,10 +1274,10 @@
     }
     .card-time-box b { color: var(--text); font-size: 14px; }
     .card-section {
-      border: 1px solid rgba(255,255,255,.075);
-      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 10px;
       background: rgba(255,255,255,.025);
-      padding: 10px;
+      padding: 11px;
     }
     .teams-line {
       border: 0;
@@ -1293,7 +1309,7 @@
     }
     .pick-summary-main strong {
       color: var(--text);
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 900;
       line-height: 1.2;
     }
@@ -1318,16 +1334,16 @@
       display: grid;
       gap: 1px;
       place-items: center;
-      min-width: 68px;
-      border-radius: 10px;
-      padding: 10px 12px;
-      background: rgba(49,209,135,.10);
-      border: 1px solid rgba(49,209,135,.28);
+      min-width: 72px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(49,209,135,.12);
+      border: 1px solid rgba(49,209,135,.32);
       color: #bff8dc;
       font-weight: 900;
     }
-    .odds-box small { color: rgba(191,248,220,.6); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
-    .odds-box b { font-size: 22px; line-height: 1; }
+    .odds-box small { color: rgba(191,248,220,.55); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+    .odds-box b { font-size: 26px; line-height: 1; }
     .why-line {
       color: var(--muted);
       font-size: 12px;
@@ -2534,12 +2550,17 @@
     /* Panels & cards */
     .panel { background: #FFFFFF; border-color: rgba(33,31,27,.09); box-shadow: 0 4px 16px rgba(40,33,22,.05); }
     .card {
-      background: linear-gradient(180deg,#FFFFFF,#FDFCFB);
-      border-color: rgba(33,31,27,.09);
-      box-shadow: 0 2px 10px rgba(40,33,22,.05);
+      background: #FFFFFF;
+      border-color: rgba(33,31,27,.08);
+      box-shadow: 0 2px 12px rgba(40,33,22,.06), 0 1px 3px rgba(40,33,22,.03);
+      border-radius: var(--radius);
     }
-    .card:hover { border-color: rgba(37,99,235,.22); box-shadow: 0 8px 28px rgba(40,33,22,.09); transform: translateY(-1px); }
-    .card-head { background: #F9F6F1; border-bottom-color: rgba(33,31,27,.07); }
+    .card:hover {
+      border-color: rgba(21,128,61,.22);
+      box-shadow: 0 6px 28px rgba(40,33,22,.10), 0 2px 6px rgba(40,33,22,.05);
+      transform: translateY(-2px);
+    }
+    .card-head { background: #F7F4EF; border-bottom-color: rgba(33,31,27,.06); padding: 13px 14px 11px; }
     .league { color: #211F1B; }
     .time   { color: #6E675C; }
 
@@ -2566,7 +2587,7 @@
     .team-side.selected:after, .versus.selected:after { background: #15803D; border-color: rgba(21,128,61,.85); color: #fff; box-shadow: 0 6px 18px rgba(21,128,61,.20); }
 
     /* Pick box */
-    .picked-bet { background: rgba(21,128,61,.05); border-color: rgba(21,128,61,.22); box-shadow: 0 2px 10px rgba(21,128,61,.08); }
+    .picked-bet { background: rgba(21,128,61,.06); border-color: rgba(21,128,61,.26); box-shadow: 0 3px 14px rgba(21,128,61,.10); border-radius: 12px; }
     .picked-bet .label { color: #15803D; }
     .picked-bet strong { color: #211F1B; }
     .pick-action { color: #15803D; border-top-color: rgba(21,128,61,.14); }
@@ -2585,12 +2606,13 @@
     .result-detail span { color: #A39B8C; }
 
     /* Odds box */
-    .odds-box { background: rgba(21,128,61,.07); border-color: rgba(21,128,61,.22); color: #15803D; }
+    .odds-box { background: rgba(21,128,61,.08); border-color: rgba(21,128,61,.26); color: #15803D; border-radius: 12px; }
     .odds-box small { color: #A39B8C; }
+    .odds-box b { color: #0F5C2C; }
     .why-line { color: #6E675C; }
 
     /* Card internals */
-    .card-section { background: #F9F6F1; border-color: rgba(33,31,27,.08); }
+    .card-section { background: #F4F1EC; border-color: rgba(33,31,27,.07); border-radius: 10px; }
     .teams-line { background: transparent; border: none; }
     .pick-summary-main span { color: #A39B8C; }
     .pick-summary-main strong { color: #211F1B; }
