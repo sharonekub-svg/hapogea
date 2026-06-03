@@ -1335,6 +1335,7 @@
     .badge-unverified { color: #211600; background: var(--gold); }
     .verdict.closed { color: var(--muted); border-color: rgba(255,255,255,.10); background: rgba(255,255,255,.05); }
     .badge-closed { color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); }
+    .badge-no-odds { color: #b8a060; background: rgba(180,140,60,.15); border: 1px solid rgba(180,140,60,.30); }
     .badge-cancelled-he { color: #ffc5c3; background: rgba(239,83,80,.18); border: 1px solid rgba(239,83,80,.35); }
     .card-verified {
       justify-content: space-between;
@@ -2602,6 +2603,7 @@
     .badge-pending { color:#fff; background:#2563EB; }
     .badge-void, .badge-suspended { color:#fff; background:#92600A; }
     .badge-closed  { color:#6E675C; background:rgba(33,31,27,.07); border:1px solid rgba(33,31,27,.12); }
+    .badge-no-odds { color:#7a6520; background:rgba(180,140,60,.12); border:1px solid rgba(180,140,60,.28); }
 
     /* Live card */
     .card-live-area { background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.18); }
@@ -4567,7 +4569,7 @@
     }
 
     function hasPick(row) {
-      return row.recommended === true || (!!row.odds && !row.outsideRange);
+      return row.noOddsYet || row.recommended === true || (!!row.odds && !row.outsideRange);
     }
 
     function trackedResultKeys() {
@@ -4639,6 +4641,9 @@
         return !query || text.includes(query);
       });
       rows.sort((a, b) => {
+        // noOddsYet (no lines) always last
+        if (a.noOddsYet && !b.noOddsYet) return 1;
+        if (!a.noOddsYet && b.noOddsYet) return -1;
         // In-range picks first, then outside-range
         if (!a.outsideRange && b.outsideRange) return -1;
         if (a.outsideRange && !b.outsideRange) return 1;
@@ -4650,7 +4655,11 @@
           || (b.odds || 0) - (a.odds || 0)
           || String(a.time).localeCompare(String(b.time));
       });
-      return isYesterday ? rows : rows.slice(0, 20);
+      if (isYesterday) return rows;
+      // Keep up to 20 scored picks + all noOddsYet rows appended after
+      const pickRows = rows.filter(r => !r.noOddsYet).slice(0, 20);
+      const noOddsRows = rows.filter(r => r.noOddsYet);
+      return [...pickRows, ...noOddsRows];
     }
 
     function currentRowsBySport() {
@@ -4673,6 +4682,8 @@
 
     function sortRows(rows) {
       return [...rows].sort((a, b) => {
+        if (a.noOddsYet && !b.noOddsYet) return 1;
+        if (!a.noOddsYet && b.noOddsYet) return -1;
         if (!a.outsideRange && b.outsideRange) return -1;
         if (a.outsideRange && !b.outsideRange) return 1;
         if (state.sort === "odds") return (b.oddsRaw || b.odds || 0) - (a.oddsRaw || a.odds || 0);
@@ -4775,11 +4786,12 @@
       // Always compute from live feed rows (gives avg odds + counts for today)
       const sportRows = currentRows();
       {
-        const oddsRows = sportRows.filter(r => (r.oddsRaw || r.odds) > 1);
+        const pickRows = sportRows.filter(r => !r.noOddsYet);
+        const oddsRows = pickRows.filter(r => (r.oddsRaw || r.odds) > 1);
         avgOdds = oddsRows.length > 0
           ? oddsRows.reduce((s, r) => s + (r.oddsRaw || r.odds || 0), 0) / oddsRows.length
           : 0;
-        sportRows.forEach(row => {
+        pickRows.forEach(row => {
           const outcome = rowOutcome(row);
           if (outcome.key === "hit") won++;
           else if (outcome.key === "miss") lost++;
@@ -6372,10 +6384,11 @@
         : (state.feed?.fallback || state.feed?.stale) ? "snapshot מאומת" : "נתונים חיים";
       const totalRows = daySportRows(state.day, state.sportTab).length;
       const withPick = rows.filter(row => row.recommended && !row.outsideRange).length;
-      const withoutPick = Math.max(0, rows.length - withPick);
+      const noOddsCount = rows.filter(row => row.noOddsYet).length;
+      const withoutPick = Math.max(0, rows.filter(row => !row.noOddsYet).length - withPick);
       const withoutPickText = `${withoutPick} ללא יתרון סטטיסטי`;
       meta.textContent = isOpenDay()
-        ? `${rows.length}/20 משחקי Winner עם הציון הסטטיסטי הגבוה ביותר · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
+        ? `${rows.length}/20 משחקי Winner · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}${noOddsCount ? ` · ${noOddsCount} ממתינים לקווים` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
         : `${rows.length} \u05ea\u05d5\u05e6\u05d0\u05d5\u05ea \u05e8\u05e9\u05de\u05d9\u05d5\u05ea \u05de\u05ea\u05d5\u05da ${totalRows}. \u05d4\u05de\u05e1\u05da \u05d4\u05d6\u05d4 \u05e1\u05d5\u05d2\u05e8 \u05ea\u05d7\u05d6\u05d9\u05d5\u05ea \u05e9\u05e0\u05e9\u05de\u05e8\u05d5 \u05e7\u05d5\u05d3\u05dd. ${sourceMode}${isRefreshing ? " \u00b7 \u05de\u05ea\u05e2\u05d3\u05db\u05df..." : ""}`;
       const banners = [
         (state.feed?.fallback || state.feed?.stale) ? `<div class="fallback-banner">\u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05d9\u05d1\u05d5\u05d9 \u05de\u05d0\u05d5\u05de\u05ea\u05d9\u05dd. Winner Live \u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05db\u05e8\u05d2\u05e2 \u05d1\u05e9\u05e8\u05ea; \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d5\u05d3\u05db\u05e0\u05d5 ${formatShortTime(state.feed.generatedAt || state.localCachedAt)}.</div>` : "",
@@ -6685,6 +6698,10 @@
       const match = matchStatusInfo(row);
       const outcome = rowOutcome(row);
       const badges = [`<span class="badge ${match.cls}">${match.label}</span>`];
+      if (row.noOddsYet) {
+        badges.push('<span class="badge badge-no-odds">ממתין לקווים</span>');
+        return badges.join("");
+      }
       if (row.recommended) badges.push(`<span class="badge ${outcome.cls === "hit" ? "badge-won" : outcome.cls === "miss" ? "badge-lost" : outcome.cls === "unverified" ? "badge-unverified" : outcome.cls === "closed" ? "badge-closed" : "badge-pending"}">${outcome.label}</span>`);
       if (row.isAlternativeMarket) badges.push('<span class="badge badge-odds-changed">שוק חלופי</span>');
       if (row.marketTier === "spread") badges.push('<span class="badge badge-pending">ליין כדורסל</span>');
@@ -6822,7 +6839,7 @@
     }
 
     function rowCard(row) {
-      const hasRecommendation = row.recommended || (!!row.odds && !row.outsideRange);
+      const hasRecommendation = !row.noOddsYet && (row.recommended || (!!row.odds && !row.outsideRange));
       const noPickLabel = row.recommendationReason === "rank"
         ? "לא בטופ 20"
         : row.recommendationReason === "odds-range"
@@ -6830,7 +6847,7 @@
           : "ללא יתרון סטטיסטי";
       const why = (row.explanation || [])[1] || (row.signals || []).slice(0, 2).join(" · ");
       return `
-        <article class="card ${hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${rowOutcome(row).key}" data-outcome-label="${escapeHtml(rowOutcome(row).label)}" data-home="${escapeHtml(row.home || "")}" data-away="${escapeHtml(row.away || "")}" data-sport="${escapeHtml(row.sportId || "football")}">
+        <article class="card ${row.noOddsYet ? "no-pick no-odds-yet" : hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${row.noOddsYet ? "pending" : rowOutcome(row).key}" data-outcome-label="${row.noOddsYet ? "ממתין לקווים" : escapeHtml(rowOutcome(row).label)}" data-home="${escapeHtml(row.home || "")}" data-away="${escapeHtml(row.away || "")}" data-sport="${escapeHtml(row.sportId || "football")}">
           <div class="card-head">
             <div class="card-topline" style="width:100%">
               <div class="card-meta-stack">
@@ -6852,7 +6869,15 @@
             <div class="card-section">
               <div class="teams-line">${teamsMarkup(row)}</div>
             </div>
-            <div class="card-section">
+            ${row.noOddsYet
+              ? `<div class="card-section">
+                   <div class="pick-summary" style="opacity:.6">
+                     <div class="pick-summary-main" style="width:100%">
+                       <span style="font-size:12px;color:var(--text-muted)">קווי הימורים טרם נפתחו — המשחק יעודכן אוטומטית</span>
+                     </div>
+                   </div>
+                 </div>`
+              : `<div class="card-section">
               ${hasRecommendation
                 ? `<div class="pick-summary">
                      <div class="pick-summary-main">
@@ -6876,16 +6901,16 @@
                        <span>${noPickLabel}</span>
                      </div>
                    </div>`}
-            </div>
-            ${resultMarkup(row)}
-            ${cardVerifiedMarkup(row)}
+            </div>`}
+            ${row.noOddsYet ? "" : resultMarkup(row)}
+            ${row.noOddsYet ? "" : cardVerifiedMarkup(row)}
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
-              <div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
+              ${row.noOddsYet ? "" : `<div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
                 <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
                 <button class="btn-share-tg" data-share-tg="1">Telegram</button>
                 <button class="btn-share-link" data-share-copy="1">העתק</button>
-              </div>
+              </div>`}
             </div>
           </div>
         </article>

@@ -1579,6 +1579,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     // If no in-range outcome, pick the best (lowest odds = favourite) outcome
     // and mark it as outside-range so the UI can show it without a recommendation
     let outsideRange = false;
+    let noOddsYet = false;
     if (!bestScored) {
       const allOutcomes = (market.outcomes || [])
         .map((outcome) => ({ outcome, odds: decimal(outcome.price) }))
@@ -1612,6 +1613,25 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
           oddsBook,
         };
         outsideRange = true;
+      } else if ((market.outcomes || []).length >= 2) {
+        // Betting lines not open yet — show game name only, no odds
+        noOddsYet = true;
+        outsideRange = true;
+        bestScored = {
+          outcomeId: null,
+          pick: teams.home || "",
+          pickTeam: teams.home || "",
+          spread: null,
+          odds: null,
+          implied: null,
+          normalizedProbability: null,
+          marketGap: null,
+          overround: null,
+          hitProbability: null,
+          reliability: null,
+          score: 0,
+          oddsBook: { outcomes: [], overround: 0 },
+        };
       }
     }
 
@@ -1656,6 +1676,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
       odds: outsideRange ? null : scored.odds,           // null = no recommendation
       oddsRaw: scored.odds,                               // always the actual odds
       outsideRange,
+      noOddsYet,
       oddsBook: scored.oddsBook,
       probability: outsideRange ? null : scored.hitProbability,
       normalizedProbability: scored.normalizedProbability,
@@ -1669,7 +1690,9 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
       score: outsideRange ? 0 : scored.score,
       status: "ממתין",
       result: "",
-      signals: outsideRange
+      signals: noOddsYet
+        ? ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"]
+        : outsideRange
         ? [
             `יחס Winner ${scored.odds.toFixed(2)} — מחוץ לטווח הניתוח המרכזי (1.40–1.90)`,
             `הסתברות שוק ${Math.round(scored.normalizedProbability * 100)} אחוז`,
@@ -1683,7 +1706,12 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
             ...(scored.ev > 0 ? [`ערך צפוי חיובי (EV +${(scored.ev * 100).toFixed(1)}%) — סיגנל ערך`] : []),
           ],
       allMarkets: eventMarkets,
-      explanation: outsideRange
+      explanation: noOddsYet
+        ? [
+            "המשחק קיים במערכת Winner אך קווי ההימורים טרם נפתחו.",
+            "ווינר פותחים קווים בהדרגה — בדרך כלל כמה שעות לפני הקיקאוף. המשחק יקבל ניתוח מלא ברגע שהיחסים יעלו.",
+          ]
+        : outsideRange
         ? [
             "המשחק מופיע בווינר-ליין אך הפייבוריט מחוץ לטווח הניתוח המרכזי.",
             `יחס הפייבוריט הוא ${scored.odds.toFixed(2)} — ${scored.odds < 1.4 ? "נמוך מדי (פערים ברורים מדי, סיכון גבוה להפתעה)" : "גבוה מדי (שוק פתוח מדי, אין יתרון ברור)"}. אין כאן יתרון סטטיסטי מסומן.`,
@@ -1744,9 +1772,20 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     // outsideRange rows show without a recommendation — don't require hasSingleClearFavorite
     // so friendlies/playoffs with clear (but out-of-range) favorites aren't silently dropped
     .filter((row) => row.matchPhase === "final" || row.outsideRange || hasSingleClearFavorite(row))
+    // Basketball confidence gate: below 75 = no recommendation
+    .filter((row) => {
+      if (Number(row.sportId) !== WINNER_BASKETBALL_ID) return true;
+      if (row.noOddsYet || row.outsideRange || row.matchPhase === "final") return true;
+      const conf = basketballConfidence(row);
+      if (conf < 75) {
+        console.info(`[bball-confidence] Excluded: ${row.match} — conf ${conf}/100`);
+        return false;
+      }
+      return true;
+    })
     // Motivation filter: exclude games where the favourite has no meaningful stake
     .filter((row) => {
-      if (!row.motivationRisk) return true;
+      if (row.noOddsYet || !row.motivationRisk) return true;
       console.info(
         `[motivation-filter] Excluded: ${row.match} — ${row.motivationInfo?.label || "no stake"}`
       );
