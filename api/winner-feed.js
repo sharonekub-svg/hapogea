@@ -63,11 +63,25 @@ const ODDS_API_SPORTS = [
   { key: "soccer_japan_j_league",               label: "J-League",                  sportId: 240 },
   { key: "soccer_china_superleague",            label: "סינית ראשונה",               sportId: 240 },
   { key: "soccer_australia_aleague",            label: "A-League",                  sportId: 240 },
-  // כדורסל
+  // כדורסל — כל הליגות הגדולות בעולם
   { key: "basketball_nba",                       label: "NBA",                       sportId: 227 },
-  { key: "basketball_nbl",                      label: "NBL",                       sportId: 227 },
+  { key: "basketball_nbl",                       label: "NBL (אוסטרליה)",            sportId: 227 },
   { key: "basketball_euroleague",                label: "יורוליג",                   sportId: 227 },
-  { key: "basketball_ncaab",                    label: "NCAA",                      sportId: 227 },
+  { key: "basketball_eurocup",                   label: "יורוקאפ",                   sportId: 227 },
+  { key: "basketball_ncaab",                     label: "NCAA",                      sportId: 227 },
+  { key: "basketball_spain_acb",                 label: "ACB (ספרד)",                sportId: 227 },
+  { key: "basketball_france_pro_a",              label: "Pro A (צרפת)",              sportId: 227 },
+  { key: "basketball_italy_lba",                 label: "Lega Basket (איטליה)",      sportId: 227 },
+  { key: "basketball_turkey_bsl",                label: "BSL (טורקיה)",              sportId: 227 },
+  { key: "basketball_germany_bbl",               label: "BBL (גרמניה)",              sportId: 227 },
+  { key: "basketball_greece_basket_league",      label: "ליגה יוונית",               sportId: 227 },
+  { key: "basketball_russia_vtb",                label: "VTB (רוסיה)",               sportId: 227 },
+  { key: "basketball_lithuania_lkl",             label: "LKL (ליטא)",                sportId: 227 },
+  { key: "basketball_czech_nbl",                 label: "NBL (צ'כיה)",               sportId: 227 },
+  { key: "basketball_poland_tbl",                label: "TBL (פולין)",               sportId: 227 },
+  { key: "basketball_israel_premier_league",     label: "ליגת העל כדורסל",           sportId: 227 },
+  { key: "basketball_cba",                       label: "CBA (סין)",                 sportId: 227 },
+  { key: "basketball_nba_championship_winner",   label: "NBA אליפות",                sportId: 227 },
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
