@@ -3661,5 +3661,6 @@ module.exports = async function handler(req, res) {
 
 module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
+module.exports.buildOddsApiFeed = buildOddsApiFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
