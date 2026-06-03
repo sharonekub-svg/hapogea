@@ -3518,12 +3518,11 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   }
 
   // If Winner has too few games OR too few distinct leagues, supplement from The Odds API.
-  const todayCount =
-    (payload.tabs?.today?.sports?.football?.length || 0) +
-    (payload.tabs?.today?.sports?.basketball?.length || 0);
-  const tomorrowCount =
-    (payload.tabs?.tomorrow?.sports?.football?.length || 0) +
-    (payload.tabs?.tomorrow?.sports?.basketball?.length || 0);
+  // noOddsYet rows are 365Scores schedule placeholders with no odds — they don't count as real picks.
+  const countReal = (tab) =>
+    [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet).length;
+  const todayCount = countReal(payload.tabs?.today);
+  const tomorrowCount = countReal(payload.tabs?.tomorrow);
 
   function tabLeagueSet(tab) {
     const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
