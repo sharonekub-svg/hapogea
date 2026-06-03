@@ -336,6 +336,18 @@
       font-weight: 800;
       text-align: center;
     }
+    .logo-wrap.no-logo { display: none; }
+    .logo-wrap.no-logo + .team-name {
+      font-size: 15px;
+      font-weight: 900;
+      max-width: 150px;
+      white-space: normal;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    .team-side.selected .logo-wrap.no-logo + .team-name {
+      color: #bff8dc;
+    }
     .team-odd {
       min-height: 22px;
       display: inline-flex;
@@ -4522,15 +4534,24 @@
       return String(value).includes("227") || String(value).toLowerCase().includes("basket") ? "&#127936;" : "&#9917;";
     }
     function logoMarkup(asset, size = "") {
-      if (!asset) return `<div class="logo-wrap ${size}">${imageWithFallback("", "לא זמין", "team")}</div>`;
+      if (size === "small") {
+        // League logos — keep existing behavior
+        if (!asset) return `<div class="logo-wrap ${size}">${imageWithFallback("", "לא זמין", "league")}</div>`;
+        const source = String(asset.logoSource || "");
+        const isGenerated = !asset.logo || String(asset.logo).startsWith("data:image") || /generated|fallback/i.test(source);
+        if (asset.logo && !isGenerated) {
+          return `<div class="logo-wrap ${size}">${imageWithFallback(asset.logo, asset.name || "", "league")}</div>`;
+        }
+        return `<div class="logo-wrap ${size}">${imageWithFallback("", asset.name || asset.initials || "לא זמין", "league")}</div>`;
+      }
+      // Team logos — when no confirmed real logo, return hidden placeholder so CSS shows big name
+      if (!asset) return `<div class="logo-wrap no-logo" aria-hidden="true"></div>`;
       const source = String(asset.logoSource || "");
       const isGenerated = !asset.logo || String(asset.logo).startsWith("data:image") || /generated|fallback/i.test(source);
-      // For team logos with no real logo, add data-team-name so client-side JS can find the real crest
-      const lookupName = size !== "small" ? (asset.name || null) : null;
       if (asset.logo && !isGenerated) {
-        return `<div class="logo-wrap ${size}">${imageWithFallback(asset.logo, asset.name || "", size === "small" ? "league" : "team")}</div>`;
+        return `<div class="logo-wrap ${size}">${imageWithFallback(asset.logo, asset.name || "", "team")}</div>`;
       }
-      return `<div class="logo-wrap ${size}">${imageWithFallback("", asset.name || asset.initials || "לא זמין", size === "small" ? "league" : "team", lookupName)}</div>`;
+      return `<div class="logo-wrap no-logo" aria-hidden="true"></div>`;
     }
 
 
