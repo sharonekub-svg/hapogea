@@ -1350,6 +1350,59 @@
       line-height: 1.45;
       margin-top: 7px;
     }
+
+    /* ── Pick Hero ─────────────────────────────────────────── */
+    .pick-hero { display: grid; gap: 10px; }
+    .pick-hero-top {
+      display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    }
+    .pick-hero-label {
+      font-size: 11px; font-weight: 900; color: #31d187;
+      letter-spacing: .3px; white-space: nowrap;
+    }
+    .pick-hero-main {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+    }
+    .pick-hero-name {
+      font: 900 clamp(15px,3.5vw,21px)/1.2 Heebo, Assistant, sans-serif;
+      color: #fff; flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .pick-hero-odds {
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      min-width: 60px; padding: 10px 14px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(49,209,135,.12); border: 1.5px solid rgba(49,209,135,.35);
+    }
+    .pick-hero-odds b {
+      font: 900 26px/1 Heebo, sans-serif; color: #bff8dc;
+    }
+    .pick-hero-odds small {
+      font-size: 9px; font-weight: 800; color: rgba(191,248,220,.55);
+      text-transform: uppercase; letter-spacing: .4px;
+    }
+    .pick-hero-why {
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+      border-top: 1px solid rgba(255,255,255,.07); padding-top: 8px;
+    }
+    /* Green tint on pick section of recommended cards */
+    .has-pick .pick-section {
+      background: rgba(49,209,135,.07);
+      border-color: rgba(49,209,135,.22);
+    }
+    /* Hide share strip inside cards — accessible via detail modal */
+    .card .share-strip { display: none; }
+    /* Footer: minimal right-aligned detail link */
+    .card .card-footer-actions {
+      display: flex; justify-content: flex-end; padding-top: 2px;
+    }
+    .card .open-game {
+      width: auto; min-height: 0; border: none; background: none;
+      padding: 3px 0; font-size: 12px; font-weight: 800;
+      color: var(--muted); border-radius: 0; transition: color .15s;
+    }
+    .card .open-game:hover { color: var(--text); }
+
     .result-line {
       grid-template-columns: 1fr auto;
       gap: 10px;
@@ -2596,6 +2649,17 @@
     .market-row { background: rgba(21,128,61,.05); border-color: rgba(21,128,61,.16); }
     .market-row .name { color: #211F1B; }
     .market-row .price { color: #92600A; }
+
+    /* Pick Hero — light theme */
+    .pick-hero-label { color: #15803D; }
+    .pick-hero-name { color: #1A1816; }
+    .pick-hero-odds { background: rgba(21,128,61,.08); border-color: rgba(21,128,61,.28); }
+    .pick-hero-odds b { color: #0F5C2C; }
+    .pick-hero-odds small { color: #9E9689; }
+    .pick-hero-why { color: #6B6357; border-top-color: rgba(33,31,27,.07); }
+    .has-pick .pick-section { background: rgba(21,128,61,.05); border-color: rgba(21,128,61,.16); }
+    .card .open-game { color: #9E9689; border-color: transparent; }
+    .card .open-game:hover { color: #1A1816; }
 
     /* Result line */
     .result-line { background: #F9F6F1; border-color: rgba(33,31,27,.09); color: #6E675C; }
@@ -6898,31 +6962,27 @@
               <div class="teams-line">${teamsMarkup(row)}</div>
             </div>
             ${row.noOddsYet
-              ? `<div class="card-section">
-                   <div class="pick-summary" style="opacity:.6">
-                     <div class="pick-summary-main" style="width:100%">
-                       <span style="font-size:12px;color:var(--text-muted)">קווי הימורים טרם נפתחו — המשחק יעודכן אוטומטית</span>
-                     </div>
-                   </div>
+              ? `<div class="card-section" style="opacity:.6">
+                   <p style="margin:0;font-size:12px;font-weight:700;color:var(--muted)">⌛ קווי הימורים טרם נפתחו — יעודכן אוטומטית</p>
                  </div>`
-              : `<div class="card-section">
+              : `<div class="card-section pick-section">
               ${hasRecommendation
-                ? `<div class="pick-summary">
-                     <div class="pick-summary-main">
-                       <span>הצד שנבחר ✦</span>
-                       <strong>${explicitPickText(row)}</strong>
-                       <div class="pick-label-row">
-                         <span class="pick-market-chip">${marketLabelText(row)}</span>
+                ? `<div class="pick-hero">
+                     <div class="pick-hero-top">
+                       <span class="pick-hero-label">✦ הפוגע בוחר</span>
+                       <span class="pick-market-chip">${marketLabelText(row)}</span>
+                     </div>
+                     <div class="pick-hero-main">
+                       <strong class="pick-hero-name">${explicitPickText(row)}</strong>
+                       <div class="pick-hero-odds">
+                         <b>${row.odds ? formatOdds(row.odds) : "—"}</b>
+                         <small>יחס</small>
                        </div>
                      </div>
-                     <div class="odds-box">
-                       <small>יחס</small>
-                       <b>${row.odds ? formatOdds(row.odds) : "—"}</b>
-                     </div>
+                     ${why ? `<div class="pick-hero-why">${why}</div>` : ""}
                    </div>
-                   ${why ? `<div class="why-line">${why}</div>` : ""}
                    ${oddsMovementMarkup(row)}`
-                : `<div class="pick-summary" style="opacity:.55">
+                : `<div class="pick-summary" style="opacity:.50">
                      <div class="pick-summary-main">
                        <span>ללא יתרון סטטיסטי</span>
                        <strong style="font-size:15px">${explicitPickText(row)}${row.oddsRaw ? ` · ${formatOdds(row.oddsRaw)}` : ""}</strong>
