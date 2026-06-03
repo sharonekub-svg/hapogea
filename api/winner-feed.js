@@ -286,7 +286,7 @@ const CACHE_TTL_MS = {
   tomorrow: 60 * 60 * 1000,
   full: 5 * 60 * 1000,
 };
-const memoryCache = globalThis.__WINNER_FEED_CACHE__ || (globalThis.__WINNER_FEED_CACHE__ = new Map());
+const memoryCache = globalThis.__WINNER_FEED_CACHE_V2__ || (globalThis.__WINNER_FEED_CACHE_V2__ = new Map());
 // Persists across warm Lambda invocations — avoids re-fetching logos for the same teams
 const globalLogoCache = globalThis.__LOGO_CACHE__ || (globalThis.__LOGO_CACHE__ = new Map());
 
@@ -3132,8 +3132,8 @@ function getTeamStakeFromStandings(standings, competitorId) {
 // ── The Odds API integration ─────────────────────────────────────────────────
 
 // In-process cache for the /sports discovery result (6-hour TTL across warm lambdas)
-const oddsDiscoveryCache = globalThis.__ODDS_DISCOVERY_CACHE__ ||
-  (globalThis.__ODDS_DISCOVERY_CACHE__ = { at: 0, sports: null });
+const oddsDiscoveryCache = globalThis.__ODDS_DISCOVERY_CACHE_V2__ ||
+  (globalThis.__ODDS_DISCOVERY_CACHE_V2__ = { at: 0, sports: null });
 
 // Returns array of all active sport objects {key, title, active} or null on failure.
 async function discoverActiveSports() {
