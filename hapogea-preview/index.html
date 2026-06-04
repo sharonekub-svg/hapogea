@@ -6914,7 +6914,7 @@
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-                ${row.noOddsYet ? "" : `<button class="btn-ai-card" data-ai-id="${row.id}">ניתוח AI 🤖</button>`}
+                ${row.noOddsYet ? "" : `<button class="btn-ai-card" data-ai-id="${row.id}">הפוגע AI ✦</button>`}
                 ${row.noOddsYet ? "" : `<div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
                   <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
                   <button class="btn-share-tg" data-share-tg="1">Telegram</button>
@@ -8422,7 +8422,7 @@
         if (!panel) return;
         if (panel.classList.contains("open") && !aiBtn.classList.contains("ai-loading")) {
           panel.classList.remove("open");
-          aiBtn.textContent = "ניתוח AI 🤖";
+          aiBtn.textContent = "הפוגע AI ✦";
           return;
         }
         if (aiBtn.classList.contains("ai-loading")) return;
@@ -8435,7 +8435,7 @@
         aiBtn.classList.add("ai-loading");
         aiBtn.innerHTML = `<span class="ai-spinner"></span>מנתח...`;
         panel.classList.add("open");
-        panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI · Claude</span><span class="ai-spinner"></span> מנתח נתונים...`;
+        panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI</span><span class="ai-spinner"></span> מנתח נתונים...`;
         fetch("/api/analyze-game", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -8453,16 +8453,16 @@
         .then(r => r.json())
         .then(data => {
           aiBtn.classList.remove("ai-loading");
-          aiBtn.textContent = "סגור ניתוח ✕";
+          aiBtn.textContent = "סגור ✕";
           if (data.ok && data.analysis) {
-            panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI · Claude Haiku</span>${escapeHtml(data.analysis)}`;
+            panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI</span>${escapeHtml(data.analysis)}`;
           } else {
-            panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI</span><span class="ai-panel-error">שגיאה: ${escapeHtml(data.error || "לא ניתן לנתח כרגע")}</span>`;
+            panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI</span><span class="ai-panel-error">שגיאה: ${escapeHtml(data.error || "לא ניתן לנתח כרגע")}</span>`;
           }
         })
         .catch(() => {
           aiBtn.classList.remove("ai-loading");
-          aiBtn.textContent = "ניתוח AI 🤖";
+          aiBtn.textContent = "הפוגע AI ✦";
           panel.innerHTML = `<span class="ai-panel-error">שגיאה בחיבור לשרת</span>`;
         });
         return;
