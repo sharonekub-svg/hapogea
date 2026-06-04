@@ -2596,6 +2596,7 @@
     #ai-root .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
     @media (max-width: 760px) {
       #ai-root .ai-sidebar { position: absolute; z-index: 30; height: 100%; box-shadow: var(--shadow-lg); }
+      #ai-root .ai-sidebar-backdrop { position: absolute; inset: 0; z-index: 29; background: rgba(0,0,0,.45); }
       #ai-section { top: 60px; }
       #ai-root { --pad: 14px; --msg-gap: 20px; --font-base: 15px; }
       #ai-root .ai-topbar { height: 50px; padding: 0 14px; }
@@ -9134,11 +9135,14 @@ function groupSessions(sessions) {
   return groups;
 }
 
-function AiSidebar({ collapsed, onNewChat, user, sessions }) {
+function AiSidebar({ collapsed, onNewChat, user, sessions, onClose }) {
   const openAccount = () => { if (window.HapAuth) window.HapAuth.openOrMenu(); };
   const groups = groupSessions(sessions);
+  const isMobile = () => window.innerWidth <= 760;
   return (
-    <div className={"ai-sidebar"+(collapsed?" collapsed":"")}>
+    <>
+      {!collapsed && isMobile() && <div className="ai-sidebar-backdrop" onClick={onClose}/>}
+      <div className={"ai-sidebar"+(collapsed?" collapsed":"")}>
       <div className="ai-sb-inner">
         <div className="ai-sb-head">
           <div className="ai-brand">
@@ -9173,6 +9177,7 @@ function AiSidebar({ collapsed, onNewChat, user, sessions }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -9297,7 +9302,7 @@ function AiApp() {
   const [busy,setBusy] = React.useState(false);
   const [scrolled,setScrolled] = React.useState(false);
   const [showScrollBtn,setShowScrollBtn] = React.useState(false);
-  const [collapsed,setCollapsed] = React.useState(false);
+  const [collapsed,setCollapsed] = React.useState(()=>window.innerWidth<=760);
   const scrollRef = React.useRef(null);
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
@@ -9488,7 +9493,7 @@ function AiApp() {
   const empty=messages.length===0;
   return (
     <div className="ai-app">
-      <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user} sessions={sessions}/>
+      <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user} sessions={sessions} onClose={()=>setCollapsed(true)}/>
       <div className="ai-main">
         <div className={"ai-topbar"+(scrolled?" scrolled":"")}>
           <button className="ai-icon-btn" onClick={()=>setCollapsed(c=>!c)} aria-label="תפריט">
