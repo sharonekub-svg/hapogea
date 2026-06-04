@@ -9340,7 +9340,7 @@ function AiApp() {
   const isPrem=()=>typeof window.isPremiumUser==="function"?window.isPremiumUser():false;
 
   const showLimit=(msg)=>{
-    const limitHtml='⛔ <strong>הגעת למגבלה היומית שלך.</strong><br><br>משתמשים חינמיים יכולים לשלוח <strong>3 הודעות ביום</strong> לצ\'אט ו-<strong>תמונה אחת ביום</strong> לניתוח.<br><br><button onclick="openPremiumModal()" style="padding:9px 22px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer;margin-top:4px">🔓 שדרג לפרימיום</button>';
+    const limitHtml='⛔ <strong>הגעת למגבלה היומית שלך.</strong><br><br>משתמשים חינמיים יכולים לשלוח <strong>הודעה אחת ביום</strong> לצ\'אט ו-<strong>תמונה אחת ביום</strong> לניתוח.<br><br><button onclick="openPremiumModal()" style="padding:9px 22px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer;margin-top:4px">🔓 שדרג לפרימיום</button>';
     setMessages(m=>[...m,{role:"user",text:msg||"שלחתי הודעה"},{role:"ai",phase:"done",streamLen:9999,intro:limitHtml,analysis:[],revealed:0,open:{},showFinal:false}]);
   };
 
@@ -9379,7 +9379,7 @@ function AiApp() {
 
   const send=async(text)=>{
     if(busy)return;
-    if(!isPrem()&&rlGet("chat")>=3){showLimit(text);return;}
+    if(!isPrem()&&rlGet("chat")>=1){showLimit(text);return;}
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
     rlInc("chat");
