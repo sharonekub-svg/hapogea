@@ -9332,8 +9332,21 @@ function AiApp() {
 
   const newChat=()=>{runRef.current++;setBusy(false);setMessages([]);atBottom.current=true;};
 
+  // ── Rate limiting helpers ─────────────────────────────────────────────────
+  const todayStr=()=>new Date().toLocaleDateString("he-IL",{timeZone:"Asia/Jerusalem"});
+  const rlKey=(type)=>"hapogea_rl_"+type+"_"+(user?.id||"guest");
+  const rlGet=(type)=>{try{const v=JSON.parse(localStorage.getItem(rlKey(type))||"{}");return v.date===todayStr()?v.count||0:0;}catch{return 0;}};
+  const rlInc=(type)=>{const c=rlGet(type)+1;try{localStorage.setItem(rlKey(type),JSON.stringify({date:todayStr(),count:c}));}catch{}};
+  const isPrem=()=>typeof window.isPremiumUser==="function"?window.isPremiumUser():false;
+
+  const showLimit=(msg)=>{
+    const limitHtml='⛔ <strong>הגעת למגבלה היומית שלך.</strong><br><br>משתמשים חינמיים יכולים לשלוח <strong>3 הודעות ביום</strong> לצ\'אט ו-<strong>תמונה אחת ביום</strong> לניתוח.<br><br><button onclick="openPremiumModal()" style="padding:9px 22px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer;margin-top:4px">🔓 שדרג לפרימיום</button>';
+    setMessages(m=>[...m,{role:"user",text:msg||"שלחתי הודעה"},{role:"ai",phase:"done",streamLen:9999,intro:limitHtml,analysis:[],revealed:0,open:{},showFinal:false}]);
+  };
+
   const sendImage=async(file)=>{
     if(busy)return;
+    if(!isPrem()&&rlGet("slip")>=1){showLimit("📎 שלחתי תמונה לניתוח");return;}
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
     setMessages(m=>[...m,
@@ -9351,6 +9364,7 @@ function AiApp() {
       const data=await resp.json().catch(()=>({}));
       if(run!==runRef.current)return;
       const answer=data.answer||"לא הצלחתי לנתח את התמונה.";
+      rlInc("slip");
       patchAi({phase:"streaming",intro:answer,streamLen:answer.length,analysis:[],showFinal:false});
       patchAi({phase:"done"});
     }catch(err){
@@ -9365,8 +9379,10 @@ function AiApp() {
 
   const send=async(text)=>{
     if(busy)return;
+    if(!isPrem()&&rlGet("chat")>=3){showLimit(text);return;}
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
+    rlInc("chat");
     const historySnap=messages.slice(-6).map(m=>({role:m.role,text:m.role==="user"?m.text:(m.intro||"")}));
     setMessages(m=>[...m,
       {role:"user",text},

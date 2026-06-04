@@ -49,6 +49,16 @@ Important:
 - Explain which leg has the weakest statistical support and why, without giving instructions to bet.
 - Never use phrases like "place it", "bet on", "my pick", "best bet", "tip", or Hebrew equivalents such as "שים על" / "הייתי מהמר".
 
+סיכום חובה בסוף:
+בסוף כל תשובה, הוסף בלוק סיכום נפרד בפורמט הבא (בעברית):
+
+---
+**📊 סיכום הפוגע:**
+**מה אני חושב על הטופס:** [משפט קצר — חזק / בינוני / חלש סטטיסטית]
+**יפגע?** [כן / לא / לא בטוח] — [נימוק אחד קצר]
+**הסתברות משוערת:** [X]% להצלחה
+---
+
 User note:
 ${cleanText(note) || "No extra note."}
 
