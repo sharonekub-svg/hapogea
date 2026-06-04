@@ -1198,6 +1198,25 @@
       gap: 6px;
       flex-wrap: wrap;
     }
+    .wc-team.wc-team-selected {
+      border-color: rgba(49,209,135,.55);
+      background: rgba(49,209,135,.08);
+      box-shadow: 0 0 0 3px rgba(49,209,135,.12), 0 0 18px rgba(49,209,135,.15);
+    }
+    .wc-team.wc-team-selected b { color: #bff8dc; }
+    .wc-pick-hero {
+      border: 1px solid rgba(49,209,135,.28);
+      background: rgba(49,209,135,.07);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: grid;
+      gap: 8px;
+    }
+    .wc-footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 2px;
+    }
     .footer { padding-top: 18px; padding-bottom: 24px; color: var(--soft); font-size: 12px; line-height: 1.6; }
 
     /* ── Badge system ── */
@@ -2627,6 +2646,9 @@
     .wc-odd.selected { background: rgba(21,128,61,.07); border-color: rgba(21,128,61,.22); color: #15803D; }
     .wc-why { background: rgba(146,96,10,.05); border-color: rgba(146,96,10,.14); color: #6E675C; }
     .wc-why.neutral { background: rgba(37,99,235,.04); border-color: rgba(37,99,235,.12); }
+    .wc-team.wc-team-selected { border-color: rgba(21,128,61,.55); background: rgba(21,128,61,.07); box-shadow: 0 0 0 3px rgba(21,128,61,.10); }
+    .wc-team.wc-team-selected b { color: #15803D; }
+    .wc-pick-hero { background: rgba(21,128,61,.06); border-color: rgba(21,128,61,.20); }
     .wc-group-table { background: #FDFCFB; border-color: rgba(33,31,27,.10); }
     .wc-group-head { background: rgba(37,99,235,.08); border-bottom-color: rgba(33,31,27,.08); color: #2563EB; }
     .wc-group-row { border-bottom-color: rgba(33,31,27,.06); }
@@ -5162,8 +5184,15 @@
     function wcFixtureCard(item) {
       const date = wcDateLabel(item.date);
       const status = wcStatus(item);
+      const hasOdds = !!(item.odds && item.pick);
+      const pickName = wcPickLabel(item);
+      const pickOddsVal = hasOdds ? item.odds[item.pick] : null;
+      const pickOddsFmt = pickOddsVal ? formatOdds(pickOddsVal) : "—";
+      const waText = hasOdds
+        ? `${item.home} נגד ${item.away} | ${pickName} @ ${pickOddsFmt} | הפוגע מונדיאל`
+        : "";
       return `
-        <article class="wc-match">
+        <article class="wc-match ${hasOdds ? "wc-has-pick" : ""}">
           <div class="wc-card-top">
             <span class="wc-stage">${item.stage || "שלב בתים"}</span>
             <span class="wc-status ${status.cls}">${status.label}</span>
@@ -5176,21 +5205,36 @@
             </div>
           </div>
           <div class="wc-teams">
-            <div class="wc-team">${flagImg(item.hc, item.home)}<b>${item.home}</b></div>
-            <div class="wc-prediction"><span>VS</span><b>${item.odds && item.pick ? formatOdds(item.odds[item.pick]) : "—"}</b><span>${item.odds ? "יחס" : "Winner"}</span></div>
-            <div class="wc-team">${flagImg(item.ac, item.away)}<b>${item.away}</b></div>
+            <div class="wc-team ${item.pick === "home" ? "wc-team-selected" : ""}">${flagImg(item.hc, item.home)}<b>${item.home}</b></div>
+            <div class="wc-prediction"><span>${item.pick === "draw" && hasOdds ? "תיקו" : "VS"}</span></div>
+            <div class="wc-team ${item.pick === "away" ? "wc-team-selected" : ""}">${flagImg(item.ac, item.away)}<b>${item.away}</b></div>
+          </div>
+          ${hasOdds ? `
+          <div class="wc-pick-hero">
+            <div class="pick-hero-top">
+              <span class="pick-hero-label">✦ הפוגע בוחר</span>
+              <span class="pick-market-chip">Winner · 1X2</span>
+            </div>
+            <div class="pick-hero-main">
+              <strong class="pick-hero-name">${pickName}</strong>
+              <div class="pick-hero-odds">
+                <b>${pickOddsFmt}</b>
+                <small>יחס</small>
+              </div>
+            </div>
           </div>
           ${wcFixtureOdds(item)}
-          <div class="wc-why">
-            <b>${item.source} · ${date.date}</b><br>
-            סטטוס: ${status.label}. ${item.odds ? `הצד שנבדק הוא ${wcPickLabel(item)} לפי יחס Winner אמיתי.` : "המשחק שמור בלוח הטורניר, אבל ניתוח שוק ייפתח רק כשיש יחס Winner אמיתי ועדכני."}
+          <div class="wc-footer-actions">
+            <a class="btn-wa-card" href="https://wa.me/?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer">שלח ל-WhatsApp 📲</a>
           </div>
+          ` : `
+          <div class="wc-why neutral"><b>יחסי Winner</b><br>אין יחס Winner פתוח כרגע. לא מוצג יחס מומצא — ניתוח ייפתח 48 שעות לפני המשחק.</div>
+          `}
           <div class="wc-factors">
             <span class="signal">שלב טורניר</span>
             <span class="signal">דגלי נבחרות</span>
             <span class="signal">תאריך ושעה</span>
             <span class="signal">Winner בלבד</span>
-            <span class="signal">בדיקת 48 שעות</span>
           </div>
         </article>
       `;
