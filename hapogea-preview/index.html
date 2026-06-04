@@ -6663,17 +6663,18 @@
               ${loading ? renderAiThinking() : ""}
             </div>
 
-            ${isLocked ? `
-            <div style="text-align:center;padding:28px 20px;border-top:1px solid rgba(255,255,255,.06)">
-              <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8)">השתמשת בניתוח החינמי שלך</p>
-              <p style="margin:0 0 18px;font-size:12px;color:rgba(255,255,255,.32)">פרימיום נותן גישה בלתי מוגבלת להפוגע AI</p>
-              <button onclick="openPremiumModal()" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">פתח פרימיום</button>
-            </div>
-            ` : `
             <div class="reuben-input-area">
+              <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" ${loading ? "disabled" : ""}>
+              ${isLocked ? `
+              <div style="text-align:center;padding:20px 20px 16px;border-top:1px solid rgba(255,255,255,.06)">
+                <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"};margin-bottom:14px">📎 העלה תמונה לניתוח</label>
+                <p style="margin:14px 0 6px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8)">השתמשת בניתוח החינמי שלך</p>
+                <p style="margin:0 0 14px;font-size:12px;color:rgba(255,255,255,.32)">פרימיום נותן גישה בלתי מוגבלת להפוגע AI</p>
+                <button onclick="openPremiumModal()" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">פתח פרימיום</button>
+              </div>
+              ` : `
               <div class="reuben-input-frame">
                 <div style="padding: 0 4px 8px; display:flex; gap:6px; flex-wrap:wrap;">
-                  <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" ${loading ? "disabled" : ""}>
                   <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"}">📎 העלה תמונה לניתוח</label>
                 </div>
                 <div class="reuben-input-row">
@@ -6686,8 +6687,8 @@
               <div class="reuben-input-footer">
                 <span class="reuben-disclaimer">ניתוח ספורטיבי בלבד · אין ייעוץ הימורים</span>
               </div>
+              `}
             </div>
-            `}
           </div>
         </section>
       `;
