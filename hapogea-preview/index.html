@@ -1408,6 +1408,35 @@
       font-weight: 900;
       cursor: pointer;
     }
+    /* ── AI analysis button + panel ── */
+    .btn-ai-card {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px; border-radius: 7px;
+      border: 1px solid rgba(99,102,241,.30);
+      background: rgba(99,102,241,.07);
+      color: #4f46e5; font-size: 11px; font-weight: 800;
+      cursor: pointer; transition: all .15s; white-space: nowrap; line-height: 1;
+    }
+    .btn-ai-card:hover { background: rgba(99,102,241,.14); border-color: rgba(99,102,241,.55); color: #3730a3; }
+    .btn-ai-card.ai-loading { opacity: .65; cursor: wait; pointer-events: none; }
+    .ai-panel {
+      display: none; margin: 6px 0 0; padding: 12px 14px;
+      background: rgba(99,102,241,.06); border: 1px solid rgba(99,102,241,.20);
+      border-radius: 12px; font-size: 13px; line-height: 1.65; color: var(--text);
+      white-space: pre-wrap; direction: rtl; text-align: right;
+    }
+    .ai-panel.open { display: block; }
+    .ai-panel-label {
+      display: block; font-size: 10px; font-weight: 900; color: #4f46e5;
+      letter-spacing: .4px; margin-bottom: 8px; text-transform: uppercase;
+    }
+    .ai-panel-error { color: var(--red); }
+    .ai-spinner {
+      display: inline-block; width: 13px; height: 13px; border-radius: 50%;
+      border: 2px solid rgba(99,102,241,.20); border-top-color: #4f46e5;
+      animation: ai-spin .7s linear infinite; vertical-align: -2px; margin-inline-end: 5px;
+    }
+    @keyframes ai-spin { to { transform: rotate(360deg); } }
     .team-name {
       max-width: min(150px, 38vw);
       font-size: 12px;
@@ -6884,12 +6913,16 @@
             ${row.noOddsYet ? "" : cardVerifiedMarkup(row)}
             <div class="card-footer-actions">
               <button class="open-game" data-open="${row.id}">פירוט משחק ←</button>
-              ${row.noOddsYet ? "" : `<div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
-                <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
-                <button class="btn-share-tg" data-share-tg="1">Telegram</button>
-                <button class="btn-share-link" data-share-copy="1">העתק</button>
-              </div>`}
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+                ${row.noOddsYet ? "" : `<button class="btn-ai-card" data-ai-id="${row.id}">ניתוח AI 🤖</button>`}
+                ${row.noOddsYet ? "" : `<div class="share-strip" data-share-text="${escapeHtml(shareTextForRow(row))}">
+                  <button class="btn-share-wa" data-share-wa="1">WhatsApp</button>
+                  <button class="btn-share-tg" data-share-tg="1">Telegram</button>
+                  <button class="btn-share-link" data-share-copy="1">העתק</button>
+                </div>`}
+              </div>
             </div>
+            ${row.noOddsYet ? "" : `<div class="ai-panel" id="ai-panel-${row.id}"></div>`}
           </div>
         </article>
       `;
@@ -8381,6 +8414,60 @@
         })();
         return;
       }
+      // ── AI analysis button ────────────────────────────────────────────────────
+      const aiBtn = event.target.closest("[data-ai-id]");
+      if (aiBtn) {
+        const id = aiBtn.dataset.aiId;
+        const panel = document.getElementById(`ai-panel-${id}`);
+        if (!panel) return;
+        if (panel.classList.contains("open") && !aiBtn.classList.contains("ai-loading")) {
+          panel.classList.remove("open");
+          aiBtn.textContent = "ניתוח AI 🤖";
+          return;
+        }
+        if (aiBtn.classList.contains("ai-loading")) return;
+        const row = findRow(id);
+        if (!row) return;
+        const odds1 = row.oddsBook?.home?.odds;
+        const oddsX = row.oddsBook?.draw?.odds;
+        const odds2 = row.oddsBook?.away?.odds;
+        const handicap = row.oddsBook?.home?.spread ?? row.oddsBook?.away?.spread ?? null;
+        aiBtn.classList.add("ai-loading");
+        aiBtn.innerHTML = `<span class="ai-spinner"></span>מנתח...`;
+        panel.classList.add("open");
+        panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI · Claude</span><span class="ai-spinner"></span> מנתח נתונים...`;
+        fetch("/api/analyze-game", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            home: row.home,
+            away: row.away,
+            sport: row.sport || row.sportId,
+            league: row.league,
+            odds1: odds1 ? formatOdds(odds1) : null,
+            oddsX: oddsX ? formatOdds(oddsX) : null,
+            odds2: odds2 ? formatOdds(odds2) : null,
+            handicap: handicap,
+          }),
+        })
+        .then(r => r.json())
+        .then(data => {
+          aiBtn.classList.remove("ai-loading");
+          aiBtn.textContent = "סגור ניתוח ✕";
+          if (data.ok && data.analysis) {
+            panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI · Claude Haiku</span>${escapeHtml(data.analysis)}`;
+          } else {
+            panel.innerHTML = `<span class="ai-panel-label">✦ ניתוח AI</span><span class="ai-panel-error">שגיאה: ${escapeHtml(data.error || "לא ניתן לנתח כרגע")}</span>`;
+          }
+        })
+        .catch(() => {
+          aiBtn.classList.remove("ai-loading");
+          aiBtn.textContent = "ניתוח AI 🤖";
+          panel.innerHTML = `<span class="ai-panel-error">שגיאה בחיבור לשרת</span>`;
+        });
+        return;
+      }
+      // ─────────────────────────────────────────────────────────────────────────
       const button = event.target.closest("[data-open]");
       if (!button) return;
       state.selectedId = button.dataset.open;
