@@ -8813,7 +8813,16 @@
         fetch("/api/analyze-game", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ home: row.home, away: row.away, sport: row.sport || row.sportId }),
+          body: JSON.stringify({
+            home: row.home, away: row.away,
+            sport: row.sport || row.sportId,
+            league: row.league || row.leagueName || null,
+            odds: row.oddsBook ? {
+              home: row.oddsBook.home?.odds,
+              draw: row.oddsBook.draw?.odds,
+              away: row.oddsBook.away?.odds,
+            } : null,
+          }),
         })
         .then(r => r.json())
         .then(data => {
