@@ -1937,12 +1937,13 @@
     .reuben-send-btn:disabled { opacity: .3; cursor: default; }
     .reuben-input-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
     .reuben-upload-label {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
-      border: 1px solid rgba(99,102,241,.45); background: rgba(99,102,241,.15);
-      font-size: 16px; cursor: pointer; transition: all .15s;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid rgba(99,102,241,.55); background: rgba(99,102,241,.18);
+      color: #a5b4fc; font: 700 12px Heebo, sans-serif;
+      cursor: pointer; transition: all .15s; white-space: nowrap;
     }
-    .reuben-upload-label:hover { background: rgba(99,102,241,.30); border-color: rgba(99,102,241,.7); }
+    .reuben-upload-label:hover { background: rgba(99,102,241,.32); border-color: #818cf8; color: #c7d2fe; }
     .reuben-disclaimer { font-size: 10px; color: rgba(255,255,255,.18); margin-inline-start: auto; }
     /* ── THINKING / LOADING ── */
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -6671,9 +6672,11 @@
             ` : `
             <div class="reuben-input-area">
               <div class="reuben-input-frame">
-                <div class="reuben-input-row">
+                <div style="padding: 0 4px 8px; display:flex; gap:6px; flex-wrap:wrap;">
                   <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" ${loading ? "disabled" : ""}>
-                  <label for="reubenSlipFile" class="reuben-upload-label" title="העלה תמונה לניתוח" style="opacity:${loading ? ".45" : "1"}">📎</label>
+                  <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"}">📎 העלה תמונה לניתוח</label>
+                </div>
+                <div class="reuben-input-row">
                   <textarea id="reubenInput" placeholder="כתוב משחק: ארסנל נגד פריז, לייקרס נגד סלטיקס..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
                   <button class="reuben-send-btn" type="button" id="reubenAnalyze" ${loading ? "disabled" : ""}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8.5 2.5L14 8l-5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
