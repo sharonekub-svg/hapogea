@@ -154,9 +154,11 @@ module.exports = async (req, res) => {
   if (!home || !away) { res.status(400).json({ ok: false, error: "home and away required" }); return; }
 
   const sportHint = isBasketball(sport) ? "basketball" : "football";
-  const system = `אתה אנליסט ספורט. ענה תמיד בעברית, קצר וישיר — 2-3 משפטים בלבד. אל תרשום כותרות. כשתשתמש בכלי get_recent_matches השתמש ב-sport="${sportHint}".`;
+  const system = `אתה אנליסט ספורט. ענה תמיד בעברית, קצר וישיר — 2-3 משפטים בלבד. אל תרשום כותרות. כשתשתמש בכלי get_recent_matches השתמש ב-sport="${sportHint}".
 
-  const userMsg = `שלוף 5 משחקים אחרונים של ${home} ו-5 משחקים אחרונים של ${away}, ואז תן תחזית קצרה למשחק הקרוב ביניהן: מי מנצח ולמה.`;
+חשוב מאוד: אל תמציא משחקים. אם אתה לא יודע שיש משחק מתוכנן בין הקבוצות בקרוב — אמור בפירוש "אין משחק מתוכנן בין הקבוצות האלה בקרוב" ואל תנתח. אל תנחש תאריכים. אל תמציא מידע.`;
+
+  const userMsg = `שלוף 5 משחקים אחרונים של ${home} ו-5 משחקים אחרונים של ${away}. אם אתה לא יודע בוודאות שיש משחק קרוב ביניהן — אמור שאין. אם כן יש — תן תחזית קצרה: מי מנצח ולמה.`;
 
   try {
     const analysis = await runLoop(
