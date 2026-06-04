@@ -8426,6 +8426,23 @@
           return;
         }
         if (aiBtn.classList.contains("ai-loading")) return;
+        // ── Rate limiting ────────────────────────────────────────────────────
+        const AI_LIMIT_FREE = 3;
+        const AI_LIMIT_PREM = 30;
+        const AI_KEY = "hapogea_ai_usage";
+        const todayStr = new Date().toLocaleDateString("he-IL", { timeZone: "Asia/Jerusalem" });
+        let usage = {};
+        try { usage = JSON.parse(localStorage.getItem(AI_KEY) || "{}"); } catch (_) {}
+        if (usage.date !== todayStr) usage = { date: todayStr, count: 0 };
+        const limit = state.isPremium ? AI_LIMIT_PREM : AI_LIMIT_FREE;
+        if (usage.count >= limit) {
+          panel.classList.add("open");
+          panel.innerHTML = state.isPremium
+            ? `<span class="ai-panel-error">הגעת למגבלת ${AI_LIMIT_PREM} ניתוחים ליום. תחזור מחר.</span>`
+            : `<span class="ai-panel-label">✦ הפוגע AI</span>השתמשת ב-${AI_LIMIT_FREE} ניתוחים החינמיים שלך להיום.<br><strong>שדרג לפרימיום</strong> לקבלת ${AI_LIMIT_PREM} ניתוחים ביום.`;
+          return;
+        }
+        // ────────────────────────────────────────────────────────────────────
         const row = findRow(id);
         if (!row) return;
         aiBtn.classList.add("ai-loading");
@@ -8446,7 +8463,12 @@
           aiBtn.classList.remove("ai-loading");
           aiBtn.textContent = "סגור ✕";
           if (data.ok && data.analysis) {
-            panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI</span>${escapeHtml(data.analysis)}`;
+            // Count only successful analyses
+            usage.count = (usage.count || 0) + 1;
+            try { localStorage.setItem(AI_KEY, JSON.stringify(usage)); } catch (_) {}
+            const remaining = limit - usage.count;
+            const remainingNote = state.isPremium ? "" : ` <small style="opacity:.5">(נותרו ${remaining} ניתוחים היום)</small>`;
+            panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI${remainingNote}</span>${escapeHtml(data.analysis)}`;
           } else {
             panel.innerHTML = `<span class="ai-panel-label">✦ הפוגע AI</span><span class="ai-panel-error">שגיאה: ${escapeHtml(data.error || "לא ניתן לנתח כרגע")}</span>`;
           }
