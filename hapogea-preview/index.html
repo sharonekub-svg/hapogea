@@ -1802,12 +1802,13 @@
     .reuben-input-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
     .reuben-upload-label {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 11px; border-radius: 7px;
-      border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.025);
-      color: rgba(255,255,255,.32); font: 500 11px Heebo, sans-serif;
-      cursor: pointer; transition: border-color .12s, color .12s;
+      padding: 6px 13px; border-radius: 8px;
+      border: 1px solid rgba(99,102,241,.35); background: rgba(99,102,241,.08);
+      color: #4f46e5; font: 700 12px Heebo, sans-serif;
+      cursor: pointer; transition: all .15s;
     }
-    .reuben-upload-label:hover { border-color: rgba(255,255,255,.13); color: rgba(255,255,255,.55); }
+    .reuben-upload-label::before { content: "📎 "; font-size: 13px; }
+    .reuben-upload-label:hover { background: rgba(99,102,241,.16); border-color: rgba(99,102,241,.55); }
     .reuben-disclaimer { font-size: 10px; color: rgba(255,255,255,.18); margin-inline-start: auto; }
     /* ── THINKING / LOADING ── */
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
