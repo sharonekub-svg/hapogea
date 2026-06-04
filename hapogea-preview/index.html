@@ -2556,6 +2556,8 @@
       box-shadow: var(--shadow-sm); transition: all .16s ease; animation: ai-rise .4s;
     }
     #ai-root .ai-chip:hover { border-color: var(--accent-line); color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+    #ai-root .ai-chip-upload { background: rgba(99,102,241,.07); border-color: rgba(99,102,241,.3); color: var(--accent); font-weight: 700; }
+    #ai-root .ai-chip-upload:hover { background: rgba(99,102,241,.14); border-color: var(--accent); }
     #ai-root .ai-composer {
       display: flex; align-items: flex-end; gap: 10px; padding: 10px 10px 10px 14px;
       background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: var(--radius-lg);
@@ -9018,11 +9020,11 @@ const AI_HISTORY = [
   ]},
 ];
 const AI_CHIPS = [
+  { id:"slip",    label:"ניתוח טופס תמונה", icon:"image",  upload:true },
   { id:"analyze", label:"נתח את המשחק", icon:"target" },
   { id:"compare", label:"השווה משחקים", icon:"compare" },
   { id:"odds",    label:"הסבר את היחסים", icon:"percent" },
   { id:"value",   label:"אתר הימורי ערך", icon:"spark" },
-  { id:"deep",    label:"ניתוח סטטיסטי מעמיק", icon:"chart" },
 ];
 const AI_THINKING_STEPS = [
   "אוסף נתוני עומק על שתי הקבוצות…",
@@ -9115,6 +9117,7 @@ function AiIcon({ name, size=18, stroke=1.9 }) {
     flag:<><path d="M5 21V4M5 4c3-2 6 2 9 0v9c-3 2-6-2-9 0"/></>,
     bolt:<><path d="M13 3 4 14h6l-1 7 9-11h-6z"/></>,
     sidebar:<><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></>,
+    image:<><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></>,
   };
   return <svg {...p} aria-hidden="true">{paths[name]||null}</svg>;
 }
@@ -9250,7 +9253,7 @@ function AiComposer({onSend,onImage,busy,showChips}) {
   return (
     <div className="ai-composer-wrap"><div className="ai-composer-inner">
       {showChips&&<div className="ai-chips">{AI_CHIPS.map((c,i)=>(
-        <button className="ai-chip" key={c.id} style={{animationDelay:i*55+"ms"}} onClick={()=>!busy&&onSend(c.label)}>
+        <button className={"ai-chip"+(c.upload?" ai-chip-upload":"")} key={c.id} style={{animationDelay:i*55+"ms"}} onClick={()=>{if(busy)return;if(c.upload)fileRef.current?.click();else onSend(c.label);}}>
           <AiIcon name={c.icon} size={15}/>{c.label}
         </button>
       ))}</div>}
