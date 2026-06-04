@@ -150,29 +150,13 @@ module.exports = async (req, res) => {
   if (req.method !== "POST")    { res.status(405).json({ ok: false, error: "POST only" }); return; }
   if (!ANTHROPIC_KEY)           { res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY not set" }); return; }
 
-  const { home, away, sport, league, date, time, odds1, oddsX, odds2 } = req.body || {};
+  const { home, away, sport } = req.body || {};
   if (!home || !away) { res.status(400).json({ ok: false, error: "home and away required" }); return; }
 
-  const sportLabel = isBasketball(sport) ? "כדורסל" : "כדורגל";
-  const sportTool  = isBasketball(sport) ? "basketball" : "football";
+  const sportHint = isBasketball(sport) ? "basketball" : "football";
+  const system = `אתה אנליסט ספורט. ענה תמיד בעברית, קצר וישיר — 2-3 משפטים בלבד. אל תרשום כותרות. כשתשתמש בכלי get_recent_matches השתמש ב-sport="${sportHint}".`;
 
-  const oddsLine = [
-    odds1 ? `${home} ${odds1}` : null,
-    oddsX ? `תיקו ${oddsX}` : null,
-    odds2 ? `${away} ${odds2}` : null,
-  ].filter(Boolean).join(" | ");
-
-  const system = "אתה אנליסט ספורט. ענה תמיד בעברית, קצר וישיר — 2-3 משפטים בלבד. אל תרשום כותרות.";
-
-  const userMsg = [
-    `משחק: ${home} נגד ${away}`,
-    league ? `ליגה: ${league}` : null,
-    `ספורט: ${sportLabel}`,
-    date || time ? `מועד: ${[date, time].filter(Boolean).join(" ")}` : null,
-    oddsLine ? `יחסים: ${oddsLine}` : null,
-    ``,
-    `שלוף 5 משחקים אחרונים לכל קבוצה, ואז תן תחזית קצרה: מי מנצח ולמה.`,
-  ].filter(s => s !== null).join("\n");
+  const userMsg = `שלוף 5 משחקים אחרונים של ${home} ו-5 משחקים אחרונים של ${away}, ואז תן תחזית קצרה למשחק הקרוב ביניהן: מי מנצח ולמה.`;
 
   try {
     const analysis = await runLoop(
