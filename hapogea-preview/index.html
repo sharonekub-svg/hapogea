@@ -4150,10 +4150,10 @@
       const btn = document.querySelector('#premiumModal button[data-submit]');
       if (btn) { btn.disabled = true; btn.textContent = 'בודק...'; }
       try {
-        const res = await fetch('/api/premium-validate', {
+        const res = await fetch('/api/premium', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: code.trim() }),
+          body: JSON.stringify({ action: 'validate', code: code.trim() }),
         });
         const data = await res.json().catch(() => ({}));
         if (data.ok) {

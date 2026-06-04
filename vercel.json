@@ -13,8 +13,7 @@
     "api/reuven.js": { "maxDuration": 45 },
     "api/reuven-slip.js": { "maxDuration": 45 },
     "api/results-ai.js": { "maxDuration": 55 },
-    "api/premium-validate.js": { "maxDuration": 10 },
-    "api/premium-create.js": { "maxDuration": 10 },
+    "api/premium.js": { "maxDuration": 10 },
     "api/manual-results.js": { "maxDuration": 15 },
     "api/analyze-game.js": { "maxDuration": 50 }
   },
