@@ -6503,9 +6503,23 @@
       ].join("");
       // Flat continuous feed sorted by time — no league grouping
       const sortedRows = sortByTime(rows);
-      const visibleRows = sortedRows.filter(r => !r.noOddsYet);
+      let visibleRows = sortedRows.filter(r => !r.noOddsYet);
       const pendingCount = sortedRows.length - visibleRows.length;
-      cards.innerHTML = banners + (visibleRows.length
+      // When today is completely empty, fall back to showing tomorrow's picks
+      let tomorrowFallback = false;
+      if (visibleRows.length === 0 && pendingCount === 0 && state.day === "today") {
+        const tomorrowRows = sortByTime(
+          (daySportRows("tomorrow", state.sportTab) || []).filter(r => !r.noOddsYet)
+        ).slice(0, 20);
+        if (tomorrowRows.length > 0) {
+          visibleRows = tomorrowRows;
+          tomorrowFallback = true;
+        }
+      }
+      const tomorrowBanner = tomorrowFallback
+        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 אין משחקים פתוחים להיום — מוצגים משחקי <b>מחר</b></div>`
+        : "";
+      cards.innerHTML = banners + tomorrowBanner + (visibleRows.length
         ? visibleRows.map(rowCard).join("")
         : `<div class="empty">${
             pendingCount > 0
@@ -6514,6 +6528,10 @@
                 ? `<div style="font-size:28px;margin-bottom:10px">⚽</div><b>אין המלצות כרגע</b><br><span style="font-size:13px">Winner לא פרסם עדיין משחקים עם יחסים פתוחים להיום.<br>בדרך כלל הם מופיעים אחר הצהריים.</span>`
                 : `<div style="font-size:28px;margin-bottom:10px">📅</div><b>אין משחקים בתאריך זה</b>`
           }</div>`);
+      if (tomorrowFallback && meta) {
+        const tmCount = visibleRows.filter(r => r.recommended || (r.odds && !r.outsideRange)).length;
+        meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
+      }
 
       // Premium lock: blur/overlay all cards beyond the first for free users
       if (!state.isPremium) {
