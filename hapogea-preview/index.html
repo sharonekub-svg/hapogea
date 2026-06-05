@@ -1516,6 +1516,35 @@
       flex-shrink: 0;
     }
     @keyframes sk-spin { to { transform: rotate(360deg); } }
+    /* ── Inline page loading bar ── */
+    .page-loading-bar {
+      margin-bottom: 14px; padding: 10px 14px 12px;
+      border-radius: 10px; background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .plb-track {
+      height: 6px; border-radius: 4px;
+      background: rgba(255,255,255,.08); overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .plb-fill {
+      height: 100%; width: 0%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--accent));
+      transition: width .5s ease;
+    }
+    .plb-label {
+      font: 700 12px/1 Heebo, Assistant, sans-serif;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .plb-label::before {
+      content: ""; display: inline-block;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.15);
+      border-top-color: var(--cyan);
+      animation: sk-spin .7s linear infinite;
+      flex-shrink: 0;
+    }
     .odds-movement {
       color: var(--muted);
       font-size: 11px;
@@ -3139,6 +3168,11 @@
     .skeleton-card { background:#FFFFFF; border-color:rgba(33,31,27,.09); }
     .skeleton-loading-status { background: rgba(0,0,0,.04); color:#6E675C; }
     .skeleton-spinner { border-color: rgba(0,0,0,.10); border-top-color: #2563EB; }
+    .page-loading-bar { background: rgba(0,0,0,.025); border-color: rgba(0,0,0,.08); }
+    .plb-track { background: rgba(0,0,0,.07); }
+    .plb-fill { background: linear-gradient(90deg,#2563EB,#4F46E5); }
+    .plb-label { color:#6E675C; }
+    .plb-label::before { border-color: rgba(0,0,0,.10); border-top-color: #2563EB; }
     .skeleton-line  { background:rgba(33,31,27,.07); }
     .skeleton-block { background:rgba(33,31,27,.05); }
 
@@ -4360,6 +4394,10 @@
         </div>
         <div id="stats-header" class="stats-header" style="display:none">ביצועי היום</div>
         <div id="pick-stats" class="pick-stats-bar" aria-live="polite"></div>
+        <div id="page-loading-bar" class="page-loading-bar" style="display:none">
+          <div class="plb-track"><div class="plb-fill" id="plbFill"></div></div>
+          <span class="plb-label" id="plbLabel">טוען נתונים מ-Winner...</span>
+        </div>
         <div class="cards" id="cards">
           <div class="empty" style="visibility:hidden">טוען...</div>
         </div>
@@ -8241,6 +8279,43 @@
     function showRefreshBar(on) {
       refreshBar.classList.toggle("active", on);
     }
+
+    // ── Inline page progress bar ──────────────────────────────────────────
+    const pageLoadingBar = document.getElementById("page-loading-bar");
+    const plbFill        = document.getElementById("plbFill");
+    const plbLabel       = document.getElementById("plbLabel");
+    const PAGE_STEPS = [
+      [10, "מתחבר ל-Winner..."],
+      [28, "מושך שווקים ויחסים..."],
+      [50, "מנתח הסתברויות..."],
+      [70, "בונה קלפים..."],
+      [88, "כמעט סיים..."],
+    ];
+    let _plbTimer = null, _plbStep = 0;
+
+    function showPageBar() {
+      if (!pageLoadingBar) return;
+      pageLoadingBar.style.display = "block";
+      plbFill.style.width = "0%";
+      plbLabel.textContent = PAGE_STEPS[0][1];
+      _plbStep = 0;
+      _plbTimer = setInterval(() => {
+        if (_plbStep < PAGE_STEPS.length) {
+          plbFill.style.width = PAGE_STEPS[_plbStep][0] + "%";
+          plbLabel.textContent = PAGE_STEPS[_plbStep][1];
+          _plbStep++;
+        } else {
+          clearInterval(_plbTimer);
+        }
+      }, 1200);
+    }
+    function hidePageBar() {
+      clearInterval(_plbTimer);
+      if (!pageLoadingBar) return;
+      plbFill.style.width = "100%";
+      plbLabel.textContent = "הנתונים עודכנו ✓";
+      setTimeout(() => { pageLoadingBar.style.display = "none"; }, 600);
+    }
     // ─────────────────────────────────────────────────────────────────────
 
     async function loadFeed() {
@@ -8272,6 +8347,7 @@
       state.loading = true;
       state.error = "";
       state.loadError = "";
+      showPageBar();
       if (!state.feed) document.getElementById("cards").innerHTML = skeletonCards();
       try {
         const response = await fetch(`/api/winner-feed?ts=${Date.now()}`);
@@ -8296,6 +8372,7 @@
         state.loading = false;
         finishProgress();
         showRefreshBar(false);
+        hidePageBar();
         render();
         scheduleRefresh(state.feed);
       }
