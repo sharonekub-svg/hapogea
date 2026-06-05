@@ -2291,6 +2291,7 @@
       overflow: hidden;
     }
     #ai-root .ai-sidebar.collapsed { width: 0; border: none; }
+    #ai-root .ai-sidebar-backdrop { display: none; }
     #ai-root .ai-sb-inner { width: var(--sidebar-w); display: flex; flex-direction: column; height: 100%; }
     #ai-root .ai-sb-head { padding: 18px 18px 10px; }
     #ai-root .ai-brand { display: flex; align-items: center; gap: 11px; padding: 6px 6px 16px; }
@@ -2355,6 +2356,8 @@
       cursor: pointer; color: var(--text-muted); background: none; border: none; transition: all .15s;
     }
     #ai-root .ai-icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--text); }
+    #ai-root .ai-newchat-btn { width: auto; padding: 0 12px; gap: 6px; display: flex; align-items: center; font: 700 13px Heebo,sans-serif; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: 9px; height: 34px; }
+    #ai-root .ai-newchat-btn::after { content: "שיחה חדשה"; }
     #ai-root .ai-topbar-title { font-weight: 700; font-size: 15.5px; display: flex; align-items: center; gap: 8px; }
     #ai-root .ai-model-pill {
       font-size: 12px; font-weight: 600; color: var(--text-muted);
@@ -2502,6 +2505,7 @@
     #ai-root .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
     @media (max-width: 760px) {
       #ai-root .ai-sidebar { position: absolute; z-index: 30; height: 100%; box-shadow: var(--shadow-lg); }
+      #ai-root .ai-sidebar-backdrop { display: block; position: absolute; inset: 0; z-index: 29; background: rgba(0,0,0,.38); }
       #ai-section { top: 60px; }
       #ai-root { --pad: 14px; --msg-gap: 20px; --font-base: 15px; }
       #ai-root .ai-topbar { height: 50px; padding: 0 14px; }
@@ -3153,6 +3157,28 @@
        Mobile Bottom Navigation
        ════════════════════════════════════════════════ */
     .mobile-bottom-nav { display: none; }
+    /* Today's count badges on nav sport buttons */
+    .nav-sport-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 16px; padding: 0 5px;
+      border-radius: 999px; font: 800 10px/1 Heebo,sans-serif;
+      background: #15803D; color: #fff; vertical-align: middle;
+      margin-right: 3px; transition: opacity .3s;
+    }
+    .nav-sport-count.basketball { background: #c2410c; }
+    .nav-sport-count.empty { opacity: 0; }
+    /* Mobile bottom nav count badge */
+    .mbn-item-wrap { position: relative; display: inline-block; line-height: 1; }
+    .mbn-badge {
+      position: absolute; top: -5px; right: -7px;
+      min-width: 16px; height: 15px; padding: 0 4px;
+      border-radius: 999px; font: 800 9px/15px Heebo,sans-serif;
+      background: #15803D; color: #fff; text-align: center;
+      border: 1.5px solid rgba(5,8,11,.97);
+      transition: opacity .3s;
+    }
+    .mbn-badge.basketball { background: #c2410c; }
+    .mbn-badge.empty { opacity: 0; }
 
     @media (max-width: 640px) {
       /* Ensure content doesn't hide behind fixed bottom nav */
@@ -3867,8 +3893,8 @@
       </div>
       <div class="lp-menu" role="navigation">
         <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל</button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל<span class="nav-sport-count empty" id="navCountFootball"></span></button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל<span class="nav-sport-count basketball empty" id="navCountBasketball"></span></button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();render();syncLpNav();},200)">🏆 מונדיאל</button>
         <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
         <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-features')">תכונות</button>
@@ -8670,15 +8696,28 @@
       if (lbl) lbl.textContent = days > 0 ? `ימים לפתיחת המונדיאל 🏆` : "מונדיאל 2026 פתוח!";
     })();
 
-    // Populate landing page today's game counts from feed
+    // Populate today's game counts — landing hero card + nav badges
     function updateLpTodayCounts() {
       const feed = state.feed;
       if (!feed) return;
       const ls = feed.lineStats || {};
+      const fb = ls.football && ls.football.today != null ? ls.football.today : null;
+      const bb = ls.basketball && ls.basketball.today != null ? ls.basketball.today : null;
+      // Landing hero card
       const fbEl = document.getElementById("lpTodayFootball");
       const bbEl = document.getElementById("lpTodayBasketball");
-      if (fbEl) fbEl.textContent = (ls.football && ls.football.today != null) ? ls.football.today : "—";
-      if (bbEl) bbEl.textContent = (ls.basketball && ls.basketball.today != null) ? ls.basketball.today : "—";
+      if (fbEl) fbEl.textContent = fb != null ? fb : "—";
+      if (bbEl) bbEl.textContent = bb != null ? bb : "—";
+      // Top nav badges
+      const navFb = document.getElementById("navCountFootball");
+      const navBb = document.getElementById("navCountBasketball");
+      if (navFb) { navFb.textContent = fb != null ? fb : ""; navFb.classList.toggle("empty", fb == null || fb === 0); }
+      if (navBb) { navBb.textContent = bb != null ? bb : ""; navBb.classList.toggle("empty", bb == null || bb === 0); }
+      // Mobile bottom nav badges
+      const mbnFb = document.getElementById("mbnCountFootball");
+      const mbnBb = document.getElementById("mbnCountBasketball");
+      if (mbnFb) { mbnFb.textContent = fb != null ? fb : ""; mbnFb.classList.toggle("empty", fb == null || fb === 0); }
+      if (mbnBb) { mbnBb.textContent = bb != null ? bb : ""; mbnBb.classList.toggle("empty", bb == null || bb === 0); }
     }
     // Run after feed loads (feed may already be cached)
     document.addEventListener("feedLoaded", updateLpTodayCounts);
@@ -9093,7 +9132,7 @@ function AiApp() {
   const [busy,setBusy] = React.useState(false);
   const [scrolled,setScrolled] = React.useState(false);
   const [showScrollBtn,setShowScrollBtn] = React.useState(false);
-  const [collapsed,setCollapsed] = React.useState(false);
+  const [collapsed,setCollapsed] = React.useState(()=>window.innerWidth<=760);
   const scrollRef = React.useRef(null);
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
@@ -9198,7 +9237,24 @@ function AiApp() {
         }
         clearTimeout(tid);clearInterval(stepTimer);
         if(run!==runRef.current)return;
-        if(!acc.trim()){const fb="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";patchAi({phase:"streaming",intro:fb,streamLen:fb.length});}
+        // Detect raw API error JSON streamed back (e.g. Anthropic credit error)
+        let finalText=acc.trim();
+        if(!finalText){finalText="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";}
+        else if(finalText.startsWith("{")&&finalText.includes('"type"')){
+          try{
+            const err=JSON.parse(finalText);
+            const t=err.error?.type||err.type||"";
+            if(t.includes("credit")||t.includes("billing")||err.error?.message?.toLowerCase().includes("credit"))
+              finalText="שגיאה: אין קרדיט ב-API. בקש מהמנהל לחדש את המנוי.";
+            else if(t.includes("invalid_api_key"))
+              finalText="שגיאה: מפתח API לא תקין. בקש מהמנהל לבדוק את ההגדרות.";
+            else if(t.includes("overloaded"))
+              finalText="השרת עמוס כרגע. נסה שוב בעוד כמה שניות.";
+            else
+              finalText="שגיאה טכנית. נסה שוב מאוחר יותר.";
+          }catch{}
+        }
+        patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
         setBusy(false);
         return;
@@ -9228,15 +9284,14 @@ function AiApp() {
 
   const empty=messages.length===0;
   return (
-    <div className="ai-app">
-      <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user} sessions={sessions}/>
-      <div className="ai-main">
+    <div className="ai-app" style={{display:"flex",flexDirection:"column",height:"100%"}}>
+      <div className="ai-main" style={{flex:1,minHeight:0}}>
         <div className={"ai-topbar"+(scrolled?" scrolled":"")}>
-          <button className="ai-icon-btn" onClick={()=>setCollapsed(c=>!c)} aria-label="תפריט">
-            <AiIcon name="sidebar" size={19}/>
-          </button>
           <div className="ai-topbar-title">הפוגע AI</div>
           <div style={{flex:1}}/>
+          <button className="ai-icon-btn ai-newchat-btn" onClick={newChat} title="שיחה חדשה" aria-label="שיחה חדשה">
+            <AiIcon name="edit" size={18}/>
+          </button>
           <div className="ai-model-pill"><span className="ai-pulse-dot"/>הפוגע · 2.5 Pro</div>
         </div>
         <div className="ai-scroll-area" ref={scrollRef} onScroll={onScroll}>
@@ -9276,11 +9331,11 @@ window.AiApp = AiApp;
       <span>בית</span>
     </button>
     <button class="mbn-item" data-page="football" aria-label="כדורגל">
-      <span class="mbn-icon" aria-hidden="true">⚽</span>
+      <span class="mbn-item-wrap"><span class="mbn-icon" aria-hidden="true">⚽</span><span class="mbn-badge empty" id="mbnCountFootball"></span></span>
       <span>כדורגל</span>
     </button>
     <button class="mbn-item" data-page="basketball" aria-label="כדורסל">
-      <span class="mbn-icon" aria-hidden="true">🏀</span>
+      <span class="mbn-item-wrap"><span class="mbn-icon" aria-hidden="true">🏀</span><span class="mbn-badge basketball empty" id="mbnCountBasketball"></span></span>
       <span>כדורסל</span>
     </button>
     <button class="mbn-item" data-page="worldcup" aria-label="מונדיאל">
