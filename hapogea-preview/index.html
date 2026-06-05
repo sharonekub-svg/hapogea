@@ -9130,7 +9130,7 @@ function AiApp() {
   const [busy,setBusy] = React.useState(false);
   const [scrolled,setScrolled] = React.useState(false);
   const [showScrollBtn,setShowScrollBtn] = React.useState(false);
-  const [collapsed,setCollapsed] = React.useState(false);
+  const [collapsed,setCollapsed] = React.useState(()=>window.innerWidth<=760);
   const scrollRef = React.useRef(null);
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
@@ -9235,7 +9235,24 @@ function AiApp() {
         }
         clearTimeout(tid);clearInterval(stepTimer);
         if(run!==runRef.current)return;
-        if(!acc.trim()){const fb="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";patchAi({phase:"streaming",intro:fb,streamLen:fb.length});}
+        // Detect raw API error JSON streamed back (e.g. Anthropic credit error)
+        let finalText=acc.trim();
+        if(!finalText){finalText="לא הצלחתי לקבל תשובה כרגע. תנסה שוב.";}
+        else if(finalText.startsWith("{")&&finalText.includes('"type"')){
+          try{
+            const err=JSON.parse(finalText);
+            const t=err.error?.type||err.type||"";
+            if(t.includes("credit")||t.includes("billing")||err.error?.message?.toLowerCase().includes("credit"))
+              finalText="שגיאה: אין קרדיט ב-API. בקש מהמנהל לחדש את המנוי.";
+            else if(t.includes("invalid_api_key"))
+              finalText="שגיאה: מפתח API לא תקין. בקש מהמנהל לבדוק את ההגדרות.";
+            else if(t.includes("overloaded"))
+              finalText="השרת עמוס כרגע. נסה שוב בעוד כמה שניות.";
+            else
+              finalText="שגיאה טכנית. נסה שוב מאוחר יותר.";
+          }catch{}
+        }
+        patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
         setBusy(false);
         return;
