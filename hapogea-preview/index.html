@@ -2291,6 +2291,7 @@
       overflow: hidden;
     }
     #ai-root .ai-sidebar.collapsed { width: 0; border: none; }
+    #ai-root .ai-sidebar-backdrop { display: none; }
     #ai-root .ai-sb-inner { width: var(--sidebar-w); display: flex; flex-direction: column; height: 100%; }
     #ai-root .ai-sb-head { padding: 18px 18px 10px; }
     #ai-root .ai-brand { display: flex; align-items: center; gap: 11px; padding: 6px 6px 16px; }
@@ -2502,6 +2503,7 @@
     #ai-root .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
     @media (max-width: 760px) {
       #ai-root .ai-sidebar { position: absolute; z-index: 30; height: 100%; box-shadow: var(--shadow-lg); }
+      #ai-root .ai-sidebar-backdrop { display: block; position: absolute; inset: 0; z-index: 29; background: rgba(0,0,0,.38); }
       #ai-section { top: 60px; }
       #ai-root { --pad: 14px; --msg-gap: 20px; --font-base: 15px; }
       #ai-root .ai-topbar { height: 50px; padding: 0 14px; }
@@ -9265,6 +9267,7 @@ function AiApp() {
   return (
     <div className="ai-app">
       <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user} sessions={sessions}/>
+      {!collapsed && <div className="ai-sidebar-backdrop" onClick={()=>setCollapsed(true)} aria-hidden="true"/>}
       <div className="ai-main">
         <div className={"ai-topbar"+(scrolled?" scrolled":"")}>
           <button className="ai-icon-btn" onClick={()=>setCollapsed(c=>!c)} aria-label="תפריט">
