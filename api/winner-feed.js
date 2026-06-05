@@ -3567,57 +3567,68 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   );
 
   if (needsOdds) {
-    try {
-      const oddsFeed = await buildOddsApiFeed();
-      const newTabs = { ...payload.tabs };
-      let usedOdds = false;
+    if (!ODDS_API_KEY) {
+      console.warn("[winner-feed] needsOdds=true but ODDS_API_KEY is not set — skipping Odds API");
+      payload = { ...payload, _oddsApiStatus: "key_missing" };
+    } else {
+      try {
+        console.info("[winner-feed] Calling Odds API (today=%d tomorrow=%d leagues=%d/%d)", todayCount, tomorrowCount, todayLeagues.size, tomorrowLeagues.size);
+        const oddsFeed = await buildOddsApiFeed();
+        const newTabs = { ...payload.tabs };
+        let usedOdds = false;
+        const oddsCountByDay = {};
 
-      for (const [dayKey, dayCount, dayLeagues] of [
-        ["today",    todayCount,    todayLeagues],
-        ["tomorrow", tomorrowCount, tomorrowLeagues],
-      ]) {
-        const oddsTab = oddsFeed.tabs?.[dayKey];
-        if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
-        const oddsCount =
-          (oddsTab.sports?.football?.length || 0) +
-          (oddsTab.sports?.basketball?.length || 0);
+        for (const [dayKey, dayCount, dayLeagues] of [
+          ["today",    todayCount,    todayLeagues],
+          ["tomorrow", tomorrowCount, tomorrowLeagues],
+        ]) {
+          const oddsTab = oddsFeed.tabs?.[dayKey];
+          if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
+          const oddsCount =
+            (oddsTab.sports?.football?.length || 0) +
+            (oddsTab.sports?.basketball?.length || 0);
+          oddsCountByDay[dayKey] = oddsCount;
 
-        if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
-          // Too few games overall — replace the tab entirely
-          newTabs[dayKey] = oddsTab;
-          usedOdds = true;
-        } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
-          // Enough games but only 1-2 leagues — merge in games from leagues not in Winner
-          const oddsRows = [
-            ...(oddsTab.sports?.football || []),
-            ...(oddsTab.sports?.basketball || []),
-          ];
-          const freshRows = oddsRows.filter((r) => {
-            const league = String(r.league || "").trim().toLowerCase();
-            return league && !dayLeagues.has(league);
-          });
-          if (freshRows.length > 0) {
-            const existing = newTabs[dayKey];
-            newTabs[dayKey] = {
-              ...existing,
-              sports: {
-                football: [
-                  ...(existing.sports?.football || []),
-                  ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
-                ],
-                basketball: [
-                  ...(existing.sports?.basketball || []),
-                  ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
-                ],
-              },
-            };
+          if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
+            // Too few games overall — replace the tab entirely
+            newTabs[dayKey] = oddsTab;
             usedOdds = true;
+          } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
+            // Enough games but only 1-2 leagues — merge in games from leagues not in Winner
+            const oddsRows = [
+              ...(oddsTab.sports?.football || []),
+              ...(oddsTab.sports?.basketball || []),
+            ];
+            const freshRows = oddsRows.filter((r) => {
+              const league = String(r.league || "").trim().toLowerCase();
+              return league && !dayLeagues.has(league);
+            });
+            if (freshRows.length > 0) {
+              const existing = newTabs[dayKey];
+              newTabs[dayKey] = {
+                ...existing,
+                sports: {
+                  football: [
+                    ...(existing.sports?.football || []),
+                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
+                  ],
+                  basketball: [
+                    ...(existing.sports?.basketball || []),
+                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
+                  ],
+                },
+              };
+              usedOdds = true;
+            }
           }
         }
+        console.info("[winner-feed] Odds API returned today=%d tomorrow=%d, usedOdds=%s", oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
+        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay };
+        if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
+      } catch (oddsErr) {
+        console.error("[winner-feed] Odds API error:", oddsErr?.message);
+        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
       }
-      if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
-    } catch {
-      // Keep the Winner payload if Odds API is unavailable.
     }
   }
 
