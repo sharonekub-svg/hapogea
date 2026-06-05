@@ -1183,6 +1183,8 @@
       flex-wrap: wrap;
     }
     .footer { padding-top: 18px; padding-bottom: 24px; color: var(--soft); font-size: 12px; line-height: 1.6; }
+    .footer-privacy-link { background: none; border: none; padding: 0; color: inherit; font: inherit; cursor: pointer; text-decoration: underline; opacity: .8; }
+    .footer-privacy-link:hover { opacity: 1; }
 
     /* ── Badge system ── */
     .card-badge-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
@@ -3978,7 +3980,8 @@
 
     <footer class="lp-footer">
       <p>© 2026 הפוגע · מנוע ניתוח ספורט מבוסס Winner<br>
-      הדמו מיועד להצגת מוצר בלבד. אינו ייעוץ הימורים ואינו מבטיח תוצאה.</p>
+      הדמו מיועד להצגת מוצר בלבד. אינו ייעוץ הימורים ואינו מבטיח תוצאה.<br>
+      <button class="footer-privacy-link" style="font-size:11px;color:#A39B8C" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button></p>
     </footer>
 
   </div>
@@ -4200,7 +4203,40 @@
 
   <footer class="footer">
     הדמו מיועד להצגת מוצר ושיטת דירוג ספורטיבי. הוא אינו ייעוץ הימורים, אינו המלצה לשים כסף ואינו מבטיח תוצאה או רווח. כאשר ממשק ציבורי אינו מחזיר נתון, הדמו מציין זאת ואינו משלים נתונים באופן מלאכותי.
+    &nbsp;·&nbsp;<button class="footer-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button>
   </footer>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal" id="privacyModal" aria-hidden="true" style="display:none" onclick="if(event.target===this){this.style.display='none';this.setAttribute('aria-hidden','true')}">
+    <div class="modal-card" style="max-width:560px;max-height:80vh;overflow-y:auto">
+      <div class="modal-head">
+        <button class="modal-close" onclick="document.getElementById('privacyModal').style.display='none';document.getElementById('privacyModal').setAttribute('aria-hidden','true')">סגירה</button>
+        <div style="font-weight:700;font-size:16px">מדיניות פרטיות</div>
+      </div>
+      <div style="padding:20px 24px;line-height:1.8;font-size:14px;color:var(--text)">
+        <p><strong>הפוגע</strong> הוא כלי ניתוח ספורטיבי המציג נתוני הימורים ממקורות ציבוריים. מדיניות זו מסבירה אילו נתונים נאספים ואיך הם מוגנים.</p>
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">מה אנו אוספים</h3>
+        <ul style="padding-right:18px;margin:0">
+          <li>כתובת דוא"ל וסיסמה (מוצפנת) לצורך יצירת חשבון. הסיסמה אינה נשמרת בטקסט פתוח בשום שלב.</li>
+          <li>היסטוריית שיחות עם הפוגע AI — נשמרת <strong>בדפדפן שלך בלבד</strong> (localStorage) ואינה מועברת לשרתים.</li>
+          <li>נתוני שימוש אנונימיים (עמודים שנצפו, שגיאות) לצורך שיפור המוצר — ללא מידע מזהה אישי.</li>
+        </ul>
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">מה אנו לא עושים</h3>
+        <ul style="padding-right:18px;margin:0">
+          <li>לא מוכרים ולא משתפים מידע אישי עם צדדים שלישיים.</li>
+          <li>לא שומרים פרטי תשלום — אין עסקאות פיננסיות באתר.</li>
+          <li>לא עוקבים אחריך מחוץ לאתר.</li>
+        </ul>
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">עוגיות (Cookies)</h3>
+        <p>האתר משתמש ב-localStorage לשמירת הגדרות ושיחות. לא נעשה שימוש בעוגיות מעקב של צד שלישי.</p>
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">זכויותיך</h3>
+        <p>תוכל למחוק את כל הנתונים השמורים על ידי ניקוי אחסון הדפדפן, או על ידי פנייה אלינו.</p>
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">יצירת קשר</h3>
+        <p>שאלות לגבי פרטיות? פנה אלינו דרך טופס יצירת קשר באתר.</p>
+        <p style="margin-top:16px;color:var(--soft);font-size:12px">עדכון אחרון: יוני 2026</p>
+      </div>
+    </div>
+  </div>
 
   <div class="modal" id="gameModal" aria-hidden="true">
     <div class="modal-card">
@@ -8697,22 +8733,21 @@
 
   <script type="text/babel">
 /* ===== הפוגע AI React App ===== */
-const AI_HISTORY = [
-  { group: "היום", items: [
-    { id:"h1", title:"ארסנל נגד מנצ'סטר סיטי", active:true },
-    { id:"h2", title:"ערך ביחסים — מחזור הפרמייר ליג" },
-  ]},
-  { group: "השבוע", items: [
-    { id:"h3", title:"ליגת האלופות — חצי גמר" },
-    { id:"h4", title:"NBA: סלטיקס מול נאגטס" },
-    { id:"h5", title:"מומנטום: ריאל מדריד בחוץ" },
-  ]},
-  { group: "קודם יותר", items: [
-    { id:"h6", title:"טניס — גמר רולאן גארוס" },
-    { id:"h7", title:"ניתוח קרנות וכרטיסים" },
-    { id:"h8", title:"מודל xG מול קו ההימור" },
-  ]},
-];
+// Session storage helpers for AI chat history
+const AI_SESSIONS_KEY_PREFIX = "hapogea_ai_sessions_";
+function aiSessionsKey(user) { return AI_SESSIONS_KEY_PREFIX + (user ? user.id : "guest"); }
+function loadAiSessions(user) {
+  try { return JSON.parse(localStorage.getItem(aiSessionsKey(user)) || "[]"); } catch { return []; }
+}
+function saveAiSession(user, messages) {
+  const userMsgs = messages.filter(m => m.role === "user");
+  if (!userMsgs.length) return;
+  const title = (userMsgs[0].text || "").slice(0, 45) + ((userMsgs[0].text||"").length > 45 ? "…" : "");
+  const id = "s_" + Date.now();
+  const sessions = loadAiSessions(user);
+  sessions.unshift({ id, title, date: new Date().toISOString() });
+  try { localStorage.setItem(aiSessionsKey(user), JSON.stringify(sessions.slice(0, 40))); } catch {}
+}
 const AI_CHIPS = [
   { id:"analyze", label:"נתח את המשחק", icon:"target" },
   { id:"compare", label:"השווה משחקים", icon:"compare" },
@@ -8815,8 +8850,27 @@ function AiIcon({ name, size=18, stroke=1.9 }) {
   return <svg {...p} aria-hidden="true">{paths[name]||null}</svg>;
 }
 
-function AiSidebar({ collapsed, onNewChat, user }) {
+function AiSidebar({ collapsed, onNewChat, user, sessions, currentTitle }) {
   const openAccount = () => { if (window.HapAuth) window.HapAuth.openOrMenu(); };
+  // Group sessions by date label
+  function dateLabel(iso) {
+    if (!iso) return "קודם יותר";
+    const d = new Date(iso), now = new Date();
+    const diffDays = Math.floor((now - d) / 86400000);
+    if (diffDays === 0) return "היום";
+    if (diffDays === 1) return "אתמול";
+    if (diffDays < 7) return "השבוע";
+    return "קודם יותר";
+  }
+  const grouped = {};
+  sessions.forEach(s => {
+    const lbl = dateLabel(s.date);
+    if (!grouped[lbl]) grouped[lbl] = [];
+    grouped[lbl].push(s);
+  });
+  const ORDER = ["היום","אתמול","השבוע","קודם יותר"];
+  const groups = ORDER.filter(l => grouped[l]).map(l => ({ label: l, items: grouped[l] }));
+
   return (
     <div className={"ai-sidebar"+(collapsed?" collapsed":"")}>
       <div className="ai-sb-inner">
@@ -8829,14 +8883,19 @@ function AiSidebar({ collapsed, onNewChat, user }) {
             </div>
           </div>
           <button className="ai-new-chat" onClick={onNewChat}><AiIcon name="edit" size={16}/>שיחה חדשה</button>
-          <div className="ai-sb-search"><AiIcon name="search" size={15}/><input placeholder="חיפוש בשיחות…"/></div>
         </div>
         <div className="ai-sb-scroll">
-          {AI_HISTORY.map(g=>(
-            <div className="ai-hist-group" key={g.group}>
-              <div className="ai-hist-label">{g.group}</div>
+          {groups.length === 0 ? (
+            <div style={{padding:"20px 16px",color:"var(--muted,#a39b8c)",fontSize:"13px",textAlign:"center",lineHeight:1.5}}>
+              שאל על כל משחק —<br/>השיחות יופיעו כאן
+            </div>
+          ) : groups.map(g=>(
+            <div className="ai-hist-group" key={g.label}>
+              <div className="ai-hist-label">{g.label}</div>
               {g.items.map(it=>(
-                <div className={"ai-hist-item"+(it.active?" active":"")} key={it.id}><span className="ht">{it.title}</span></div>
+                <div className={"ai-hist-item"+(it.active?" active":"")} key={it.id} title={it.title}>
+                  <span className="ht">{it.title}</span>
+                </div>
               ))}
             </div>
           ))}
@@ -9013,11 +9072,24 @@ function AiApp() {
     setScrolled(el.scrollTop>8);
   };
 
+  const [sessions, setSessions] = React.useState([]);
+  // Load sessions when user changes
+  React.useEffect(() => {
+    setSessions(loadAiSessions(user));
+  }, [user && user.id]);
+
   const toggleCard=(idx,id)=>{
     setMessages(m=>{const c=[...m];c[idx]={...c[idx],open:{...c[idx].open,[id]:!c[idx].open[id]}};return c;});
   };
 
-  const newChat=()=>{runRef.current++;setBusy(false);setMessages([]);atBottom.current=true;};
+  const newChat=()=>{
+    // Save current thread to history before clearing
+    if (messages.filter(m=>m.role==="user").length > 0) {
+      saveAiSession(user, messages);
+      setSessions(loadAiSessions(user));
+    }
+    runRef.current++;setBusy(false);setMessages([]);atBottom.current=true;
+  };
 
   const send=async(text)=>{
     if(busy)return;
@@ -9091,7 +9163,7 @@ function AiApp() {
   const empty=messages.length===0;
   return (
     <div className="ai-app">
-      <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user}/>
+      <AiSidebar collapsed={collapsed} onNewChat={newChat} user={user} sessions={sessions}/>
       <div className="ai-main">
         <div className={"ai-topbar"+(scrolled?" scrolled":"")}>
           <button className="ai-icon-btn" onClick={()=>setCollapsed(c=>!c)} aria-label="תפריט">
