@@ -4128,8 +4128,13 @@
     </section>
 
     <footer class="lp-footer">
-      <p>© 2026 הפוגע · מנוע ניתוח ספורט מבוסס Winner<br>
-      הדמו מיועד להצגת מוצר בלבד. אינו ייעוץ הימורים ואינו מבטיח תוצאה.</p>
+      <p>© 2026 הפוגע · מנוע ניתוח ספורט סטטיסטי</p>
+      <p style="margin-top:6px">
+        <a href="#" onclick="openLegalModal('terms');return false;" style="color:inherit;text-decoration:underline;opacity:.7">תנאי שימוש</a>
+        &nbsp;·&nbsp;
+        <a href="#" onclick="openLegalModal('privacy');return false;" style="color:inherit;text-decoration:underline;opacity:.7">מדיניות פרטיות</a>
+      </p>
+      <p style="margin-top:6px;font-size:11px;opacity:.6">השירות מיועד לבגירים בלבד (+18) · אינו ייעוץ הימורים · אין הבטחת רווח</p>
     </footer>
 
   </div>
@@ -4350,8 +4355,22 @@
   </main>
 
   <footer class="footer">
-    הדמו מיועד להצגת מוצר ושיטת דירוג ספורטיבי. הוא אינו ייעוץ הימורים, אינו המלצה לשים כסף ואינו מבטיח תוצאה או רווח. כאשר ממשק ציבורי אינו מחזיר נתון, הדמו מציין זאת ואינו משלים נתונים באופן מלאכותי.
+    הפוגע מספק ניתוח סטטיסטי-ספורטיבי בלבד ואינו מהווה ייעוץ הימורים, המלצת השקעה או הבטחת רווח.
+    כל השימוש בשירות הוא על אחריות המשתמש בלבד. השירות מיועד לבגירים בלבד (גיל +18).
+    <br>
+    <a href="#" onclick="openLegalModal('terms');return false;" style="color:inherit;text-decoration:underline;opacity:.7">תנאי שימוש</a>
+    &nbsp;·&nbsp;
+    <a href="#" onclick="openLegalModal('privacy');return false;" style="color:inherit;text-decoration:underline;opacity:.7">מדיניות פרטיות</a>
+    &nbsp;·&nbsp; © 2026 הפוגע
   </footer>
+
+  <!-- ════ Legal modals ════ -->
+  <div id="legalModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);overflow-y:auto" onclick="if(event.target===this)closeLegalModal()">
+    <div style="max-width:620px;margin:40px auto;background:#fff;border-radius:16px;padding:32px 28px;position:relative;direction:rtl;font-family:'Heebo',sans-serif;line-height:1.7;color:#211F1B">
+      <button onclick="closeLegalModal()" style="position:absolute;top:16px;left:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#666">✕</button>
+      <div id="legalModalContent"></div>
+    </div>
+  </div>
 
   <div class="modal" id="gameModal" aria-hidden="true">
     <div class="modal-card">
@@ -4948,7 +4967,7 @@
       if (isYesterday) return rows;
       // Keep up to 20 scored picks + all noOddsYet rows appended after
       const pickRows = rows.filter(r => !r.noOddsYet).slice(0, 20);
-      const noOddsRows = rows.filter(r => r.noOddsYet);
+      const noOddsRows = rows.filter(r => r.noOddsYet).slice(0, Math.max(0, 20 - pickRows.length));
       return [...pickRows, ...noOddsRows];
     }
 
@@ -9543,6 +9562,77 @@ function AiApp() {
 }
 
 window.AiApp = AiApp;
+  </script>
+
+  <script>
+  // ── Legal modals ─────────────────────────────────────────────────────────────
+  const LEGAL_CONTENT = {
+    terms: `
+      <h2 style="font-size:22px;font-weight:800;margin:0 0 18px">תנאי שימוש</h2>
+      <p style="font-size:13px;color:#888;margin-bottom:20px">עדכון אחרון: יוני 2026</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">1. אודות השירות</h3>
+      <p>הפוגע הוא כלי לניתוח סטטיסטי-ספורטיבי המבוסס על נתוני Winner ומקורות נתונים ציבוריים. השירות מיועד לצרכי עיון ובידור בלבד.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">2. אין ייעוץ הימורים</h3>
+      <p>המידע המוצג אינו מהווה ייעוץ הימורים, המלצת השקעה, ייעוץ פיננסי או הבטחת תוצאה. כל החלטה בנוגע להימורים נעשית על אחריות המשתמש בלבד. אין להסתמך על ניתוחי האתר כבסיס יחיד לכל החלטה כספית.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">3. הגבלת גיל</h3>
+      <p>השירות מיועד לבגירים בלבד (גיל 18 ומעלה). שימוש בשירות מהווה הצהרה כי המשתמש עומד בדרישת גיל זו.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">4. מנוי פרימיום</h3>
+      <p>מנוי פרימיום הוא שירות בתשלום המעניק גישה לתכונות מורחבות. התשלום אינו מקנה ערבות לרווח מהימורים. לא מוחזרים תשלומים לאחר הפעלת המנוי.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">5. אחריות מוגבלת</h3>
+      <p>מפעילי הפוגע אינם אחראים לכל נזק ישיר, עקיף, מקרי או תוצאתי הנובע מהשימוש בשירות, לרבות הפסדים כספיים.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">6. שינויים בתנאים</h3>
+      <p>אנו שומרים לעצמנו את הזכות לעדכן תנאים אלו בכל עת. המשך השימוש לאחר עדכון מהווה הסכמה לתנאים המעודכנים.</p>
+
+      <p style="margin-top:24px;font-size:12px;color:#aaa">לפרטים נוספים: sharonekub@gmail.com</p>
+    `,
+    privacy: `
+      <h2 style="font-size:22px;font-weight:800;margin:0 0 18px">מדיניות פרטיות</h2>
+      <p style="font-size:13px;color:#888;margin-bottom:20px">עדכון אחרון: יוני 2026</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">1. מידע שאנו אוספים</h3>
+      <p>בעת ההרשמה: כתובת אימייל ושם משתמש. אנו לא אוספים מספרי כרטיס אשראי ישירות — עסקאות מנוהלות דרך ספקי תשלום מאובטחים. שימוש בשירות עשוי לכלול נתוני אנליטיקה אנונימיים (עמודים שנצפו, זמן שימוש).</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">2. שימוש במידע</h3>
+      <p>המידע משמש לאימות זהות, מתן גישה למנוי, שליחת עדכונים שירותיים חיוניים, ושיפור השירות. אין אנו מוכרים, משכירים או מעבירים מידע אישי לצדדים שלישיים לצרכי שיווק.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">3. אחסון מידע</h3>
+      <p>נתוני המשתמש מאוחסנים בשרתי Supabase בהצפנה. היסטוריית שיחות AI נשמרת בדפדפן המשתמש בלבד ואינה מועברת לשרת.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">4. עוגיות ואחסון מקומי</h3>
+      <p>האתר משתמש ב-localStorage לשמירת העדפות, היסטוריית שיחות וסטטוס מנוי. אין שימוש בעוגיות מעקב של צדדים שלישיים.</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">5. זכויות המשתמש</h3>
+      <p>בהתאם לחוק הגנת הפרטיות הישראלי, המשתמש זכאי לעיין במידעו, לתקנו ולבקש מחיקתו. לפנייה: sharonekub@gmail.com</p>
+
+      <h3 style="font-size:15px;font-weight:700;margin:16px 0 6px">6. שינויים במדיניות</h3>
+      <p>אנו עשויים לעדכן מדיניות זו מעת לעת. שינויים מהותיים יובאו לידיעת המשתמשים.</p>
+
+      <p style="margin-top:24px;font-size:12px;color:#aaa">לפרטים נוספים: sharonekub@gmail.com</p>
+    `,
+  };
+
+  function openLegalModal(type) {
+    const modal = document.getElementById("legalModal");
+    const content = document.getElementById("legalModalContent");
+    if (!modal || !content) return;
+    content.innerHTML = LEGAL_CONTENT[type] || "";
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden";
+  }
+  function closeLegalModal() {
+    const modal = document.getElementById("legalModal");
+    if (modal) modal.style.display = "none";
+    document.body.style.overflow = "";
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeLegalModal(); });
+  window.openLegalModal = openLegalModal;
+  window.closeLegalModal = closeLegalModal;
   </script>
 
   <!-- ════ Mobile Bottom Navigation ════ -->
