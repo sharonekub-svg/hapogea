@@ -1,0 +1,45 @@
+name: Refresh Winner Snapshot
+
+on:
+  schedule:
+    # 05:00, 11:00, 17:00 שעון ישראל (UTC+3) — לפני בוקר, צהריים, ערב
+    - cron: '0 2,8,14 * * *'
+  workflow_dispatch: # הפעלה ידנית מהממשק
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Refresh snapshot
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          FOOTBALL_KEY: ${{ secrets.FOOTBALL_KEY }}
+        run: |
+          echo "Running refresh-winner-snapshot.js..."
+          node scripts/refresh-winner-snapshot.js
+
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name "hapogea-bot"
+          git config user.email "hapogea-bot@users.noreply.github.com"
+          git add api/winner-snapshot.json
+          if git diff --cached --quiet; then
+            echo "Snapshot unchanged — skipping commit"
+          else
+            git commit -m "chore: refresh winner snapshot $(date -u +%Y-%m-%dT%H:%M)Z [skip ci]"
+            git push
+            echo "Snapshot updated and pushed"
+          fi
