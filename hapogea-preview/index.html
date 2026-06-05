@@ -1427,6 +1427,10 @@
       background: rgba(49,209,135,.07);
       border-color: rgba(49,209,135,.22);
     }
+    /* Outside-range cards: muted pick-hero */
+    .pick-hero-weak { opacity: .72; }
+    .pick-hero-weak .pick-hero-label { opacity: .7; }
+    .pick-hero-weak .pick-hero-odds { background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.08); }
     /* Hide share strip inside cards — accessible via detail modal */
     .card .share-strip { display: none; }
     /* Footer: minimal right-aligned detail link */
@@ -2775,6 +2779,7 @@
     .pick-hero-odds small { color: #9E9689; }
     .pick-hero-why { color: #6B6357; border-top-color: rgba(33,31,27,.07); }
     .has-pick .pick-section { background: rgba(21,128,61,.05); border-color: rgba(21,128,61,.16); }
+    .pick-hero-weak .pick-hero-odds { background: rgba(0,0,0,.03); border-color: rgba(0,0,0,.10); }
     .card .open-game { color: #9E9689; border-color: transparent; }
     .card .open-game:hover { color: #1A1816; }
 
@@ -7289,8 +7294,7 @@
                    <p style="margin:0;font-size:12px;font-weight:700;color:var(--muted)">⌛ קווי הימורים טרם נפתחו — יעודכן אוטומטית</p>
                  </div>`
               : `<div class="card-section pick-section">
-              ${hasRecommendation
-                ? `<div class="pick-hero">
+              <div class="pick-hero${hasRecommendation ? "" : " pick-hero-weak"}">
                      <div class="pick-hero-top">
                        <span class="pick-hero-label">✦ הפוגע בוחר</span>
                        <span class="pick-market-chip">${marketLabelText(row)}</span>
@@ -7298,20 +7302,13 @@
                      <div class="pick-hero-main">
                        <strong class="pick-hero-name">${explicitPickText(row)}</strong>
                        <div class="pick-hero-odds">
-                         <b>${row.odds ? formatOdds(row.odds) : "—"}</b>
+                         <b>${(hasRecommendation ? row.odds : row.oddsRaw) ? formatOdds(hasRecommendation ? row.odds : row.oddsRaw) : "—"}</b>
                          <small>יחס</small>
                        </div>
                      </div>
-                     ${why ? `<div class="pick-hero-why">${why}</div>` : ""}
+                     ${why ? `<div class="pick-hero-why">${why}</div>` : hasRecommendation ? "" : `<div class="pick-hero-why">${noPickLabel}</div>`}
                    </div>
-                   ${oddsMovementMarkup(row)}`
-                : `<div class="pick-summary" style="opacity:.50">
-                     <div class="pick-summary-main">
-                       <span>ללא יתרון סטטיסטי</span>
-                       <strong style="font-size:15px">${explicitPickText(row)}${row.oddsRaw ? ` · ${formatOdds(row.oddsRaw)}` : ""}</strong>
-                       <span>${noPickLabel}</span>
-                     </div>
-                   </div>`}
+                   ${hasRecommendation ? oddsMovementMarkup(row) : ""}
             </div>`}
             ${row.noOddsYet ? "" : resultMarkup(row)}
             ${row.noOddsYet ? "" : cardVerifiedMarkup(row)}
