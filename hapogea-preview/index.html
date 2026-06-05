@@ -651,6 +651,18 @@
       font-size: 14px; line-height: 1.7;
     }
     .error { color: #ffc5c3; border-color: rgba(239,83,80,.36); }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-title { font-size: 16px; font-weight: 900; color: var(--text); display: block; margin-bottom: 8px; }
+    .empty-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin: 0 0 18px; }
+    .empty-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn-empty-refresh {
+      padding: 8px 20px; border-radius: 8px;
+      border: 1px solid var(--accent); background: rgba(99,102,241,.10);
+      color: var(--accent); font: 800 13px Heebo,sans-serif; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-empty-refresh:hover { background: rgba(99,102,241,.2); }
+    .empty-countdown { font: 600 12px Heebo,sans-serif; color: var(--muted); opacity: .75; }
 
     /* ── Loading overlay (first-load only) ── */
     #loadingOverlay {
@@ -3130,6 +3142,8 @@
     /* Banners */
     .fallback-banner, .stale-banner { background:rgba(146,96,10,.06); border-color:rgba(146,96,10,.20); color:#92600A; }
     .empty { background:#F9F6F1; border-color:rgba(33,31,27,.12); color:#6E675C; }
+    .empty-title { color:#211F1B; }
+    .btn-empty-refresh { border-color:#4F46E5; color:#4F46E5; background:rgba(79,70,229,.07); }
     .error { color:#DC2626; border-color:rgba(220,38,38,.22); background:rgba(220,38,38,.04); }
 
     /* Share button */
@@ -6854,9 +6868,15 @@
       const sortedRows = sortByTime(rows);
       cards.innerHTML = banners + (sortedRows.length
         ? sortedRows.map(rowCard).join("")
-        : `<div class="empty">${isOpenDay()
-            ? `<div style="font-size:28px;margin-bottom:10px">⚽</div><b>אין המלצות כרגע</b><br><span style="font-size:13px">Winner לא פרסם עדיין משחקים עם יחסים פתוחים להיום.<br>בדרך כלל הם מופיעים אחר הצהריים.</span>`
-            : `<div style="font-size:28px;margin-bottom:10px">📅</div><b>אין משחקים בתאריך זה</b>`
+        : `<div class="empty empty-no-games">${isOpenDay()
+            ? `<div class="empty-icon">⚽</div>
+               <b class="empty-title">Winner טרם פרסם יחסים להיום</b>
+               <p class="empty-desc">הקווים מתפרסמים בדרך כלל אחרי הצהריים.<br>האלגוריתם ינתח ויבחר אוטומטית ברגע שיפורסמו.</p>
+               <div class="empty-actions">
+                 <button class="btn-empty-refresh" onclick="window._manualRefresh&&window._manualRefresh()">רענן עכשיו</button>
+                 <span class="empty-countdown" id="emptyCountdown"></span>
+               </div>`
+            : `<div class="empty-icon">📅</div><b class="empty-title">אין משחקים בתאריך זה</b>`
           }</div>`);
 
       // Premium lock: blur/overlay all cards beyond the first for free users
@@ -8199,13 +8219,40 @@
       return pendingRowsNeedingResultCheck(feed).length ? 60 * 1000 : 30 * 60 * 1000;
     }
 
+    let _nextRefreshAt = 0;
+    let _countdownTimer = null;
+    function tickCountdown() {
+      const el = document.getElementById("emptyCountdown");
+      if (!el) return;
+      const secs = Math.max(0, Math.round((_nextRefreshAt - Date.now()) / 1000));
+      if (secs <= 0) { el.textContent = ""; return; }
+      const m = Math.floor(secs / 60), s = secs % 60;
+      el.textContent = `בודק שוב בעוד ${m > 0 ? m + ":" + String(s).padStart(2,"0") + " דקות" : s + " שניות"}`;
+    }
+    function startCountdown(ms) {
+      _nextRefreshAt = Date.now() + ms;
+      if (_countdownTimer) clearInterval(_countdownTimer);
+      _countdownTimer = setInterval(tickCountdown, 1000);
+      tickCountdown();
+    }
+
     function scheduleRefresh(feed = state.feed) {
       if (window._hapRefreshTimer) clearTimeout(window._hapRefreshTimer);
+      const ms = nextRefreshMs(feed);
+      startCountdown(ms);
       window._hapRefreshTimer = setTimeout(() => {
         if (!document.hidden) loadFeed();
         else scheduleRefresh(feed);
-      }, nextRefreshMs(feed));
+      }, ms);
     }
+
+    window._manualRefresh = function() {
+      clearTimeout(window._hapRefreshTimer);
+      if (_countdownTimer) clearInterval(_countdownTimer);
+      const el = document.getElementById("emptyCountdown");
+      if (el) el.textContent = "מרענן...";
+      loadFeed();
+    };
 
     function loadFeedThrottled() {
       if (Date.now() - lastLoadTime > 60 * 1000) loadFeed();
