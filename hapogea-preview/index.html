@@ -3153,6 +3153,28 @@
        Mobile Bottom Navigation
        ════════════════════════════════════════════════ */
     .mobile-bottom-nav { display: none; }
+    /* Today's count badges on nav sport buttons */
+    .nav-sport-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 16px; padding: 0 5px;
+      border-radius: 999px; font: 800 10px/1 Heebo,sans-serif;
+      background: #15803D; color: #fff; vertical-align: middle;
+      margin-right: 3px; transition: opacity .3s;
+    }
+    .nav-sport-count.basketball { background: #c2410c; }
+    .nav-sport-count.empty { opacity: 0; }
+    /* Mobile bottom nav count badge */
+    .mbn-item-wrap { position: relative; display: inline-block; line-height: 1; }
+    .mbn-badge {
+      position: absolute; top: -5px; right: -7px;
+      min-width: 16px; height: 15px; padding: 0 4px;
+      border-radius: 999px; font: 800 9px/15px Heebo,sans-serif;
+      background: #15803D; color: #fff; text-align: center;
+      border: 1.5px solid rgba(5,8,11,.97);
+      transition: opacity .3s;
+    }
+    .mbn-badge.basketball { background: #c2410c; }
+    .mbn-badge.empty { opacity: 0; }
 
     @media (max-width: 640px) {
       /* Ensure content doesn't hide behind fixed bottom nav */
@@ -3867,8 +3889,8 @@
       </div>
       <div class="lp-menu" role="navigation">
         <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל</button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל<span class="nav-sport-count empty" id="navCountFootball"></span></button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל<span class="nav-sport-count basketball empty" id="navCountBasketball"></span></button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();render();syncLpNav();},200)">🏆 מונדיאל</button>
         <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
         <button class="lp-menu-btn lp-landing-only" onclick="smoothTo('lp-features')">תכונות</button>
@@ -8670,15 +8692,28 @@
       if (lbl) lbl.textContent = days > 0 ? `ימים לפתיחת המונדיאל 🏆` : "מונדיאל 2026 פתוח!";
     })();
 
-    // Populate landing page today's game counts from feed
+    // Populate today's game counts — landing hero card + nav badges
     function updateLpTodayCounts() {
       const feed = state.feed;
       if (!feed) return;
       const ls = feed.lineStats || {};
+      const fb = ls.football && ls.football.today != null ? ls.football.today : null;
+      const bb = ls.basketball && ls.basketball.today != null ? ls.basketball.today : null;
+      // Landing hero card
       const fbEl = document.getElementById("lpTodayFootball");
       const bbEl = document.getElementById("lpTodayBasketball");
-      if (fbEl) fbEl.textContent = (ls.football && ls.football.today != null) ? ls.football.today : "—";
-      if (bbEl) bbEl.textContent = (ls.basketball && ls.basketball.today != null) ? ls.basketball.today : "—";
+      if (fbEl) fbEl.textContent = fb != null ? fb : "—";
+      if (bbEl) bbEl.textContent = bb != null ? bb : "—";
+      // Top nav badges
+      const navFb = document.getElementById("navCountFootball");
+      const navBb = document.getElementById("navCountBasketball");
+      if (navFb) { navFb.textContent = fb != null ? fb : ""; navFb.classList.toggle("empty", fb == null || fb === 0); }
+      if (navBb) { navBb.textContent = bb != null ? bb : ""; navBb.classList.toggle("empty", bb == null || bb === 0); }
+      // Mobile bottom nav badges
+      const mbnFb = document.getElementById("mbnCountFootball");
+      const mbnBb = document.getElementById("mbnCountBasketball");
+      if (mbnFb) { mbnFb.textContent = fb != null ? fb : ""; mbnFb.classList.toggle("empty", fb == null || fb === 0); }
+      if (mbnBb) { mbnBb.textContent = bb != null ? bb : ""; mbnBb.classList.toggle("empty", bb == null || bb === 0); }
     }
     // Run after feed loads (feed may already be cached)
     document.addEventListener("feedLoaded", updateLpTodayCounts);
@@ -9276,11 +9311,11 @@ window.AiApp = AiApp;
       <span>בית</span>
     </button>
     <button class="mbn-item" data-page="football" aria-label="כדורגל">
-      <span class="mbn-icon" aria-hidden="true">⚽</span>
+      <span class="mbn-item-wrap"><span class="mbn-icon" aria-hidden="true">⚽</span><span class="mbn-badge empty" id="mbnCountFootball"></span></span>
       <span>כדורגל</span>
     </button>
     <button class="mbn-item" data-page="basketball" aria-label="כדורסל">
-      <span class="mbn-icon" aria-hidden="true">🏀</span>
+      <span class="mbn-item-wrap"><span class="mbn-icon" aria-hidden="true">🏀</span><span class="mbn-badge basketball empty" id="mbnCountBasketball"></span></span>
       <span>כדורסל</span>
     </button>
     <button class="mbn-item" data-page="worldcup" aria-label="מונדיאל">
