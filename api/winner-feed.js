@@ -3244,7 +3244,23 @@ function oddsApiEventToRow(event, sportMeta) {
   const TARGET_ODDS = 1.65;
   const pick = pool.sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
   const prob  = 1 / pick.odds;
+  const impliedPct = Math.round(prob * 100);
   const score = Math.round(prob * 100);
+
+  // Build opponent summary for explanation text
+  const opponents = allCandidates.filter((c) => c.name !== pick.name);
+  const oppSummary = opponents
+    .map((c) => `${c.name === "תיקו" ? "תיקו" : c.name} ${c.odds.toFixed(2)}`)
+    .join(", ");
+  const pickHe = ODDS_API_TEAM_HE[pick.name] || pick.name;
+  const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
+  const explanation = [
+    `מקור: The Odds API — ${sportMeta.label}`,
+    isFav
+      ? `${pickHe} הוא הפייבוריט (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%)${oppSummary ? ` — ${oppSummary}` : ""}.`
+      : `${pickHe} (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%) — הבחירה הקרובה ביותר לטווח האידיאלי${oppSummary ? `. חלופות: ${oppSummary}` : ""}.`,
+    "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים.",
+  ];
 
   return {
     id:                 `odds-${event.id}`,
@@ -3259,23 +3275,26 @@ function oddsApiEventToRow(event, sportMeta) {
     match:              `${home} - ${away}`,
     home,
     away,
-    pick:               pick.name,
-    pickTeam:           pick.name,
-    winnerPick:         pick.name,
+    pick:               pickHe,
+    pickTeam:           pickHe,
+    winnerPick:         pickHe,
     odds:               pick.odds,
     oddsRaw:            pick.odds,
     homeOdds:           homeOdds  || null,
     drawOdds:           drawOdds  || null,
     awayOdds:           awayOdds  || null,
     probability:        prob,
+    normalizedProbability: prob,
     recommendationScore:score,
     score,
-    recommended:        hasInRange,   // only recommend if odds are in the 1.35–2.20 range
-    outsideRange:       !hasInRange,  // properly marks games outside the preferred range
+    recommended:        hasInRange,
+    outsideRange:       !hasInRange,
     status:             "ממתין",
     matchPhase:         "scheduled",
     bettingStatus:      "available",
     riskLevel:          score >= 70 ? "נמוך" : score >= 50 ? "בינוני" : "גבוה",
+    explanation,
+    signals:            [explanation[1]],
     resultKey:          `${sportMeta.sportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
     verifiedAt:         new Date().toISOString(),
   };
