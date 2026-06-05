@@ -1252,6 +1252,8 @@
     .card-live-area.phase-ht { background: rgba(255,122,69,.08); border-color: rgba(255,122,69,.28); }
     .card-live-area.phase-unavailable { background: rgba(255,255,255,.02); border-color: var(--line); }
     .live-score-main { font: 900 20px/1 Heebo,Assistant,sans-serif; color: var(--text); letter-spacing: 1px; }
+    .live-score-full { display: flex; align-items: center; gap: 8px; font: 600 13px/1 Heebo,Assistant,sans-serif; color: var(--text); }
+    .live-score-full .live-score-main { font-size: 18px; min-width: 44px; text-align: center; }
     .live-minute { font-size: 11px; color: var(--red); font-weight: 900; }
     .live-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
 
@@ -7115,7 +7117,29 @@
       const score = row.liveScore || row.result || "";
       const minute = row.matchMinute ? `${row.matchMinute}'` : "";
       const phaseClass = row.matchPhase === "final" ? "phase-final" : row.matchPhase === "ht" ? "phase-ht" : row.matchPhase === "live" ? "" : "phase-scheduled";
-      const scoreText = score || (row.matchPhase === "final" ? "אין תוצאה מאומתת" : row.matchPhase === "live" ? "נתוני חי לא זמינים" : row.time || "טרם התחיל");
+      const isFinal = row.matchPhase === "final";
+      const isLiveOrHT = row.matchPhase === "live" || row.matchPhase === "ht";
+
+      // For finished/live games with a score, show: Home X - Y Away
+      if (score && (isFinal || isLiveOrHT) && row.home && row.away) {
+        const parts = score.match(/^(\d+)\s*[-:]\s*(\d+)$/);
+        if (parts) {
+          const hs = parseInt(parts[1]), as = parseInt(parts[2]);
+          const homeWon = hs > as, awayWon = as > hs;
+          const homeStyle = homeWon ? "font-weight:900;color:var(--text)" : awayWon ? "opacity:.55" : "";
+          const awayStyle = awayWon ? "font-weight:900;color:var(--text)" : homeWon ? "opacity:.55" : "";
+          return `<div class="card-live-area ${phaseClass}" style="gap:6px">
+            <span class="live-label">${match.label}${minute ? ` · ${minute}` : ""}</span>
+            <span class="live-score-full">
+              <span style="${homeStyle}">${escapeHtml(row.home)}</span>
+              <b class="live-score-main">${hs} – ${as}</b>
+              <span style="${awayStyle}">${escapeHtml(row.away)}</span>
+            </span>
+          </div>`;
+        }
+      }
+
+      const scoreText = score || (isFinal ? "אין תוצאה מאומתת" : isLiveOrHT ? "נתוני חי לא זמינים" : row.time || "טרם התחיל");
       return `<div class="card-live-area ${phaseClass}">
         <span class="live-label">${match.label}${minute ? ` · ${minute}` : ""}</span>
         <span class="live-score-main">${scoreText}</span>
