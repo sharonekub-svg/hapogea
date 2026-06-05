@@ -42,8 +42,16 @@ async function main() {
   let payload = await buildWinnerFeedPayload({ withLogos: true });
 
   if (picksCount(payload) === 0 && process.env.ODDS_API_KEY) {
-    console.log("Winner returned 0 picks for today/tomorrow — falling back to The Odds API...");
-    payload = await buildOddsApiFeed();
+    console.log("Winner returned 0 real picks — trying The Odds API...");
+    try {
+      payload = await buildOddsApiFeed();
+      console.log("Odds API succeeded, picks:", picksCount(payload));
+    } catch (oddsErr) {
+      console.warn("Odds API fallback failed:", oddsErr.message);
+      console.log("Keeping Winner payload (noOddsYet rows).");
+    }
+  } else if (picksCount(payload) === 0) {
+    console.warn("0 real picks and ODDS_API_KEY not set — snapshot will have noOddsYet rows only.");
   }
 
   fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
