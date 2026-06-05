@@ -3887,9 +3887,9 @@
       </div>
       <div class="lp-stats-row">
         <div class="lp-stat-box"><div class="lp-stat-num">40</div><div class="lp-stat-lbl">משחקים ביום</div></div>
-        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(220,38,38,.18),rgba(185,28,28,.12));border-color:rgba(220,38,38,.45)">
-          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#DC2626">9</div>
-          <div class="lp-stat-lbl" style="color:#DC2626">ימים למונדיאל 🏆</div>
+        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(146,96,10,.18),rgba(180,118,10,.12));border-color:rgba(146,96,10,.50)">
+          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#92600A">9</div>
+          <div class="lp-stat-lbl" style="color:#92600A">ימים למונדיאל 🏆</div>
         </div>
         <div class="lp-stat-box"><div class="lp-stat-num">48</div><div class="lp-stat-lbl">נבחרות מונדיאל</div></div>
         <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">נתוני Winner</div></div>
@@ -6489,10 +6489,13 @@
       const totalRows = daySportRows(state.day, state.sportTab).length;
       const withPick = rows.filter(row => row.recommended && !row.outsideRange).length;
       const noOddsCount = rows.filter(row => row.noOddsYet).length;
-      const withoutPick = Math.max(0, rows.filter(row => !row.noOddsYet).length - withPick);
+      const oddsRows = rows.filter(row => !row.noOddsYet);
+      const withoutPick = Math.max(0, oddsRows.length - withPick);
       const withoutPickText = `${withoutPick} ללא יתרון סטטיסטי`;
       meta.textContent = isOpenDay()
-        ? `${rows.length}/20 משחקי Winner · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}${noOddsCount ? ` · ${noOddsCount} ממתינים לקווים` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
+        ? (oddsRows.length === 0 && noOddsCount > 0
+            ? `${noOddsCount} משחקים ממתינים לקווים — אין הימורים פתוחים עדיין. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
+            : `${oddsRows.length}/20 משחקי Winner · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}${noOddsCount ? ` · ${noOddsCount} ממתינים לקווים` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`)
         : `${rows.length} \u05ea\u05d5\u05e6\u05d0\u05d5\u05ea \u05e8\u05e9\u05de\u05d9\u05d5\u05ea \u05de\u05ea\u05d5\u05da ${totalRows}. \u05d4\u05de\u05e1\u05da \u05d4\u05d6\u05d4 \u05e1\u05d5\u05d2\u05e8 \u05ea\u05d7\u05d6\u05d9\u05d5\u05ea \u05e9\u05e0\u05e9\u05de\u05e8\u05d5 \u05e7\u05d5\u05d3\u05dd. ${sourceMode}${isRefreshing ? " \u00b7 \u05de\u05ea\u05e2\u05d3\u05db\u05df..." : ""}`;
       const banners = [
         (state.feed?.fallback || state.feed?.stale) ? `<div class="fallback-banner">\u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05d9\u05d1\u05d5\u05d9 \u05de\u05d0\u05d5\u05de\u05ea\u05d9\u05dd. Winner Live \u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05db\u05e8\u05d2\u05e2 \u05d1\u05e9\u05e8\u05ea; \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d5\u05d3\u05db\u05e0\u05d5 ${formatShortTime(state.feed.generatedAt || state.localCachedAt)}.</div>` : "",
@@ -6500,12 +6503,35 @@
       ].join("");
       // Flat continuous feed sorted by time — no league grouping
       const sortedRows = sortByTime(rows);
-      cards.innerHTML = banners + (sortedRows.length
-        ? sortedRows.map(rowCard).join("")
-        : `<div class="empty">${isOpenDay()
-            ? `<div style="font-size:28px;margin-bottom:10px">⚽</div><b>אין המלצות כרגע</b><br><span style="font-size:13px">Winner לא פרסם עדיין משחקים עם יחסים פתוחים להיום.<br>בדרך כלל הם מופיעים אחר הצהריים.</span>`
-            : `<div style="font-size:28px;margin-bottom:10px">📅</div><b>אין משחקים בתאריך זה</b>`
+      let visibleRows = sortedRows.filter(r => !r.noOddsYet);
+      const pendingCount = sortedRows.length - visibleRows.length;
+      // When today is completely empty, fall back to showing tomorrow's picks
+      let tomorrowFallback = false;
+      if (visibleRows.length === 0 && pendingCount === 0 && state.day === "today") {
+        const tomorrowRows = sortByTime(
+          (daySportRows("tomorrow", state.sportTab) || []).filter(r => !r.noOddsYet)
+        ).slice(0, 20);
+        if (tomorrowRows.length > 0) {
+          visibleRows = tomorrowRows;
+          tomorrowFallback = true;
+        }
+      }
+      const tomorrowBanner = tomorrowFallback
+        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 אין משחקים פתוחים להיום — מוצגים משחקי <b>מחר</b></div>`
+        : "";
+      cards.innerHTML = banners + tomorrowBanner + (visibleRows.length
+        ? visibleRows.map(rowCard).join("")
+        : `<div class="empty">${
+            pendingCount > 0
+              ? `<div style="font-size:28px;margin-bottom:10px">⌛</div><b>אין קווי הימורים פתוחים עדיין</b><br><span style="font-size:13px">${pendingCount} משחקים ממתינים לפרסום קווים.<br>קווי ההימורים נפתחים בדרך כלל מספר שעות לפני המשחק.<br>בדוק שוב מאוחר יותר, או עבור לטאב <b>מחר</b>.</span>`
+              : isOpenDay()
+                ? `<div style="font-size:28px;margin-bottom:10px">⚽</div><b>אין המלצות כרגע</b><br><span style="font-size:13px">Winner לא פרסם עדיין משחקים עם יחסים פתוחים להיום.<br>בדרך כלל הם מופיעים אחר הצהריים.</span>`
+                : `<div style="font-size:28px;margin-bottom:10px">📅</div><b>אין משחקים בתאריך זה</b>`
           }</div>`);
+      if (tomorrowFallback && meta) {
+        const tmCount = visibleRows.filter(r => r.recommended || (r.odds && !r.outsideRange)).length;
+        meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
+      }
 
       // Premium lock: blur/overlay all cards beyond the first for free users
       if (!state.isPremium) {

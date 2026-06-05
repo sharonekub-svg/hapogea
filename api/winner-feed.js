@@ -1903,12 +1903,12 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     // outsideRange rows show without a recommendation — don't require hasSingleClearFavorite
     // so friendlies/playoffs with clear (but out-of-range) favorites aren't silently dropped
     .filter((row) => row.matchPhase === "final" || row.outsideRange || hasSingleClearFavorite(row))
-    // Basketball confidence gate: below 75 = no recommendation
+    // Basketball confidence gate: only exclude completely even matchups (conf < 10)
     .filter((row) => {
       if (Number(row.sportId) !== WINNER_BASKETBALL_ID) return true;
       if (row.noOddsYet || row.outsideRange || row.matchPhase === "final") return true;
       const conf = basketballConfidence(row);
-      if (conf < 75) {
+      if (conf < 10) {
         console.info(`[bball-confidence] Excluded: ${row.match} — conf ${conf}/100`);
         return false;
       }
