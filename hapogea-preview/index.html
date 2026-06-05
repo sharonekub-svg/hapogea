@@ -9297,7 +9297,7 @@ function AiComposer({onSend,onImage,busy,showChips}) {
           <AiIcon name="bolt" size={19}/>
         </button>
       </div>
-      <div className="ai-composer-foot">הפוגע מספק <b>הערכות הסתברותיות</b> ולא הבטחות. הימור באחריות · גיל 18+</div>
+      <div className="ai-composer-foot">הפוגע מספק <b>הערכות הסתברותיות</b> ולא הבטחות. הימור באחריות · גיל 18+ · <a href="#" onClick={e=>{e.preventDefault();window.openLegalModal&&window.openLegalModal('privacy');}} style={{color:"inherit",opacity:.65,textDecoration:"underline"}}>מדיניות פרטיות</a></div>
     </div></div>
   );
 }
