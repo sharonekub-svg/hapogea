@@ -3429,6 +3429,32 @@
       color: #6E675C; max-width: 540px; margin: 0 auto 40px;
     }
     .lp-hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    /* Today's games quick-access card */
+    .lp-today-card {
+      margin-top: 20px; background: rgba(255,255,255,.72); backdrop-filter: blur(10px);
+      border: 1px solid rgba(33,31,27,.10); border-radius: 18px;
+      padding: 14px 20px; display: inline-flex; align-items: center; gap: 14px;
+      box-shadow: 0 2px 16px rgba(33,31,27,.07);
+    }
+    .lp-today-label { font: 700 13px Heebo,sans-serif; color: #6E675C; white-space: nowrap; }
+    .lp-today-sports { display: flex; gap: 8px; }
+    .lp-today-sport {
+      display: flex; align-items: center; gap: 8px; padding: 10px 18px;
+      border-radius: 12px; border: 1.5px solid rgba(33,31,27,.10);
+      background: #FAF8F4; cursor: pointer; transition: background .15s, border-color .15s, transform .12s;
+      font-family: Heebo,sans-serif;
+    }
+    .lp-today-sport:hover { background: #F0EDE7; border-color: rgba(33,31,27,.22); transform: translateY(-1px); }
+    .lp-today-sport-icon { font-size: 22px; line-height: 1; }
+    .lp-today-sport-body { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+    .lp-today-sport-name { font: 700 13px Heebo,sans-serif; color: #211F1B; }
+    .lp-today-sport-count { font: 900 18px/1 Heebo,sans-serif; color: #211F1B; }
+    .lp-today-sport-sub { font: 500 11px Heebo,sans-serif; color: #A39B8C; }
+    .lp-today-divider { width: 1px; height: 36px; background: rgba(33,31,27,.10); align-self: center; }
+    @media (max-width: 600px) {
+      .lp-today-card { flex-direction: column; gap: 10px; padding: 14px 16px; }
+      .lp-today-label { font-size: 12px; }
+    }
     .lp-btn-primary {
       padding: 15px 32px; border-radius: 12px; border: none;
       background: #211F1B; color: #FAF8F4;
@@ -3887,6 +3913,31 @@
         <button class="lp-btn-primary" onclick="enterApp()">כניסה למנוע <span aria-hidden="true" style="font-size:17px">←</span></button>
         <button class="lp-btn-secondary" onclick="smoothTo('lp-features')">למד עוד</button>
       </div>
+
+      <!-- Today's games quick-access -->
+      <div class="lp-today-card" id="lpTodayCard">
+        <div class="lp-today-label">📅 משחקים של היום</div>
+        <div class="lp-today-sports">
+          <button class="lp-today-sport" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},220)" title="המלצות כדורגל היום">
+            <span class="lp-today-sport-icon">⚽</span>
+            <div class="lp-today-sport-body">
+              <span class="lp-today-sport-name">כדורגל</span>
+              <span class="lp-today-sport-count" id="lpTodayFootball">—</span>
+              <span class="lp-today-sport-sub">המלצות</span>
+            </div>
+          </button>
+          <div class="lp-today-divider"></div>
+          <button class="lp-today-sport" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},220)" title="המלצות כדורסל היום">
+            <span class="lp-today-sport-icon">🏀</span>
+            <div class="lp-today-sport-body">
+              <span class="lp-today-sport-name">כדורסל</span>
+              <span class="lp-today-sport-count" id="lpTodayBasketball">—</span>
+              <span class="lp-today-sport-sub">המלצות</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
       <div class="lp-stats-row">
         <div class="lp-stat-box"><div class="lp-stat-num">40</div><div class="lp-stat-lbl">משחקים ביום</div></div>
         <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(146,96,10,.18),rgba(180,118,10,.12));border-color:rgba(146,96,10,.50)">
@@ -8010,6 +8061,7 @@
         state.localCachedAt = null;
         state.loadError = "";
         saveFeedLocally(feed);
+        document.dispatchEvent(new Event("feedLoaded"));
         rememberOpenPredictions(feed);
         settleTrackedPredictions(feed);
       } catch (error) {
@@ -8617,6 +8669,20 @@
       el.textContent = days > 0 ? days : "🏆";
       if (lbl) lbl.textContent = days > 0 ? `ימים לפתיחת המונדיאל 🏆` : "מונדיאל 2026 פתוח!";
     })();
+
+    // Populate landing page today's game counts from feed
+    function updateLpTodayCounts() {
+      const feed = state.feed;
+      if (!feed) return;
+      const ls = feed.lineStats || {};
+      const fbEl = document.getElementById("lpTodayFootball");
+      const bbEl = document.getElementById("lpTodayBasketball");
+      if (fbEl) fbEl.textContent = (ls.football && ls.football.today != null) ? ls.football.today : "—";
+      if (bbEl) bbEl.textContent = (ls.basketball && ls.basketball.today != null) ? ls.basketball.today : "—";
+    }
+    // Run after feed loads (feed may already be cached)
+    document.addEventListener("feedLoaded", updateLpTodayCounts);
+    if (state.feed) updateLpTodayCounts();
 
     // Fix iOS virtual keyboard covering the AI composer
     if (window.visualViewport) {
