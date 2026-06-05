@@ -28,7 +28,9 @@ function picksCount(payload) {
   let n = 0;
   for (const day of ["today", "tomorrow"]) {
     const tab = payload.tabs?.[day];
-    n += (tab?.sports?.football?.length || 0) + (tab?.sports?.basketball?.length || 0);
+    for (const sport of ["football", "basketball"]) {
+      n += (tab?.sports?.[sport] || []).filter((r) => r.odds && !r.noOddsYet).length;
+    }
   }
   return n;
 }
