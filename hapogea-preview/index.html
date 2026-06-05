@@ -1501,6 +1501,21 @@
       0%, 100% { opacity: .52; }
       50% { opacity: .92; }
     }
+    .skeleton-loading-status {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; margin-bottom: 12px;
+      border-radius: 10px; background: rgba(255,255,255,.04);
+      font: 700 13px/1 Heebo, Assistant, sans-serif;
+      color: var(--muted);
+    }
+    .skeleton-spinner {
+      width: 15px; height: 15px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.12);
+      border-top-color: var(--cyan);
+      animation: sk-spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes sk-spin { to { transform: rotate(360deg); } }
     .odds-movement {
       color: var(--muted);
       font-size: 11px;
@@ -3122,6 +3137,8 @@
 
     /* Skeletons */
     .skeleton-card { background:#FFFFFF; border-color:rgba(33,31,27,.09); }
+    .skeleton-loading-status { background: rgba(0,0,0,.04); color:#6E675C; }
+    .skeleton-spinner { border-color: rgba(0,0,0,.10); border-top-color: #2563EB; }
     .skeleton-line  { background:rgba(33,31,27,.07); }
     .skeleton-block { background:rgba(33,31,27,.05); }
 
@@ -6729,7 +6746,7 @@
       `;
     }
     function skeletonCards() {
-      return Array.from({ length: 4 }, () => `
+      const cards = Array.from({ length: 4 }, () => `
         <article class="card skeleton-card">
           <div class="card-head"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:42px"></div></div>
           <div class="card-body">
@@ -6739,6 +6756,10 @@
           </div>
         </article>
       `).join("");
+      return `<div class="skeleton-loading-status">
+        <span class="skeleton-spinner"></span>
+        <span>טוען משחקים מ-Winner...</span>
+      </div>${cards}`;
     }
 
     function sortByTime(rows) {
@@ -8240,6 +8261,7 @@
           startFakeProgress();
           window._overlayFallbackTimer = setTimeout(() => {
             finishProgress();
+            showRefreshBar(true);
             if (!state.feed) document.getElementById("cards").innerHTML = skeletonCards();
           }, 2800);
         }
