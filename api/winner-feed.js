@@ -3486,112 +3486,151 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   }
   // Cache missing or very stale: full rebuild
   let payload;
-  try {
-    payload = await buildWinnerFeedPayload({ withLogos: true });
-  } catch (winnerError) {
-    console.error("[winner-feed] buildWinnerFeedPayload threw:", winnerError?.message, winnerError?.stack?.split("\n")[1]);
-    // Winner blocked — prefer the local snapshot (real Winner data) over Odds API.
-    const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
-    if (payloadMatchesIsraelDates(snapshotNorm1)) {
-      payload = {
-        ...snapshotNorm1,
-        ok: true,
-        oddsSource: "Winner Snapshot",
-        liveError: winnerError.message,
-      };
-    } else {
-      // Snapshot is stale — fall back to Odds API.
-      try {
-        payload = await buildOddsApiFeed();
-      } catch (oddsError) {
-        console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
+
+  // ── Primary source selection ──────────────────────────────────────────────
+  // When ODDS_API_KEY is configured, try it first — it's more reliably
+  // accessible from cloud environments. Then merge in Winner data to add any
+  // Israeli-specific markets the Odds API doesn't carry.
+  // When no key is set, Winner is the sole primary source.
+
+  if (ODDS_API_KEY) {
+    // 1. Try Odds API as primary
+    try {
+      payload = await buildOddsApiFeed();
+      if (!payloadMatchesIsraelDates(payload)) throw new Error("Odds API returned mismatched dates");
+      payload.oddsSource = "The Odds API";
+    } catch (oddsError) {
+      console.warn("[winner-feed] Odds API primary failed, falling back to Winner:", oddsError.message);
+      payload = null;
+    }
+
+    // 2. Try Winner in parallel (or as sole source if Odds API failed)
+    let winnerPayload = null;
+    try {
+      winnerPayload = await buildWinnerFeedPayload({ withLogos: true });
+    } catch (winnerError) {
+      console.warn("[winner-feed] Winner also unavailable:", winnerError.message);
+    }
+
+    if (!payload && winnerPayload) {
+      // Odds API failed, use Winner
+      payload = winnerPayload;
+    } else if (payload && winnerPayload) {
+      // Both succeeded — merge Winner games into Odds API payload where Winner has more
+      for (const dayKey of ["today", "tomorrow"]) {
+        const oddsCount =
+          (payload.tabs?.[dayKey]?.sports?.football?.length || 0) +
+          (payload.tabs?.[dayKey]?.sports?.basketball?.length || 0);
+        const winnerCount =
+          (winnerPayload.tabs?.[dayKey]?.sports?.football?.length || 0) +
+          (winnerPayload.tabs?.[dayKey]?.sports?.basketball?.length || 0);
+        if (winnerCount > oddsCount) {
+          payload = {
+            ...payload,
+            tabs: { ...payload.tabs, [dayKey]: winnerPayload.tabs[dayKey] },
+            oddsSource: "Winner",
+          };
+        }
+      }
+    }
+
+    if (!payload) {
+      // Both failed — fall back to snapshot
+      const snap = normalizeFallbackRows(SNAPSHOT);
+      payload = payloadMatchesIsraelDates(snap)
+        ? { ...snap, ok: true, oddsSource: "Winner Snapshot", fallback: true }
+        : markStaleDatePayload(snap, "Winner ו-Odds API אינם זמינים, ה-snapshot ישן.");
+      payload.fallback = true;
+    }
+  } else {
+    // No Odds API key — use Winner as before
+    try {
+      payload = await buildWinnerFeedPayload({ withLogos: true });
+    } catch (winnerError) {
+      console.error("[winner-feed] buildWinnerFeedPayload threw:", winnerError?.message, winnerError?.stack?.split("\n")[1]);
+      const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
+      if (payloadMatchesIsraelDates(snapshotNorm1)) {
+        payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: winnerError.message };
+      } else {
         payload = {
-          ...markStaleDatePayload(snapshotNorm1, "טעינת Winner ו-The Odds API נכשלה וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום."),
-          ok: true,
-          fallback: true,
-          fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
-          liveError: winnerError.message,
-          oddsError: oddsError.message,
+          ...markStaleDatePayload(snapshotNorm1, "Winner אינו זמין, ה-snapshot ישן."),
+          ok: true, fallback: true, liveError: winnerError.message,
         };
       }
     }
-  }
 
-  // If Winner has too few games OR too few distinct leagues, supplement from The Odds API.
-  const todayCount =
-    (payload.tabs?.today?.sports?.football?.length || 0) +
-    (payload.tabs?.today?.sports?.basketball?.length || 0);
-  const tomorrowCount =
-    (payload.tabs?.tomorrow?.sports?.football?.length || 0) +
-    (payload.tabs?.tomorrow?.sports?.basketball?.length || 0);
+    // Supplement with Odds API if Winner returned too few games
+    const todayCount =
+      (payload.tabs?.today?.sports?.football?.length || 0) +
+      (payload.tabs?.today?.sports?.basketball?.length || 0);
+    const tomorrowCount =
+      (payload.tabs?.tomorrow?.sports?.football?.length || 0) +
+      (payload.tabs?.tomorrow?.sports?.basketball?.length || 0);
+    function tabLeagueSet(tab) {
+      const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
+      return new Set(all.map((r) => String(r.league || "").trim().toLowerCase()).filter(Boolean));
+    }
+    const todayLeagues = tabLeagueSet(payload.tabs?.today);
+    const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
+    const MIN_LEAGUES = 3;
+    const needsOdds = !payload.fallback && (
+      todayCount < MIN_PREMIUM_ROWS_PER_DAY ||
+      tomorrowCount < MIN_PREMIUM_ROWS_PER_DAY ||
+      todayLeagues.size < MIN_LEAGUES ||
+      tomorrowLeagues.size < MIN_LEAGUES
+    );
 
-  function tabLeagueSet(tab) {
-    const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
-    return new Set(all.map((r) => String(r.league || "").trim().toLowerCase()).filter(Boolean));
-  }
-  const todayLeagues = tabLeagueSet(payload.tabs?.today);
-  const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
-  // Supplement when count is low OR league variety is low (e.g. only Brazil at end of European season)
-  const MIN_LEAGUES = 3;
-  const needsOdds = !payload.fallback && (
-    todayCount < MIN_PREMIUM_ROWS_PER_DAY ||
-    tomorrowCount < MIN_PREMIUM_ROWS_PER_DAY ||
-    todayLeagues.size < MIN_LEAGUES ||
-    tomorrowLeagues.size < MIN_LEAGUES
-  );
+    if (needsOdds) {
+      try {
+        const oddsFeed = await buildOddsApiFeed();
+        const newTabs = { ...payload.tabs };
+        let usedOdds = false;
 
-  if (needsOdds) {
-    try {
-      const oddsFeed = await buildOddsApiFeed();
-      const newTabs = { ...payload.tabs };
-      let usedOdds = false;
+        for (const [dayKey, dayCount, dayLeagues] of [
+          ["today",    todayCount,    todayLeagues],
+          ["tomorrow", tomorrowCount, tomorrowLeagues],
+        ]) {
+          const oddsTab = oddsFeed.tabs?.[dayKey];
+          if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
+          const oddsCount =
+            (oddsTab.sports?.football?.length || 0) +
+            (oddsTab.sports?.basketball?.length || 0);
 
-      for (const [dayKey, dayCount, dayLeagues] of [
-        ["today",    todayCount,    todayLeagues],
-        ["tomorrow", tomorrowCount, tomorrowLeagues],
-      ]) {
-        const oddsTab = oddsFeed.tabs?.[dayKey];
-        if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
-        const oddsCount =
-          (oddsTab.sports?.football?.length || 0) +
-          (oddsTab.sports?.basketball?.length || 0);
-
-        if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
-          // Too few games overall — replace the tab entirely
-          newTabs[dayKey] = oddsTab;
-          usedOdds = true;
-        } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
-          // Enough games but only 1-2 leagues — merge in games from leagues not in Winner
-          const oddsRows = [
-            ...(oddsTab.sports?.football || []),
-            ...(oddsTab.sports?.basketball || []),
-          ];
-          const freshRows = oddsRows.filter((r) => {
-            const league = String(r.league || "").trim().toLowerCase();
-            return league && !dayLeagues.has(league);
-          });
-          if (freshRows.length > 0) {
-            const existing = newTabs[dayKey];
-            newTabs[dayKey] = {
-              ...existing,
-              sports: {
-                football: [
-                  ...(existing.sports?.football || []),
-                  ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
-                ],
-                basketball: [
-                  ...(existing.sports?.basketball || []),
-                  ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
-                ],
-              },
-            };
+          if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
+            newTabs[dayKey] = oddsTab;
             usedOdds = true;
+          } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
+            const oddsRows = [
+              ...(oddsTab.sports?.football || []),
+              ...(oddsTab.sports?.basketball || []),
+            ];
+            const freshRows = oddsRows.filter((r) => {
+              const league = String(r.league || "").trim().toLowerCase();
+              return league && !dayLeagues.has(league);
+            });
+            if (freshRows.length > 0) {
+              const existing = newTabs[dayKey];
+              newTabs[dayKey] = {
+                ...existing,
+                sports: {
+                  football: [
+                    ...(existing.sports?.football || []),
+                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
+                  ],
+                  basketball: [
+                    ...(existing.sports?.basketball || []),
+                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
+                  ],
+                },
+              };
+              usedOdds = true;
+            }
           }
         }
+        if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
+      } catch {
+        // Keep Winner payload if Odds API is unavailable.
       }
-      if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
-    } catch {
-      // Keep the Winner payload if Odds API is unavailable.
     }
   }
 
