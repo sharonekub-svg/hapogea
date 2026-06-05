@@ -4965,10 +4965,8 @@
           || String(a.time).localeCompare(String(b.time));
       });
       if (isYesterday) return rows;
-      // Keep up to 20 scored picks + all noOddsYet rows appended after
-      const pickRows = rows.filter(r => !r.noOddsYet).slice(0, 20);
-      const noOddsRows = rows.filter(r => r.noOddsYet).slice(0, Math.max(0, 20 - pickRows.length));
-      return [...pickRows, ...noOddsRows];
+      // Only show games with actual picks — no "ממתין לקווים" cards
+      return rows.filter(r => !r.noOddsYet).slice(0, 20);
     }
 
     function currentRowsBySport() {
@@ -6777,11 +6775,10 @@
         : (state.feed?.fallback || state.feed?.stale) ? "snapshot מאומת" : "נתונים חיים";
       const totalRows = daySportRows(state.day, state.sportTab).length;
       const withPick = rows.filter(row => row.recommended && !row.outsideRange).length;
-      const noOddsCount = rows.filter(row => row.noOddsYet).length;
-      const withoutPick = Math.max(0, rows.filter(row => !row.noOddsYet).length - withPick);
+      const withoutPick = Math.max(0, rows.length - withPick);
       const withoutPickText = `${withoutPick} ללא יתרון סטטיסטי`;
       meta.textContent = isOpenDay()
-        ? `${rows.length}/20 משחקי Winner · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}${noOddsCount ? ` · ${noOddsCount} ממתינים לקווים` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
+        ? `${rows.length} משחקים עם קווים · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`
         : `${rows.length} \u05ea\u05d5\u05e6\u05d0\u05d5\u05ea \u05e8\u05e9\u05de\u05d9\u05d5\u05ea \u05de\u05ea\u05d5\u05da ${totalRows}. \u05d4\u05de\u05e1\u05da \u05d4\u05d6\u05d4 \u05e1\u05d5\u05d2\u05e8 \u05ea\u05d7\u05d6\u05d9\u05d5\u05ea \u05e9\u05e0\u05e9\u05de\u05e8\u05d5 \u05e7\u05d5\u05d3\u05dd. ${sourceMode}${isRefreshing ? " \u00b7 \u05de\u05ea\u05e2\u05d3\u05db\u05df..." : ""}`;
       const banners = [
         (state.feed?.fallback || state.feed?.stale) ? `<div class="fallback-banner">\u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05d9\u05d1\u05d5\u05d9 \u05de\u05d0\u05d5\u05de\u05ea\u05d9\u05dd. Winner Live \u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05db\u05e8\u05d2\u05e2 \u05d1\u05e9\u05e8\u05ea; \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d5\u05d3\u05db\u05e0\u05d5 ${formatShortTime(state.feed.generatedAt || state.localCachedAt)}.</div>` : "",
