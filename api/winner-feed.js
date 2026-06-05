@@ -3493,10 +3493,15 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   // Israeli-specific markets the Odds API doesn't carry.
   // When no key is set, Winner is the sole primary source.
 
+  console.info(`[winner-feed] build start — ODDS_API_KEY=${ODDS_API_KEY ? "set" : "missing"}, FOOTBALL_KEY=${FOOTBALL_API_KEY ? "set" : "missing"}`);
+
   if (ODDS_API_KEY) {
     // 1. Try Odds API as primary
     try {
       payload = await buildOddsApiFeed();
+      const todayGames = (payload.tabs?.today?.sports?.football?.length || 0) + (payload.tabs?.today?.sports?.basketball?.length || 0);
+      const tomorrowGames = (payload.tabs?.tomorrow?.sports?.football?.length || 0) + (payload.tabs?.tomorrow?.sports?.basketball?.length || 0);
+      console.info(`[winner-feed] Odds API returned today=${todayGames} tomorrow=${tomorrowGames}`);
       if (!payloadMatchesIsraelDates(payload)) throw new Error("Odds API returned mismatched dates");
       payload.oddsSource = "The Odds API";
     } catch (oddsError) {
@@ -3508,6 +3513,8 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     let winnerPayload = null;
     try {
       winnerPayload = await buildWinnerFeedPayload({ withLogos: true });
+      const wToday = (winnerPayload.tabs?.today?.sports?.football?.length || 0) + (winnerPayload.tabs?.today?.sports?.basketball?.length || 0);
+      console.info(`[winner-feed] Winner returned today=${wToday}`);
     } catch (winnerError) {
       console.warn("[winner-feed] Winner also unavailable:", winnerError.message);
     }
@@ -3660,7 +3667,26 @@ module.exports = async function handler(req, res) {
   if (rateLimit(req, res, { max: 30, windowMs: 60_000 })) return;
   try {
     const force = String(req?.query?.force || "").toLowerCase() === "1";
+    const debug = String(req?.query?.debug || "").toLowerCase() === "1";
     const payload = await buildCachedWinnerFeedPayload({ force });
+    if (debug) {
+      const today = payload.tabs?.today?.sports || {};
+      const tomorrow = payload.tabs?.tomorrow?.sports || {};
+      return res.status(200).json({
+        ok: payload.ok,
+        oddsSource: payload.oddsSource,
+        fallback: payload.fallback,
+        liveError: payload.liveError,
+        oddsError: payload.oddsError,
+        cache: payload.cache,
+        env: { ODDS_API_KEY: ODDS_API_KEY ? "set" : "missing", FOOTBALL_KEY: FOOTBALL_API_KEY ? "set" : "missing" },
+        counts: {
+          today:    { football: today.football?.length || 0,    basketball: today.basketball?.length || 0 },
+          tomorrow: { football: tomorrow.football?.length || 0, basketball: tomorrow.basketball?.length || 0 },
+        },
+        dates: { today: payload.tabs?.today?.date, tomorrow: payload.tabs?.tomorrow?.date },
+      });
+    }
     res.status(200).json(payload);
   } catch (error) {
     try {
