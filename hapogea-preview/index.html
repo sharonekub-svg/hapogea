@@ -3876,6 +3876,136 @@
       .auth-modal-card { padding: 30px 20px 24px !important; }
     }
 
+    /* ── Privacy Policy Checkbox ── */
+    .gate-privacy-wrap {
+      width: 100%;
+      margin: 12px 0 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .gate-privacy-wrap input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      accent-color: #55d6ff;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .gate-privacy-label {
+      font-size: 12px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.5;
+      cursor: pointer;
+      user-select: none;
+      text-align: right;
+    }
+    .gate-privacy-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #55d6ff;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .gate-privacy-link:hover { color: #80e8ff; }
+    .gate-google-btn:disabled, .gate-skip:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .auth-privacy-wrap {
+      width: 100%;
+      margin: 10px 0 2px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .auth-privacy-wrap input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      min-width: 15px;
+      accent-color: #6366f1;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .auth-privacy-label {
+      font-size: 11.5px;
+      color: rgba(255,255,255,.42);
+      line-height: 1.5;
+      cursor: pointer;
+      user-select: none;
+    }
+    .auth-privacy-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #818cf8;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .auth-google-btn:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── World Cup Mobile Improvements ── */
+    @media (max-width: 640px) {
+      .wc-hub-hero { padding: 20px 14px 18px; }
+      .wc-hub-sub { font-size: 12px; }
+      .wc-count-cell b { font-size: 20px; }
+      .wc-count-cap { font-size: 11px; }
+      .wc-fact b { font-size: 20px; }
+      .wc-hosts-wrap { padding: 10px 12px; gap: 10px; }
+      .wc-tl-item { min-width: 72px; padding: 10px 6px 8px; }
+      .wc-tl-date { font-size: 12px; }
+      .wc-stage-chip { padding: 6px 10px; font-size: 12px; }
+      .wc-match { padding: 10px; gap: 8px; }
+      .wc-team { padding: 8px 4px; }
+      .wc-flag { width: 42px; height: 42px; }
+      .wc-team b { font-size: 12px; max-width: min(110px, 26vw); min-height: 28px; }
+      .wc-odd { min-height: 46px; padding: 5px 4px; font-size: 10px; }
+      .wc-odd b { font-size: 14px; }
+      .wc-why { font-size: 11px; padding: 8px; }
+      .wc-factors { gap: 4px; }
+      .wc-card-top { gap: 6px; }
+      .wc-head h3 { font-size: 18px; }
+      .wc-head p { font-size: 12px; }
+      .wc-body { padding: 10px; }
+      .wc-match-grid { gap: 8px; }
+      .wc-toolbar { padding: 8px; }
+      .wc-day-pill { padding: 6px 8px; font-size: 11px; }
+    }
+    @media (max-width: 400px) {
+      .wc-hub-hero { padding: 16px 12px 14px; }
+      .wc-team b { font-size: 11px; max-width: min(90px, 24vw); }
+      .wc-flag { width: 36px; height: 36px; }
+      .wc-count-cell b { font-size: 18px; }
+      .wc-hub-title { font-size: 20px; }
+    }
+
+    /* ── AI Image Upload Button ── */
+    .ai-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.45);
+      font: 700 11.5px Heebo, sans-serif;
+      cursor: pointer;
+      transition: border-color .18s, color .18s, background .18s;
+      white-space: nowrap;
+    }
+    .ai-upload-btn:hover { border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.7); background: rgba(255,255,255,.07); }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -4096,12 +4226,16 @@
         <div class="gate-stat"><span class="gate-stat-icon">🌍</span><span class="gate-stat-label">מונדיאל</span></div>
       </div>
       <p class="gate-cta-label">כניסה לפלטפורמה</p>
-      <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="gate-google-btn">
+      <div class="gate-privacy-wrap">
+        <input type="checkbox" id="gatePrivacyCheck" onchange="(function(c){var g=document.getElementById('gateGoogleBtn'),s=document.querySelector('.gate-skip');if(g)g.disabled=!c.checked;if(s)s.disabled=!c.checked;})(this)">
+        <label for="gatePrivacyCheck" class="gate-privacy-label">אני מאשר/ת שקראתי והסכמתי ל<button type="button" class="gate-privacy-link" onclick="event.preventDefault();document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button></label>
+      </div>
+      <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="gate-google-btn" disabled>
         <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         המשך עם Google
       </button>
       <p id="gateError" class="gate-error"></p>
-      <button onclick="HapAuth.skipGate()" class="gate-skip">כניסה ללא התחברות</button>
+      <button onclick="HapAuth.skipGate()" class="gate-skip" disabled>כניסה ללא התחברות</button>
       <p class="gate-security">🔒 ההתחברות מאובטחת דרך Supabase · Winner odds</p>
     </div>
   </div>
@@ -7543,6 +7677,7 @@
           applyManualResults();
           _mrUpdateIndicator();
           if (typeof renderStats === "function") renderStats();
+          if (typeof renderCards === "function") renderCards();
         }
       } catch (_) { /* silent */ }
       finally { _MR.pending = false; }
@@ -8331,6 +8466,8 @@
         modal().classList.remove("hidden");
         showView(false);
         _resetOtpForm();
+        const pc = document.getElementById("authPrivacyCheck");
+        if (pc) { pc.checked = false; const gb = document.querySelector("#authFormView .auth-google-btn"); if (gb) gb.disabled = true; }
         setTimeout(() => { const f = document.getElementById("authEmail"); if (f) f.focus(); }, 60);
       }
       function closeModal() { modal().classList.add("hidden"); }
@@ -8816,8 +8953,12 @@
           <h2 class="auth-header-title">הפוגע <span class="auth-ai-badge">AI</span></h2>
           <p class="auth-header-sub">כניסה לחשבון</p>
         </div>
-        <button onclick="HapAuth.signInWithGoogle()" class="auth-google-btn">
-          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        <div class="auth-privacy-wrap">
+          <input type="checkbox" id="authPrivacyCheck" onchange="(function(c){var g=document.querySelector('#authFormView .auth-google-btn');if(g)g.disabled=!c.checked;})(this)">
+          <label for="authPrivacyCheck" class="auth-privacy-label">אני מאשר/ת שקראתי והסכמתי ל<button type="button" class="auth-privacy-link" onclick="event.preventDefault();HapAuth.closeModal();document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button></label>
+        </div>
+        <button onclick="HapAuth.signInWithGoogle()" class="auth-google-btn" disabled>
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
           המשך עם Google
         </button>
         <p class="auth-footnote">כניסה מאובטחת דרך Google</p>
@@ -9075,14 +9216,16 @@ function AiFinalLean({show}) {
   );
 }
 
-function AiComposer({onSend,busy,showChips}) {
+function AiComposer({onSend,onImage,busy,showChips}) {
   const [val,setVal] = React.useState("");
   const [focus,setFocus] = React.useState(false);
   const ref = React.useRef(null);
+  const fileRef = React.useRef(null);
   const grow=()=>{const el=ref.current;if(!el)return;el.style.height="auto";el.style.height=Math.min(el.scrollHeight,180)+"px";};
   React.useEffect(grow,[val]);
   const submit=()=>{const t=val.trim();if(!t||busy)return;onSend(t);setVal("");};
   const onKey=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}};
+  const handleFile=e=>{const f=e.target.files?.[0];e.target.value="";if(f&&onImage)onImage(f);};
   return (
     <div className="ai-composer-wrap"><div className="ai-composer-inner">
       {showChips&&<div className="ai-chips">{AI_CHIPS.map((c,i)=>(
@@ -9098,7 +9241,15 @@ function AiComposer({onSend,busy,showChips}) {
           <AiIcon name="bolt" size={19}/>
         </button>
       </div>
-      <div className="ai-composer-foot">הפוגע מספק <b>הערכות הסתברותיות</b> ולא הבטחות. הימור באחריות · גיל 18+</div>
+      <div className="ai-composer-foot" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"8px",flexWrap:"wrap"}}>
+        <span>הפוגע מספק <b>הערכות הסתברותיות</b> ולא הבטחות. הימור באחריות · גיל 18+</span>
+        <span>
+          <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" style={{display:"none"}} disabled={busy} onChange={handleFile}/>
+          <label className="ai-upload-btn" style={{opacity:busy?.45:1,cursor:busy?"not-allowed":"pointer"}} onClick={()=>!busy&&fileRef.current&&fileRef.current.click()}>
+            📎 תמונה לניתוח
+          </label>
+        </span>
+      </div>
     </div></div>
   );
 }
@@ -9282,6 +9433,48 @@ function AiApp() {
     }
   };
 
+  const sendImage=async(file)=>{
+    if(busy)return;
+    const run=++runRef.current;
+    setBusy(true);atBottom.current=true;
+    let imageDataUrl;
+    try {
+      imageDataUrl = await (typeof imageFileToDataUrl==="function"
+        ? imageFileToDataUrl(file)
+        : new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}));
+    } catch(e) {
+      setBusy(false);
+      setMessages(m=>[...m,{role:"ai",phase:"done",intro:"לא הצלחתי לקרוא את התמונה: "+e.message,streamLen:999,analysis:[],revealed:0,open:{},showFinal:false}]);
+      return;
+    }
+    const userText="נתח את התמונה הזו מבחינה ספורטיבית וסטטיסטית בלבד.";
+    setMessages(m=>[...m,
+      {role:"user",text:userText,image:imageDataUrl},
+      {role:"ai",phase:"thinking",thinkStep:0,streamLen:0,intro:"",analysis:[],revealed:0,open:{},showFinal:false},
+    ]);
+    const stepTimer=setInterval(()=>{
+      if(run!==runRef.current){clearInterval(stepTimer);return;}
+      patchAi(prev=>({thinkStep:Math.min((prev.thinkStep||0)+1,AI_THINKING_STEPS.length-1)}));
+    },2000);
+    try{
+      const resp=await fetch("/api/reuven-slip",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:imageDataUrl,note:""}),signal:AbortSignal.timeout(60000)});
+      clearInterval(stepTimer);
+      if(run!==runRef.current)return;
+      const data=await resp.json().catch(()=>({}));
+      const answer=data.answer||"לא הצלחתי לקבל ניתוח לתמונה. תנסה שוב.";
+      patchAi({phase:"streaming",intro:answer,streamLen:answer.length});
+      patchAi({phase:"done"});
+    }catch(e){
+      clearInterval(stepTimer);
+      if(run!==runRef.current)return;
+      const msg="שגיאה בשליחת התמונה. תנסה שוב.";
+      patchAi({phase:"streaming",intro:msg,streamLen:msg.length});
+      patchAi({phase:"done"});
+    }finally{
+      if(run===runRef.current)setBusy(false);
+    }
+  };
+
   const empty=messages.length===0;
   return (
     <div className="ai-app" style={{display:"flex",flexDirection:"column",height:"100%"}}>
@@ -9306,7 +9499,10 @@ function AiApp() {
             <div className="ai-thread">
               {messages.map((m,i)=>
                 m.role==="user"
-                  ?<div className="ai-msg user" key={i}><div className="ai-bubble">{m.text}</div></div>
+                  ?<div className="ai-msg user" key={i}>
+                    {m.image&&<img src={m.image} alt="תמונה" style={{maxWidth:"180px",maxHeight:"120px",borderRadius:"8px",display:"block",marginBottom:"6px",objectFit:"cover"}}/>}
+                    <div className="ai-bubble">{m.text}</div>
+                  </div>
                   :<div className="ai-msg" key={i}><AiMessage m={m} idx={i} onToggle={toggleCard}/></div>
               )}
             </div>
@@ -9315,7 +9511,7 @@ function AiApp() {
         <button className={"ai-scroll-btn"+(showScrollBtn?" show":"")} onClick={()=>scrollDown()} aria-label="גלול למטה">
           <AiIcon name="chevron" size={18}/>
         </button>
-        <AiComposer onSend={send} busy={busy} showChips={empty}/>
+        <AiComposer onSend={send} onImage={sendImage} busy={busy} showChips={empty}/>
       </div>
     </div>
   );
