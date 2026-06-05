@@ -3182,8 +3182,8 @@ async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
     const data = await fetchJson(url, { retryAttempts: 1, retryBaseDelay: 500 });
     return Array.isArray(data) ? data : [];
   } catch (e) {
-    // Propagate quota errors so callers can fall back to snapshot
-    if (e.message?.includes("401:")) throw e;
+    // Propagate auth/block errors so callers surface them correctly
+    if (e.message?.includes("401:") || e.message?.includes("403:")) throw e;
     return [];
   }
 }
@@ -3327,8 +3327,8 @@ async function buildOddsApiFeed() {
     );
     for (const r of batchResults) {
       if (r.status === "rejected") {
-        if (r.reason?.message?.includes("401:")) {
-          throw new Error("Odds API quota exceeded: " + r.reason.message.slice(0, 120));
+        if (r.reason?.message?.includes("401:") || r.reason?.message?.includes("403:")) {
+          throw new Error("Odds API blocked/quota: " + r.reason.message.slice(0, 120));
         }
         continue;
       }
