@@ -6,7 +6,7 @@
   <title>הפוגע | ניתוח ספורט חכם</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F7F5F1;
@@ -4125,6 +4125,69 @@
     }
     .ai-upload-btn:hover { border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.7); background: rgba(255,255,255,.07); }
 
+    /* ─── 8-bit 404 Page ─────────────────────────────────────── */
+    #notFoundSection {
+      display: none;
+      min-height: 80vh;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      padding: 48px 24px;
+    }
+    #notFoundSection.visible { display: flex; }
+    .retro-font { font-family: 'Press Start 2P', monospace; }
+    .nf-404 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(48px, 12vw, 96px);
+      color: #55d6ff;
+      text-shadow: 4px 4px 0 #0e4a6b, 8px 8px 0 rgba(85,214,255,.15);
+      line-height: 1;
+    }
+    .nf-img {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 160px; height: 160px;
+      margin: -10px 0;
+    }
+    .nf-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(12px, 2.5vw, 18px);
+      color: #fff;
+      line-height: 1.8;
+      max-width: 480px;
+    }
+    .nf-desc {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(8px, 1.5vw, 11px);
+      color: rgba(255,255,255,.55);
+      line-height: 2;
+      max-width: 420px;
+    }
+    .nf-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      padding: 14px 24px;
+      background: #55d6ff;
+      color: #06131a;
+      border: none;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #0e4a6b;
+      transition: transform .1s, box-shadow .1s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .nf-btn:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #0e4a6b;
+    }
+    .nf-btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: none;
+    }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -4444,6 +4507,23 @@
   <!-- ════ הפוגע AI section (React) ════ -->
   <div id="ai-section">
     <div id="ai-root"></div>
+  </div>
+
+  <!-- ════════ 8-bit 404 ════════ -->
+  <div id="notFoundSection" role="main" aria-label="דף לא נמצא">
+    <div class="nf-404">404</div>
+    <img
+      class="nf-img"
+      src="https://www.8bitcn.com/_next/image?url=%2Fimages%2F8bit-ogre.png&w=256&q=75&dpl=dpl_B9Q5u7DD6qZpoCz3VRwuR19npVHK"
+      alt="אוגר 8 ביט"
+      width="160" height="160"
+      onerror="this.style.fontSize='80px';this.style.lineHeight='1';this.outerHTML='<div style=\'font-size:80px;line-height:1\'>👹</div>'"
+    />
+    <h1 class="nf-title">הרגזת את האוגר!</h1>
+    <p class="nf-desc">הדף הזה לא קיים.<br>חזור לפני שיהיה מאוחר מדי.</p>
+    <button class="nf-btn" onclick="goToLanding()">
+      ← חזרה לדף הבית
+    </button>
   </div>
 
   <main class="shell">
@@ -8482,6 +8562,12 @@
     // Day always stays "today" — no toggle needed
 
     function syncPageSections() {
+      const VALID_TABS = new Set(['football', 'basketball', 'worldcup', 'ai', 'home', 'about', 'reuben']);
+      const isNotFound = !VALID_TABS.has(state.sportTab);
+      const nfSection = document.getElementById('notFoundSection');
+      if (nfSection) nfSection.classList.toggle('visible', isNotFound);
+      if (isNotFound) return;
+
       const isAi = state.sportTab === 'ai';
       const isWC = state.sportTab === 'worldcup';
       const isSport = !isAi;
