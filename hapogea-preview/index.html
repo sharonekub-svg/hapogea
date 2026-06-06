@@ -3482,14 +3482,16 @@
       .lp-today-label { font-size: 12px; }
     }
     .lp-btn-primary {
-      padding: 15px 32px; border-radius: 12px; border: none;
+      padding: 15px 36px; border-radius: 12px; border: none;
       background: #211F1B; color: #FAF8F4;
       font: 900 16px Heebo,sans-serif; cursor: pointer;
       display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 20px rgba(33,31,27,.18);
-      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(33,31,27,.22);
+      transition: transform .18s, box-shadow .18s, background .18s;
+      letter-spacing: -.01em;
     }
-    .lp-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(33,31,27,.28); }
+    .lp-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(33,31,27,.32); }
+    .lp-btn-primary:active { transform: translateY(-1px); }
     .lp-btn-secondary {
       padding: 15px 32px; border-radius: 12px;
       border: 1.5px solid rgba(33,31,27,.2); background: transparent;
@@ -4076,22 +4078,22 @@
     <section class="lp-hero" id="lp-hero">
       <div class="lp-eyebrow">
         <span class="lp-eyebrow-dot"></span>
-        ניתוח ספורט חכם · כדורגל · כדורסל · מונדיאל 2026
+        AI לניתוח ספורט · כדורגל · כדורסל · מונדיאל 2026
       </div>
       <div class="lp-brand-display">הפוגע <span>AI</span></div>
-      <h1>ניתוחי ספורט <span>חכמים</span><br>בזמן אמת</h1>
+      <h1>רואים את <span>המשחק</span><br>לפני כולם</h1>
       <p class="lp-hero-sub">
-        פלטפורמת ניתוח שמדרגת כדורגל וכדורסל לפי יתרון סטטיסטי אמיתי.
-        רק יחסים שבהם לנתונים יש דבר לומר — ללא המצאות.
+        יחסי שוק אמיתיים, ניתוח סטטיסטי חי ו-AI שמסביר בעברית.
+        לא מנחשים — מחשבים. לא ממציאים — מנתחים.
       </p>
       <div class="lp-hero-actions">
-        <button class="lp-btn-primary" onclick="enterApp()">כניסה <span aria-hidden="true" style="font-size:17px">←</span></button>
-        <button class="lp-btn-secondary" onclick="smoothTo('lp-features')">למד עוד</button>
+        <button class="lp-btn-primary" onclick="enterApp()">התחל לנתח <span aria-hidden="true" style="font-size:17px">←</span></button>
+        <button class="lp-btn-secondary" onclick="smoothTo('lp-features')">איך זה עובד</button>
       </div>
 
       <!-- Today's games quick-access -->
       <div class="lp-today-card" id="lpTodayCard">
-        <div class="lp-today-label">📅 משחקים של היום</div>
+        <div class="lp-today-label">⚡ ניתוחי היום</div>
         <div class="lp-today-sports">
           <button class="lp-today-sport" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},220)" title="המלצות כדורגל היום">
             <span class="lp-today-sport-icon">⚽</span>
@@ -4114,51 +4116,51 @@
       </div>
 
       <div class="lp-stats-row">
-        <div class="lp-stat-box"><div class="lp-stat-num">40</div><div class="lp-stat-lbl">משחקים ביום</div></div>
+        <div class="lp-stat-box"><div class="lp-stat-num">20+</div><div class="lp-stat-lbl">ניתוחים ביום</div></div>
         <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(146,96,10,.18),rgba(180,118,10,.12));border-color:rgba(146,96,10,.50)">
           <div class="lp-stat-num" id="lpWCDaysNum" style="color:#92600A">9</div>
           <div class="lp-stat-lbl" style="color:#92600A">ימים למונדיאל 🏆</div>
         </div>
         <div class="lp-stat-box"><div class="lp-stat-num">48</div><div class="lp-stat-lbl">נבחרות מונדיאל</div></div>
-        <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">נתונים חיים</div></div>
+        <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">יחסי שוק חיים</div></div>
       </div>
     </section>
 
     <section id="lp-features" class="lp-section-wrap white">
       <div class="lp-section-inner">
-        <p class="lp-section-kicker">מה תקבל</p>
-        <h2 class="lp-section-h">כל הכלים לניתוח ספורט</h2>
-        <p class="lp-section-p">ניתוח AI, לוח מונדיאל ועוד — הכל במקום אחד.</p>
+        <p class="lp-section-kicker">יכולות הפלטפורמה</p>
+        <h2 class="lp-section-h">הכלים שלך לקרוא את השוק</h2>
+        <p class="lp-section-p">נתוני שוק חיים, AI שמדבר עברית, ולוח מונדיאל — הכל במקום אחד.</p>
         <div class="lp-feat-grid">
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(37,99,235,.1)">⚡</div>
-            <h3 class="lp-feat-title">נתוני שוק בזמן אמת</h3>
-            <p class="lp-feat-text">יחסים ומכרזים ישירות ממקור שוק. ללא עיבוד מחדש, ללא המצאת נתונים — רק מה שהשוק מציג.</p>
+            <h3 class="lp-feat-title">יחסי שוק חיים</h3>
+            <p class="lp-feat-text">מידע ישיר מהשוק — ללא עיכוב, ללא המצאות. הרגע שיחסים מתעדכנים, אתה הראשון לדעת.</p>
           </div>
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(208,92,26,.1)">🤖</div>
             <h3 class="lp-feat-title">הפוגע AI</h3>
-            <p class="lp-feat-text">ניתוח שפה טבעית לכל משחק. שאל שאלות, קבל הסברים על יחסים וסטטיסטיקות בעברית פשוטה.</p>
+            <p class="lp-feat-text">שאל בעברית, קבל ניתוח ברמת אנליסט. "ארסנל נגד פריז — יש ערך?" — תוך שניות יש תשובה מנומקת.</p>
           </div>
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(21,128,61,.1)">📊</div>
-            <h3 class="lp-feat-title">דירוג סטטיסטי</h3>
-            <p class="lp-feat-text">אלגוריתם מדרג משחקים לפי יתרון סטטיסטי מחושב. רואים רק את המשחקים שמצדיקים תשומת לב.</p>
+            <h3 class="lp-feat-title">אלגוריתם דירוג</h3>
+            <p class="lp-feat-text">המנוע לוקח 100+ משחקים, מנפה רעש, ומוציא 20 שבהם הנתונים אומרים משהו. לא כמות — איכות.</p>
           </div>
           <div class="lp-feat-card">
-            <div class="lp-feat-icon" style="background:rgba(146,96,10,.1)">⚽</div>
+            <div class="lp-feat-icon" style="background:rgba(146,96,10,.1)">🏆</div>
             <h3 class="lp-feat-title">מונדיאל 2026</h3>
-            <p class="lp-feat-text">לוח טורניר מלא עם דגלי נבחרות, שלבי בתים, תאריכים ויחסי שוק כשזמינים. מקסיקו · קנדה · ארה"ב.</p>
+            <p class="lp-feat-text">לוח טורניר מלא: דגלים, שלבים, תאריכים ויחסים כשהם מגיעים. מקסיקו · קנדה · ארה"ב · 48 נבחרות.</p>
           </div>
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(85,214,255,.1)">📱</div>
-            <h3 class="lp-feat-title">מותאם לכל מכשיר</h3>
-            <p class="lp-feat-text">עיצוב רספונסיבי מלא. ניווט תחתון למובייל, כרטיסיות מותאמות, חוויה נוחה בכל גודל מסך.</p>
+            <h3 class="lp-feat-title">מובייל ראשון</h3>
+            <p class="lp-feat-text">תוכנן מהיסוד למסך קטן. ניווט תחתון, כרטיסים קומפקטיים, טעינה מהירה — נוח בפנים גם ברחוב.</p>
           </div>
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(99,102,241,.1)">✦</div>
             <h3 class="lp-feat-title">פרימיום</h3>
-            <p class="lp-feat-text">גישה מלאה לכל הניתוחים, AI ללא הגבלה, יחסי שוק לכל הליגות ופילטר מוטיבציה בלעדי.</p>
+            <p class="lp-feat-text">כל הניתוחים, AI ללא הגבלה ויחסים לכל הליגות. למי שרוצה את כל הנתונים — ולא חצי.</p>
           </div>
         </div>
       </div>
@@ -4166,24 +4168,24 @@
 
     <section id="lp-how" class="lp-section-wrap">
       <div class="lp-section-inner">
-        <p class="lp-section-kicker">תהליך</p>
-        <h2 class="lp-section-h">איך זה עובד</h2>
-        <p class="lp-section-p">שלושה שלבים פשוטים — מנתוני שוק לניתוח מלא.</p>
+        <p class="lp-section-kicker">הלוגיקה מאחורה</p>
+        <h2 class="lp-section-h">שלושה שלבים, תוצאה אחת</h2>
+        <p class="lp-section-p">מנתוני השוק ועד לניתוח מלא — בפחות מדקה.</p>
         <div class="lp-steps">
           <div class="lp-step">
             <div class="lp-step-num">1</div>
-            <h3 class="lp-step-title">מנוע הניתוח סורק</h3>
-            <p class="lp-step-text">בכל בוקר המנוע סורק את כל המשחקים הזמינים — כדורגל וכדורסל — עם יחסים ומידע מלא ישירות מהשוק.</p>
+            <h3 class="lp-step-title">המנוע סורק את השוק</h3>
+            <p class="lp-step-text">בכל בוקר המנוע שואב יחסים חיים לכל משחקי הכדורגל והכדורסל. שום נתון לא מומצא — רק מה שהשוק פתח.</p>
           </div>
           <div class="lp-step">
             <div class="lp-step-num">2</div>
-            <h3 class="lp-step-title">אלגוריתם מדרג</h3>
-            <p class="lp-step-text">כל משחק מקבל ציון לפי יחסי שוק וניתוח סטטיסטי. רואים רק את 20 המשחקים עם יתרון ברור ומחושב.</p>
+            <h3 class="lp-step-title">האלגוריתם מסנן ומדרג</h3>
+            <p class="lp-step-text">100+ משחקים נכנסים, 20 יוצאים. כל משחק מקבל ציון לפי יתרון סטטיסטי, פער הסתברות ועוצמת יחס. רק הנבחרים עוברים.</p>
           </div>
           <div class="lp-step">
             <div class="lp-step-num">3</div>
-            <h3 class="lp-step-title">AI מנתח ומסביר</h3>
-            <p class="lp-step-text">הפוגע AI קורא את הנתונים ומסביר בעברית פשוטה למה משחק נבחר, מה היחסים אומרים ואיפה הסיכוי.</p>
+            <h3 class="lp-step-title">שאל — קבל ניתוח מלא</h3>
+            <p class="lp-step-text">הפוגע AI מסביר בעברית: למה הצד הזה, מה היחס שווה, איפה הסיכון — בלי מסתורין, בלי מינוח שלא מבינים.</p>
           </div>
         </div>
       </div>
@@ -4192,21 +4194,21 @@
     <section class="lp-section-wrap dark" style="text-align:center">
       <div class="lp-section-inner">
         <div class="lp-premium-badge">✦ פרימיום</div>
-        <h2 class="lp-section-h" style="max-width:600px;margin-inline:auto;margin-bottom:14px">גישה מלאה לכל הנתונים</h2>
-        <p class="lp-section-p" style="margin-bottom:32px">כניסה בלתי מוגבלת לכל הניתוחים, AI ללא הגבלה ויחסי שוק לכל הליגות.</p>
+        <h2 class="lp-section-h" style="max-width:600px;margin-inline:auto;margin-bottom:14px">בשביל מי שרוצה את כל הנתונים</h2>
+        <p class="lp-section-p" style="margin-bottom:32px">כל הניתוחים, AI ללא הגבלה, יחסים מכל הליגות ולוח מונדיאל מלא — בגישה אחת.</p>
         <div class="lp-premium-feats">
-          <div class="lp-premium-feat"><span>✓</span> כל ניתוחי היום</div>
-          <div class="lp-premium-feat"><span>✓</span> הפוגע AI ללא הגבלה</div>
-          <div class="lp-premium-feat"><span>✓</span> נתונים בזמן אמת</div>
-          <div class="lp-premium-feat"><span>✓</span> מונדיאל 2026</div>
+          <div class="lp-premium-feat"><span>✓</span> כל ניתוחי היום — ללא חיתוך</div>
+          <div class="lp-premium-feat"><span>✓</span> הפוגע AI — שיחות ללא הגבלה</div>
+          <div class="lp-premium-feat"><span>✓</span> יחסי שוק חיים לכל הליגות</div>
+          <div class="lp-premium-feat"><span>✓</span> לוח מונדיאל 2026 מלא</div>
         </div>
-        <button class="lp-premium-cta" onclick="enterApp();setTimeout(openPremiumModal,200)">שדרג לפרימיום</button>
+        <button class="lp-premium-cta" onclick="enterApp();setTimeout(openPremiumModal,200)">גש לפרימיום ←</button>
       </div>
     </section>
 
     <footer class="lp-footer">
-      <p>© 2026 הפוגע · פלטפורמת ניתוח ספורט<br>
-      הדמו מיועד להצגת מוצר בלבד. אינו ייעוץ הימורים ואינו מבטיח תוצאה.<br>
+      <p>© 2026 הפוגע · פלטפורמת ניתוח ספורט מבוססת AI<br>
+      הפלטפורמה מיועדת לניתוח ולמידה בלבד — אינה ייעוץ הימורים ואינה מבטיחה תוצאות. גיל מינימלי 18+.<br>
       <button class="footer-privacy-link" style="font-size:11px;color:#A39B8C" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button>
       &nbsp;·&nbsp;<button class="footer-privacy-link" style="font-size:11px;color:#A39B8C" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי שימוש</button></p>
     </footer>
@@ -4256,7 +4258,7 @@
         </div>
       </div>
       <h1 class="gate-title">הפוגע <span class="gate-ai-text">AI</span></h1>
-      <p class="gate-subtitle">פלטפורמת ניתוח ספורט מתקדמת<br>כדורגל · כדורסל · מונדיאל 2026</p>
+      <p class="gate-subtitle">יחסי שוק חיים · ניתוח AI בעברית<br>כדורגל · כדורסל · מונדיאל 2026</p>
       <div class="gate-stats">
         <div class="gate-stat"><span class="gate-stat-icon">⚽</span><span class="gate-stat-label">כדורגל</span></div>
         <div class="gate-stat-div"></div>
@@ -4264,7 +4266,7 @@
         <div class="gate-stat-div"></div>
         <div class="gate-stat"><span class="gate-stat-icon">🌍</span><span class="gate-stat-label">מונדיאל</span></div>
       </div>
-      <p class="gate-cta-label">כניסה לפלטפורמה</p>
+      <p class="gate-cta-label">כניסה מהירה עם Google</p>
       <div class="gate-privacy-wrap">
         <input type="checkbox" id="gatePrivacyCheck" onchange="updateGateButtons()">
         <label for="gatePrivacyCheck" class="gate-privacy-label">קראתי והסכמתי ל<button type="button" class="gate-privacy-link" onclick="event.preventDefault();document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button></label>
@@ -4278,8 +4280,8 @@
         המשך עם Google
       </button>
       <p id="gateError" class="gate-error"></p>
-      <button onclick="HapAuth.skipGate()" class="gate-skip" disabled>כניסה ללא התחברות</button>
-      <p class="gate-security">🔒 ההתחברות מאובטחת דרך Supabase</p>
+      <button onclick="HapAuth.skipGate()" class="gate-skip" disabled>כניסה ללא חשבון →</button>
+      <p class="gate-security">🔒 כניסה מאובטחת · אין שמירת סיסמה · גיל 18+</p>
     </div>
   </div>
 
@@ -4305,7 +4307,7 @@
       </div>
       <div class="ld-title-group">
         <div class="loading-title">הפוגע <span class="ld-ai-badge">AI</span></div>
-        <div class="loading-sub">מחפש משחקים...</div>
+        <div class="loading-sub">שואב נתוני שוק חיים...</div>
       </div>
       <div class="ld-progress-wrap">
         <div class="progress-track">
@@ -4335,10 +4337,10 @@
       </div>
       <button class="lp-home-btn" onclick="goToLanding()" title="חזור לדף הבית" aria-label="דף הבית">⌂ בית</button>
       <nav class="nav" id="mainNav">
-        <button class="tab active" data-page="home">בית</button>
+        <button class="tab active" data-page="home">סקירה</button>
         <button class="tab" data-page="football">⚽ כדורגל</button>
         <button class="tab" data-page="basketball">🏀 כדורסל</button>
-        <button class="tab" data-page="ai">הפוגע AI ✦</button>
+        <button class="tab" data-page="ai">✦ הפוגע AI</button>
         <button class="tab" data-page="about">אודות</button>
       </nav>
       <button id="premiumHeaderBtn" onclick="isPremiumUser() ? deactivatePremium() : openPremiumModal()"
@@ -4362,10 +4364,10 @@
     <section class="hero">
       <div class="hero-main">
         <div class="hero-content">
-          <span class="eyebrow">יחסי שוק אמיתיים · ניתוח סטטיסטי · בלי המצאת נתונים</span>
-          <h2>ניתוחי ספורט בזמן אמת — כדורגל, כדורסל ומונדיאל 2026</h2>
+          <span class="eyebrow">יחסי שוק חיים · ניתוח AI · ללא המצאות</span>
+          <h2>המשחקים שהנתונים מצביעים עליהם — כדורגל, כדורסל, מונדיאל</h2>
           <p class="hero-copy">
-            הפוגע מציג משחקים עם יתרון סטטיסטי ויחסי שוק פעילים. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים. כל נתון מבוסס על מידע שוק אמיתי.
+            האלגוריתם סרק את כל השוק, סינן את הרעש, והשאיר רק את מה שמצדיק תשומת לב. בחר ספורט, קרא את הניתוח, שאל את ה-AI.
           </p>
           <div class="stats"></div>
         </div>
@@ -4389,8 +4391,8 @@
         <div class="wc-banner-copy">
           <span class="wc-kicker"><span class="wc-kicker-dot"></span>FIFA World Cup 2026 · אזור פרימיום</span>
           <h3>מונדיאל 2026</h3>
-          <p class="wc-tagline">לוח טורניר ברור, נקי ומאומת</p>
-          <p>דגלי נבחרות, שלבי בתים, תאריך, שעה וסטטוס — עם יחסי שוק אמיתיים כשהם זמינים.</p>
+          <p class="wc-tagline">לוח טורניר מלא · דגלים · שלבים · יחסים</p>
+          <p>48 נבחרות, 3 מדינות מארחות, 104 משחקים. כל המידע ברור וסדור — עם יחסי שוק אמיתיים ברגע שנפתחים.</p>
           <div class="wc-banner-hosts">
             <span class="wc-host-flags">
               <img src="https://flagcdn.com/w40/mx.png" alt="מקסיקו" loading="lazy">
@@ -4400,8 +4402,8 @@
             <span class="wc-host-label">מקסיקו · קנדה · ארה"ב · 48 נבחרות</span>
           </div>
           <div class="wc-premium-row">
-            <button class="wc-enter" type="button">כניסה למשחקים <span class="wc-enter-arrow" aria-hidden="true">←</span></button>
-            <span class="pill">דגלים · שלבים · שוק</span>
+            <button class="wc-enter" type="button">לוח המונדיאל <span class="wc-enter-arrow" aria-hidden="true">←</span></button>
+            <span class="pill">104 משחקים · 48 נבחרות</span>
           </div>
         </div>
         <div class="wc-mark" id="wcBannerMark">
@@ -4430,12 +4432,12 @@
         <div class="stats" id="stats" style="margin-bottom:12px"></div>
         <div class="section-title" id="sectionTitleBox" style="display:none">
           <div>
-            <h3 id="listTitle">ניתוחים מחושבים</h3>
-            <p id="resultMeta">טוען נתונים מווינר</p>
+            <h3 id="listTitle">ניתוחי היום</h3>
+            <p id="resultMeta">טוען נתוני שוק...</p>
           </div>
-          <span class="pill">מקור: שוק</span>
+          <span class="pill">יחסי שוק חיים</span>
         </div>
-        <div id="stats-header" class="stats-header" style="display:none">ביצועי היום</div>
+        <div id="stats-header" class="stats-header" style="display:none">מעקב תוצאות</div>
         <div id="pick-stats" class="pick-stats-bar" aria-live="polite"></div>
         <div class="cards" id="cards">
           <div class="empty" style="visibility:hidden">טוען...</div>
@@ -4456,8 +4458,9 @@
   </main>
 
   <footer class="footer">
-    הדמו מיועד להצגת מוצר ושיטת דירוג ספורטיבי. הוא אינו ייעוץ הימורים, אינו המלצה לשים כסף ואינו מבטיח תוצאה או רווח. כאשר ממשק ציבורי אינו מחזיר נתון, הדמו מציין זאת ואינו משלים נתונים באופן מלאכותי.
+    © 2026 הפוגע AI · פלטפורמת ניתוח ספורט לצרכי מידע ולימוד בלבד · אינה ייעוץ הימורים ואינה מבטיחה תוצאה · גיל 18+ · הנתונים מגיעים מהשוק — שום נתון לא מומצא.
     &nbsp;·&nbsp;<button class="footer-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button>
+    &nbsp;·&nbsp;<button class="footer-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי שימוש</button>
   </footer>
 
   <!-- Privacy Policy Modal -->
@@ -6645,19 +6648,19 @@
     function renderAiThinking() {
       const currentStep = state.reubenThinkingStep || 0;
       const steps = [
-        "מזהה קבוצות, ענף ורמת משחק",
-        "מחשב פער רמה ויתרון ביתי",
-        "בודק שווקי שוק ויחסים בזמן אמת",
-        "מנתח מוטיבציה, H2H ומלכודות שוק",
-        "מחשב הסתברות, Value ורמת סיכון",
-        "בונה ניתוח מלא עם המלצה",
+        "מזהה קבוצות, ענף ורמת ליגה...",
+        "שואב יחסי שוק עדכניים...",
+        "מחשב הסתברות גלומה ו-Value...",
+        "בודק מלכודות שוק ופערי רמה...",
+        "מנתח יתרון/חיסרון ורמת סיכון...",
+        "מכין ניתוח מלא ומנומק...",
       ];
       return `
         <div class="chat-msg ai">
           <div class="ai-thinking" aria-live="polite" aria-label="הפוגע AI חושב">
             <div class="thinking-header">
               <div class="thinking-avatar">AI</div>
-              <span class="thinking-title-text">הפוגע AI מנתח</span>
+              <span class="thinking-title-text">מנתח לעומק...</span>
               <div class="thinking-dots">
                 <div class="thinking-dot"></div>
                 <div class="thinking-dot"></div>
@@ -6680,13 +6683,13 @@
       const messages = state.reubenMessages.length
         ? state.reubenMessages
         : [{ role: "ai", sections: [
-          { type: "verdict", title: "שלום, אני הפוגע AI",
-            content: "מנתח משחקים מקצועי — חושב כמו אנליסט ספורט, מדבר כמו בן אדם.\n\nאני מנתח כל משחק בעולם: כדורגל, כדורסל, כל ליגה.\nעובד עם יחסי שוק בזמן אמת + סטטיסטיקות היסטוריות." },
-          { type: "analysis", title: "מה אני יכול לנתח",
-            content: "כל משחק — גם בלי יחסי שוק (נתח לפי דירוגים + היסטוריה)\nיחסים ו-Value — האם המחיר שווה?\nמלכודות שוק — מתי פייבוריט מסוכן?\nאנדרדוג — מתי הקטן יכול להפתיע?\nתיקו — מתי זה Value אמיתי?" },
-          { type: "disclaimer", title: "תשאל אותי",
-            content: "\"ארסנל נגד פריז\" · \"ברצלונה נגד ריאל מדריד\" · \"יש פה Value?\" · \"זה מלכודת?\" · \"היית נכנס?\"" }
-        ], suggestions: ["ארסנל נגד פריז", "ברצלונה נגד ריאל מדריד", "לייקרס נגד סלטיקס", "מנצ׳סטר סיטי היום"], text: "שלום! אני הפוגע AI." }];
+          { type: "verdict", title: "הפוגע AI — ניתוח ספורט חכם",
+            content: "שולט בנתוני שוק, חושב כאנליסט, מדבר כבן אדם.\n\nשאל על כל משחק בעולם — כדורגל, כדורסל, כל ליגה, כל שלב.\nאני עובד עם יחסים חיים מהשוק ואסביר לך בדיוק מה הם אומרים." },
+          { type: "analysis", title: "מה אפשר לשאול",
+            content: "📌 ניתוח ספציפי — \"ארסנל נגד פריז, מה אתה רואה?\"\n💰 Value — \"האם 1.85 על ברצלונה שווה?\"\n⚠️ מלכודת שוק — \"מתי פייבוריט מסוכן?\"\n🎯 אנדרדוג — \"מתי הקטן יכול להפתיע?\"\n🤝 תיקו — \"מתי זה Value אמיתי?\"" },
+          { type: "disclaimer", title: "דוגמאות לשאלות",
+            content: "\"ברצלונה נגד ריאל מדריד\" · \"לייקרס נגד סלטיקס\" · \"יש Value בתיקו?\" · \"זה מלכודת?\" · \"היית נכנס ב-1.70?\"" }
+        ], suggestions: ["ארסנל נגד פריז", "ברצלונה נגד ריאל מדריד", "לייקרס נגד סלטיקס", "יש Value כאן?"], text: "שלום! אני הפוגע AI." }];
       const loading = state.reubenLoading;
       const isLocked = !state.isPremium && (state.reubenFreeUsed || 0) >= 1;
       const sidebarOpen = state.reubenSidebarOpen ? " open" : "";
@@ -6716,7 +6719,7 @@
               ${sidebarBodyHtml}
             </div>
             <div class="reuben-sidebar-footer">
-              <div class="reuben-sidebar-tip">ניתוח ספורטיבי בלבד · אין ייעוץ הימורים</div>
+              <div class="reuben-sidebar-tip">ניתוח סטטיסטי בלבד · לא ייעוץ הימורים · גיל 18+</div>
             </div>
           </div>
 
@@ -6730,7 +6733,7 @@
                 <div class="reuben-header-name">הפוגע AI</div>
                 <div class="reuben-header-status">
                   <span class="reuben-online-dot"></span>
-                  מנתח משחקים · Winner בזמן אמת
+                  ניתוח ספורט · יחסי שוק חיים
                   <span class="reuben-live-badge">LIVE</span>
                 </div>
               </div>
@@ -6747,14 +6750,14 @@
             ${isLocked ? `
             <div style="text-align:center;padding:28px 20px;border-top:1px solid rgba(255,255,255,.06)">
               <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:rgba(255,255,255,.8)">השתמשת בניתוח החינמי שלך</p>
-              <p style="margin:0 0 18px;font-size:12px;color:rgba(255,255,255,.32)">פרימיום נותן גישה בלתי מוגבלת להפוגע AI</p>
-              <button onclick="openPremiumModal()" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">פתח פרימיום</button>
+              <p style="margin:0 0 18px;font-size:12px;color:rgba(255,255,255,.32)">פרימיום = AI ללא הגבלה + כל הניתוחים</p>
+              <button onclick="openPremiumModal()" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font:700 13px Heebo,sans-serif;cursor:pointer">גש לפרימיום ←</button>
             </div>
             ` : `
             <div class="reuben-input-area">
               <div class="reuben-input-frame">
                 <div class="reuben-input-row">
-                  <textarea id="reubenInput" placeholder="כתוב משחק: ארסנל נגד פריז, לייקרס נגד סלטיקס..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
+                  <textarea id="reubenInput" placeholder="שאל: ארסנל נגד פריז, יש Value? · לייקרס נגד סלטיקס..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
                   <button class="reuben-send-btn" type="button" id="reubenAnalyze" ${loading ? "disabled" : ""}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8.5 2.5L14 8l-5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
@@ -6884,7 +6887,7 @@
             const outcomeLabel = card.dataset.outcomeLabel || 'ממתין לתוצאה';
             const clsMap = { hit: 'hit', miss: 'miss', pending: 'wait', closed: 'closed' };
             const outcomeCls = clsMap[outcome] || 'wait';
-            overlay.innerHTML = `<span class="verdict ${outcomeCls}" style="margin-bottom:10px;font-size:13px;padding:5px 14px">${outcomeLabel}</span><span class="lock-icon">🔒</span><span class="lock-label">זמין למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">קנה פרימיום</button>`;
+            overlay.innerHTML = `<span class="verdict ${outcomeCls}" style="margin-bottom:10px;font-size:13px;padding:5px 14px">${outcomeLabel}</span><span class="lock-icon">🔒</span><span class="lock-label">גישה מלאה עם פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">גש לפרימיום ←</button>`;
             card.appendChild(overlay);
           }
         });
@@ -8244,12 +8247,12 @@
     function startFakeProgress() {
       // Animate from 0 → 85% over ~8s to give the illusion of work
       const steps = [
-        [8,   "טוען נתונים"],
-        [22,  "מושך שווקים ויחסים"],
-        [40,  "מנתח הסתברויות"],
-        [60,  "בונה קלפים"],
-        [75,  "מעשיר לוגואים"],
-        [85,  "כמעט סיים..."],
+        [8,   "מתחבר לנתוני שוק חיים..."],
+        [22,  "שואב יחסים ומשחקים..."],
+        [40,  "מחשב יתרון סטטיסטי..."],
+        [60,  "בונה ניתוחים ומסנן..."],
+        [75,  "טוען לוגואים ונתוני ליגה..."],
+        [85,  "מכין את הניתוחים שלך..."],
       ];
       let i = 0;
       setProgress(0, steps[0][1]);
@@ -8264,7 +8267,7 @@
     }
     function finishProgress() {
       clearInterval(_progressTimer);
-      setProgress(100, "טוען...");
+      setProgress(100, "כמעט מוכן...");
       setTimeout(() => {
         overlay.classList.add("hidden");
       }, 350);
@@ -8999,18 +9002,18 @@
     <div style="background:linear-gradient(145deg,#0d1820,#1a2a3a);border:1px solid rgba(85,214,255,.25);border-radius:20px;padding:36px 32px;max-width:380px;width:90%;position:relative;box-shadow:0 0 60px rgba(85,214,255,.15),0 0 30px rgba(230,57,70,.1)">
       <button onclick="closePremiumModal()" style="position:absolute;top:14px;left:14px;background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;line-height:1">×</button>
       <div style="text-align:center;margin-bottom:20px">
-        <div style="font-size:40px;margin-bottom:8px">🎯</div>
-        <h2 style="margin:0;font:900 26px/1 Heebo,sans-serif;color:#fff">הפוגע</h2>
-        <p style="margin:4px 0 0;font-size:13px;background:linear-gradient(90deg,#55d6ff,#e63946);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">מהדורת פרימיום</p>
+        <div style="font-size:40px;margin-bottom:8px">✦</div>
+        <h2 style="margin:0;font:900 26px/1 Heebo,sans-serif;color:#fff">פרימיום</h2>
+        <p style="margin:4px 0 0;font-size:13px;background:linear-gradient(90deg,#55d6ff,#e63946);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">גישה מלאה לכל הנתונים</p>
       </div>
       <ul style="list-style:none;padding:0;margin:0 0 20px;display:grid;gap:10px">
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> כל ניתוחי היום — ללא הגבלה</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> הפוגע AI ללא הגבלה — שאל כל שאלה</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> יחסי שוק בזמן אמת לכל הליגות</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> פילטר מוטיבציה — מנועל לחברים בלבד</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> כל ניתוחי היום — ללא חיתוך</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> הפוגע AI — שיחות ללא הגבלה</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> יחסי שוק חיים לכל הליגות</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> לוח מונדיאל 2026 + ניתוחים מלאים</li>
       </ul>
       <div style="margin-bottom:12px">
-        <input id="premiumCodeInput" type="text" placeholder="הכנס קוד פרימיום" autocomplete="off"
+        <input id="premiumCodeInput" type="text" placeholder="קוד פרימיום" autocomplete="off"
           style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:10px;border:1px solid rgba(85,214,255,.3);background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-family:Heebo,sans-serif;text-align:center;letter-spacing:2px">
       </div>
       <p id="premiumCodeError" style="color:#e63946;font-size:12px;text-align:center;margin:0 0 12px;min-height:16px"></p>
@@ -9019,14 +9022,14 @@
         errEl.textContent = '';
         const code = document.getElementById('premiumCodeInput').value;
         activatePremium(code).then(ok => {
-          if (!ok) errEl.textContent = 'קוד שגוי או נוצל כבר — בדוק ונסה שוב';
+          if (!ok) errEl.textContent = 'קוד שגוי או נוצל כבר — בדוק שוב';
         });
       " style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#55d6ff,#2196f3);color:#06131a;font-weight:900;font-size:16px;font-family:Heebo,sans-serif;cursor:pointer;letter-spacing:.5px">
-        פתח פרימיום 🔓
+        פתח גישה מלאה 🔓
       </button>
       <div style="margin-top:16px;padding:12px 16px;background:rgba(85,214,255,.06);border:1px solid rgba(85,214,255,.15);border-radius:10px;text-align:center">
         <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,.5)">אין לך קוד עדיין?</p>
-        <a href="mailto:kubovskys@gmail.com" style="color:#55d6ff;font:800 13px Heebo,sans-serif;text-decoration:none">✉ שלח אימייל לקבלת קוד</a>
+        <a href="mailto:kubovskys@gmail.com" style="color:#55d6ff;font:800 13px Heebo,sans-serif;text-decoration:none">✉ קבל קוד גישה</a>
       </div>
     </div>
   </div>
@@ -9041,7 +9044,7 @@
         <div class="auth-header">
           <img src="/logo.svg" alt="הפוגע" class="auth-header-logo"/>
           <h2 class="auth-header-title">הפוגע <span class="auth-ai-badge">AI</span></h2>
-          <p class="auth-header-sub">כניסה לחשבון</p>
+          <p class="auth-header-sub">כניסה · ניתוח ספורט חכם בעברית</p>
         </div>
         <div class="auth-privacy-wrap">
           <input type="checkbox" id="authPrivacyCheck" onchange="updateAuthButtons()">
@@ -9089,18 +9092,18 @@ function saveAiSession(user, messages) {
   try { localStorage.setItem(aiSessionsKey(user), JSON.stringify(sessions.slice(0, 40))); } catch {}
 }
 const AI_CHIPS = [
-  { id:"analyze", label:"נתח את המשחק", icon:"target" },
-  { id:"compare", label:"השווה משחקים", icon:"compare" },
-  { id:"odds",    label:"הסבר את היחסים", icon:"percent" },
-  { id:"value",   label:"אתר הימורי ערך", icon:"spark" },
-  { id:"deep",    label:"ניתוח סטטיסטי מעמיק", icon:"chart" },
+  { id:"arsenal",  label:"ארסנל נגד פריז", icon:"target" },
+  { id:"barca",    label:"ברצלונה נגד ריאל מדריד", icon:"pitch" },
+  { id:"lakers",   label:"לייקרס נגד סלטיקס", icon:"chart" },
+  { id:"value",    label:"יש Value כאן?", icon:"spark" },
+  { id:"trap",     label:"זה מלכודת שוק?", icon:"percent" },
 ];
 const AI_THINKING_STEPS = [
-  "אוסף נתוני עומק על שתי הקבוצות…",
-  "בוחן צורה עכשווית, פציעות והרכבים צפויים…",
-  "מצליב מודל xG מול קו ההימור הנוכחי…",
-  "מעריך מומנטום והקשר טקטי…",
-  "מנסח מסקנה מאוזנת עם רמת ודאות…",
+  "מזהה קבוצות ורמת ליגה...",
+  "שואב יחסי שוק עדכניים...",
+  "מחשב הסתברות ו-Value...",
+  "בודק מלכודות ופערי רמה...",
+  "מכין ניתוח מנומק...",
 ];
 const AI_INTRO_TEXT = "ארסנל מארחת את מנצ'סטר סיטי באצטדיון האמירויות — אחד המשחקים השקולים של המחזור. שתי הקבוצות בכושר טוב, אבל הנתונים מספרים סיפור מעניין מתחת לפני השטח. ריכזתי עבורך ניתוח שכבתי: מהתמונה הטקטית, דרך המספרים, ועד היכן (אם בכלל) מסתתר ערך בקו ההימור.";
 const AI_ANALYSIS = [
@@ -9328,7 +9331,7 @@ function AiComposer({onSend,onImage,busy,showChips}) {
         </button>
       ))}</div>}
       <div className={"ai-composer"+(focus?" focus":"")}>
-        <textarea ref={ref} rows={1} value={val} placeholder="שאל את הפוגע על משחק, יחסים או סטטיסטיקה…"
+        <textarea ref={ref} rows={1} value={val} placeholder="שאל: ארסנל נגד פריז, יש Value? | לייקרס נגד סלטיקס..."
           onChange={e=>setVal(e.target.value)} onKeyDown={onKey}
           onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}/>
         <button className="ai-send" disabled={!val.trim()||busy} onClick={submit} aria-label="שלח">
@@ -9585,9 +9588,9 @@ function AiApp() {
           {empty?(
             <div className="ai-welcome">
               <div className="ai-wmark"><AiIcon name="bolt" size={28}/></div>
-              <h1>שלום, אני הפוגע</h1>
-              <p>בינת ספורט שמנתחת משחקים, סטטיסטיקות ויחסי הימור — ומסבירה את ההיגיון מאחורי כל הערכה.</p>
-              <div className="ai-disclaim">הערכות הסתברותיות בלבד · ללא הבטחת רווח · הימור באחריות</div>
+              <h1>הפוגע AI</h1>
+              <p>שאל על כל משחק — כדורגל, כדורסל, כל ליגה. מסביר יחסים, מזהה ערך, ומדבר עברית ישירה.</p>
+              <div className="ai-disclaim">ניתוח סטטיסטי בלבד · לא ייעוץ הימורים · גיל 18+</div>
             </div>
           ):(
             <div className="ai-thread">
