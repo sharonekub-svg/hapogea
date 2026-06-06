@@ -2551,25 +2551,18 @@ function oddsApiEventToRow(event, sportMeta) {
 
   if (!allCandidates.length) return null;
 
-  // Pick clear favourites: odds 1.35–1.85, target ~1.55.
-  // All other outcomes must be 2.20+ to ensure a genuine favourite.
-  const TARGET_MIN = 1.35, TARGET_MAX = 1.85;
-  const TARGET_ODDS = 1.55;
-  const OPPONENT_MIN_ODDS = 2.20;
+  const TARGET_MIN = 1.20, TARGET_MAX = 2.80;
+  const TARGET_ODDS = 1.65;
 
   const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
-  if (!inRange.length) return null;
-
-  const pick = inRange.sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
+  const hasInRange = inRange.length > 0;
+  const pool = hasInRange ? inRange : allCandidates;
+  const pick = pool.sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
   const opponents = allCandidates.filter((c) => c.name !== pick.name);
-
-  // Require all other outcomes to be 3.0+ — ensures a clear single favourite
-  if (!opponents.every((c) => c.odds >= OPPONENT_MIN_ODDS)) return null;
 
   const prob  = 1 / pick.odds;
   const impliedPct = Math.round(prob * 100);
   const score = Math.round(prob * 100);
-  const hasInRange = true;
   const oppSummary = opponents
     .map((c) => `${c.name === "תיקו" ? "תיקו" : c.name} ${c.odds.toFixed(2)}`)
     .join(", ");
