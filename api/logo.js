@@ -146,40 +146,6 @@ async function getJson(url, extraHeaders = {}, timeoutMs = 4500) {
   }
 }
 
-async function try365Scores(name, type) {
-  const data = await getJson(
-    `https://webws.365scores.com/web/search/?query=${encodeURIComponent(name)}&langId=2`,
-    { Origin: "https://www.365scores.com", Referer: "https://www.365scores.com/he/" }
-  );
-  if (!data) return null;
-  const rows = type === "league" ? (data.competitions || []) : (data.competitors || []);
-  const row = bestNamedCandidate(name, rows, (item) => item.name || item.nameForURL || "", 0.72);
-  if (!row?.id) return null;
-  const folder = type === "league" ? "Competitions" : "Competitors";
-  return {
-    url: `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/${folder}/${row.id}`,
-    source: "365Scores",
-  };
-}
-
-async function trySofaScore(name, type) {
-  const data = await getJson(
-    `https://api.sofascore.com/api/v1/search/all?q=${encodeURIComponent(name)}&page=0`,
-    { Referer: "https://www.sofascore.com/" }
-  );
-  const target = type === "league" ? "uniqueTournament" : "team";
-  const rows = (data?.results || []).filter((item) => item.type === target);
-  const row = bestNamedCandidate(name, rows, (item) => item.entity?.name || "", 0.72);
-  const id = row?.entity?.id;
-  if (!id) return null;
-  return {
-    url: type === "league"
-      ? `https://api.sofascore.com/api/v1/unique-tournament/${id}/image`
-      : `https://api.sofascore.com/api/v1/team/${id}/image`,
-    source: "SofaScore",
-  };
-}
-
 async function wikidataEntity(name, lang = "he") {
   const search = await getJson(
     `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=${lang}&format=json&limit=5&search=${encodeURIComponent(name)}&origin=*`
@@ -214,7 +180,8 @@ async function tryWikidata(name, type) {
 async function trySportsDb(name, type, originalName = name) {
   const endpoint = type === "league" ? "search_all_leagues.php" : "searchteams.php";
   const param = type === "league" ? "l" : "t";
-  const data = await getJson(`https://www.thesportsdb.com/api/v1/json/3/${endpoint}?${param}=${encodeURIComponent(name)}`);
+  // key=123 is the public free tier (no account needed); key=3 is paid
+  const data = await getJson(`https://www.thesportsdb.com/api/v1/json/123/${endpoint}?${param}=${encodeURIComponent(name)}`);
   const rows = data?.teams || data?.leagues || [];
   const row = bestNamedCandidate(originalName, rows, (item) => item.strTeam || item.strLeague || "", 0.78) ||
     bestNamedCandidate(name, rows, (item) => item.strTeam || item.strLeague || "", 0.82);
@@ -228,8 +195,6 @@ async function resolveLogo(name, type) {
   const pending = (async () => {
     const resolvers = [
       () => tryFootballLogos(name, type),
-      () => try365Scores(name, type),
-      () => trySofaScore(name, type),
       () => tryWikidata(name, type),
       () => trySportsDb(name, type),
     ];
