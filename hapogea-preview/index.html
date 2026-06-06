@@ -9201,13 +9201,7 @@ function saveAiSession(user, messages) {
   sessions.unshift({ id, title, date: new Date().toISOString() });
   try { localStorage.setItem(aiSessionsKey(user), JSON.stringify(sessions.slice(0, 40))); } catch {}
 }
-const AI_CHIPS = [
-  { id:"analyze", label:"נתח את המשחק", icon:"target" },
-  { id:"compare", label:"השווה משחקים", icon:"compare" },
-  { id:"odds",    label:"הסבר את היחסים", icon:"percent" },
-  { id:"value",   label:"אתר הימורי ערך", icon:"spark" },
-  { id:"deep",    label:"ניתוח סטטיסטי מעמיק", icon:"chart" },
-];
+const AI_CHIPS = [];
 const AI_THINKING_STEPS = [
   "אוסף נתוני עומק על שתי הקבוצות…",
   "בוחן צורה עכשווית, פציעות והרכבים צפויים…",
