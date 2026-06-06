@@ -1226,7 +1226,7 @@ function scoreOutcome(market, outcome) {
   if (!odds || odds <= oddsMin || odds >= oddsMax) return null;
   const oddsBook = marketOddsBook(market);
 
-  // Football (3-way) + basketball moneyline: all opponents must be >= 3.0
+  // Football 3-way + basketball moneyline: all opponents must be >= 3.0
   if (!isSpread) {
     const pickedDesc = cleanText(outcome.desc);
     const otherOdds = oddsBook.outcomes
@@ -2688,8 +2688,6 @@ function passesOpponentGate(r) {
   if (!r.recommended || !r.oddsBook?.outcomes) return true;
   const pickClean = cleanText(r.pick || r.winnerPick || "");
   if (!pickClean) return true;
-  // Spread/handicap markets have both sides at ~50/50 by design — skip gate
-  if (cleanText(r.market || "").includes("הימור יתרון")) return true;
   const otherOdds = (r.oddsBook.outcomes || [])
     .filter((o) => cleanText(o.desc) !== pickClean)
     .map((o) => o.odds)
@@ -2701,6 +2699,7 @@ function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
+    .filter((r) => !/NBA|WNBA/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
   const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
