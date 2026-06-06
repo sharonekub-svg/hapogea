@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>הפוגע | Winner Odds Engine</title>
+  <title>הפוגע | ניתוח ספורט חכם</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -4144,12 +4144,12 @@
     <section class="lp-hero" id="lp-hero">
       <div class="lp-eyebrow">
         <span class="lp-eyebrow-dot"></span>
-        נתוני Winner בזמן אמת · כדורגל · כדורסל · מונדיאל 2026
+        ניתוחי ספורט חיים · כדורגל · כדורסל · מונדיאל 2026
       </div>
       <div class="lp-brand-display">הפוגע <span>AI</span></div>
       <h1>ניתוחי ספורט <span>חכמים</span><br>בזמן אמת</h1>
       <p class="lp-hero-sub">
-        מנוע Winner שמדרג כדורגל וכדורסל לפי יתרון סטטיסטי אמיתי.
+        ניתוח ספורט חכם שמדרג משחקים לפי יתרון סטטיסטי אמיתי.
         רק יחסים שבהם לנתונים יש דבר לומר — ללא המצאות.
       </p>
       <div class="lp-hero-actions">
@@ -4273,7 +4273,7 @@
     </section>
 
     <footer class="lp-footer">
-      <p>© 2026 הפוגע · מנוע ניתוח ספורט מבוסס Winner<br>
+      <p>© 2026 הפוגע · ניתוח ספורט חכם<br>
       הדמו מיועד להצגת מוצר בלבד. אינו ייעוץ הימורים ואינו מבטיח תוצאה.<br>
       <button class="footer-privacy-link" style="font-size:11px;color:#A39B8C" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button></p>
     </footer>
@@ -4304,7 +4304,7 @@
         </div>
       </div>
       <h1 class="gate-title">הפוגע <span class="gate-ai-text">AI</span></h1>
-      <p class="gate-subtitle">פלטפורמת ניתוח Winner המתקדמת<br>כדורגל · כדורסל · מונדיאל 2026</p>
+      <p class="gate-subtitle">פלטפורמת ניתוח ספורט מתקדמת<br>כדורגל · כדורסל · מונדיאל 2026</p>
       <div class="gate-stats">
         <div class="gate-stat"><span class="gate-stat-icon">⚽</span><span class="gate-stat-label">כדורגל</span></div>
         <div class="gate-stat-div"></div>
@@ -4313,13 +4313,25 @@
         <div class="gate-stat"><span class="gate-stat-icon">🌍</span><span class="gate-stat-label">מונדיאל</span></div>
       </div>
       <p class="gate-cta-label">כניסה לפלטפורמה</p>
-      <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="gate-google-btn">
+      <div class="gate-privacy-wrap">
+        <input type="checkbox" id="gatePrivacyCheck" onchange="updateGateConsent()">
+        <label class="gate-privacy-label" for="gatePrivacyCheck">
+          קראתי ואני מסכים/ה ל<button type="button" class="gate-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button>
+        </label>
+      </div>
+      <div class="gate-privacy-wrap" style="margin-top:2px">
+        <input type="checkbox" id="gateTermsCheck" onchange="updateGateConsent()">
+        <label class="gate-privacy-label" for="gateTermsCheck">
+          קראתי ואני מסכים/ה ל<button type="button" class="gate-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button>, כולל הגבלת גיל 18+
+        </label>
+      </div>
+      <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="gate-google-btn" disabled>
         <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         המשך עם Google
       </button>
       <p id="gateError" class="gate-error"></p>
-      <button onclick="HapAuth.skipGate()" class="gate-skip">כניסה ללא התחברות</button>
-      <p class="gate-security">🔒 ההתחברות מאובטחת דרך Supabase · Winner odds</p>
+      <button id="gateSkipBtn" onclick="HapAuth.skipGate()" class="gate-skip" disabled>כניסה ללא התחברות</button>
+      <p class="gate-security">🔒 ההתחברות מאובטחת דרך Google · גיל 18+ בלבד</p>
     </div>
   </div>
 
@@ -4370,7 +4382,7 @@
         </div>
         <div>
           <h1>הפוגע</h1>
-          <p>מנוע יחסים מבוסס Winner</p>
+          <p>ניתוח ספורט מתקדם</p>
         </div>
       </div>
       <button class="lp-home-btn" onclick="goToLanding()" title="חזור לדף הבית" aria-label="דף הבית">⌂ בית</button>
@@ -4402,10 +4414,10 @@
     <section class="hero">
       <div class="hero-main">
         <div class="hero-content">
-          <span class="eyebrow">מקור Winner בלבד · יחסים אמיתיים בלבד · בלי המצאת נתונים</span>
-          <h2>ניתוחי Winner בזמן אמת — כדורגל, כדורסל ומונדיאל 2026</h2>
+          <span class="eyebrow">יחסים אמיתיים בלבד · ניתוח סטטיסטי · בלי המצאת נתונים</span>
+          <h2>ניתוחי ספורט בזמן אמת — כדורגל, כדורסל ומונדיאל 2026</h2>
           <p class="hero-copy">
-            הפוגע מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים. כל נתון מבוסס על Winner בלבד.
+            הפוגע מציג משחקים עם יתרון סטטיסטי מוכח. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים.
           </p>
           <div class="stats" id="heroStats">
             <div class="stat skeleton-card" style="height:78px"></div>
@@ -4435,7 +4447,7 @@
           <span class="wc-kicker"><span class="wc-kicker-dot"></span>FIFA World Cup 2026 · אזור פרימיום</span>
           <h3>מונדיאל 2026</h3>
           <p class="wc-tagline">לוח טורניר ברור, נקי ומאומת</p>
-          <p>דגלי נבחרות, שלבי בתים, תאריך, שעה וסטטוס — עם יחסי Winner אמיתיים כשהם זמינים.</p>
+          <p>דגלי נבחרות, שלבי בתים, תאריך, שעה וסטטוס — עם יחסים אמיתיים כשהם זמינים.</p>
           <div class="wc-banner-hosts">
             <span class="wc-host-flags">
               <img src="https://flagcdn.com/w40/mx.png" alt="מקסיקו" loading="lazy">
@@ -4496,6 +4508,7 @@
   <footer class="footer">
     הדמו מיועד להצגת מוצר ושיטת דירוג ספורטיבי. הוא אינו ייעוץ הימורים, אינו המלצה לשים כסף ואינו מבטיח תוצאה או רווח. כאשר ממשק ציבורי אינו מחזיר נתון, הדמו מציין זאת ואינו משלים נתונים באופן מלאכותי.
     &nbsp;·&nbsp;<button class="footer-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות פרטיות</button>
+    &nbsp;·&nbsp;<button class="footer-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי שימוש</button>
   </footer>
 
   <!-- Privacy Policy Modal -->
@@ -4525,6 +4538,49 @@
         <p>תוכל למחוק את כל הנתונים השמורים על ידי ניקוי אחסון הדפדפן, או על ידי פנייה אלינו.</p>
         <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">יצירת קשר</h3>
         <p>שאלות לגבי פרטיות? פנה אלינו דרך טופס יצירת קשר באתר.</p>
+        <p style="margin-top:16px;color:var(--soft);font-size:12px">עדכון אחרון: יוני 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Use Modal -->
+  <div class="modal" id="termsModal" aria-hidden="true" style="display:none" onclick="if(event.target===this){this.style.display='none';this.setAttribute('aria-hidden','true')}">
+    <div class="modal-card" style="max-width:560px;max-height:80vh;overflow-y:auto">
+      <div class="modal-head">
+        <button class="modal-close" onclick="document.getElementById('termsModal').style.display='none';document.getElementById('termsModal').setAttribute('aria-hidden','true')">סגירה</button>
+        <div style="font-weight:700;font-size:16px">תנאי שימוש</div>
+      </div>
+      <div style="padding:20px 24px;line-height:1.8;font-size:14px;color:var(--text)">
+        <p><strong>הפוגע</strong> הוא כלי ניתוח ספורטיבי בלבד. השימוש בו כפוף לתנאים הבאים.</p>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">⚠️ הגבלת גיל — 18+</h3>
+        <p>השירות מיועד לבני 18 ומעלה בלבד. אם אינך בן 18, עליך לצאת מהאתר מיידית. על ידי שימוש בשירות, אתה מאשר כי גילך 18 ומעלה.</p>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">אין ייעוץ הימורים</h3>
+        <ul style="padding-right:18px;margin:0">
+          <li>כל הניתוחים, הנתונים וההמלצות באתר הם <strong>לצורכי מידע בלבד</strong> ואינם מהווים ייעוץ הימורים.</li>
+          <li>הפוגע אינו מבטיח תוצאות, רווחים, או הצלחה בהימורים.</li>
+          <li>אחריותך הבלעדית להחלטות שתקבל על בסיס המידע המוצג.</li>
+        </ul>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">שימוש מותר</h3>
+        <ul style="padding-right:18px;margin:0">
+          <li>השירות מיועד לשימוש אישי, לא מסחרי.</li>
+          <li>אסור לשכפל, להפיץ, או להשתמש בתוכן לצרכים מסחריים ללא אישור בכתב.</li>
+          <li>אסור לנסות לעקוף מנגנוני אבטחה, לפצח את המערכת, או להשתמש בה בדרך שתגרום נזק.</li>
+        </ul>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">בעלות על תוכן</h3>
+        <p>כל התוכן, העיצוב, והקוד של הפוגע הם קניין רוחני של מפעיל השירות. שימוש בהם ללא רשות מהווה הפרה.</p>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">הגבלת אחריות</h3>
+        <p>הפוגע מספק את השירות "כפי שהוא" (AS IS). אין אחריות לנזקים ישירים, עקיפים, או תוצאתיים שייגרמו משימוש בשירות.</p>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">שינויים בתנאים</h3>
+        <p>אנו שומרים לעצמנו את הזכות לשנות תנאים אלו בכל עת. המשך השימוש לאחר שינוי מהווה הסכמה לתנאים החדשים.</p>
+
+        <h3 style="font-size:14px;margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">יצירת קשר</h3>
+        <p>שאלות? פנה אלינו בדוא"ל: <a href="mailto:kubovskys@gmail.com" style="color:#55d6ff">kubovskys@gmail.com</a></p>
         <p style="margin-top:16px;color:var(--soft);font-size:12px">עדכון אחרון: יוני 2026</p>
       </div>
     </div>
@@ -8482,6 +8538,16 @@
         }
       } catch (e) { sb = null; }
 
+      function updateGateConsent() {
+        const p = document.getElementById("gatePrivacyCheck");
+        const t = document.getElementById("gateTermsCheck");
+        const ok = !!(p?.checked && t?.checked);
+        const g = document.getElementById("gateGoogleBtn");
+        const s = document.getElementById("gateSkipBtn");
+        if (g) g.disabled = !ok;
+        if (s) s.disabled = !ok;
+      }
+
       const gateEl = () => document.getElementById("loginGate");
       function showGate(show) {
         // Don't show login gate while user is on landing page
@@ -8560,6 +8626,14 @@
           label.textContent = "התחבר";
           av.style.display = "none";
         }
+      }
+
+      function updateAuthConsent() {
+        const p = document.getElementById("authPrivacyCheck");
+        const t = document.getElementById("authTermsCheck");
+        const ok = !!(p?.checked && t?.checked);
+        const btn = document.getElementById("authGoogleBtn");
+        if (btn) btn.disabled = !ok;
       }
 
       // ── Modal control ──
@@ -9078,11 +9152,23 @@
           <h2 class="auth-header-title">הפוגע <span class="auth-ai-badge">AI</span></h2>
           <p class="auth-header-sub">כניסה לחשבון</p>
         </div>
-        <button onclick="HapAuth.signInWithGoogle()" class="auth-google-btn">
+        <div class="auth-privacy-wrap">
+          <input type="checkbox" id="authPrivacyCheck" onchange="updateAuthConsent()">
+          <label class="auth-privacy-label" for="authPrivacyCheck">
+            קראתי ואני מסכים/ה ל<button type="button" class="auth-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button>
+          </label>
+        </div>
+        <div class="auth-privacy-wrap" style="margin-top:2px">
+          <input type="checkbox" id="authTermsCheck" onchange="updateAuthConsent()">
+          <label class="auth-privacy-label" for="authTermsCheck">
+            קראתי ואני מסכים/ה ל<button type="button" class="auth-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button> (גיל 18+)
+          </label>
+        </div>
+        <button id="authGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="auth-google-btn" disabled>
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
           המשך עם Google
         </button>
-        <p class="auth-footnote">כניסה מאובטחת דרך Google</p>
+        <p class="auth-footnote">כניסה מאובטחת דרך Google · גיל 18+ בלבד</p>
       </div>
 
       <!-- Account (signed-in) view -->
