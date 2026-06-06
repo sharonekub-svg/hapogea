@@ -1578,7 +1578,7 @@ function rejectionReasons(row) {
   return reasons;
 }
 
-function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, resultsByEvent = new Map(), sportIdFilter = null, standingsMap365 = new Map()) {
+function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, resultsByEvent = new Map(), sportIdFilter = null) {
   const events = new Map();
 
   // First pass: collect all events that have an allowed market on this date
@@ -1753,37 +1753,11 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
     const matchedResult = findResultEvent(resultsByEvent, row);
     const enrichedRow = applyResult(row, matchedResult);
 
-    // ── Motivation check via 365scores standings ──
-    // Only applies when the pick is a specific team win (not draw/X)
-    let motivationInfo = null;
-    const pickRaw = cleanText(scored.pick).toLowerCase();
-    const isDrawPick = pickRaw === "x" || pickRaw === "תיקו";
-    if (!isDrawPick && matchedResult?.competitionId365 && standingsMap365.size) {
-      const standings = standingsMap365.get(String(matchedResult.competitionId365));
-      if (standings?.length) {
-        // Determine which team is the favourite pick
-        const pickNorm = normalizeMatchName(scored.pickTeam || outcomeTeam(scored.pick));
-        const homeNorm = normalizeMatchName(teams.home);
-        const awayNorm = normalizeMatchName(teams.away);
-        const homeScore = teamNameScore(pickNorm, homeNorm);
-        const awayScore = teamNameScore(pickNorm, awayNorm);
-        const isPickHome = homeScore >= awayScore && homeScore >= 0.5;
-        const favoriteCompetitorId = isPickHome
-          ? matchedResult.homeCompetitorId
-          : matchedResult.awayCompetitorId;
-        if (favoriteCompetitorId) {
-          motivationInfo = getTeamStakeFromStandings(standings, favoriteCompetitorId);
-        }
-      }
-    }
-
     const current = events.get(market.eId);
     // Prefer: in-range pick > outside-range; within same category prefer higher score
     const currentOutside = current?.outsideRange ?? true;
     const newOutside = enrichedRow.outsideRange;
-    const enrichedWithMotivation = motivationInfo
-      ? { ...enrichedRow, motivationInfo, motivationRisk: !motivationInfo.hasStake }
-      : enrichedRow;
+    const enrichedWithMotivation = enrichedRow;
 
     // Basketball-specific replacement logic: moneyline > spread unless spread edge ≥ 15 conf pts
     const isBball = Number(market.sId) === WINNER_BASKETBALL_ID;
@@ -2478,247 +2452,6 @@ function auditOpenRows(rows, acceptedRows) {
     .slice(0, 120);
 }
 
-async function getWinnerLine() {
-  const hashMessage = JSON.stringify({ prevCurrentVersion: null, reason: "Initiated" });
-  const hashes = await fetchJson("https://api.winner.co.il/v2/publicapi/GetCMobileHashes", {
-    headers: winnerHeaders({ HashesMessage: hashMessage }),
-  });
-  const lineMessage = JSON.stringify({
-    prevCurrentVersion: null,
-    newCurrentVersion: hashes.currentVersion,
-    lineNewHash: hashes.lineChecksum,
-    reason: "Hashes not equal",
-  });
-  const line = await fetchJson(
-    `https://api.winner.co.il/v2/publicapi/GetCMobileLine?lineChecksum=${encodeURIComponent(hashes.lineChecksum)}`,
-    { headers: winnerHeaders({ HashesMessage: lineMessage }) }
-  );
-  return { hashes, markets: line.markets || [] };
-}
-
-async function getResults(startDate, endDate) {
-  const payload = {
-    startDate: `${startDate}T00:00:00+03:00`,
-    endDate: `${endDate}T23:59:59+03:00`,
-    sports: [],
-    leagues: [],
-  };
-  const data = await fetchJson("https://www.winner.co.il/api/v2/publicapi/GetResults", {
-    method: "POST",
-    headers: winnerHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return data?.results?.events || [];
-}
-
-async function buildWinnerFeedPayload({ withLogos = true } = {}) {
-  const yesterday = israelDate(-1);
-  const today = israelDate(0);
-  const tomorrow = israelDate(1);
-  let _winnerBlockedError = null;
-  const [{ hashes, markets }, winnerResultEvents, scores365Events, oddsApiScores, apiSportsScores] = await Promise.all([
-    getWinnerLine().catch((error) => {
-      console.warn("[winner-feed] Winner line unavailable, using snapshot picks only:", error.message);
-      _winnerBlockedError = error;
-      return { hashes: { currentVersion: null }, markets: [] };
-    }),
-    getResults(yesterday, tomorrow).catch((error) => {
-      console.warn("Winner results unavailable; continuing with live line only:", error.message);
-      return [];
-    }),
-    Promise.all([
-      get365FootballResults(yesterday, yesterday),
-      get365FootballResults(today, today),
-      get365FootballResults(tomorrow, tomorrow),
-      get365BasketballResults(yesterday, yesterday),
-      get365BasketballResults(today, today),
-      get365BasketballResults(tomorrow, tomorrow),
-    ]).then((items) => items.flat()),
-    getOddsApiScores().catch(() => []),
-    Promise.all([
-      getApiSportsFootballResults(yesterday),
-      getApiSportsFootballResults(today),
-      getApiSportsBasketballResults(yesterday),
-      getApiSportsBasketballResults(today),
-    ]).then((items) => items.flat()).catch(() => []),
-  ]);
-  const resultEvents = [...winnerResultEvents, ...scores365Events, ...oddsApiScores, ...apiSportsScores];
-  const resultsByEvent = resultIndex(resultEvents);
-
-  // ── Standings: fetch for competitions appearing in today's / tomorrow's 365scores games
-  const competitionIds365 = new Set(
-    scores365Events
-      .filter((e) => e.competitionId365 && (e.date === today || e.date === tomorrow))
-      .map((e) => String(e.competitionId365))
-  );
-  const standingsEntries = await Promise.allSettled(
-    [...competitionIds365].map(async (id) => [id, await fetch365Standings(id)])
-  );
-  const standingsMap365 = new Map(
-    standingsEntries
-      .filter((r) => r.status === "fulfilled" && r.value[1]?.length)
-      .map((r) => r.value)
-  );
-
-  // Pull previously-recommended picks from snapshot to remember what was selected.
-  // Without this, finished games disappear from the live odds line and lose their hit/miss status.
-  const snapshotPicksForDay = (dateKey) => {
-    for (const key of ["yesterday", "today", "tomorrow"]) {
-      const tab = SNAPSHOT?.tabs?.[key];
-      if (tab?.date === dateKey) {
-        return [
-          ...(tab.sports?.football || []),
-          ...(tab.sports?.basketball || []),
-        ].filter((r) => !r.day || r.day === dateKey);
-      }
-    }
-    return [];
-  };
-
-  const yesterdayResultRows = [
-    ...buildResultRows(winnerResultEvents, yesterday),
-    ...build365FootballRows(scores365Events, yesterday),
-    ...build365BasketballRows(scores365Events, yesterday),
-    ...build365FootballRows(oddsApiScores, yesterday),
-    ...build365BasketballRows(oddsApiScores, yesterday),
-    ...build365FootballRows(apiSportsScores, yesterday),
-    ...build365BasketballRows(apiSportsScores, yesterday),
-  ];
-  // Primary: snapshot picks for yesterday (knows what was recommended + picked team)
-  // Secondary: live result rows (have actualWinner + matchPhase:final)
-  const snapshotYesterdayPicks = snapshotPicksForDay(yesterday);
-  const yesterdayMerged = resolvePickStatuses(mergeRows(
-    snapshotYesterdayPicks.length > 0 ? snapshotYesterdayPicks : buildResultRows(winnerResultEvents, yesterday),
-    yesterdayResultRows
-  ));
-
-  const liveFootballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365);
-  const liveBasketballToday = buildCurrentPicks(markets, today, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365);
-  // When Winner has no open markets for today, show 365Scores scheduled games as "ממתין לקווים" cards
-  const s365today = (scores365Events || []).filter(e => e.date === today);
-  console.info(`[today-fallback] live football=${liveFootballToday.length} basketball=${liveBasketballToday.length} scores365today=${s365today.length}`);
-  const fallbackFootball = liveFootballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID).slice(0, BOARD_PICK_LIMIT)
-    : [];
-  const fallbackBasketball = liveBasketballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID).slice(0, BOARD_PICK_LIMIT)
-    : [];
-  console.info(`[today-fallback] fallbackFootball=${fallbackFootball.length} fallbackBasketball=${fallbackBasketball.length}`);
-  const liveTodayPicks = [...liveFootballToday, ...liveBasketballToday, ...fallbackFootball, ...fallbackBasketball];
-  // Supplement live picks with snapshot picks for games that fell off the live line (already started)
-  const snapshotTodayPicks = snapshotPicksForDay(today);
-  const todayCurrentRows = resolvePickStatuses(mergeRows(
-    [...liveTodayPicks, ...snapshotTodayPicks],
-    [
-      ...buildResultRows(winnerResultEvents, today),
-      ...build365FootballRows(scores365Events, today),
-      ...build365BasketballRows(scores365Events, today),
-      ...build365FootballRows(oddsApiScores, today),
-      ...build365BasketballRows(oddsApiScores, today),
-      ...build365FootballRows(apiSportsScores, today),
-      ...build365BasketballRows(apiSportsScores, today),
-    ]
-  ));
-  const tomorrowCurrentRows = [
-    ...buildCurrentPicks(markets, tomorrow, BOARD_PICK_LIMIT, resultsByEvent, WINNER_FOOTBALL_ID, standingsMap365),
-    ...buildCurrentPicks(markets, tomorrow, BOARD_PICK_LIMIT, resultsByEvent, WINNER_BASKETBALL_ID, standingsMap365),
-  ];
-  // Enrich all three days in parallel — was sequential (3x slower)
-  const [yesterdayEnrichedRows, todayEnrichedRows, tomorrowEnrichedRows] = withLogos
-    ? await Promise.all([
-        enrichLogos(yesterdayMerged),
-        enrichLogos(todayCurrentRows),
-        enrichLogos(tomorrowCurrentRows),
-      ])
-    : [yesterdayMerged, todayCurrentRows, tomorrowCurrentRows];
-  const yesterdayFinalRows = withLogos ? finalResultRowsByDay(yesterdayEnrichedRows) : yesterdayEnrichedRows.slice(0, TARGET_PICKS_PER_SPORT);
-  const yesterdayRows = splitBySport(yesterdayFinalRows);
-  const todayFinalRows = withLogos ? finalOpenRowsByDay(todayEnrichedRows) : todayEnrichedRows.slice(0, TARGET_PICKS_PER_SPORT);
-  const todayRows = splitBySport(todayFinalRows);
-  const tomorrowFinalRows = withLogos ? finalOpenRowsByDay(tomorrowEnrichedRows) : tomorrowEnrichedRows.slice(0, TARGET_PICKS_PER_SPORT);
-  const tomorrowRows = splitBySport(tomorrowFinalRows);
-  const trackingResults = [
-    ...buildResultRows(winnerResultEvents, yesterday),
-    ...buildResultRows(winnerResultEvents, today),
-    ...buildResultRows(winnerResultEvents, tomorrow),
-    ...build365FootballRows(scores365Events, yesterday),
-    ...build365FootballRows(scores365Events, today),
-    ...build365FootballRows(scores365Events, tomorrow),
-    ...build365BasketballRows(scores365Events, yesterday),
-    ...build365BasketballRows(scores365Events, today),
-    ...build365BasketballRows(scores365Events, tomorrow),
-    ...build365FootballRows(oddsApiScores, yesterday),
-    ...build365FootballRows(oddsApiScores, today),
-    ...build365BasketballRows(oddsApiScores, yesterday),
-    ...build365BasketballRows(oddsApiScores, today),
-  ].map(compactTrackingRow);
-  const lineStats = {
-    football: {
-      today: countRecommendedPicks(todayRows.football),
-      tomorrow: countRecommendedPicks(tomorrowRows.football),
-    },
-    basketball: {
-      today: countRecommendedPicks(todayRows.basketball),
-      tomorrow: countRecommendedPicks(tomorrowRows.basketball),
-    },
-    total: {
-      yesterday: yesterdayFinalRows.length,
-      today: todayFinalRows.length,
-      tomorrow: tomorrowFinalRows.length,
-    },
-  };
-  return {
-    ok: true,
-    generatedAt: new Date().toISOString(),
-    serverVersion: hashes.currentVersion,
-    _winnerBlocked: !!_winnerBlockedError,
-    _winnerBlockedReason: _winnerBlockedError?.message || null,
-    oddsRange: { min: ODDS_MIN, max: ODDS_MAX },
-    targetPicksPerSport: TARGET_PICKS_PER_SPORT,
-    lineStats,
-    trackingResults,
-    reuvenSchedule: buildReuvenSchedule(markets, today, 31),
-    debugAudit: {
-      today: splitBySport(auditOpenRows(todayEnrichedRows, todayFinalRows)),
-      tomorrow: splitBySport(auditOpenRows(tomorrowEnrichedRows, tomorrowFinalRows)),
-    },
-    tabs: {
-      yesterday: { label: "אתמול", date: yesterday, sports: yesterdayRows },
-      today: { label: "היום", date: today, sports: todayRows },
-      tomorrow: { label: "מחר", date: tomorrow, sports: tomorrowRows },
-    },
-    modelStats: {
-      title: "מה עומד מאחורי הניתוחים",
-      factors: [
-        "שוקי בסיס: 1X2 בכדורגל, מנצחת/ליין יתרון בכדורסל מכל הליגות שמופיעות ב-Winner. בימים חלשים נכנסים שווקים חלופיים מסומנים בלבד.",
-        `${TARGET_PICKS_PER_SPORT} ניתוחים ביום — יחס Winner אמיתי בטווח 1.40-1.90 כנתון שוק; אם יחס יוצא מהטווח או השוק לא זמין, המשחק לא נכנס לטופ.`,
-        "היחסים מומרים להסתברות, עוברים ניכוי מרווח בית, ואז מדורגים לפי הסתברות מנורמלת ופער מול היריבה הקרובה.",
-        "בית/חוץ: פייבוריט בחוץ מקבל הסבר של פער איכות; פייבוריט בבית מקבל יתרון מגרש.",
-        "לא מוצגים פציעות, הרכבים או חדשות אם הם לא חזרו ממקור מאומת.",
-      ],
-    },
-    win2goFeatures: [
-      "טאבים אתמול/היום/מחר",
-      "קטגוריות כדורגל וכדורסל",
-      "יחסי Winner בזמן אמת או snapshot מאומת",
-      "לוגואים לקבוצות ולליגות",
-      "דיוק תחזיות סטטיסטיות לפי ניתוחים שנשמרו",
-      "ציון ביטחון והסתברות שוק",
-      "הסבר יתרון סטטיסטי לכל משחק",
-      "AI Sports Analyst: ניתוח משחק ידני, סיכון, חלופות שוק וסטטיסטיקות רלוונטיות",
-      "מונדיאל: ניתוחים רק בחלון 48 שעות לפני משחק עם פציעות, סגלים, מאמנים וכושר",
-      "חיפוש ומיון",
-      "פירוט משחק",
-    ],
-    notes: [
-      `אתמול/היום/מחר: עד ${TARGET_PICKS_PER_SPORT} ניתוחים ביום עם יחס Winner בטווח 1.40-1.90 כנתון שוק; כדורגל וכדורסל מופרדים בתצוגה.`,
-      "אם בווינר יש פחות מ-20 משחקי בסיס בטווח, האלגוריתם מוסיף סיכוי כפול או מעל/מתחת רק כשהיחס עדיין בטווח ומסמן זאת כשוק חלופי.",
-      "אתמול הוא מסך סגירה ובדיקת תחזית סטטיסטית מול תוצאה רשמית, לא מסך פעולה פתוחה.",
-      "לכל קבוצה וליגה מוצג לוגו ממקור חיצוני או תג גרפי כאשר אין לוגו רשמי זמין.",
-    ],
-  };
-}
-
 function normalizePredictionStatus(status) {
   const value = cleanText(status);
   if (value === "נתפס" || value === "תפס" || value === "hit") return "hit";
@@ -2726,100 +2459,6 @@ function normalizePredictionStatus(status) {
   if (value === "החזר" || value === "לא אומת") return "לא אומת";
   if (value === "בוטל") return "בוטל";
   return value || "ממתין";
-}
-
-// ── Standings & Motivation filter ────────────────────────────────────────────
-
-const standingsCache365 = globalThis.__STANDINGS_365_CACHE__ ||
-  (globalThis.__STANDINGS_365_CACHE__ = new Map());
-
-/**
- * Fetch league standings from 365scores for a given competition ID.
- * Cached for 6 hours. Returns [] on any error (fail-open).
- */
-async function fetch365Standings(competitionId) {
-  if (!competitionId) return [];
-  const cacheKey = `standings365:${competitionId}`;
-  const cached = standingsCache365.get(cacheKey);
-  if (cached && Date.now() - cached.at < 6 * 60 * 60 * 1000) return cached.data;
-  const url =
-    `https://webws.365scores.com/web/standings/?appTypeId=5&langId=8` +
-    `&competitionId=${competitionId}&games=0`;
-  const data = await fetchJson(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-      Origin: "https://www.365scores.com",
-      Referer: "https://www.365scores.com/",
-      Accept: "application/json",
-    },
-    retryAttempts: 1,
-  }).catch(() => null);
-  const standings = data?.standings || [];
-  standingsCache365.set(cacheKey, { at: Date.now(), data: standings });
-  return standings;
-}
-
-/**
- * Check a team's motivation based on standings.
- * Returns:
- *   { hasStake: false, penaltyType, label, signal }  → exclude from recommendations
- *   { hasStake: true,  penaltyType: null, label }    → keep, may have soft note
- *   null                                              → no data, keep by default
- *
- * penaltyType values:
- *   "champion_confirmed"  – team already secured the title
- *   "relegated_confirmed" – team already relegated
- *   "promotion_confirmed" – team already promoted (in lower league)
- */
-function getTeamStakeFromStandings(standings, competitorId) {
-  if (!standings?.length || !competitorId) return null;
-  for (const group of standings) {
-    for (const row of group.rows || []) {
-      if (String(row.competitor?.id) !== String(competitorId)) continue;
-      const qt = cleanText(row.qualifiedType || row.type || "").toLowerCase();
-      const isQual = Boolean(row.qualified);
-      // Title / Championship confirmed
-      if (isQual && (
-        qt.includes("champion") || qt === "winner" || qt.includes("title") ||
-        qt === "1st" || qt === "first"
-      )) {
-        return {
-          hasStake: false,
-          penaltyType: "champion_confirmed",
-          label: "אליפות בטוחה",
-          signal: "קבוצה זו כבר הבטיחה את האליפות — מוטיבציה עלולה להיות נמוכה, לא מומלצת.",
-        };
-      }
-      // Promotion confirmed (lower league teams)
-      if (isQual && (qt.includes("promot") || qt.includes("upgrad"))) {
-        return {
-          hasStake: false,
-          penaltyType: "promotion_confirmed",
-          label: "עלייה בטוחה",
-          signal: "קבוצה זו כבר הבטיחה עלייה — מוטיבציה עלולה להיות נמוכה, לא מומלצת.",
-        };
-      }
-      // Relegation confirmed — bad team anyway, rarely a favourite
-      if (isQual && (
-        qt.includes("relegat") || qt.includes("descent") || qt.includes("demot") || qt.includes("drop")
-      )) {
-        return {
-          hasStake: false,
-          penaltyType: "relegated_confirmed",
-          label: "ירידה בטוחה",
-          signal: "קבוצה זו כבר ירדה לדיוויזיה נמוכה — מוטיבציה עלולה להיות נמוכה.",
-        };
-      }
-      // Still fighting (European spot, avoiding relegation, title race, etc.)
-      return {
-        hasStake: true,
-        penaltyType: null,
-        label: isQual ? "מוכשרת למטרה, עדיין נלחמת על מיקום" : "עדיין נלחמת על מטרה",
-        signal: null,
-      };
-    }
-  }
-  return null; // team not found — keep by default
 }
 
 // ── The Odds API integration ─────────────────────────────────────────────────
@@ -3178,15 +2817,12 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   const key = cacheKeyForToday();
   const cached = await kvGet(key);
   const cachedMatchesDates = payloadMatchesIsraelDates(cached?.payload);
-  // Fresh hit — serve immediately
   if (!force && cachedMatchesDates && isFreshCache(cached, CACHE_TTL_MS.full)) {
     return {
       ...cached.payload,
       cache: { status: "hit", key, cachedAt: cached.cachedAt, ttlMs: CACHE_TTL_MS.full },
     };
   }
-  // Stale but recent (< 20 min): serve immediately, let CDN stale-while-revalidate
-  // trigger the background rebuild on the next CDN revalidation cycle.
   const staleAgeMs = cached?.cachedAt ? Date.now() - Number(cached.cachedAt) : Infinity;
   if (!force && cachedMatchesDates && cached?.payload && staleAgeMs < 20 * 60 * 1000) {
     return {
@@ -3195,151 +2831,18 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       cache: { status: "stale-recent", key, cachedAt: cached.cachedAt, staleAgeMs },
     };
   }
-  // Cache missing or very stale: full rebuild
   let payload;
   try {
-    payload = await buildWinnerFeedPayload({ withLogos: true });
-  } catch (winnerError) {
-    console.error("[winner-feed] buildWinnerFeedPayload threw:", winnerError?.message, winnerError?.stack?.split("\n")[1]);
+    payload = await buildOddsApiFeed();
+  } catch (oddsError) {
+    console.error("[winner-feed] buildOddsApiFeed threw:", oddsError?.message);
     payload = null;
   }
-
-  // If Winner API was blocked (returned no markets due to IP restriction), prefer the local snapshot
-  // which contains real Winner odds refreshed from an Israeli IP.
-  if (payload?._winnerBlocked) {
-    console.info("[winner-feed] Winner blocked — checking snapshot for today's picks");
-    const snapshotNorm0 = normalizeFallbackRows(SNAPSHOT);
-    const snapshotCountReal = (tab) =>
-      [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
-    const snapshotHasPicks = payloadMatchesIsraelDates(snapshotNorm0) &&
-      (snapshotCountReal(snapshotNorm0.tabs?.today) > 0 || snapshotCountReal(snapshotNorm0.tabs?.tomorrow) > 0);
-    if (snapshotHasPicks) {
-      console.info("[winner-feed] Using snapshot with real Winner picks");
-      payload = { ...snapshotNorm0, ok: true, oddsSource: "Winner Snapshot", liveError: payload._winnerBlockedReason };
-    }
-  }
-
-  if (!payload) {
-    // buildWinnerFeedPayload threw — prefer the local snapshot (real Winner data) over Odds API.
-    const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
-    if (payloadMatchesIsraelDates(snapshotNorm1)) {
-      payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
-    } else {
-      // Snapshot is stale — fall back to Odds API.
-      try {
-        payload = await buildOddsApiFeed();
-      } catch (oddsError) {
-        console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
-        payload = {
-          ...markStaleDatePayload(snapshotNorm1, "טעינת Winner ו-The Odds API נכשלה וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום."),
-          ok: true,
-          fallback: true,
-          fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
-          oddsError: oddsError.message,
-        };
-      }
-    }
-  }
-
-  // If Winner has too few games OR too few distinct leagues, supplement from The Odds API.
-  // noOddsYet rows are 365Scores schedule placeholders with no odds — they don't count as real picks.
-  const countReal = (tab) =>
-    [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet).length;
-  const todayCount = countReal(payload.tabs?.today);
-  const tomorrowCount = countReal(payload.tabs?.tomorrow);
-
-  function tabLeagueSet(tab) {
-    const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
-    return new Set(all.map((r) => String(r.league || "").trim().toLowerCase()).filter(Boolean));
-  }
-  const todayLeagues = tabLeagueSet(payload.tabs?.today);
-  const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
-  // Supplement when count is low OR league variety is low (e.g. only Brazil at end of European season)
-  const MIN_LEAGUES = 3;
-  const needsOdds = !payload.fallback && (
-    todayCount < MIN_PREMIUM_ROWS_PER_DAY ||
-    tomorrowCount < MIN_PREMIUM_ROWS_PER_DAY ||
-    todayLeagues.size < MIN_LEAGUES ||
-    tomorrowLeagues.size < MIN_LEAGUES
-  );
-
-  if (needsOdds) {
-    if (!ODDS_API_KEY) {
-      console.warn("[winner-feed] needsOdds=true but ODDS_API_KEY is not set — skipping Odds API");
-      payload = { ...payload, _oddsApiStatus: "key_missing" };
-    } else {
-      try {
-        console.info("[winner-feed] Calling Odds API (today=%d tomorrow=%d leagues=%d/%d)", todayCount, tomorrowCount, todayLeagues.size, tomorrowLeagues.size);
-        const oddsFeed = await buildOddsApiFeed();
-        const newTabs = { ...payload.tabs };
-        let usedOdds = false;
-        const oddsCountByDay = {};
-
-        for (const [dayKey, dayCount, dayLeagues] of [
-          ["today",    todayCount,    todayLeagues],
-          ["tomorrow", tomorrowCount, tomorrowLeagues],
-        ]) {
-          const oddsTab = oddsFeed.tabs?.[dayKey];
-          if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
-          const oddsCount =
-            (oddsTab.sports?.football?.length || 0) +
-            (oddsTab.sports?.basketball?.length || 0);
-          oddsCountByDay[dayKey] = oddsCount;
-
-          if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
-            // Too few games overall — replace the tab entirely
-            newTabs[dayKey] = oddsTab;
-            usedOdds = true;
-          } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
-            // Enough games but only 1-2 leagues — merge in games from leagues not in Winner
-            const oddsRows = [
-              ...(oddsTab.sports?.football || []),
-              ...(oddsTab.sports?.basketball || []),
-            ];
-            const freshRows = oddsRows.filter((r) => {
-              const league = String(r.league || "").trim().toLowerCase();
-              return league && !dayLeagues.has(league);
-            });
-            if (freshRows.length > 0) {
-              const existing = newTabs[dayKey];
-              newTabs[dayKey] = {
-                ...existing,
-                sports: {
-                  football: [
-                    ...(existing.sports?.football || []),
-                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
-                  ],
-                  basketball: [
-                    ...(existing.sports?.basketball || []),
-                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
-                  ],
-                },
-              };
-              usedOdds = true;
-            }
-          }
-        }
-        console.info("[winner-feed] Odds API returned today=%d tomorrow=%d, usedOdds=%s", oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
-        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay };
-        if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
-      } catch (oddsErr) {
-        console.error("[winner-feed] Odds API error:", oddsErr?.message);
-        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
-      }
-    }
-  }
-
-  if (!payloadMatchesIsraelDates(payload)) {
-    const snapshotNorm2 = normalizeFallbackRows(SNAPSHOT);
-    const snapshot = payloadMatchesIsraelDates(snapshotNorm2)
-      ? snapshotNorm2
-      : markStaleDatePayload(snapshotNorm2, "המקור החזיר תאריכים שלא תואמים ל-Asia/Jerusalem, לכן הטאבים הפתוחים רוקנו כדי לא להציג משחקים ישנים בתור היום.");
-    payload = {
-      ...snapshot,
-      ok: true,
-      fallback: true,
-      fallbackReason: snapshot.fallbackReason || "payload date mismatch",
-    };
+  if (!payload || !payloadMatchesIsraelDates(payload)) {
+    const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
+    payload = payloadMatchesIsraelDates(snapshotNorm)
+      ? { ...snapshotNorm, ok: true, oddsSource: "Snapshot", fallback: true }
+      : markStaleDatePayload(snapshotNorm, "The Odds API לא זמין וה-snapshot שייך לתאריך אחר.");
   }
   const entry = { cachedAt: Date.now(), payload };
   await kvSet(key, entry, 24 * 60 * 60);
@@ -3374,12 +2877,12 @@ module.exports = async function handler(req, res) {
       const snapshotNorm3 = normalizeFallbackRows(SNAPSHOT);
       const snapshot = payloadMatchesIsraelDates(snapshotNorm3)
         ? snapshotNorm3
-        : markStaleDatePayload(snapshotNorm3, "חיבור חי ל-Winner נחסם וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום.");
+        : markStaleDatePayload(snapshotNorm3, "טעינת הנתונים נכשלה וה-snapshot שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום.");
       res.status(200).json({
         ...snapshot,
         ok: true,
         fallback: true,
-        fallbackReason: "חיבור חי ל-Winner נחסם מסביבת השרת, לכן נטען snapshot מאומת שנמשך מ-Winner.",
+        fallbackReason: "טעינת הנתונים נכשלה, לכן נטען snapshot.",
         liveError: error.message,
       });
     } catch (snapshotError) {
@@ -3393,7 +2896,6 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
 module.exports.buildOddsApiFeed = buildOddsApiFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
