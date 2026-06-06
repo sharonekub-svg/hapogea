@@ -4314,15 +4314,10 @@
       </div>
       <p class="gate-cta-label">כניסה לפלטפורמה</p>
       <div class="gate-privacy-wrap">
-        <input type="checkbox" id="gatePrivacyCheck" onchange="updateGateConsent()">
-        <label class="gate-privacy-label" for="gatePrivacyCheck">
+        <input type="checkbox" id="gateConsentCheck" onchange="updateGateConsent()">
+        <label class="gate-privacy-label" for="gateConsentCheck">
           קראתי ואני מסכים/ה ל<button type="button" class="gate-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button>
-        </label>
-      </div>
-      <div class="gate-privacy-wrap" style="margin-top:2px">
-        <input type="checkbox" id="gateTermsCheck" onchange="updateGateConsent()">
-        <label class="gate-privacy-label" for="gateTermsCheck">
-          קראתי ואני מסכים/ה ל<button type="button" class="gate-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button>, כולל הגבלת גיל 18+
+          ול<button type="button" class="gate-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button>. גיל 18+ בלבד.
         </label>
       </div>
       <button id="gateGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="gate-google-btn" disabled>
@@ -8520,18 +8515,14 @@
     }
     // ── Consent checkbox helpers (global scope — called from HTML onchange) ──
     function updateGateConsent() {
-      const p = document.getElementById("gatePrivacyCheck");
-      const t = document.getElementById("gateTermsCheck");
-      const ok = !!(p?.checked && t?.checked);
+      const ok = !!document.getElementById("gateConsentCheck")?.checked;
       const g = document.getElementById("gateGoogleBtn");
       const s = document.getElementById("gateSkipBtn");
       if (g) g.disabled = !ok;
       if (s) s.disabled = !ok;
     }
     function updateAuthConsent() {
-      const p = document.getElementById("authPrivacyCheck");
-      const t = document.getElementById("authTermsCheck");
-      const ok = !!(p?.checked && t?.checked);
+      const ok = !!document.getElementById("authConsentCheck")?.checked;
       const btn = document.getElementById("authGoogleBtn");
       if (btn) btn.disabled = !ok;
     }
@@ -9153,15 +9144,10 @@
           <p class="auth-header-sub">כניסה לחשבון</p>
         </div>
         <div class="auth-privacy-wrap">
-          <input type="checkbox" id="authPrivacyCheck" onchange="updateAuthConsent()">
-          <label class="auth-privacy-label" for="authPrivacyCheck">
+          <input type="checkbox" id="authConsentCheck" onchange="updateAuthConsent()">
+          <label class="auth-privacy-label" for="authConsentCheck">
             קראתי ואני מסכים/ה ל<button type="button" class="auth-privacy-link" onclick="document.getElementById('privacyModal').removeAttribute('aria-hidden');document.getElementById('privacyModal').style.display='flex'">מדיניות הפרטיות</button>
-          </label>
-        </div>
-        <div class="auth-privacy-wrap" style="margin-top:2px">
-          <input type="checkbox" id="authTermsCheck" onchange="updateAuthConsent()">
-          <label class="auth-privacy-label" for="authTermsCheck">
-            קראתי ואני מסכים/ה ל<button type="button" class="auth-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button> (גיל 18+)
+            ול<button type="button" class="auth-privacy-link" onclick="document.getElementById('termsModal').removeAttribute('aria-hidden');document.getElementById('termsModal').style.display='flex'">תנאי השימוש</button>. גיל 18+ בלבד.
           </label>
         </div>
         <button id="authGoogleBtn" onclick="HapAuth.signInWithGoogle()" class="auth-google-btn" disabled>
