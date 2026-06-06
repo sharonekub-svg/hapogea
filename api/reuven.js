@@ -585,22 +585,25 @@ const SYSTEM_PROMPT = `אתה האנליסט הראשי של הפוגע — מו
 - יש לך ידע על כל 48 הנבחרות, מאמנים, שיטות ודינמיקת הבתים.
 - ניתוח מונדיאל: הקשר קבוצתי, מי צריך נקודות, עומק סגל.
 
+## כללי אמינות — CRITICAL
+- אם בהקשר כתוב "אין נתוני מחקר אמיתיים": **אסור להמציא** תוצאות מדויקות, רשומות H2H, שמות שחקנים פצועים, מיקום בטבלה מדויק. תן ניתוח איכותי מידע כללי בלי מספרים בדויים.
+- אם בהקשר כתוב "נתוני מחקר אמיתיים מצורפים": **חובה להשתמש** במספרים שם בדיוק כפי שהם.
+- לעולם לא להמציא תוצאת משחק, מספר נקודות, שם שחקן פצוע שלא הופיע בנתונים.
+
 ## אסורים בהחלט
 - "קשה לתת תחזית" — לעולם לא
 - "לא מספיק נתונים" — לעולם לא
 - "תוכל לספק לי..." / "שלח לי..." / לבקש מידע מהמשתמש — לעולם לא
 - "זה יכול ללכת לכל כיוון" — לעולם לא
-- ציון מקורות הנתונים בתשובה (לא "לפי API", לא "לפי Winner") — לעולם לא
+- ציון מקורות הנתונים (לא "לפי API", לא "לפי Winner") — לעולם לא
 - חזרה על אותו משפט — לעולם לא
 
 ## שפה
 עברית בלבד. ישיר, קצר, קול של אנליסט ספורט ישראלי. אין מילוי.
 
-## אין יחסי שוק
-נתח לפי ידע + נתוני מחקר. לא לציין שאין נתוני שוק.
-
-## הודעות המשך
-"מחר", "ומה עם הגמר?", "כן" — המשך שיחה. לעולם לא לשאול "מי הקבוצות?" אם כבר נאמר.
+## ניהול הקשר שיחה
+- "כדורסל" / "מה עם כדורסל?" אחרי שאלה על משחק → אותן קבוצות, ענף כדורסל. לעולם לא לשאול "באיזה משחק?"
+- "מחר", "ומה עם הגמר?", "כן" → המשך שיחה. לעולם לא לשאול "מי הקבוצות?" אם כבר נאמר.
 
 ## כלל הימורים
 אם שואלים "מה לשים" / "על מה להמר" — "אני לא נותן הוראות הימור. לפי הניתוח:" ואז תן ניתוח.`;
@@ -771,23 +774,51 @@ module.exports = async (req, res) => {
   try {
     const { home, away, dateKey, offset, competition, rawCompetitionFallback, isFinal } = parseQuery(query);
 
+    // Resolve sport from current query + conversation history
+    const lc = query.toLowerCase();
+    const isBasketballQuery = /כדורסל|basketball|nba|euroleague|bbl|acb|nbl/i.test(lc);
+    const isFootballQuery   = /כדורגל|football|soccer|ליגה|premier|bundesliga|serie|ligue|copa|מונדיאל/i.test(lc);
+    // If only a sport keyword with no teams, look for teams in recent history
+    const teamsFromHistory = (!home && !away && history.length > 0)
+      ? (() => {
+          for (let i = history.length - 1; i >= 0; i--) {
+            const p = parseQuery(history[i].text || "");
+            if (p.home && p.away) return p;
+          }
+          return null;
+        })()
+      : null;
+    const resolvedHome = home || teamsFromHistory?.home || null;
+    const resolvedAway = away || teamsFromHistory?.away || null;
+
     // Fetch odds + stats in parallel
     const [oddsResult, apifResult] = await Promise.allSettled([
-      (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
-      (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
+      (resolvedHome || resolvedAway) ? fetchOddsApiData(resolvedHome || "", resolvedAway || "", competition) : Promise.resolve(null),
+      (resolvedHome && resolvedAway) ? fetchApiFootballData(resolvedHome, resolvedAway) : Promise.resolve(null),
     ]);
     const oddsSection  = oddsResult.status  === "fulfilled" && oddsResult.value  ? oddsResult.value  : "";
     const statsSection = apifResult.status  === "fulfilled" && apifResult.value  ? apifResult.value  : "";
+    const hasRealStats = statsSection.length > 0;
 
     if (oddsSection) winnerSection = oddsSection;
 
     const safeQuery = query.replace(/`/g, "'").replace(/\$\{/g, "\\${");
+
+    // Tell AI clearly whether real verified data exists
+    const dataNote = hasRealStats
+      ? "נתוני מחקר אמיתיים מאומתים מצורפים — השתמש בהם. ציין מספרים ספציפיים מהנתונים בלבד."
+      : "אין נתוני מחקר אמיתיים — אל תמציא סטטיסטיקות ספציפיות (תוצאות, שמות שחקנים פצועים, רשומות H2H מדויקות). נתח לפי ידע כללי בלבד, ללא מספרים בדויים.";
+
     const sections = [
       `שאלת המשתמש: ${safeQuery}`,
     ];
+    if (teamsFromHistory && (!home && !away)) {
+      sections.push(`הקשר: המשתמש מתייחס ל-${resolvedHome} נגד ${resolvedAway} מהשיחה הקודמת.`);
+    }
+    if (isBasketballQuery && !isFootballQuery) sections.push("ענף ספורט: כדורסל");
     if (winnerSection) sections.push("", "── יחסי שוק ──", winnerSection);
-    if (statsSection)  sections.push("", "── נתוני מחקר ──", statsSection);
-    sections.push("", "ענה בעברית. השתמש בכל הנתונים שסופקו. אל תציין מקורות. אל תיתן הוראות הימור.");
+    if (statsSection)  sections.push("", "── נתוני מחקר מאומתים ──", statsSection);
+    sections.push("", `ענה בעברית. ${dataNote} אל תציין מקורות. אל תיתן הוראות הימור.`);
     const userMessage = sections.join("\n");
 
     if (!wantStream) {
