@@ -1226,9 +1226,8 @@ function scoreOutcome(market, outcome) {
   if (!odds || odds <= oddsMin || odds >= oddsMax) return null;
   const oddsBook = marketOddsBook(market);
 
-  // For football 3-way markets: draw + opponent must BOTH be >= 3.0
-  // This guarantees a dominant favourite with no close competitor
-  if (!isBasketball && !isSpread) {
+  // Football (3-way) + basketball moneyline: all opponents must be >= 3.0
+  if (!isSpread) {
     const pickedDesc = cleanText(outcome.desc);
     const otherOdds = oddsBook.outcomes
       .filter((o) => o.desc !== pickedDesc)
@@ -2700,7 +2699,7 @@ function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
-    .filter((r) => !/\bNBA\b/i.test(r.league || ""));
+    .filter(passesOpponentGate);
 
   const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
   const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
@@ -3546,6 +3545,9 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       if (tab?.sports?.football) {
         tab.sports.football = tab.sports.football.filter(passesOpponentGate);
       }
+      if (tab?.sports?.basketball) {
+        tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
+      }
     }
     const snapshotCountReal = (tab) =>
       [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
@@ -3564,6 +3566,9 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       const tab = snapshotNorm1.tabs?.[tabKey];
       if (tab?.sports?.football) {
         tab.sports.football = tab.sports.football.filter(passesOpponentGate);
+      }
+      if (tab?.sports?.basketball) {
+        tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
       }
     }
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
