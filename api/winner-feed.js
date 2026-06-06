@@ -104,8 +104,6 @@ const SPORTS = {
 };
 const WINNER_FOOTBALL_ID = 240;
 const WINNER_BASKETBALL_ID = 227;
-const SCORES365_FOOTBALL_ID = 1;
-const SCORES365_BASKETBALL_ID = 2;
 
 // English→Hebrew team name translations for Odds API score settlement
 const ODDS_API_TEAM_HE = {
@@ -289,30 +287,6 @@ const CACHE_TTL_MS = {
 const memoryCache = globalThis.__WINNER_FEED_CACHE_V3__ || (globalThis.__WINNER_FEED_CACHE_V3__ = new Map());
 // Persists across warm Lambda invocations — avoids re-fetching logos for the same teams
 const globalLogoCache = globalThis.__LOGO_CACHE__ || (globalThis.__LOGO_CACHE__ = new Map());
-
-function winnerHeaders(extra = {}) {
-  return {
-    "User-Agent": "Mozilla/5.0",
-    Origin: "https://www.winner.co.il",
-    Referer: "https://www.winner.co.il/",
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
-    RequestId: crypto.randomUUID(),
-    DeviceId: crypto.randomUUID(),
-    UserAgentData: JSON.stringify({
-      devicemodel: "",
-      deviceos: "windows",
-      deviceosversion: "10",
-      appversion: "2.6.1",
-      apptype: "desktop",
-      originId: 15,
-      isAccessibility: false,
-    }),
-    appVersion: "2.6.1",
-    ...extra,
-  };
-}
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -646,44 +620,6 @@ async function sportsDbSearch(kind, term) {
   };
 }
 
-async function sofascoreLogoSearch(name, kind) {
-  const value = cleanText(name);
-  if (!value || value.length < 2) return null;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 1500);
-  try {
-    const url = `https://api.sofascore.com/api/v1/search/all?q=${encodeURIComponent(value)}&page=0`;
-    const data = await fetchJson(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        Accept: "application/json",
-        Referer: "https://www.sofascore.com/",
-      },
-      signal: controller.signal,
-      retryAttempts: 0,
-    }).catch(() => null);
-    clearTimeout(timeout);
-    if (!data) return null;
-    const type = kind === "league" ? "uniqueTournament" : "team";
-    const results = (data.results || []).filter(r => r.type === type);
-    if (!results.length) return null;
-    const hit = results[0];
-    const id = hit.entity?.id;
-    if (!id) return null;
-    const imgPath = kind === "league"
-      ? `https://api.sofascore.com/api/v1/unique-tournament/${id}/image`
-      : `https://api.sofascore.com/api/v1/team/${id}/image`;
-    return {
-      name: cleanText(hit.entity?.name || value),
-      logo_url: imgPath,
-      source: `SofaScore ${kind}`,
-    };
-  } catch (_) {
-    clearTimeout(timeout);
-    return null;
-  }
-}
-
 async function wikipediaLogoSearch(name, kind) {
   const value = cleanText(name);
   if (!value || value.length < 3) return null;
@@ -807,18 +743,12 @@ async function resolveLogoRow(table, kind, name) {
         const sbHit = sbResults.find(r => r.status === "fulfilled" && r.value?.logo_url)?.value;
         if (sbHit?.logo_url) return sbHit;
 
-        // 2. SofaScore + Wikidata for ALL terms in parallel
-        const extResults = await Promise.allSettled(
-          terms.flatMap(t => [sofascoreLogoSearch(t, kind), wikidataLogoSearch(t, kind)])
+        // 2. Wikidata for ALL terms in parallel
+        const wikidataResults = await Promise.allSettled(
+          terms.map(t => wikidataLogoSearch(t, kind))
         );
-        // Prefer SofaScore (even-indexed), then Wikidata (odd-indexed)
-        for (let i = 0; i < extResults.length; i += 2) {
-          if (extResults[i].status === "fulfilled" && extResults[i].value?.logo_url)
-            return extResults[i].value;
-        }
         let englishName = null;
-        for (let i = 1; i < extResults.length; i += 2) {
-          const r = extResults[i];
+        for (const r of wikidataResults) {
           if (r.status === "fulfilled" && r.value?.logo_url) return r.value;
           if (r.status === "fulfilled" && r.value?.englishName && !englishName)
             englishName = r.value.englishName;
@@ -844,21 +774,9 @@ async function resolveLogoRow(table, kind, name) {
   return row;
 }
 
-function asset365(name, logoUrl, kind) {
-  return {
-    name: cleanText(name),
-    logo: logoUrl,
-    initials: initials(name),
-    logoSource: "365Scores",
-    logoTier: 1,
-  };
-}
-
 async function enrichLogos(rows) {
-  async function teamAsset(name, directUrl) {
+  async function teamAsset(name) {
     const key = cleanText(name);
-    // If we already have a 365Scores URL, use it directly — no lookup needed
-    if (directUrl) return asset365(key, directUrl, "team");
     const row = await resolveLogoRow("teams", "team", key);
     return {
       name: key,
@@ -867,9 +785,8 @@ async function enrichLogos(rows) {
       logoSource: row?.source || (row?.logo_url ? "win2go teams" : "generated team badge"),
     };
   }
-  async function leagueAsset(name, directUrl) {
+  async function leagueAsset(name) {
     const key = cleanText(name);
-    if (directUrl) return asset365(key, directUrl, "league");
     const row = await resolveLogoRow("leagues", "league", key);
     return {
       name: key,
@@ -893,9 +810,9 @@ async function enrichLogos(rows) {
   }
   return Promise.all(rows.map(async (row) => {
     const [leagueAssetValue, homeRaw, awayRaw] = await Promise.all([
-      leagueAsset(row.league, row.leagueLogoUrl),
-      teamAsset(row.home, row.homeLogoUrl),
-      teamAsset(row.away, row.awayLogoUrl),
+      leagueAsset(row.league),
+      teamAsset(row.home),
+      teamAsset(row.away),
     ]);
     const homeAsset = withLeagueFallback(homeRaw, leagueAssetValue, row.home);
     const awayAsset = withLeagueFallback(awayRaw, leagueAssetValue, row.away);
@@ -2138,105 +2055,6 @@ function buildResultRows(results, dateKey) {
     .slice(0, 200);
 }
 
-function seed365Logo(kind, name, id, folder) {
-  if (!name || !id) return;
-  const key = `${kind}:${name}`;
-  if (!globalLogoCache.has(key)) {
-    globalLogoCache.set(key, {
-      name,
-      logo_url: `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/${folder}/${id}`,
-      source: "365Scores",
-    });
-  }
-}
-
-async function get365Results(startDate, endDate, sportId365, winnerSportId, refererSport) {
-  const dates = [startDate];
-  if (endDate && endDate !== startDate) dates.push(endDate);
-  const rows = [];
-  for (const dateKey of dates) {
-    const day = scores365Date(dateKey);
-    if (!day) continue;
-    const params = new URLSearchParams({
-      langId: "2",
-      timezoneName: "Asia/Jerusalem",
-      userCountryId: "6",
-      appTypeId: "5",
-      sports: String(sportId365),
-      startDate: day,
-      endDate: day,
-    });
-    const data = await fetchJson(`https://webws.365scores.com/web/games/?${params}`, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        Origin: "https://www.365scores.com",
-        Referer: `https://www.365scores.com/he/${refererSport}/match-results`,
-        Accept: "application/json",
-      },
-    }).catch(() => null);
-    for (const game of data?.games || []) {
-      const home = cleanText(game.homeCompetitor?.name);
-      const away = cleanText(game.awayCompetitor?.name);
-      if (!home || !away) continue;
-      // Seed globalLogoCache so enrichLogos finds logos without extra lookups
-      seed365Logo("team", home, game.homeCompetitor?.id, "Competitors");
-      seed365Logo("team", away, game.awayCompetitor?.id, "Competitors");
-      seed365Logo("league", cleanText(game.competitionDisplayName), game.competition?.id || game.competitionId, "Competitions");
-      const homeScore = Number(game.homeCompetitor?.score);
-      const awayScore = Number(game.awayCompetitor?.score);
-      const hasScore = Number.isFinite(homeScore) && Number.isFinite(awayScore) && homeScore >= 0 && awayScore >= 0;
-      const isFinal = Number(game.statusGroup) === 4 || /final|ended|הסתיים/i.test(cleanText(game.statusText));
-      const actualWinner = hasScore && isFinal
-        ? homeScore === awayScore
-          ? "תיקו"
-          : homeScore > awayScore ? home : away
-        : "";
-      const start = game.startTime ? new Date(game.startTime) : null;
-      // Store 365Scores IDs — used to build direct CDN logo URLs
-      const homeId = game.homeCompetitor?.id;
-      const awayId = game.awayCompetitor?.id;
-      const competitionId = game.competition?.id || game.competitionId;
-      rows.push({
-        eventid: `365-${game.id}`,
-        eventid365: String(game.id),
-        date: dateKey,
-        time: start && !Number.isNaN(start.getTime())
-          ? new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(start)
-          : "",
-        sportid: winnerSportId,
-        league: cleanText(game.competitionDisplayName),
-        teamA: home,
-        teamB: away,
-        scoreA: hasScore ? String(homeScore) : "",
-        scoreB: hasScore ? String(awayScore) : "",
-        matchMinute: game.gameTime || game.shortStatusText || "",
-        statusGroup: game.statusGroup,
-        isFinal,
-        statusText: cleanText(game.statusText),
-        markets: actualWinner ? [{ title: "המנצח", marketResults: [actualWinner] }] : [],
-        source: "365Scores",
-        // Direct logo CDN paths — no lookup needed for matches we already got from 365
-        homeLogoUrl: homeId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/${homeId}` : null,
-        awayLogoUrl: awayId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/${awayId}` : null,
-        leagueLogoUrl: competitionId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/${competitionId}` : null,
-        // Carry raw IDs for standings / motivation lookup
-        homeCompetitorId: homeId || null,
-        awayCompetitorId: awayId || null,
-        competitionId365: competitionId || null,
-      });
-    }
-  }
-  return rows;
-}
-
-function get365FootballResults(startDate, endDate) {
-  return get365Results(startDate, endDate, SCORES365_FOOTBALL_ID, WINNER_FOOTBALL_ID, "football");
-}
-
-function get365BasketballResults(startDate, endDate) {
-  return get365Results(startDate, endDate, SCORES365_BASKETBALL_ID, WINNER_BASKETBALL_ID, "basketball");
-}
-
 function translateEnTeamToHe(name) {
   if (!name) return name;
   const direct = ODDS_API_TEAM_HE[name.trim()];
@@ -2404,146 +2222,6 @@ async function getApiSportsBasketballResults(dateKey) {
   console.log(`[API-Sports] basketball ${dateKey}: ${rows.length} finished games`);
   if (rows.length > 0) memoryCache.set(cacheKey, { ts: Date.now(), data: rows });
   return rows;
-}
-
-function build365ResultRows(results, dateKey, winnerSportId, marketTitle, signals) {
-  return (results || [])
-    .filter((event) => String(event.sportid) === String(winnerSportId) && event.date === dateKey)
-    .map((event) => {
-      const actualWinner = resultWinner(event);
-      const phase = resultPhase(event);
-      const verifiedAt = new Date().toISOString();
-      const finishedAt = event.closedAt || event.finishedAt || (phase === "final" ? verifiedAt : null);
-      const teams = { home: cleanText(event.teamA), away: cleanText(event.teamB) };
-      return {
-        id: `result-${event.eventid}`,
-        eventId: String(event.eventid),
-        eventId365: event.eventid365 || String(event.eventid).replace(/^365-/, ""),
-        source: "365Scores Results",
-        verifiedAt,
-        finishedAt,
-        bettingStatus: "closed",
-        resultVerified: !!actualWinner,
-        day: dateKey,
-        time: String(event.time || "").slice(0, 5),
-        sport: SPORTS[winnerSportId],
-        sportId: winnerSportId,
-        league: cleanText(event.league),
-        country: "",
-        match: `${teams.home} - ${teams.away}`,
-        home: teams.home,
-        away: teams.away,
-        // Carry 365Scores CDN logo URLs so enrichLogos can skip the lookup
-        homeLogoUrl: event.homeLogoUrl || null,
-        awayLogoUrl: event.awayLogoUrl || null,
-        leagueLogoUrl: event.leagueLogoUrl || null,
-        resultKey: resultKeyFor({ day: dateKey, sportId: winnerSportId, home: teams.home, away: teams.away }),
-        market: marketTitle,
-        pick: actualWinner,
-        winnerPick: actualWinner,
-        actualWinner,
-        odds: null,
-        probability: null,
-        score: 0,
-        status: phase === "final" ? "נסגר" : phase === "cancelled" ? "בוטל" : phase === "postponed" ? "לא אומת" : "ממתין",
-        liveScore: scoreText(event.scoreA, event.scoreB, event.noScoreLabel),
-        matchPhase: actualWinner ? "final" : resultPhase(event),
-        matchMinute: event.matchMinute || "",
-        result: scoreText(event.scoreA, event.scoreB, event.noScoreLabel),
-        resultVerifiedAt: phase === "final" ? verifiedAt : "",
-        signals,
-        allMarkets: [{
-          marketId: null,
-          title: marketTitle,
-          category: marketCategory(marketTitle),
-          bettable: false,
-          best: null,
-          outcomes: actualWinner ? [{ outcomeId: null, desc: actualWinner, price: null, spread: "", probability: null, score: null }] : [],
-        }],
-        explanation: [
-          `זהו משחק ${SPORTS[winnerSportId] || "ספורט"} מארכיון התוצאות של 365Scores.`,
-          `התוצאה הרשמית לפי 365Scores היא ${actualWinner || "לא זמינה"}.`,
-          "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה.",
-        ],
-      };
-    })
-    .slice(0, 200);
-}
-
-function build365FootballRows(results, dateKey) {
-  return build365ResultRows(
-    results,
-    dateKey,
-    WINNER_FOOTBALL_ID,
-    "1X2",
-    ["תוצאה מ-365Scores", "כיסוי כדורגל מ-365Scores", "משמש לסגירת תחזיות Winner"]
-  );
-}
-
-function build365BasketballRows(results, dateKey) {
-  return build365ResultRows(
-    results,
-    dateKey,
-    WINNER_BASKETBALL_ID,
-    "המנצח",
-    ["תוצאה מ-365Scores", "כיסוי כדורסל לכל הליגות", "משמש לסגירת תחזיות Winner"]
-  );
-}
-
-// Build noOddsYet display rows from 365Scores scheduled events when Winner has no open markets
-function build365ScheduledRows(results, dateKey, winnerSportId) {
-  const now = new Date().toISOString();
-  return (results || [])
-    .filter((event) => {
-      if (String(event.sportid) !== String(winnerSportId)) return false;
-      if (event.date !== dateKey) return false;
-      const phase = resultPhase(event);
-      return phase === "scheduled" || phase === "pre";
-    })
-    .map((event) => {
-      const teams = { home: cleanText(event.teamA), away: cleanText(event.teamB) };
-      return {
-        id: `sched-365-${event.eventid}`,
-        eventId: String(event.eventid),
-        eventId365: event.eventid365 || String(event.eventid).replace(/^365-/, ""),
-        source: "365Scores",
-        verifiedAt: now,
-        bettingStatus: "available",
-        day: dateKey,
-        time: String(event.time || "").slice(0, 5),
-        sport: SPORTS[winnerSportId],
-        sportId: winnerSportId,
-        league: cleanText(event.league),
-        country: "",
-        match: `${teams.home} - ${teams.away}`,
-        home: teams.home,
-        away: teams.away,
-        homeLogoUrl: event.homeLogoUrl || null,
-        awayLogoUrl: event.awayLogoUrl || null,
-        leagueLogoUrl: event.leagueLogoUrl || null,
-        resultKey: resultKeyFor({ day: dateKey, sportId: winnerSportId, home: teams.home, away: teams.away }),
-        market: "",
-        pick: "",
-        pickTeam: "",
-        winnerPick: "",
-        odds: null,
-        oddsRaw: null,
-        outsideRange: true,
-        noOddsYet: true,
-        probability: null,
-        normalizedProbability: null,
-        score: 0,
-        status: "ממתין",
-        matchPhase: "scheduled",
-        result: "",
-        liveScore: "",
-        signals: ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
-        explanation: [
-          "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-          "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
-        ],
-      };
-    });
 }
 
 function compactTrackingRow(row) {
