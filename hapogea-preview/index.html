@@ -1863,12 +1863,12 @@
     .reuben-input-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
     .reuben-upload-label {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 11px; border-radius: 7px;
-      border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.025);
-      color: rgba(255,255,255,.32); font: 500 11px Heebo, sans-serif;
-      cursor: pointer; transition: border-color .12s, color .12s;
+      padding: 6px 13px; border-radius: 8px;
+      border: 1px solid rgba(85,214,255,.45); background: rgba(85,214,255,.1);
+      color: rgba(85,214,255,.95); font: 600 11px Heebo, sans-serif;
+      cursor: pointer; transition: border-color .15s, background .15s, color .15s;
     }
-    .reuben-upload-label:hover { border-color: rgba(255,255,255,.13); color: rgba(255,255,255,.55); }
+    .reuben-upload-label:hover { border-color: rgba(85,214,255,.75); background: rgba(85,214,255,.18); color: #55d6ff; }
     .reuben-disclaimer { font-size: 10px; color: rgba(255,255,255,.18); margin-inline-start: auto; }
     /* ── THINKING / LOADING ── */
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -6210,7 +6210,7 @@
           content: "ניתוח סטטיסטי כללי — ללא יחסי Winner בזמן אמת. אין ייעוץ הימורים, המלצה לשים כסף, או הבטחת תוצאה." });
 
         if (away) suggestions.push("יש פה Value?", "זה מלכודת?", `היית נכנס ל-${favored}?`, isBball ? "ספרד או Moneyline?" : "מה הסיכוי לתיקו?");
-        else suggestions.push(`ספר לי עוד על ${home}`, "ברצלונה נגד ריאל מדריד", "ארסנל נגד מנצ׳סטר סיטי", "לייקרס נגד סלטיקס");
+        else suggestions.push(`ספר לי עוד על ${home}`, "יש Value?", "מה הסיכוי לתיקו?", "אנדרדוג שווה?");
 
       } else {
         const matchTitle = away ? `${home} vs ${away}` : home;
@@ -6292,7 +6292,7 @@
     function analyzeReubenBet(text) {
       const value = String(text || "").trim();
       if (!value) {
-        return "כתוב שם משחק — לדוגמה: ברצלונה נגד ריאל מדריד, ארסנל נגד פריז, מנצ׳סטר סיטי היום. אנתח כל משחק אפשרי לפי סטטיסטיקות, דירוגים ונתוני Winner בזמן אמת.";
+        return "כתוב שם משחק — לדוגמה: פריז נגד ליל, יוסטון נגד אוקלהומה, מנצ׳סטר סיטי היום. אנתח כל משחק אפשרי לפי סטטיסטיקות, דירוגים ונתוני Winner בזמן אמת.";
       }
       const choice = value.match(/^\s*(?:#|מספר|בחירה)?\s*(\d+)\s*$/i);
       if (choice && state.reubenCandidates.length) {
@@ -6716,8 +6716,8 @@
           { type: "analysis", title: "מה אני יכול לנתח",
             content: "כל משחק — גם בלי Winner (נתח לפי דירוגים + היסטוריה)\nיחסים ו-Value — האם המחיר שווה?\nמלכודות שוק — מתי פייבוריט מסוכן?\nאנדרדוג — מתי הקטן יכול להפתיע?\nתיקו — מתי זה Value אמיתי?" },
           { type: "disclaimer", title: "תשאל אותי",
-            content: "\"ארסנל נגד פריז\" · \"ברצלונה נגד ריאל מדריד\" · \"יש פה Value?\" · \"זה מלכודת?\" · \"היית נכנס?\"" }
-        ], suggestions: ["ארסנל נגד פריז", "ברצלונה נגד ריאל מדריד", "לייקרס נגד סלטיקס", "מנצ׳סטר סיטי היום"], text: "שלום! אני הפוגע AI." }];
+            content: "\"פריז נגד ליל\" · \"יוסטון נגד אוקלהומה\" · \"יש פה Value?\" · \"זה מלכודת?\" · \"היית נכנס?\"" }
+        ], suggestions: ["פריז נגד ליל", "יוסטון נגד אוקלהומה", "מנצ׳סטר סיטי היום", "זה מלכודת?"], text: "שלום! אני הפוגע AI." }];
       const loading = state.reubenLoading;
       const isLocked = !state.isPremium && (state.reubenFreeUsed || 0) >= 1;
       const sidebarOpen = state.reubenSidebarOpen ? " open" : "";
@@ -6785,7 +6785,7 @@
             <div class="reuben-input-area">
               <div class="reuben-input-frame">
                 <div class="reuben-input-row">
-                  <textarea id="reubenInput" placeholder="כתוב משחק: ארסנל נגד פריז, לייקרס נגד סלטיקס..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
+                  <textarea id="reubenInput" placeholder="כתוב משחק — לדוגמה: פריז נגד ליל, יוסטון נגד אוקלהומה..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
                   <button class="reuben-send-btn" type="button" id="reubenAnalyze" ${loading ? "disabled" : ""}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8.5 2.5L14 8l-5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
@@ -6793,7 +6793,7 @@
               </div>
               <div class="reuben-input-footer">
                 <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" ${loading ? "disabled" : ""}>
-                <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"}">תמונה לניתוח</label>
+                <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"}">📷 העלאת תמונת טופס</label>
                 <span class="reuben-disclaimer">ניתוח ספורטיבי בלבד · אין ייעוץ הימורים</span>
               </div>
             </div>

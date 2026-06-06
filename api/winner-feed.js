@@ -85,13 +85,13 @@ const ODDS_API_SPORTS = [
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ODDS_MIN = 1.4;
-const ODDS_MAX = 1.9;
-const SOFT_ODDS_MIN = 1.20;
+const ODDS_MIN = 1.22;
+const ODDS_MAX = 1.80;
+const SOFT_ODDS_MIN = 1.15;
 const SOFT_ODDS_MAX = 2.10;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
-const BASKETBALL_ODDS_MIN = 1.25;
+const BASKETBALL_ODDS_MIN = 1.18;
 const BASKETBALL_ODDS_MAX_MONEYLINE = 1.90;
 const BASKETBALL_ODDS_MAX_SPREAD = 2.05;
 /** Top Winner picks shown per day (verified line + odds in range). */
@@ -1302,7 +1302,7 @@ function describeOverUnderPick(market, scored) {
       parts.push(`קו ${line} גולים — קו גבוה, מתאים למשחקים התקפיים. ${dir === "מעל" ? "הניתוח מניח לפחות " + Math.ceil(line) + " גולים." : "הניתוח מניח משחק צמוד ומועט גולים."}`);
     }
   }
-  parts.push(`האלגוריתם מבוסס על סיגנל שוק Winner: כשהצד "${dir}" מתומחר בטווח 1.40–1.90 ומשקף הסתברות גבוהה לאחר ניכוי מרווח הבית, הוא נכנס לניתוח המרכזי.`);
+  parts.push(`האלגוריתם מבוסס על סיגנל שוק Winner: כשהצד "${dir}" מתומחר בטווח 1.22–1.80 ומשקף הסתברות גבוהה לאחר ניכוי מרווח הבית, הוא נכנס לניתוח המרכזי.`);
   return parts.join(" ");
 }
 
@@ -1589,10 +1589,10 @@ function scoreBreakdown(row) {
   const extremeSpreadPenalty = isBasketballRow && Number.isFinite(spread) && Math.abs(spread) > 12
     ? 24
     : isBballSpread ? 10 : 0;
-  const tooLowOddsPenalty = !isBasketballRow && odds <= 1.42 && marketGap < 0.08 ? 10 : 0;
-  // Sweet spot bonus: odds 1.55–1.80 are statistically the most reliable range
-  const sweetSpotBonus = odds >= 1.50 && odds <= 1.85
-    ? Math.round((1 - Math.abs(odds - 1.675) / 0.325) * 14)
+  const tooLowOddsPenalty = !isBasketballRow && odds <= 1.18 && marketGap < 0.08 ? 10 : 0;
+  // Sweet spot bonus: clear favourites 1.22–1.65 are the most reliable safety range
+  const sweetSpotBonus = odds >= 1.22 && odds <= 1.65
+    ? Math.round((1 - Math.abs(odds - 1.435) / 0.215) * 14)
     : 0;
   // Expected Value bonus: positive EV is the core signal for a genuine value pick
   const ev = Number(row.ev || 0);
@@ -1654,7 +1654,7 @@ function rejectionReasons(row) {
   if (!hasVerifiedLogo(row.awayAsset)) reasons.push("אין לוגו אמיתי לקבוצת החוץ");
   if (row.homeAsset?.logo && row.homeAsset.logo === row.awayAsset?.logo) reasons.push("לוגו זהה לשתי הקבוצות");
   if (!hasSingleClearFavorite(row)) reasons.push("אין פייבוריטית אחת מספיק ברורה");
-  const oddsLowThreshold = Number(row.sportId) === WINNER_BASKETBALL_ID ? 1.27 : 1.42;
+  const oddsLowThreshold = Number(row.sportId) === WINNER_BASKETBALL_ID ? 1.18 : 1.20;
   if (Number(row.odds || 0) <= oddsLowThreshold && Number(row.marketGap || 0) < 0.04) {
     reasons.push("יחס נמוך מדי בלי פער שוק גדול");
   }
@@ -1803,7 +1803,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
         ? ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"]
         : outsideRange
         ? [
-            `יחס Winner ${scored.odds.toFixed(2)} — מחוץ לטווח הניתוח המרכזי (1.40–1.90)`,
+            `יחס Winner ${scored.odds.toFixed(2)} — מחוץ לטווח הניתוח המרכזי (1.22–1.80)`,
             `הסתברות שוק ${Math.round(scored.normalizedProbability * 100)} אחוז`,
             "המשחק מוצג ללא יתרון סטטיסטי",
           ]
@@ -1822,8 +1822,8 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
           ]
         : outsideRange
         ? [
-            "המשחק מופיע בווינר-ליין אך הפייבוריט מחוץ לטווח הניתוח המרכזי.",
-            `יחס הפייבוריט הוא ${scored.odds.toFixed(2)} — ${scored.odds < 1.4 ? "נמוך מדי (פערים ברורים מדי, סיכון גבוה להפתעה)" : "גבוה מדי (שוק פתוח מדי, אין יתרון ברור)"}. אין כאן יתרון סטטיסטי מסומן.`,
+            "המשחק מופיע בווינר-ליין אך הפייבוריט מחוץ לטווח הניתוח המרכזי (1.22–1.80).",
+            `יחס הפייבוריט הוא ${scored.odds.toFixed(2)} — ${scored.odds < 1.22 ? "נמוך מדי (פערים ברורים מדי, סיכון גבוה להפתעה)" : "גבוה מדי (שוק פתוח מדי, אין יתרון ברור)"}. אין כאן יתרון סטטיסטי מסומן.`,
             "האלגוריתם מציג את המשחק כדי שתוכל לראות את כל הלוח — בלי לתת הוראת פעולה.",
           ]
         : [
@@ -1940,7 +1940,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
       ],
       explanation: [
         "המשחק נכנס כניתוח משלים כי לא נמצאו מספיק משחקים בטווח האידיאלי.",
-        `יחס Winner הוא ${Number(row.oddsRaw).toFixed(2)} — קרוב לטווח המרכזי 1.40-1.90, ולכן נשמר רק אם יש פייבוריט ברור.`,
+        `יחס Winner הוא ${Number(row.oddsRaw).toFixed(2)} — קרוב לטווח המרכזי 1.22-1.80, ולכן נשמר רק אם יש פייבוריט ברור.`,
         "היחס משמש כנתון שוק בלבד; אין כאן הוראת פעולה.",
       ],
     }));
