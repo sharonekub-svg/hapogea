@@ -8518,6 +8518,24 @@
         ReactDOM.createRoot(root).render(React.createElement(AiApp));
       }
     }
+    // ── Consent checkbox helpers (global scope — called from HTML onchange) ──
+    function updateGateConsent() {
+      const p = document.getElementById("gatePrivacyCheck");
+      const t = document.getElementById("gateTermsCheck");
+      const ok = !!(p?.checked && t?.checked);
+      const g = document.getElementById("gateGoogleBtn");
+      const s = document.getElementById("gateSkipBtn");
+      if (g) g.disabled = !ok;
+      if (s) s.disabled = !ok;
+    }
+    function updateAuthConsent() {
+      const p = document.getElementById("authPrivacyCheck");
+      const t = document.getElementById("authTermsCheck");
+      const ok = !!(p?.checked && t?.checked);
+      const btn = document.getElementById("authGoogleBtn");
+      if (btn) btn.disabled = !ok;
+    }
+
     // ══════════════ Account / Authentication ══════════════
     // Device-local accounts: real sign-up / sign-in / sign-out with a
     // persistent session and SHA-256 (salted) password hashing. Personalises
@@ -8537,16 +8555,6 @@
           sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
       } catch (e) { sb = null; }
-
-      function updateGateConsent() {
-        const p = document.getElementById("gatePrivacyCheck");
-        const t = document.getElementById("gateTermsCheck");
-        const ok = !!(p?.checked && t?.checked);
-        const g = document.getElementById("gateGoogleBtn");
-        const s = document.getElementById("gateSkipBtn");
-        if (g) g.disabled = !ok;
-        if (s) s.disabled = !ok;
-      }
 
       const gateEl = () => document.getElementById("loginGate");
       function showGate(show) {
@@ -8626,14 +8634,6 @@
           label.textContent = "התחבר";
           av.style.display = "none";
         }
-      }
-
-      function updateAuthConsent() {
-        const p = document.getElementById("authPrivacyCheck");
-        const t = document.getElementById("authTermsCheck");
-        const ok = !!(p?.checked && t?.checked);
-        const btn = document.getElementById("authGoogleBtn");
-        if (btn) btn.disabled = !ok;
       }
 
       // ── Modal control ──
