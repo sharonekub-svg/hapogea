@@ -2733,7 +2733,26 @@
     .wc-meta { color: #A39B8C; }
     .wc-toolbar { background: #F9F6F1; border-color: rgba(33,31,27,.09); }
     .wc-day-pill { background: #F3EFE8; border-color: rgba(33,31,27,.09); color: #6E675C; }
-    .wc-day-pill.active { background: rgba(146,96,10,.10); border-color: rgba(146,96,10,.28); color: #92600A; }
+    .wc-day-pill.active { background: #7700BB; border-color: #7700BB; color: #fff; }
+    /* wcm cards — light mode */
+    .wcm { background: #F9F6F1; border-color: rgba(33,31,27,.10); }
+    .wcm:hover { background: #F3EFE8; border-color: rgba(33,31,27,.18); transform: translateY(-1px); }
+    .wcm[data-status="live"] { border-color: rgba(21,128,61,.28); background: rgba(21,128,61,.04); }
+    .wcm-group { color: #7700BB; }
+    .wcm-status { background: rgba(37,99,235,.07); color: #2563EB; border-color: rgba(37,99,235,.18); }
+    .wcm-status.live { background: rgba(21,128,61,.09); color: #15803D; border-color: rgba(21,128,61,.25); }
+    .wcm-status.finished { background: rgba(33,31,27,.06); color: #6E675C; border-color: rgba(33,31,27,.12); }
+    .wcm-status.upcoming { background: rgba(119,0,187,.08); color: #7700BB; border-color: rgba(119,0,187,.20); }
+    .wcm-name { color: #211F1B; }
+    .wcm-odds { color: #6E675C; background: rgba(33,31,27,.06); }
+    .wcm-odds-pick { background: rgba(119,0,187,.09); color: #7700BB; border-color: rgba(119,0,187,.25); }
+    .wcm-team.picked .wcm-name { color: #7700BB; }
+    .wcm-vs { color: rgba(33,31,27,.28); }
+    .wcm-time { color: #6E675C; }
+    .wcm-date { color: #A39B8C; }
+    .wcm-draw { color: #6E675C; }
+    .wcm-venue { color: #A39B8C; }
+    .wcm-score { color: #211F1B; }
     .wc-match { background: #FFFFFF; border-color: rgba(33,31,27,.09); }
     .wc-match:hover { border-color: rgba(37,99,235,.22); background: #FDFCFB; }
     .wc-team { background: #F9F6F1; border-color: rgba(33,31,27,.07); }
@@ -4996,6 +5015,7 @@
       selectedId: null,
       wcOpen: false,
       wcSplashShown: false,
+      wcActiveGroup: '',
       reubenMessages: [],
       reubenCandidates: [],
       reubenLastQuery: "",
@@ -6044,42 +6064,42 @@
         return;
       }
 
-      // Group by date for tab navigation
-      const allDates = [...new Set(WC2026_FIXTURES.map(f => f.date))].sort();
-      const todayStr2 = new Date().toISOString().slice(0,10);
-      const defaultDate = allDates.find(d => d >= todayStr2) || allDates[0] || '';
-      const activeDateKey = state.wcActiveDate || defaultDate;
-      if (!state.wcActiveDate) state.wcActiveDate = activeDateKey;
-      const dateTabs = allDates.map(d => {
-        const dd = new Date(d + 'T12:00:00');
-        const label = dd.toLocaleDateString('he-IL', { day:'numeric', month:'short', weekday:'short' });
-        return `<button class="wc-day-pill${d===activeDateKey?' active':''}" data-wc-date="${d}" type="button">${label}</button>`;
-      }).join('');
-      const dayFixtures = WC2026_FIXTURES.filter(f => f.date === activeDateKey);
-      const dayCards = dayFixtures.length
-        ? dayFixtures.map(wcFixtureCard).join('')
-        : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בתאריך זה</div>`;
+      // Group by stage (בית A, B, C...) for tab navigation
+      const allGroups = [...new Set(WC2026_FIXTURES.map(f => f.stage))].filter(Boolean).sort((a, b) => {
+        const la = a.replace(/[^A-Za-zא-ת]/g, '').slice(-1);
+        const lb = b.replace(/[^A-Za-zא-ת]/g, '').slice(-1);
+        return la.localeCompare(lb);
+      });
+      const activeGroupKey = state.wcActiveGroup || allGroups[0] || '';
+      if (!state.wcActiveGroup) state.wcActiveGroup = activeGroupKey;
+      const groupTabs = allGroups.map(g =>
+        `<button class="wc-day-pill${g===activeGroupKey?' active':''}" data-wc-group="${escapeHtml(g)}" type="button">${escapeHtml(g)}</button>`
+      ).join('');
+      const groupFixtures = WC2026_FIXTURES.filter(f => f.stage === activeGroupKey);
+      const groupCards = groupFixtures.length
+        ? groupFixtures.map(wcFixtureCard).join('')
+        : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בבית זה</div>`;
 
       target.innerHTML = `
         ${worldCupHubMarkup()}
         <div class="wc-head wc-head-open">
           <div>
-            <span class="wc-kicker">World Cup 2026 · לוח משחקים</span>
-            <h3>בחר תאריך</h3>
+            <span class="wc-kicker">World Cup 2026 · לוח משחקים לפי בתים</span>
+            <h3>בחר בית</h3>
           </div>
           <button class="wc-enter" type="button" data-wc-close="true">חזרה לסיכום <span aria-hidden="true">↑</span></button>
         </div>
-        <div class="wc-day-tabs" id="wcDayTabs" style="overflow-x:auto;display:flex;gap:6px;padding:10px 0;scrollbar-width:none">${dateTabs}</div>
-        <div class="wc-match-grid" id="wcDayGrid">${dayCards}</div>
+        <div class="wc-day-tabs" id="wcGroupTabs" style="overflow-x:auto;display:flex;gap:6px;padding:10px 0;scrollbar-width:none;flex-wrap:wrap">${groupTabs}</div>
+        <div class="wc-match-grid" id="wcGroupGrid">${groupCards}</div>
       `;
       wcStartCountdown();
       requestAnimationFrame(() => { target.classList.add("wc-body-in"); });
     }
 
     document.addEventListener("click", (e) => {
-      const datePill = e.target.closest && e.target.closest(".wc-day-pill[data-wc-date]");
-      if (datePill) {
-        state.wcActiveDate = datePill.getAttribute('data-wc-date');
+      const groupPill = e.target.closest && e.target.closest(".wc-day-pill[data-wc-group]");
+      if (groupPill) {
+        state.wcActiveGroup = groupPill.getAttribute('data-wc-group');
         renderWorldCup();
         return;
       }
