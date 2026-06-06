@@ -3540,6 +3540,13 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   if (payload?._winnerBlocked) {
     console.info("[winner-feed] Winner blocked — checking snapshot for today's picks");
     const snapshotNorm0 = normalizeFallbackRows(SNAPSHOT);
+    // Apply passesOpponentGate to snapshot tabs so invalid picks never leak through
+    for (const tabKey of ["yesterday", "today", "tomorrow"]) {
+      const tab = snapshotNorm0.tabs?.[tabKey];
+      if (tab?.sports?.football) {
+        tab.sports.football = tab.sports.football.filter(passesOpponentGate);
+      }
+    }
     const snapshotCountReal = (tab) =>
       [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
     const snapshotHasPicks = payloadMatchesIsraelDates(snapshotNorm0) &&
@@ -3553,6 +3560,12 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   if (!payload) {
     // buildWinnerFeedPayload threw — prefer the local snapshot (real Winner data) over Odds API.
     const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
+    for (const tabKey of ["yesterday", "today", "tomorrow"]) {
+      const tab = snapshotNorm1.tabs?.[tabKey];
+      if (tab?.sports?.football) {
+        tab.sports.football = tab.sports.football.filter(passesOpponentGate);
+      }
+    }
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
