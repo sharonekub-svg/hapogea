@@ -29,26 +29,7 @@ function aiCacheSet(key, value) {
   _aiCache.set(key, { value, exp: Date.now() + AI_CACHE_TTL_MS });
 }
 
-// ── Winner API helpers ────────────────────────────────────────────────────────
-
-function winnerHeaders(extra = {}) {
-  return {
-    "User-Agent": "Mozilla/5.0",
-    Origin: "https://www.winner.co.il",
-    Referer: "https://www.winner.co.il/",
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
-    RequestId: crypto.randomUUID(),
-    DeviceId: crypto.randomUUID(),
-    UserAgentData: JSON.stringify({
-      devicemodel: "", deviceos: "windows", deviceosversion: "10",
-      appversion: "2.6.1", apptype: "desktop", originId: 15, isAccessibility: false,
-    }),
-    appVersion: "2.6.1",
-    ...extra,
-  };
-}
+// ── Odds helpers ──────────────────────────────────────────────────────────────
 
 function cleanText(value) {
   return String(value || "").replace(/[‪-‮‌‎‏]/g, "").replace(/\s+/g, " ").trim();
@@ -63,22 +44,6 @@ async function fetchJson(url, options = {}) {
   const res = await fetch(url, { ...options, signal: AbortSignal.timeout(14000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
-}
-
-async function getWinnerLine() {
-  const hashMessage = JSON.stringify({ prevCurrentVersion: null, reason: "Initiated" });
-  const hashes = await fetchJson("https://api.winner.co.il/v2/publicapi/GetCMobileHashes", {
-    headers: winnerHeaders({ HashesMessage: hashMessage }),
-  });
-  const lineMessage = JSON.stringify({
-    prevCurrentVersion: null, newCurrentVersion: hashes.currentVersion,
-    lineNewHash: hashes.lineChecksum, reason: "Hashes not equal",
-  });
-  const line = await fetchJson(
-    `https://api.winner.co.il/v2/publicapi/GetCMobileLine?lineChecksum=${encodeURIComponent(hashes.lineChecksum)}`,
-    { headers: winnerHeaders({ HashesMessage: lineMessage }) }
-  );
-  return line.markets || [];
 }
 
 function winnerDateToIso(value) {
@@ -266,13 +231,15 @@ async function fetchApiFootballData(home, away) {
     const awayId = awaySearch.status === "fulfilled" ? awaySearch.value?.response?.[0]?.team?.id : null;
     if (!homeId && !awayId) return null;
 
-    // Fetch form (last 5 each) + H2H + injuries in parallel
-    const [homeForm, awayForm, h2h, homeInj, awayInj] = await Promise.allSettled([
+    // Fetch form, H2H, injuries, and standings all in parallel
+    const [homeForm, awayForm, h2h, homeInj, awayInj, homeStandings, awayStandings] = await Promise.allSettled([
       homeId ? fetch(`https://v3.football.api-sports.io/fixtures?team=${homeId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       awayId ? fetch(`https://v3.football.api-sports.io/fixtures?team=${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       (homeId && awayId) ? fetch(`https://v3.football.api-sports.io/fixtures/headtohead?h2h=${homeId}-${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       homeId ? fetch(`https://v3.football.api-sports.io/injuries?team=${homeId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       awayId ? fetch(`https://v3.football.api-sports.io/injuries?team=${awayId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      homeId ? fetch(`https://v3.football.api-sports.io/standings?team=${homeId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      awayId ? fetch(`https://v3.football.api-sports.io/standings?team=${awayId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
     ]);
 
     const parts = [];
@@ -288,18 +255,36 @@ async function fetchApiFootballData(home, away) {
         const d = (f.fixture?.date || "").slice(0, 10);
         const isHome = teamMatchScore(nameEn, fh) >= 0.5;
         const res = isHome
-          ? (gh > ga ? "נצ'" : gh < ga ? "הפסד" : "תיקו")
-          : (ga > gh ? "נצ'" : ga < gh ? "הפסד" : "תיקו");
+          ? (gh > ga ? "W" : gh < ga ? "L" : "D")
+          : (ga > gh ? "W" : ga < gh ? "L" : "D");
         return `  ${d}: ${fh} ${gh}:${ga} ${fa} [${res}]`;
       });
-      return `📊 ${nameEn} — פורמה (5 אחרונים):\n${lines.join("\n")}`;
+      return `FORM ${nameEn} (last 5):\n${lines.join("\n")}`;
     }
 
-    const homeFormVal = homeForm.status === "fulfilled" ? homeForm.value : null;
-    const awayFormVal = awayForm.status === "fulfilled" ? awayForm.value : null;
-    const h2hVal = h2h.status === "fulfilled" ? h2h.value : null;
-    const homeInjVal = homeInj.status === "fulfilled" ? homeInj.value : null;
-    const awayInjVal = awayInj.status === "fulfilled" ? awayInj.value : null;
+    function standingsLine(data, nameEn) {
+      const groups = data?.response?.[0]?.league?.standings || [];
+      for (const group of groups) {
+        for (const entry of group) {
+          if (teamMatchScore(nameEn, entry.team?.name || "") >= 0.5) {
+            const s = entry;
+            return `STANDING ${nameEn}: rank ${s.rank} | ${s.points}pts | ${s.all?.played}P ${s.all?.win}W ${s.all?.draw}D ${s.all?.lose}L | GD${s.goalsDiff > 0 ? "+" : ""}${s.goalsDiff} | form: ${s.form || ""}`;
+          }
+        }
+      }
+      return "";
+    }
+
+    const homeFormVal     = homeForm.status      === "fulfilled" ? homeForm.value      : null;
+    const awayFormVal     = awayForm.status      === "fulfilled" ? awayForm.value      : null;
+    const h2hVal          = h2h.status           === "fulfilled" ? h2h.value           : null;
+    const homeInjVal      = homeInj.status       === "fulfilled" ? homeInj.value       : null;
+    const awayInjVal      = awayInj.status       === "fulfilled" ? awayInj.value       : null;
+    const homeStandVal    = homeStandings.status === "fulfilled" ? homeStandings.value : null;
+    const awayStandVal    = awayStandings.status === "fulfilled" ? awayStandings.value : null;
+
+    if (homeStandVal) { const s = standingsLine(homeStandVal, homeEn); if (s) parts.push(s); }
+    if (awayStandVal) { const s = standingsLine(awayStandVal, awayEn); if (s) parts.push(s); }
 
     if (homeFormVal) { const s = formLines(homeFormVal, homeEn); if (s) parts.push(s); }
     if (awayFormVal) { const s = formLines(awayFormVal, awayEn); if (s) parts.push(s); }
@@ -314,16 +299,16 @@ async function fetchApiFootballData(home, away) {
         const d = (f.fixture?.date || "").slice(0, 10);
         return `  ${d}: ${fh} ${gh}:${ga} ${fa}`;
       });
-      parts.push(`🔄 H2H (5 עימותים אחרונים):\n${h2hLines.join("\n")}`);
+      parts.push(`H2H (last 5):\n${h2hLines.join("\n")}`);
     }
 
     function injLines(data, nameEn) {
       const injured = (data?.response || []).filter(i =>
-        /injur|פצוע/i.test(i.player?.type || "") || /injur/i.test(i.player?.reason || "")
-      ).slice(0, 5);
+        /injur|suspend/i.test(i.player?.type || "") || /injur/i.test(i.player?.reason || "")
+      ).slice(0, 6);
       if (!injured.length) return "";
-      const lines = injured.map(i => `  ${i.player?.name || "?"} — ${i.player?.reason || "פציעה"}`);
-      return `🚑 פצועים — ${nameEn}:\n${lines.join("\n")}`;
+      const lines = injured.map(i => `  ${i.player?.name || "?"} (${i.player?.reason || "injury"})`);
+      return `INJURIES ${nameEn}:\n${lines.join("\n")}`;
     }
 
     if (homeInjVal) { const s = injLines(homeInjVal, homeEn); if (s) parts.push(s); }
@@ -556,73 +541,69 @@ function parseQuery(text) {
 
 // ── Groq API call ────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are HaPogea's senior sports analyst — an elite AI agent specializing in soccer, basketball, statistics, odds, and match intelligence.
+const SYSTEM_PROMPT = `אתה האנליסט הראשי של הפוגע — מומחה בכדורגל, כדורסל, סטטיסטיקה ושווקי הימורים.
 
-You receive structured real-time data from Winner, The Odds API, API-Football (form + H2H + injuries). Use ALL provided data.
+אתה מקבל נתוני שוק + נתוני מחקר (פורמה, H2H, פציעות, טבלה). השתמש בכולם בטבעיות — אל תציין מאיפה הנתונים.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MANDATORY RESPONSE FORMAT — NO EXCEPTIONS
-Every single analysis response MUST follow this exact structure. Skipping any section is failure.
+פורמט חובה לכל ניתוח:
 
-**ניתוח:** [2-3 sentences. Cover: current form, H2H record, tactical edge. Cite actual stats from the data provided — goals scored, win streaks, key absences.]
+**ניתוח:** [2-3 משפטים. כסה: פורמה עדכנית, H2H, פציעות ומיקום בטבלה — אם רלוונטי. ציין נתונים מספריים ספציפיים.]
 
-**המלצה:** [Single clear pick. Name the team/outcome explicitly.]
+**המלצה:** [בחירה אחת ברורה. שם הקבוצה/תוצאה במפורש.]
 
-**ביטחון:** [X% — one specific number. Never a range. Commit to it.]
+**ביטחון:** [X% — מספר אחד. אף פעם לא טווח.]
 
-**הנימוק:** [One sentence: WHY this pick, based on the data.]
+**הנימוק:** [משפט אחד: למה הבחירה הזאת, לפי הנתונים.]
 
 ---
-**💬 מה אני באמת חושב:** [1-2 sentences. Honest. No hedging. No "depends". Your real verdict.]
+**💬 מה אני באמת חושב:** [1-2 משפטים. ישיר. בלי גידור. הדעה האמיתית.]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## HOW TO USE THE DATA PROVIDED
+## כיצד להשתמש בנתונים
 
-### Odds (Winner / The Odds API)
-- Always calculate implied probability: 1/odds × 100%
-- If home odds = 1.75 → implied = 57.1% — cite this number
-- Note overround (sum of implied > 100%) and what it means
+### יחסי שוק
+- תמיד חשב הסתברות גלומה: 1/יחס × 100%
+- ציין את המספר: "יחס 1.75 = 57% לפי השוק"
+- שים לב לפער בין השוק לניתוח שלך
 
-### Form (API-Football last 5)
-- Count wins/draws/losses from the data. State it: "4W-1D in last 5"
-- If away form differs from home form, flag it
+### פורמה (5 אחרונים)
+- ספור ניצחונות/תיקוים/הפסדים: "4W-1D בחמישה האחרונים"
+- אם הפורמה הביתית שונה מחוץ — ציין
 
-### H2H (head-to-head)
-- Count who won more. State: "X won 3 of last 5 meetings"
-- Note if the H2H pattern contradicts the current odds
+### H2H
+- מי ניצח יותר: "X ניצח ב-3 מתוך 5 עימותים"
+- אם ה-H2H סותר את השוק — ציין
 
-### Injuries
-- If injury data is provided, ALWAYS mention key absences in **ניתוח**
-- State it clearly: "X missing [position], which weakens their [attack/defense]"
-- If no injuries listed: assume squad is healthy
+### פציעות ומיקום בטבלה
+- שלב את המידע טבעית בניתוח — לא כהודעה נפרדת
+- "X נכנסים עם הגנה שלמה, Y בלי שני שחקני ציר" — ככה
+- מיקום בטבלה: ציין אם רלוונטי לדינמיקה של המשחק
 
-## WORLD CUP 2026 GUIDANCE
-- World Cup 2026 starts June 11, 2026. Group stage runs through July.
-- You have knowledge of all 48 qualified teams, their coaches, systems, and group dynamics.
-- For WC analysis: cover group context (who needs the points), travel/climate factors, squad depth.
-- If user asks about a WC match and no odds are provided, you STILL give a full analysis.
+## מונדיאל 2026
+- מונדיאל 2026 מתחיל 11 ביוני 2026. בקבוצות עד יולי.
+- יש לך ידע על כל 48 הנבחרות, מאמנים, שיטות ודינמיקת הבתים.
+- ניתוח מונדיאל: הקשר קבוצתי, מי צריך נקודות, עומק סגל.
 
-## BANNED BEHAVIORS
-- "קשה לתת תחזית" — NEVER
-- "לא מספיק נתונים" for any major team — NEVER
-- Vague "it could go either way" conclusions — NEVER
-- Repeating the same sentence — NEVER
-- Naming individual players beyond what's in injury data — NEVER
+## אסורים בהחלט
+- "קשה לתת תחזית" — לעולם לא
+- "לא מספיק נתונים" — לעולם לא
+- "תוכל לספק לי..." / "שלח לי..." / לבקש מידע מהמשתמש — לעולם לא
+- "זה יכול ללכת לכל כיוון" — לעולם לא
+- ציון מקורות הנתונים בתשובה (לא "לפי API", לא "לפי Winner") — לעולם לא
+- חזרה על אותו משפט — לעולם לא
 
-## Language
-Hebrew only. Fluent, direct, Israeli sports analyst voice. Short sentences. No filler.
+## שפה
+עברית בלבד. ישיר, קצר, קול של אנליסט ספורט ישראלי. אין מילוי.
 
-## Odds present → use them
-Calculate implied prob, note market edge, cite the number in your analysis.
+## אין יחסי שוק
+נתח לפי ידע + נתוני מחקר. לא לציין שאין נתוני שוק.
 
-## No odds → use knowledge
-Note: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני שוק בזמן אמת." Then give full analysis anyway.
+## הודעות המשך
+"מחר", "ומה עם הגמר?", "כן" — המשך שיחה. לעולם לא לשאול "מי הקבוצות?" אם כבר נאמר.
 
-## Follow-up messages
-"מחר", "ומה עם הגמר?", "כן", "מה הסיכויים?" — treat as follow-up. Never ask "מי הקבוצות?" if already established.
-
-## Betting rule
-If asked "מה לשים" / "על מה להמר" — say: "אני לא נותן הוראות הימור. לפי הנתונים:" then give analysis.`;
+## כלל הימורים
+אם שואלים "מה לשים" / "על מה להמר" — "אני לא נותן הוראות הימור. לפי הניתוח:" ואז תן ניתוח.`;
 
 
 function buildMessages(userMessage, conversationHistory) {
@@ -790,90 +771,25 @@ module.exports = async (req, res) => {
   try {
     const { home, away, dateKey, offset, competition, rawCompetitionFallback, isFinal } = parseQuery(query);
 
-    try {
-      const markets = await getWinnerLine();
-      const dateLabel = offset === 0 ? "היום" : offset === 1 ? "מחר" : "אתמול";
-
-      let found = (home || away) ? findMatchInMarkets(markets, home, away, dateKey) : null;
-      if (!found && (home || away)) found = findMatchInMarkets(markets, home, away, null);
-
-      if (found) {
-        matchInfo = { desc: found.desc, league: found.league, date: found.date };
-        const formatted = formatMarketsForPrompt(markets, found.eId);
-        const dl = found.date === dateKey ? dateLabel : found.date;
-        winnerSection = `✅ נמצא ב-Winner: ${found.desc}\nליגה: ${found.league}\nתאריך: ${dl} (${found.date})\n\nשווקים ויחסים:\n${formatted}`;
-
-      } else {
-        const contextMatches = findMatchesByContext(markets, { competition, rawCompetitionFallback, dateKey, isFinal });
-
-        if (contextMatches.length === 1) {
-          const m = contextMatches[0];
-          matchInfo = { desc: m.desc, league: m.league, date: m.date };
-          const formatted = formatMarketsForPrompt(markets, m.eId);
-          winnerSection = `✅ נמצא ב-Winner: ${m.desc}\nליגה: ${m.league}\nתאריך: ${m.date} ${m.time}\n\nשווקים ויחסים:\n${formatted}`;
-
-        } else if (contextMatches.length > 1) {
-          const lines = contextMatches.slice(0, 8).map(m => {
-            const odds = formatMarketsForPrompt(markets, m.eId);
-            return `📅 ${m.date} ${m.time} | ${m.league}\n⚽ ${m.desc}\n${odds}`;
-          }).join("\n\n---\n\n");
-          winnerSection = `נמצאו ${contextMatches.length} משחקים רלוונטיים ב-Winner:\n\n${lines}`;
-
-        } else if (home || away) {
-          winnerSection = `⚠️ לא מצאתי "${[home, away].filter(Boolean).join(" נגד ")}" ב-Winner. ייתכן שהמשחק עבר, נדחה, או שם הקבוצה שונה.`;
-
-        } else {
-          if (dateKey) {
-            const schedule = formatScheduleSummary(markets, dateKey);
-            winnerSection = schedule.length > 0
-              ? `לוח משחקים ${dateLabel} (${dateKey}) ב-Winner:\n${schedule.join("\n")}`
-              : `לא מצאתי משחקים ב-Winner ל-${dateLabel} (${dateKey}).`;
-          } else {
-            const allUpcoming = formatScheduleSummary(markets, null);
-            winnerSection = allUpcoming.length > 0
-              ? `משחקים קרובים ב-Winner:\n${allUpcoming.join("\n")}`
-              : "לא מצאתי משחקים קרובים ב-Winner כרגע.";
-          }
-        }
-      }
-    } catch (winnerErr) {
-      winnerSection = `⚠️ לא הצלחתי להתחבר ל-Winner (${winnerErr.message}).`;
-    }
-
-    // Always fetch stats + external odds in parallel (regardless of Winner status)
-    // Stats enrich analysis even when Winner has odds — form, H2H, injuries are independent
-    const [apifResult, oddsResult] = await Promise.allSettled([
-      (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
+    // Fetch odds + stats in parallel
+    const [oddsResult, apifResult] = await Promise.allSettled([
       (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
+      (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
     ]);
-    const statsSection = apifResult.status === "fulfilled" && apifResult.value ? apifResult.value : "";
-    const externalOdds = oddsResult.status === "fulfilled" && oddsResult.value ? oddsResult.value : "";
+    const oddsSection  = oddsResult.status  === "fulfilled" && oddsResult.value  ? oddsResult.value  : "";
+    const statsSection = apifResult.status  === "fulfilled" && apifResult.value  ? apifResult.value  : "";
 
-    // Append external odds to winnerSection only when Winner has no data
-    const winnerLackingOdds = !winnerSection || winnerSection.startsWith("⚠️") || winnerSection.startsWith("לא מצאתי");
-    if (winnerLackingOdds && externalOdds) {
-      winnerSection = (winnerSection ? winnerSection + "\n\n" : "") + externalOdds;
-    }
+    if (oddsSection) winnerSection = oddsSection;
 
-    const hasLiveOdds = winnerSection && !winnerSection.startsWith("⚠️") && winnerSection.length > 30;
-    const safeQuery = query.replace(/`/g, "'").replace(/\$\{/g, "\\${" );
-    const dataInstruction = hasLiveOdds
-      ? "יש יחסי שוק — חשב הסתברות גלומה (1/יחס) לכל תוצאה ונתח לפי הנתונים."
-      : "אין יחסי שוק בזמן אמת — בצע ניתוח מעמיק לפי ידע כללי ונתוני הסטטיסטיקה שסופקו.";
-
+    const safeQuery = query.replace(/`/g, "'").replace(/\$\{/g, "\\${");
     const sections = [
       `שאלת המשתמש: ${safeQuery}`,
-      "",
-      "══ יחסי שוק (Winner / Odds API) ══",
-      winnerSection || "(אין נתוני שוק)",
     ];
-    if (statsSection) {
-      sections.push("", "══ סטטיסטיקות | פורמה | H2H | פציעות (API-Football) ══", statsSection);
-    }
-    sections.push("═══════════════════════════════════", "", `ענה בעברית. ${dataInstruction} אל תיתן הוראות הימור.`);
+    if (winnerSection) sections.push("", "── יחסי שוק ──", winnerSection);
+    if (statsSection)  sections.push("", "── נתוני מחקר ──", statsSection);
+    sections.push("", "ענה בעברית. השתמש בכל הנתונים שסופקו. אל תציין מקורות. אל תיתן הוראות הימור.");
     const userMessage = sections.join("\n");
 
-    // Non-streaming path: check cache first (streaming is always live)
     if (!wantStream) {
       const cacheKey = aiCacheKey(safeQuery, winnerSection);
       const cached = aiCacheGet(cacheKey);
@@ -892,23 +808,18 @@ module.exports = async (req, res) => {
     await streamClaude(res, userMessage, history);
   } catch (err) {
     console.error("Reuven API error:", err);
-    // If we've already started streaming bytes, we can only finish the stream.
     if (res.headersSent) { try { res.end(); } catch {} return; }
 
     const isQuota = /429|quota|rate.?limit/i.test(err.message);
-    const quotaText = (() => {
-      const hasWinnerData = winnerSection && !winnerSection.startsWith("⚠️") && winnerSection.length > 20;
-      return hasWinnerData
-        ? `ה-AI לא זמין כרגע (מכסה יומית מוצתה). הנה נתוני Winner ישירות:\n\n${winnerSection}`
-        : `ה-AI לא זמין כרגע (מכסה יומית מוצתה). ${winnerSection || "נסה שוב מאוחר יותר."}`;
-    })();
-    const errText = isQuota ? quotaText : `שגיאה טכנית: ${err.message}. אנא נסה שוב.`;
+    const errText = isQuota
+      ? "ה-AI לא זמין כרגע. אנא נסה שוב בעוד מספר דקות."
+      : `שגיאה טכנית. אנא נסה שוב.`;
 
     if (wantStream) {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.status(200).end(errText);
       return;
     }
-    res.status(200).json({ ok: false, answer: errText, matchInfo: isQuota ? matchInfo : null });
+    res.status(200).json({ ok: false, answer: errText, matchInfo: null });
   }
 };
