@@ -12,8 +12,19 @@ const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
 // Keyed by SHA-256 of (query + winnerData). TTL: 4 minutes.
 const _aiCache = new Map();
 const AI_CACHE_TTL_MS = 4 * 60 * 1000;
-function aiCacheKey(query, winnerSection) {
-  return crypto.createHash("sha256").update(`${query}|${(winnerSection || "").slice(0, 500)}`).digest("hex").slice(0, 16);
+function aiCacheKey(query, winnerSection, historyFingerprint) {
+  return crypto.createHash("sha256")
+    .update(`${query}|${(winnerSection || "").slice(0, 500)}|${historyFingerprint || ""}`)
+    .digest("hex").slice(0, 16);
+}
+function historyFingerprint(history) {
+  // Hash of last 3 user messages so same query in different conversations gets different cache
+  const sig = history
+    .filter(h => h.role === "user")
+    .slice(-3)
+    .map(h => (h.text || "").slice(0, 100))
+    .join("|");
+  return sig ? crypto.createHash("sha256").update(sig).digest("hex").slice(0, 8) : "";
 }
 function aiCacheGet(key) {
   const entry = _aiCache.get(key);
@@ -606,16 +617,26 @@ const SYSTEM_PROMPT = `אתה האנליסט הראשי של הפוגע — מו
 ## שפה
 עברית בלבד. ישיר, קצר, קול של אנליסט ספורט ישראלי. אין מילוי.
 
-## ניהול הקשר שיחה
-- "כדורסל" / "מה עם כדורסל?" אחרי שאלה על משחק → אותן קבוצות, ענף כדורסל. לעולם לא לשאול "באיזה משחק?"
-- "מחר", "ומה עם הגמר?", "כן" → המשך שיחה. לעולם לא לשאול "מי הקבוצות?" אם כבר נאמר.
+## ניהול הקשר שיחה — CRITICAL
+כאשר הבקשה לא מכילה שמות קבוצות, **חפש את הקבוצות מהשאלה הקודמת** בשיחה.
+אסור לשאול "באיזה משחק?" / "מי הקבוצות?" / "על מה אתה מדבר?" — בכלל.
+
+דוגמאות:
+- "ארסנל נגד פריז" → "כמה גולים יהיו?" = ארסנל נגד פריז, שאלה על גולים. ענה.
+- "מי השחקנים?" / "מה ההרכב?" = אותו משחק מהשאלה הקודמת. ענה על הרכב.
+- "כדורסל" / "מה עם כדורסל?" אחרי שאלה על משחק = אותן קבוצות, ענף כדורסל.
+- "מה הסיכויים?" / "מה אתה חושב?" / "ומה עם..." = המשך ישיר של השיחה הנוכחית.
+- "מחר", "ומה עם הגמר?", "כן", "ולמה?" = המשך שיחה בהתאם להקשר.
+- "ומה על ה-H2H?" / "פציעות?" / "מה הפורמה?" = אותו משחק, שאלת המשך.
+
+אם ניתן בהקשר "הקשר: המשתמש מתייחס ל-X נגד Y" — זה **חד משמעי**, ענה על X נגד Y.
 
 ## כלל הימורים
 אם שואלים "מה לשים" / "על מה להמר" — "אני לא נותן הוראות הימור. לפי הניתוח:" ואז תן ניתוח.`;
 
 
 function buildMessages(userMessage, conversationHistory) {
-  const historyMsgs = conversationHistory.slice(-6)
+  const historyMsgs = conversationHistory.slice(-8)
     .map(h => ({ role: h.role === "user" ? "user" : "assistant", content: h.text || "" }))
     .filter(h => h.content.trim().length > 0);
 
@@ -768,9 +789,9 @@ module.exports = async (req, res) => {
     res.status(400).json({ error: "Missing query" });
     return;
   }
-  const history = rawHistory.slice(-6).map((m) => ({
+  const history = rawHistory.slice(-8).map((m) => ({
     role: m.role === "user" ? "user" : "assistant",
-    text: sanitizeInput(m.text, 500),
+    text: sanitizeInput(m.text, 1500),
   }));
 
   let winnerSection = "";
@@ -783,22 +804,30 @@ module.exports = async (req, res) => {
     const lc = query.toLowerCase();
     const isBasketballQuery = /כדורסל|basketball|nba|euroleague|bbl|acb|nbl/i.test(lc);
     const isFootballQuery   = /כדורגל|football|soccer|ליגה|premier|bundesliga|serie|ligue|copa|מונדיאל/i.test(lc);
-    // If only a sport keyword with no teams, look for teams in recent history
-    const teamsFromHistory = (!home && !away && history.length > 0)
+    // If no teams in current query, look for teams + competition + sport in recent history
+    const contextFromHistory = (!home && !away && history.length > 0)
       ? (() => {
           for (let i = history.length - 1; i >= 0; i--) {
             const p = parseQuery(history[i].text || "");
-            if (p.home && p.away) return p;
+            if (p.home && p.away) {
+              // Also scan history text for sport type
+              const htext = (history[i].text || "").toLowerCase();
+              const histBasketball = /כדורסל|basketball|nba|euroleague|bbl|acb|nbl/i.test(htext);
+              return { ...p, histBasketball };
+            }
           }
           return null;
         })()
       : null;
-    const resolvedHome = home || teamsFromHistory?.home || null;
-    const resolvedAway = away || teamsFromHistory?.away || null;
+    const teamsFromHistory = contextFromHistory; // alias for context note
+    const resolvedHome = home || contextFromHistory?.home || null;
+    const resolvedAway = away || contextFromHistory?.away || null;
+    const resolvedCompetition = competition || contextFromHistory?.competition || null;
+    const resolvedBasketball = isBasketballQuery || (!isFootballQuery && contextFromHistory?.histBasketball) || false;
 
     // Fetch odds + stats in parallel
     const [oddsResult, apifResult] = await Promise.allSettled([
-      (resolvedHome || resolvedAway) ? fetchOddsApiData(resolvedHome || "", resolvedAway || "", competition) : Promise.resolve(null),
+      (resolvedHome || resolvedAway) ? fetchOddsApiData(resolvedHome || "", resolvedAway || "", resolvedCompetition) : Promise.resolve(null),
       (resolvedHome && resolvedAway) ? fetchApiFootballData(resolvedHome, resolvedAway) : Promise.resolve(null),
     ]);
     const oddsSection  = oddsResult.status  === "fulfilled" && oddsResult.value  ? oddsResult.value  : "";
@@ -817,17 +846,21 @@ module.exports = async (req, res) => {
     const sections = [
       `שאלת המשתמש: ${safeQuery}`,
     ];
-    if (teamsFromHistory && (!home && !away)) {
-      sections.push(`הקשר: המשתמש מתייחס ל-${resolvedHome} נגד ${resolvedAway} מהשיחה הקודמת.`);
+    if (contextFromHistory && (!home && !away)) {
+      const ctx = [`הקשר: המשתמש מתייחס ל-${resolvedHome} נגד ${resolvedAway} מהשיחה הקודמת.`];
+      if (resolvedCompetition) ctx.push(`תחרות: ${resolvedCompetition}.`);
+      if (resolvedBasketball) ctx.push("ענף: כדורסל.");
+      sections.push(ctx.join(" "));
     }
-    if (isBasketballQuery && !isFootballQuery) sections.push("ענף ספורט: כדורסל");
+    if (resolvedBasketball && !contextFromHistory?.histBasketball) sections.push("ענף ספורט: כדורסל");
     if (winnerSection) sections.push("", "── יחסי שוק ──", winnerSection);
     if (statsSection)  sections.push("", "── נתוני מחקר מאומתים ──", statsSection);
     sections.push("", `ענה בעברית. ${dataNote} אל תציין מקורות. אל תיתן הוראות הימור.`);
     const userMessage = sections.join("\n");
 
     if (!wantStream) {
-      const cacheKey = aiCacheKey(safeQuery, winnerSection);
+      const hFp = historyFingerprint(history);
+      const cacheKey = aiCacheKey(safeQuery, winnerSection, hFp);
       const cached = aiCacheGet(cacheKey);
       if (cached) {
         return res.status(200).json({ ok: true, answer: cached, matchInfo, cached: true });
