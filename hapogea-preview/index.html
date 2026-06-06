@@ -3876,6 +3876,223 @@
       .auth-modal-card { padding: 30px 20px 24px !important; }
     }
 
+    /* Premium modal */
+    .pm-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,.82); display: flex;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .pm-overlay.hidden { display: none !important; }
+    .pm-card {
+      background: linear-gradient(145deg,#0d1820,#1a2a3a);
+      border: 1px solid rgba(85,214,255,.25);
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 380px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 0 60px rgba(85,214,255,.15), 0 0 30px rgba(230,57,70,.1);
+      animation: auth-modal-enter .35s cubic-bezier(.22,.68,0,1.1) both;
+    }
+    .pm-close {
+      position: absolute; top: 14px; left: 14px;
+      background: none; border: none;
+      color: rgba(255,255,255,.45); font-size: 22px;
+      cursor: pointer; line-height: 1; padding: 4px;
+      border-radius: 6px; transition: color .15s;
+    }
+    .pm-close:hover { color: rgba(255,255,255,.8); }
+    .pm-header { text-align: center; margin-bottom: 22px; }
+    .pm-icon { font-size: 38px; margin-bottom: 8px; }
+    .pm-title { margin: 0; font: 900 26px/1 Heebo, sans-serif; color: #fff; }
+    .pm-subtitle {
+      margin: 6px 0 0; font-size: 13px; font-weight: 800;
+      background: linear-gradient(90deg,#55d6ff,#e63946);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pm-features { list-style: none; padding: 0; margin: 0 0 22px; display: grid; gap: 10px; }
+    .pm-features li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,.85); }
+    .pm-features li .pm-feat-icon { color: #55d6ff; font-size: 15px; flex-shrink: 0; }
+    .pm-input {
+      width: 100%; box-sizing: border-box;
+      padding: 12px 16px; border-radius: 10px;
+      border: 1px solid rgba(85,214,255,.3);
+      background: rgba(255,255,255,.06); color: #fff;
+      font-size: 15px; font-family: Heebo, sans-serif;
+      text-align: center; letter-spacing: 2px;
+      transition: border-color .2s;
+    }
+    .pm-input:focus { outline: none; border-color: rgba(85,214,255,.6); }
+    .pm-error { color: #e63946; font-size: 12px; text-align: center; margin: 8px 0 12px; min-height: 16px; }
+    .pm-submit {
+      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg,#55d6ff,#2196f3);
+      color: #06131a; font-weight: 900; font-size: 16px;
+      font-family: Heebo, sans-serif; cursor: pointer; letter-spacing: .5px;
+      transition: opacity .2s, transform .15s;
+    }
+    .pm-submit:hover { opacity: .92; transform: translateY(-1px); }
+    .pm-submit:active { transform: translateY(0); }
+    .pm-footer {
+      margin-top: 16px; padding: 12px 16px;
+      background: rgba(85,214,255,.06);
+      border: 1px solid rgba(85,214,255,.15);
+      border-radius: 10px; text-align: center;
+    }
+    .pm-footer p { margin: 0 0 6px; font-size: 12px; color: rgba(255,255,255,.5); }
+    .pm-footer a { color: #55d6ff; font: 800 13px Heebo, sans-serif; text-decoration: none; }
+    .pm-footer a:hover { text-decoration: underline; }
+
+    /* ── Privacy Policy Checkbox ── */
+    .gate-privacy-wrap {
+      width: 100%;
+      margin: 12px 0 4px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .gate-privacy-wrap input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      accent-color: #55d6ff;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .gate-privacy-label {
+      font-size: 12px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.5;
+      cursor: pointer;
+      user-select: none;
+      text-align: right;
+    }
+    .gate-privacy-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #55d6ff;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .gate-privacy-link:hover { color: #80e8ff; }
+    .gate-google-btn:disabled, .gate-skip:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .auth-privacy-wrap {
+      width: 100%;
+      margin: 10px 0 2px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .auth-privacy-wrap input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      min-width: 15px;
+      accent-color: #6366f1;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .auth-privacy-label {
+      font-size: 11.5px;
+      color: rgba(255,255,255,.42);
+      line-height: 1.5;
+      cursor: pointer;
+      user-select: none;
+    }
+    .auth-privacy-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #818cf8;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .auth-google-btn:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── World Cup Mobile Improvements ── */
+    @media (max-width: 640px) {
+      /* Hub header */
+      .wc-hub-hero { padding: 18px 14px 16px; }
+      .wc-hub-sub { font-size: 12px; }
+      .wc-count-cell b { font-size: 20px; }
+      .wc-count-cap { font-size: 11px; }
+      .wc-fact b { font-size: 20px; }
+      .wc-hosts-wrap { padding: 10px 12px; gap: 10px; }
+      .wc-tl-item { min-width: 68px; padding: 9px 5px 7px; }
+      .wc-tl-date { font-size: 12px; }
+      .wc-tl-label { font-size: 10px; }
+      .wc-stage-chip { padding: 6px 10px; font-size: 12px; }
+      /* Match card container */
+      .wc-match { padding: 10px; gap: 8px; }
+      .wc-card-top { gap: 6px; }
+      /* Keep teams HORIZONTAL on mobile — home | vs | away */
+      .wc-teams { grid-template-columns: 1fr auto 1fr !important; gap: 6px !important; }
+      .wc-team { padding: 7px 4px; }
+      .wc-flag { width: 38px !important; height: 38px !important; border-radius: 5px; }
+      .wc-flag img { width: 38px !important; height: 38px !important; }
+      .wc-team b { font-size: 11px; max-width: min(88px, 25vw); min-height: 26px; line-height: 1.2; }
+      .wc-prediction { min-width: 50px !important; }
+      .wc-prediction b { font-size: 17px; }
+      .wc-prediction span { font-size: 9px; }
+      /* Keep odds HORIZONTAL — 3 columns */
+      .wc-odds { grid-template-columns: repeat(3, 1fr) !important; gap: 5px !important; }
+      .wc-odd { min-height: 46px !important; padding: 5px 3px !important; font-size: 10px; }
+      .wc-odd b { font-size: 13px; margin-top: 1px; }
+      /* Keep date row HORIZONTAL — date box + details */
+      .wc-date-row { grid-template-columns: auto 1fr !important; gap: 8px !important; }
+      .wc-datebox { width: auto !important; min-width: 54px; min-height: 48px; }
+      /* Text and misc */
+      .wc-why { font-size: 11px; padding: 8px; }
+      .wc-factors { gap: 4px; }
+      .wc-head h3 { font-size: 18px; }
+      .wc-head p { font-size: 12px; }
+      .wc-body { padding: 10px !important; }
+      .wc-match-grid { gap: 8px; grid-template-columns: 1fr !important; }
+      .wc-toolbar { padding: 7px; gap: 6px; }
+      .wc-day-pill { padding: 5px 7px; font-size: 11px; }
+    }
+    @media (max-width: 400px) {
+      .wc-hub-hero { padding: 14px 10px 12px; }
+      .wc-hub-title { font-size: 20px !important; }
+      .wc-hub-sub { font-size: 11px; }
+      .wc-count-cell b { font-size: 18px; }
+      .wc-team b { font-size: 10px; max-width: min(76px, 22vw); }
+      .wc-flag { width: 32px !important; height: 32px !important; }
+      .wc-flag img { width: 32px !important; height: 32px !important; }
+      .wc-prediction { min-width: 44px !important; }
+      .wc-odd b { font-size: 12px; }
+    }
+
+    /* ── AI Image Upload Button ── */
+    .ai-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.45);
+      font: 700 11.5px Heebo, sans-serif;
+      cursor: pointer;
+      transition: border-color .18s, color .18s, background .18s;
+      white-space: nowrap;
+    }
+    .ai-upload-btn:hover { border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.7); background: rgba(255,255,255,.07); }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -4190,7 +4407,12 @@
           <p class="hero-copy">
             הפוגע מציג משחקים עם יתרון סטטיסטי ויחס Winner פעיל. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים. כל נתון מבוסס על Winner בלבד.
           </p>
-          <div class="stats"></div>
+          <div class="stats" id="heroStats">
+            <div class="stat skeleton-card" style="height:78px"></div>
+            <div class="stat skeleton-card" style="height:78px"></div>
+            <div class="stat skeleton-card" style="height:78px"></div>
+            <div class="stat skeleton-card" style="height:78px"></div>
+          </div>
         </div>
       </div>
       <aside class="hero-side" id="dailyTip"></aside>
@@ -4261,21 +4483,14 @@
         <div id="stats-header" class="stats-header" style="display:none">ביצועי היום</div>
         <div id="pick-stats" class="pick-stats-bar" aria-live="polite"></div>
         <div class="cards" id="cards">
-          <div class="empty" style="visibility:hidden">טוען...</div>
+          <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:88%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
+          <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:76%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
+          <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:63%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:82%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
         </div>
       </section>
     </section>
 
-    <section class="panel debug-panel" id="debugPanel">
-      <div class="section-title">
-        <div>
-          <h3>Debug Audit</h3>
-          <p id="debugMeta">Accepted and rejected Winner candidates with exact reasons.</p>
-        </div>
-        <span class="pill">/debug</span>
-      </div>
-      <div class="debug-grid" id="debugRows"></div>
-    </section>
+    <section class="panel debug-panel" id="debugPanel"></section>
   </main>
 
   <footer class="footer">
@@ -4356,7 +4571,7 @@
       } catch {
         return false;
       } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'פתח פרימיום 🔓'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'פתח גישה מלאה 🔓'; }
       }
     }
     function premiumDaysLeft() {
@@ -4976,6 +5191,46 @@
           renderStats();
         }
       } catch {}
+    }
+
+    function renderHeroStats() {
+      const el = document.getElementById("heroStats");
+      if (!el) return;
+      if (!state.feed) return;
+      const tabs = state.feed.tabs || {};
+      const days = ["yesterday", "today", "tomorrow"];
+      let allRows = [];
+      days.forEach(d => {
+        ["football", "basketball"].forEach(sport => {
+          const rows = tabs[d]?.sports?.[sport] || tabs[d]?.[sport] || [];
+          allRows = allRows.concat(rows);
+        });
+      });
+      const picks = allRows.filter(r => !r.noOddsYet);
+      let won = 0, lost = 0;
+      picks.forEach(r => {
+        const o = rowOutcome(r);
+        if (o.key === "hit") won++;
+        else if (o.key === "miss") lost++;
+      });
+      const settled = won + lost;
+      const hitRate = settled ? Math.round((won / settled) * 100) : null;
+      const oddsRows = picks.filter(r => (r.oddsRaw || r.odds) > 1);
+      const avgOdds = oddsRows.length > 0
+        ? oddsRows.reduce((s, r) => s + (r.oddsRaw || r.odds || 0), 0) / oddsRows.length
+        : null;
+      const todayRows = ["football", "basketball"].flatMap(s =>
+        tabs.today?.sports?.[s] || tabs.today?.[s] || []
+      );
+      const items = [
+        { label: "ניתוחי היום", value: todayRows.length || "—" },
+        { label: "נתפסו", value: won > 0 ? won : "—", style: won > 0 ? "color:#15803D" : "" },
+        { label: "אחוז הצלחה", value: hitRate !== null ? `${hitRate}%` : "—", style: hitRate >= 60 ? "color:#15803D" : hitRate >= 50 ? "color:#ca8a04" : hitRate > 0 ? "color:#DC2626" : "" },
+        { label: "יחס ממוצע", value: avgOdds ? avgOdds.toFixed(2) : "—" },
+      ];
+      el.innerHTML = items.map(({ label, value, style }) =>
+        `<div class="stat"><b style="${style || ""}">${value}</b><span>${label}</span></div>`
+      ).join("");
     }
 
     function renderStats() {
@@ -6688,13 +6943,23 @@
     }
 
     function renderDebug() {
+      const panel = document.getElementById("debugPanel");
+      if (!panel) return;
+      if (!state.debugMode) {
+        panel.innerHTML = "";
+        return;
+      }
+      if (!panel.querySelector(".debug-grid")) {
+        panel.innerHTML = `
+          <div class="section-title">
+            <div><h3>Debug Audit</h3><p id="debugMeta">Accepted and rejected Winner candidates with exact reasons.</p></div>
+            <span class="pill">/debug</span>
+          </div>
+          <div class="debug-grid" id="debugRows"></div>`;
+      }
       const target = document.getElementById("debugRows");
       const meta = document.getElementById("debugMeta");
       if (!target || !meta) return;
-      if (!state.debugMode) {
-        target.innerHTML = "";
-        return;
-      }
       if (state.error) {
         target.innerHTML = `<div class="error">${state.error}</div>`;
         meta.textContent = "Debug data failed to load";
@@ -8061,6 +8326,7 @@
           rememberOpenPredictions(local.feed);
           settleTrackedPredictions(local.feed);
           render();
+          renderHeroStats();
           finishProgress();
           showRefreshBar(true);
         } else {
@@ -8103,6 +8369,7 @@
         finishProgress();
         showRefreshBar(false);
         render();
+        renderHeroStats();
         scheduleRefresh(state.feed);
       }
     }
@@ -8768,38 +9035,33 @@
   </script>
 
   <!-- Premium Modal -->
-  <div id="premiumModal" class="hidden" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)">
-    <div style="background:linear-gradient(145deg,#0d1820,#1a2a3a);border:1px solid rgba(85,214,255,.25);border-radius:20px;padding:36px 32px;max-width:380px;width:90%;position:relative;box-shadow:0 0 60px rgba(85,214,255,.15),0 0 30px rgba(230,57,70,.1)">
-      <button onclick="closePremiumModal()" style="position:absolute;top:14px;left:14px;background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;line-height:1">×</button>
-      <div style="text-align:center;margin-bottom:20px">
-        <div style="font-size:40px;margin-bottom:8px">🎯</div>
-        <h2 style="margin:0;font:900 26px/1 Heebo,sans-serif;color:#fff">הפוגע</h2>
-        <p style="margin:4px 0 0;font-size:13px;background:linear-gradient(90deg,#55d6ff,#e63946);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800">מהדורת פרימיום</p>
+  <div id="premiumModal" class="pm-overlay hidden">
+    <div class="pm-card">
+      <button class="pm-close" onclick="closePremiumModal()" aria-label="סגור">×</button>
+      <div class="pm-header">
+        <div class="pm-icon">✦</div>
+        <h2 class="pm-title">פרימיום</h2>
+        <p class="pm-subtitle">גישה מלאה לכל הנתונים</p>
       </div>
-      <ul style="list-style:none;padding:0;margin:0 0 20px;display:grid;gap:10px">
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> כל ניתוחי היום — ללא הגבלה</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> הפוגע AI ללא הגבלה — שאל כל שאלה</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> יחסי Winner בזמן אמת לכל הליגות</li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.85)"><span style="color:#55d6ff;font-size:16px">✦</span> פילטר מוטיבציה — מנועל לחברים בלבד</li>
+      <ul class="pm-features">
+        <li><span class="pm-feat-icon">✦</span> כל ניתוחי היום — ללא חיתוך</li>
+        <li><span class="pm-feat-icon">✦</span> הפוגע AI — שיחות ללא הגבלה</li>
+        <li><span class="pm-feat-icon">✦</span> יחסי שוק חיים לכל הליגות</li>
+        <li><span class="pm-feat-icon">✦</span> לוח מונדיאל 2026 + ניתוחים מלאים</li>
       </ul>
-      <div style="margin-bottom:12px">
-        <input id="premiumCodeInput" type="text" placeholder="הכנס קוד פרימיום" autocomplete="off"
-          style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:10px;border:1px solid rgba(85,214,255,.3);background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-family:Heebo,sans-serif;text-align:center;letter-spacing:2px">
-      </div>
-      <p id="premiumCodeError" style="color:#e63946;font-size:12px;text-align:center;margin:0 0 12px;min-height:16px"></p>
-      <button data-submit onclick="
+      <input id="premiumCodeInput" class="pm-input" type="text" placeholder="קוד פרימיום" autocomplete="off">
+      <p id="premiumCodeError" class="pm-error"></p>
+      <button class="pm-submit" data-submit onclick="
         const errEl = document.getElementById('premiumCodeError');
         errEl.textContent = '';
         const code = document.getElementById('premiumCodeInput').value;
         activatePremium(code).then(ok => {
-          if (!ok) errEl.textContent = 'קוד שגוי או נוצל כבר — בדוק ונסה שוב';
+          if (!ok) errEl.textContent = 'קוד שגוי או נוצל כבר — בדוק שוב';
         });
-      " style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#55d6ff,#2196f3);color:#06131a;font-weight:900;font-size:16px;font-family:Heebo,sans-serif;cursor:pointer;letter-spacing:.5px">
-        פתח פרימיום 🔓
-      </button>
-      <div style="margin-top:16px;padding:12px 16px;background:rgba(85,214,255,.06);border:1px solid rgba(85,214,255,.15);border-radius:10px;text-align:center">
-        <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,.5)">אין לך קוד עדיין?</p>
-        <a href="mailto:kubovskys@gmail.com" style="color:#55d6ff;font:800 13px Heebo,sans-serif;text-decoration:none">✉ שלח אימייל לקבלת קוד</a>
+      ">פתח גישה מלאה 🔓</button>
+      <div class="pm-footer">
+        <p>אין לך קוד עדיין?</p>
+        <a href="mailto:kubovskys@gmail.com">✉ קבל קוד גישה</a>
       </div>
     </div>
   </div>
