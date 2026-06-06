@@ -3876,6 +3876,114 @@
       .auth-modal-card { padding: 30px 20px 24px !important; }
     }
 
+    /* ══════ BeamsBackground canvas ══════ */
+    #beamsCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    /* ══════ GooeyLoader ══════ */
+    .gooey-loader-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .gooey-loader-el {
+      width: 10em;
+      height: 2.6em;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 6px solid rgba(99,102,241,.35);
+      filter: url(#gooey-filter);
+      font-size: 10px;
+    }
+    .gooey-loader-el::before,
+    .gooey-loader-el::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+    }
+    .gooey-loader-el::before {
+      width: 22em; height: 18em;
+      background: rgba(99,102,241,.9);
+      left: -2em; bottom: -18em;
+      animation: gooey-wee1 2s linear infinite;
+    }
+    .gooey-loader-el::after {
+      width: 16em; height: 12em;
+      background: rgba(85,214,255,.85);
+      left: -4em; bottom: -12em;
+      animation: gooey-wee2 2s linear infinite .75s;
+    }
+    @keyframes gooey-wee1 {
+      0%   { transform: translateX(-10em) rotate(0deg); }
+      100% { transform: translateX(7em)  rotate(180deg); }
+    }
+    @keyframes gooey-wee2 {
+      0%   { transform: translateX(-8em) rotate(0deg); }
+      100% { transform: translateX(8em)  rotate(180deg); }
+    }
+
+    /* ══════ BackButton (lp-home-btn animated) ══════ */
+    .lp-home-btn {
+      position: relative !important;
+      overflow: hidden !important;
+    }
+    .lp-home-btn .btn-label {
+      display: inline-block;
+      transition: opacity .5s ease;
+    }
+    .lp-home-btn .btn-arrow-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      width: 28%;
+      background: rgba(33,31,27,.1);
+      transition: width .5s ease;
+      border-radius: inherit;
+    }
+    .lp-home-btn:hover .btn-label { opacity: 0; }
+    .lp-home-btn:hover .btn-arrow-wrap { width: 100%; }
+
+    /* ══════ Not-Found / Empty styled state ══════ */
+    .not-found-wrap {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 24px;
+      text-align: center;
+      gap: 14px;
+    }
+    .not-found-num {
+      font: 900 88px/1 Heebo, sans-serif;
+      background: linear-gradient(135deg, #6366f1, #55d6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -4px;
+    }
+    .not-found-icon { font-size: 72px; line-height: 1; }
+    .not-found-title {
+      font: 700 20px/1.35 Heebo, sans-serif;
+      color: rgba(255,255,255,.82);
+      margin: 0;
+    }
+    .not-found-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,.42);
+      max-width: 280px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -3883,6 +3991,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+  <!-- ══ BeamsBackground canvas ══ -->
+  <canvas id="beamsCanvas" aria-hidden="true"></canvas>
+
+  <!-- ══ GooeyLoader SVG filter (global, used by #loadingOverlay) ══ -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <filter id="gooey-filter">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 48 -7"
+          result="goo"/>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+    </defs>
+  </svg>
 
   <!-- ════════ Unified navigation — always visible ════════ -->
   <nav class="lp-nav" id="lpNav" aria-label="ניווט ראשי">
@@ -4143,6 +4267,10 @@
         <div class="ld-stat-sep"></div>
         <div class="ld-stat"><span class="ld-stat-n">🌍</span><span class="ld-stat-l">מונדיאל</span></div>
       </div>
+      <!-- GooeyLoader -->
+      <div class="gooey-loader-wrap" role="status" aria-label="טוען">
+        <div class="gooey-loader-el"></div>
+      </div>
     </div>
   </div>
   <header class="topbar">
@@ -4156,7 +4284,12 @@
           <p>מנוע יחסים מבוסס Winner</p>
         </div>
       </div>
-      <button class="lp-home-btn" onclick="goToLanding()" title="חזור לדף הבית" aria-label="דף הבית">⌂ בית</button>
+      <button class="lp-home-btn" onclick="goToLanding()" title="חזור לדף הבית" aria-label="דף הבית">
+        <span class="btn-label">⌂ בית</span>
+        <i class="btn-arrow-wrap" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </i>
+      </button>
       <nav class="nav" id="mainNav">
         <button class="tab active" data-page="home">בית</button>
         <button class="tab" data-page="football">⚽ כדורגל</button>
@@ -9377,6 +9510,93 @@ window.AiApp = AiApp;
 
 
     syncBottomNav();
+  })();
+  </script>
+
+  <!-- ══ BeamsBackground animation ══ -->
+  <script>
+  (function() {
+    const canvas = document.getElementById("beamsCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let beams = [];
+    let animId;
+    const BEAM_COUNT = 18;
+
+    function createBeam(w, h) {
+      const angle = -35 + Math.random() * 10;
+      return {
+        x: Math.random() * w * 1.5 - w * 0.25,
+        y: Math.random() * h * 1.5 - h * 0.25,
+        width: 30 + Math.random() * 60,
+        length: h * 2.5,
+        angle: angle,
+        speed: 0.4 + Math.random() * 0.8,
+        opacity: 0.06 + Math.random() * 0.09,
+        hue: 200 + Math.random() * 50,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.015 + Math.random() * 0.025
+      };
+    }
+
+    function resetBeam(beam, index, total, w, h) {
+      const col = index % 3;
+      const spacing = w / 3;
+      beam.y = h + 100;
+      beam.x = col * spacing + spacing / 2 + (Math.random() - 0.5) * spacing * 0.5;
+      beam.width = 80 + Math.random() * 80;
+      beam.speed = 0.35 + Math.random() * 0.45;
+      beam.hue = 200 + (index * 50) / total;
+      beam.opacity = 0.05 + Math.random() * 0.07;
+    }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const W = window.innerWidth, H = window.innerHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.scale(dpr, dpr);
+      beams = Array.from({ length: BEAM_COUNT }, () => createBeam(W, H));
+    }
+
+    function drawBeam(beam) {
+      const W = window.innerWidth, H = window.innerHeight;
+      ctx.save();
+      ctx.translate(beam.x, beam.y);
+      ctx.rotate(beam.angle * Math.PI / 180);
+      const pulse = beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2);
+      const g = ctx.createLinearGradient(0, 0, 0, beam.length);
+      g.addColorStop(0,   `hsla(${beam.hue},80%,62%,0)`);
+      g.addColorStop(0.1, `hsla(${beam.hue},80%,62%,${pulse * 0.5})`);
+      g.addColorStop(0.4, `hsla(${beam.hue},80%,62%,${pulse})`);
+      g.addColorStop(0.6, `hsla(${beam.hue},80%,62%,${pulse})`);
+      g.addColorStop(0.9, `hsla(${beam.hue},80%,62%,${pulse * 0.5})`);
+      g.addColorStop(1,   `hsla(${beam.hue},80%,62%,0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
+      ctx.restore();
+    }
+
+    function animate() {
+      const W = window.innerWidth, H = window.innerHeight;
+      ctx.clearRect(0, 0, W, H);
+      ctx.filter = "blur(28px)";
+      beams.forEach((b, i) => {
+        b.y -= b.speed;
+        b.pulse += b.pulseSpeed;
+        if (b.y + b.length < -100) resetBeam(b, i, beams.length, W, H);
+        drawBeam(b);
+      });
+      animId = requestAnimationFrame(animate);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    animate();
   })();
   </script>
 
