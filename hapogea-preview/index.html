@@ -4188,6 +4188,58 @@
       box-shadow: none;
     }
 
+    /* ─── GooeyLoader — shared across all feature loading states ──────── */
+    .gooey-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .gooey-wrap.sm  { transform: scale(.6); transform-origin: center; }
+    .gooey-wrap.xs  { transform: scale(.42); transform-origin: center; }
+    .site-gooey {
+      --gl-primary:   #55d6ff;
+      --gl-secondary: rgba(37,99,235,.9);
+      --gl-border:    rgba(85,214,255,.35);
+      width: 12em; height: 3em;
+      position: relative; overflow: hidden;
+      border-bottom: 8px solid var(--gl-border);
+      filter: url(#site-gooey-filter);
+    }
+    .site-gooey::before,
+    .site-gooey::after {
+      content: ''; position: absolute; border-radius: 50%;
+    }
+    .site-gooey::before {
+      width: 22em; height: 18em;
+      background: var(--gl-primary);
+      left: -2em; bottom: -18em;
+      animation: sgl-wee1 2s linear infinite;
+    }
+    .site-gooey::after {
+      width: 16em; height: 12em;
+      background: var(--gl-secondary);
+      left: -4em; bottom: -12em;
+      animation: sgl-wee2 2s linear infinite .75s;
+    }
+    @keyframes sgl-wee1 {
+      0%   { transform: translateX(-10em) rotate(0deg); }
+      100% { transform: translateX(7em) rotate(180deg); }
+    }
+    @keyframes sgl-wee2 {
+      0%   { transform: translateX(-8em) rotate(0deg); }
+      100% { transform: translateX(8em) rotate(180deg); }
+    }
+    /* Refreshing banner */
+    .refresh-gooey-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(85,214,255,.07);
+      border: 1px solid rgba(85,214,255,.18);
+      border-radius: 10px; padding: 6px 14px;
+      margin-bottom: 12px;
+      font: 700 12px Heebo,sans-serif; color: rgba(85,214,255,.85);
+    }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -4196,6 +4248,18 @@
 </head>
 <body>
   <canvas id="beams-bg" aria-hidden="true"></canvas>
+
+  <!-- Shared SVG filter for GooeyLoader across all feature loading states -->
+  <svg class="absolute w-0 h-0" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <filter id="site-gooey-filter">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 48 -7" result="goo"/>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+    </defs>
+  </svg>
 
   <!-- ════════ Unified navigation — always visible ════════ -->
   <nav class="lp-nav" id="lpNav" aria-label="ניווט ראשי">
@@ -4457,6 +4521,9 @@
       <div class="ld-title-group">
         <div class="loading-title">הפוגע <span class="ld-ai-badge">AI</span></div>
         <div class="loading-sub">מחפש משחקים ב-ווינר...</div>
+      </div>
+      <div class="gooey-wrap" style="margin:8px 0 4px">
+        <div class="site-gooey"></div>
       </div>
       <div class="ld-progress-wrap">
         <div class="progress-track">
@@ -6861,11 +6928,9 @@
             <div class="thinking-header">
               <div class="thinking-avatar">AI</div>
               <span class="thinking-title-text">הפוגע AI מנתח</span>
-              <div class="thinking-dots">
-                <div class="thinking-dot"></div>
-                <div class="thinking-dot"></div>
-                <div class="thinking-dot"></div>
-              </div>
+            </div>
+            <div class="gooey-wrap sm" style="margin:6px 0 2px">
+              <div class="site-gooey"></div>
             </div>
             <div class="thinking-steps-card">
               ${steps.map((text, i) => {
@@ -7038,6 +7103,7 @@
             : `${oddsRows.length}/20 משחקי ווינר · ${withPick} עם יתרון סטטיסטי${withoutPick ? ` · ${withoutPickText}` : ""}${noOddsCount ? ` · ${noOddsCount} ממתינים לקווים` : ""}. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`)
         : `${rows.length} \u05ea\u05d5\u05e6\u05d0\u05d5\u05ea \u05e8\u05e9\u05de\u05d9\u05d5\u05ea \u05de\u05ea\u05d5\u05da ${totalRows}. \u05d4\u05de\u05e1\u05da \u05d4\u05d6\u05d4 \u05e1\u05d5\u05d2\u05e8 \u05ea\u05d7\u05d6\u05d9\u05d5\u05ea \u05e9\u05e0\u05e9\u05de\u05e8\u05d5 \u05e7\u05d5\u05d3\u05dd. ${sourceMode}${isRefreshing ? " \u00b7 \u05de\u05ea\u05e2\u05d3\u05db\u05df..." : ""}`;
       const banners = [
+        isRefreshing ? `<div class="refresh-gooey-bar"><div class="gooey-wrap xs" style="height:28px;flex-shrink:0"><div class="site-gooey"></div></div><span>מעדכן נתונים...</span></div>` : "",
         (state.feed?.fallback || state.feed?.stale) ? `<div class="fallback-banner">\u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05d9\u05d1\u05d5\u05d9 \u05de\u05d0\u05d5\u05de\u05ea\u05d9\u05dd. ווינר Live \u05dc\u05d0 \u05d6\u05de\u05d9\u05df \u05db\u05e8\u05d2\u05e2 \u05d1\u05e9\u05e8\u05ea; \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d5\u05d3\u05db\u05e0\u05d5 ${formatShortTime(state.feed.generatedAt || state.localCachedAt)}.</div>` : "",
         state.loadError ? `<div class="stale-banner">\u05d4\u05e8\u05e2\u05e0\u05d5\u05df \u05d4\u05d0\u05d7\u05e8\u05d5\u05df \u05e0\u05db\u05e9\u05dc: ${escapeHtml(state.loadError)}. \u05de\u05d5\u05e6\u05d2\u05d9\u05dd \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05d4\u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd \u05e9\u05e0\u05e9\u05de\u05e8\u05d5.</div>` : ""
       ].join("");
