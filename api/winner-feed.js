@@ -2832,7 +2832,16 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     console.error("[winner-feed] buildOddsApiFeed threw:", oddsError?.message);
     payload = null;
   }
-  if (!payload || !payloadMatchesIsraelDates(payload)) {
+  const oddsApiGames = payload
+    ? (payload.tabs?.today?.sports?.football?.length || 0) +
+      (payload.tabs?.today?.sports?.basketball?.length || 0) +
+      (payload.tabs?.tomorrow?.sports?.football?.length || 0) +
+      (payload.tabs?.tomorrow?.sports?.basketball?.length || 0)
+    : 0;
+  if (!payload || !payloadMatchesIsraelDates(payload) || oddsApiGames === 0) {
+    if (payload && oddsApiGames === 0) {
+      console.warn("[winner-feed] Odds API returned 0 games — using snapshot fallback");
+    }
     const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
     payload = payloadMatchesIsraelDates(snapshotNorm)
       ? { ...snapshotNorm, ok: true, oddsSource: "Snapshot", fallback: true }
