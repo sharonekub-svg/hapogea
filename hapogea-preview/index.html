@@ -1979,6 +1979,20 @@
     .reuben-send-btn:hover:not(:disabled) { background: #7c3aed; transform: scale(1.04); }
     .reuben-send-btn:active:not(:disabled) { transform: scale(.96); }
     .reuben-send-btn:disabled { opacity: .3; cursor: default; }
+    .reuben-upload-btn {
+      width: 38px; height: 38px; border-radius: 9px; border: none;
+      background: #2563eb; color: #fff;
+      font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex: 0 0 auto; align-self: flex-end; margin-bottom: 4px; margin-inline-end: 4px;
+      transition: opacity .15s, transform .15s, background .15s;
+      position: relative;
+    }
+    .reuben-upload-btn:hover:not(:disabled) { background: #1d4ed8; transform: scale(1.04); }
+    .reuben-upload-btn:active:not(:disabled) { transform: scale(.96); }
+    .reuben-upload-btn:disabled { opacity: .3; cursor: default; }
+    .reuben-upload-btn input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
     .reuben-input-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
     .reuben-upload-label {
       display: inline-flex; align-items: center; gap: 5px;
@@ -2611,6 +2625,14 @@
     #ai-root .ai-send:hover:not(:disabled) { background: var(--accent-press); transform: scale(1.06); }
     #ai-root .ai-send:active:not(:disabled) { transform: scale(.94); }
     #ai-root .ai-send:disabled { opacity: .4; cursor: default; background: var(--surface-3); color: var(--text-faint); box-shadow: none; }
+    #ai-root .ai-img-upload {
+      width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0; border: none; cursor: pointer;
+      background: #2563eb; color: #fff; display: grid; place-items: center; margin-inline-end: 5px;
+      transition: transform .14s ease, background .14s, opacity .2s; box-shadow: 0 4px 12px -3px rgba(37,99,235,.45);
+    }
+    #ai-root .ai-img-upload:hover:not(:disabled) { background: #1d4ed8; transform: scale(1.06); }
+    #ai-root .ai-img-upload:active:not(:disabled) { transform: scale(.94); }
+    #ai-root .ai-img-upload:disabled { opacity: .35; cursor: default; }
     #ai-root .ai-composer-foot { text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 9px; }
     #ai-root .ai-composer-foot b { color: var(--text-muted); font-weight: 600; }
     #ai-root .ai-scroll-btn {
@@ -7216,14 +7238,16 @@
               <div class="reuben-input-frame">
                 <div class="reuben-input-row">
                   <textarea id="reubenInput" placeholder="כתוב משחק — לדוגמה: פריז נגד ליל, יוסטון נגד אוקלהומה..." autocomplete="off" spellcheck="false" rows="2" ${loading ? "disabled" : ""}></textarea>
+                  <label class="reuben-upload-btn" title="העלאת תמונה" aria-label="העלאת תמונה" style="opacity:${loading ? '.3' : '1'}">
+                    <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" ${loading ? "disabled" : ""}>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </label>
                   <button class="reuben-send-btn" type="button" id="reubenAnalyze" ${loading ? "disabled" : ""}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8.5 2.5L14 8l-5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
                 </div>
               </div>
               <div class="reuben-input-footer">
-                <input id="reubenSlipFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" ${loading ? "disabled" : ""}>
-                <label for="reubenSlipFile" class="reuben-upload-label" style="opacity:${loading ? ".45" : "1"}">📷 העלאת תמונת טופס</label>
                 <span class="reuben-disclaimer">ניתוח ספורטיבי בלבד · אין ייעוץ הימורים</span>
               </div>
             </div>
@@ -9800,14 +9824,22 @@ function AiFinalLean({show}) {
   );
 }
 
-function AiComposer({onSend,busy,showChips}) {
+function AiComposer({onSend,onSendImage,busy,showChips}) {
   const [val,setVal] = React.useState("");
   const [focus,setFocus] = React.useState(false);
   const ref = React.useRef(null);
+  const fileRef = React.useRef(null);
   const grow=()=>{const el=ref.current;if(!el)return;el.style.height="auto";el.style.height=Math.min(el.scrollHeight,180)+"px";};
   React.useEffect(grow,[val]);
   const submit=()=>{const t=val.trim();if(!t||busy)return;onSend(t);setVal("");};
   const onKey=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit();}};
+  const onFile=e=>{
+    const file=e.target.files?.[0];
+    e.target.value="";
+    if(!file||busy)return;
+    if(onSendImage)onSendImage(file,val.trim());
+    setVal("");
+  };
   return (
     <div className="ai-composer-wrap"><div className="ai-composer-inner">
       {showChips&&<div className="ai-chips">{AI_CHIPS.map((c,i)=>(
@@ -9819,6 +9851,10 @@ function AiComposer({onSend,busy,showChips}) {
         <textarea ref={ref} rows={1} value={val} placeholder="שאל את הפוגע על משחק, יחסים או סטטיסטיקה…"
           onChange={e=>setVal(e.target.value)} onKeyDown={onKey}
           onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}/>
+        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" style={{display:"none"}} onChange={onFile} disabled={busy}/>
+        <button className="ai-img-upload" disabled={busy} onClick={()=>fileRef.current&&fileRef.current.click()} aria-label="העלאת תמונה" title="העלאת תמונה" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
         <button className="ai-send" disabled={!val.trim()||busy} onClick={submit} aria-label="שלח">
           <AiIcon name="bolt" size={19}/>
         </button>
@@ -10007,6 +10043,30 @@ function AiApp() {
     }
   };
 
+  const sendImage=async(file,note)=>{
+    if(busy)return;
+    setBusy(true);
+    const userText=note?`[תמונה] ${note}`:"[תמונה] נתח את הטופס/צילום הזה";
+    setMessages(m=>[...m,
+      {role:"user",text:userText},
+      {role:"ai",phase:"thinking",thinkStep:0,streamLen:0,intro:"",analysis:[],revealed:0,open:{},showFinal:false},
+    ]);
+    try{
+      const image=await window.imageFileToDataUrl(file);
+      const resp=await fetch("/api/reuven-slip",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({image,note:note||""}),
+      });
+      const data=await resp.json().catch(()=>({}));
+      const ans=data.answer||"לא הצלחתי לנתח את התמונה. תנסה להעלות שוב או לכתוב את הנתונים בטקסט.";
+      setMessages(m=>[...m.slice(0,-1),{role:"ai",phase:"done",intro:ans,streamLen:ans.length,analysis:[],revealed:0,open:{},showFinal:false}]);
+    }catch(err){
+      const msg="שגיאה בעיבוד התמונה — "+err.message;
+      setMessages(m=>[...m.slice(0,-1),{role:"ai",phase:"done",intro:msg,streamLen:msg.length,analysis:[],revealed:0,open:{},showFinal:false}]);
+    }
+    setBusy(false);
+  };
+
   const empty=messages.length===0;
   return (
     <div className="ai-app" style={{display:"flex",flexDirection:"column",height:"100%"}}>
@@ -10040,7 +10100,7 @@ function AiApp() {
         <button className={"ai-scroll-btn"+(showScrollBtn?" show":"")} onClick={()=>scrollDown()} aria-label="גלול למטה">
           <AiIcon name="chevron" size={18}/>
         </button>
-        <AiComposer onSend={send} busy={busy} showChips={empty}/>
+        <AiComposer onSend={send} onSendImage={sendImage} busy={busy} showChips={empty}/>
       </div>
     </div>
   );
