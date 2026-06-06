@@ -2688,6 +2688,8 @@ function passesOpponentGate(r) {
   if (!r.recommended || !r.oddsBook?.outcomes) return true;
   const pickClean = cleanText(r.pick || r.winnerPick || "");
   if (!pickClean) return true;
+  // Spread/handicap markets have both sides at ~50/50 by design — skip gate
+  if (cleanText(r.market || "").includes("הימור יתרון")) return true;
   const otherOdds = (r.oddsBook.outcomes || [])
     .filter((o) => cleanText(o.desc) !== pickClean)
     .map((o) => o.odds)
