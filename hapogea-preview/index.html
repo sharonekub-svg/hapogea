@@ -1011,43 +1011,6 @@
       background: #8800CC;
       border-color: rgba(136,0,204,.85);
     }
-    /* World Cup video splash overlay */
-    #wcSplash {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9200;
-      background: #000;
-      align-items: center;
-      justify-content: center;
-      animation: wcSplashIn .25s ease;
-    }
-    #wcSplash.active { display: flex; }
-    #wcSplashVideo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .wc-splash-skip {
-      position: absolute;
-      bottom: 32px;
-      left: 32px;
-      background: rgba(255,255,255,.16);
-      border: 1px solid rgba(255,255,255,.32);
-      color: #fff;
-      border-radius: 10px;
-      padding: 10px 22px;
-      font-size: 15px;
-      font-weight: 800;
-      font-family: Heebo, sans-serif;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: background .18s;
-      direction: rtl;
-      letter-spacing: .3px;
-    }
-    .wc-splash-skip:hover { background: rgba(255,255,255,.28); }
-    @keyframes wcSplashIn { from { opacity: 0; } to { opacity: 1; } }
     .wc-match-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
@@ -4441,7 +4404,7 @@
         <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל<span class="nav-sport-count empty" id="navCountFootball"></span></button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל<span class="nav-sport-count basketball empty" id="navCountBasketball"></span></button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();syncLpNav();showWcSplash(()=>render());},200)">🏆 מונדיאל</button>
+        <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();render();syncLpNav();},200)">🏆 מונדיאל</button>
         <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
       </div>
       <!-- Landing: Google sign-in + enter button -->
@@ -5014,7 +4977,6 @@
       loadError: "",
       selectedId: null,
       wcOpen: false,
-      wcSplashShown: false,
       wcActiveGroup: '',
       reubenMessages: [],
       reubenCandidates: [],
@@ -5878,30 +5840,6 @@
       ],
     };
     let wcCountdownTimer = null;
-
-    function showWcSplash(onDone) {
-      if (state.wcSplashShown) { if (onDone) onDone(); return; }
-      state.wcSplashShown = true;
-      const splash = document.getElementById('wcSplash');
-      const vid = document.getElementById('wcSplashVideo');
-      splash.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      function dismiss() {
-        splash.classList.remove('active');
-        document.body.style.overflow = '';
-        vid.pause();
-        splash._onDone = null;
-        if (onDone) onDone();
-      }
-      splash._onDone = dismiss;
-      vid.currentTime = 0;
-      vid.play().catch(() => dismiss());
-      vid.onended = dismiss;
-    }
-    function dismissWcSplash() {
-      const splash = document.getElementById('wcSplash');
-      if (splash._onDone) splash._onDone();
-    }
 
     function wcFlagImg(code) {
       const cc = String(code || "").trim().toLowerCase();
@@ -9281,20 +9219,16 @@
       }
       if (event.target.closest("#wcToggle") || event.target.closest("[data-wc-open]")) {
         state.wcOpen = true;
-        showWcSplash(() => {
-          renderWorldCup();
-          document.getElementById("worldCupSection").scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+        renderWorldCup();
+        document.getElementById("worldCupSection").scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
     document.getElementById("wcToggle").addEventListener("keydown", event => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       state.wcOpen = true;
-      showWcSplash(() => {
-        renderWorldCup();
-        document.getElementById("worldCupSection").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+      renderWorldCup();
+      document.getElementById("worldCupSection").scrollIntoView({ behavior: "smooth", block: "start" });
     });
     document.getElementById("cards").addEventListener("click", event => {
       const shareStrip = event.target.closest(".share-strip[data-share-text]");
@@ -10270,11 +10204,6 @@ window.AiApp = AiApp;
   })();
   </script>
 
-  <!-- World Cup video splash overlay -->
-  <div id="wcSplash" role="dialog" aria-modal="true" aria-label="כניסה למונדיאל 2026">
-    <video id="wcSplashVideo" src="/wc-splash.mp4" muted playsinline preload="auto" style="width:100%;height:100%;object-fit:cover"></video>
-    <button class="wc-splash-skip" type="button" onclick="dismissWcSplash()">דלג ›</button>
-  </div>
 
 </body>
 </html>
