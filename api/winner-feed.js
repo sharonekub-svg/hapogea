@@ -2551,31 +2551,32 @@ function oddsApiEventToRow(event, sportMeta) {
 
   if (!allCandidates.length) return null;
 
-  // Wide range: captures strong favourites (≥1.20) through mild underdogs (≤2.80).
-  // Narrower Winner-style range [1.40–1.90] would miss many valid picks.
-  const TARGET_MIN = 1.20, TARGET_MAX = 2.80;
+  // Only pick clear favourites: odds 1.35–1.70, target ~1.50.
+  // All other outcomes (opponent + draw) must be 3.0+ to qualify.
+  const TARGET_MIN = 1.35, TARGET_MAX = 1.70;
+  const TARGET_ODDS = 1.50;
+  const OPPONENT_MIN_ODDS = 3.0;
+
   const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
-  const hasInRange = inRange.length > 0;
-  const pool = hasInRange ? inRange : allCandidates;
-  // Among valid candidates, pick the one closest to 1.65 (ideal confidence score ~61%)
-  const TARGET_ODDS = 1.65;
-  const pick = pool.sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
+  if (!inRange.length) return null;
+
+  const pick = inRange.sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
+  const opponents = allCandidates.filter((c) => c.name !== pick.name);
+
+  // Require all other outcomes to be 3.0+ — ensures a clear single favourite
+  if (!opponents.every((c) => c.odds >= OPPONENT_MIN_ODDS)) return null;
+
   const prob  = 1 / pick.odds;
   const impliedPct = Math.round(prob * 100);
   const score = Math.round(prob * 100);
-
-  // Build opponent summary for explanation text
-  const opponents = allCandidates.filter((c) => c.name !== pick.name);
+  const hasInRange = true;
   const oppSummary = opponents
     .map((c) => `${c.name === "תיקו" ? "תיקו" : c.name} ${c.odds.toFixed(2)}`)
     .join(", ");
   const pickHe = ODDS_API_TEAM_HE[pick.name] || pick.name;
-  const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
   const explanation = [
     `מקור: The Odds API — ${sportMeta.label}`,
-    isFav
-      ? `${pickHe} הוא הפייבוריט (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%)${oppSummary ? ` — ${oppSummary}` : ""}.`
-      : `${pickHe} (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%) — הבחירה הקרובה ביותר לטווח האידיאלי${oppSummary ? `. חלופות: ${oppSummary}` : ""}.`,
+    `${pickHe} הוא הפייבוריט הברור (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%)${oppSummary ? ` — יתר האפשרויות: ${oppSummary}` : ""}.`,
     "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים.",
   ];
 
