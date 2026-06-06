@@ -2685,8 +2685,20 @@ function finalOpenRows(rows) {
     }));
 }
 
+function passesOpponentGate(r) {
+  if (!r.recommended || !r.oddsBook?.outcomes) return true;
+  const pickClean = cleanText(r.pick || r.winnerPick || "");
+  if (!pickClean) return true;
+  const otherOdds = (r.oddsBook.outcomes || [])
+    .filter((o) => cleanText(o.desc) !== pickClean)
+    .map((o) => o.odds)
+    .filter(Boolean);
+  return otherOdds.length === 0 || otherOdds.every((o) => o >= MIN_OPPONENT_ODDS);
+}
+
 function finalOpenRowsByDay(rows) {
-  const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID);
+  const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
+    .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
     .filter((r) => !/\bNBA\b/i.test(r.league || ""));
 
