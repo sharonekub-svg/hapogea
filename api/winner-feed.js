@@ -2551,11 +2551,11 @@ function oddsApiEventToRow(event, sportMeta) {
 
   if (!allCandidates.length) return null;
 
-  // Only pick clear favourites: odds 1.35–1.70, target ~1.50.
-  // All other outcomes (opponent + draw) must be 3.0+ to qualify.
-  const TARGET_MIN = 1.35, TARGET_MAX = 1.70;
-  const TARGET_ODDS = 1.50;
-  const OPPONENT_MIN_ODDS = 3.0;
+  // Pick clear favourites: odds 1.35–1.85, target ~1.55.
+  // All other outcomes must be 2.20+ to ensure a genuine favourite.
+  const TARGET_MIN = 1.35, TARGET_MAX = 1.85;
+  const TARGET_ODDS = 1.55;
+  const OPPONENT_MIN_ODDS = 2.20;
 
   const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
   if (!inRange.length) return null;
