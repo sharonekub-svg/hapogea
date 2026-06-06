@@ -1957,9 +1957,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
         "היחס משמש כנתון שוק בלבד; אין כאן הוראת פעולה.",
       ],
     }));
-  const selectionPool = strictCandidates.length >= Math.min(MIN_PREMIUM_ROWS_PER_DAY, limit)
-    ? strictCandidates
-    : [...strictCandidates, ...softCandidates];
+  const selectionPool = strictCandidates;
   return selectionPool
     .map((row) => ({
       ...row,
@@ -2688,30 +2686,16 @@ function finalOpenRows(rows) {
 }
 
 function finalOpenRowsByDay(rows) {
-  // Each sport is capped independently inside finalOpenRows.
-  // No combined cap here — football and basketball render in separate tabs on the frontend.
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID);
-  const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID);
+  const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
+    .filter((r) => !/\bNBA\b/i.test(r.league || ""));
 
   const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
   const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
 
-  // noOddsYet rows are display-only placeholders — only show them when the algorithm
-  // found no real picks for that sport, capped at TARGET_PICKS_PER_SPORT and sorted by time.
-  const sortedNoOdds = (sport) =>
-    sport
-      .filter((r) => r.noOddsYet)
-      .sort((a, b) => String(a.time || "99:99").localeCompare(String(b.time || "99:99")))
-      .slice(0, TARGET_PICKS_PER_SPORT);
-
-  const noOddsFootball   = pickedFootball.length   === 0 ? sortedNoOdds(football)   : [];
-  const noOddsBasketball = pickedBasketball.length === 0 ? sortedNoOdds(basketball) : [];
-
   return [
     ...pickedFootball,
-    ...noOddsFootball,
     ...pickedBasketball,
-    ...noOddsBasketball,
   ];
 }
 
