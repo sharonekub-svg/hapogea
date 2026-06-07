@@ -2705,9 +2705,20 @@ function finalOpenRowsByDay(rows) {
   const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
   const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
 
+  // When Winner has no open lines, fall back to 365Scores scheduled placeholders so the
+  // user sees upcoming games even before odds are published.
+  const scheduledFootball   = pickedFootball.length === 0
+    ? football.filter((r) => r.noOddsYet).slice(0, TARGET_PICKS_PER_SPORT)
+    : [];
+  const scheduledBasketball = pickedBasketball.length === 0
+    ? basketball.filter((r) => r.noOddsYet).slice(0, TARGET_PICKS_PER_SPORT)
+    : [];
+
   return [
     ...pickedFootball,
     ...pickedBasketball,
+    ...scheduledFootball,
+    ...scheduledBasketball,
   ];
 }
 
