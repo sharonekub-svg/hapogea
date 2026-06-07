@@ -2659,7 +2659,7 @@ function capPerLeague(rows, max = 5) {
   });
 }
 
-function finalOpenRows(rows) {
+function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
   const sorted = (rows || [])
     .filter((row) => row.recommended && row.odds && row.status === "ממתין" && !["final", "live", "ht"].includes(row.matchPhase))
     .sort((a, b) => {
@@ -2677,7 +2677,7 @@ function finalOpenRows(rows) {
       return hardReasons.length === 0;
     });
   return capPerLeague([...strict, ...logoFill])
-    .slice(0, TARGET_PICKS_PER_SPORT)
+    .slice(0, limit)
     .map((row) => ({
       ...row,
       logoVerified: hasVerifiedTeamLogos(row),
@@ -2703,7 +2703,7 @@ function finalOpenRowsByDay(rows) {
     .filter((r) => !/\bNBA\b/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
-  const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
+  const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet), 5);
   const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
 
   // When Winner has no open lines, fall back to 365Scores scheduled placeholders so the
