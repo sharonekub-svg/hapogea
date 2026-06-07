@@ -5320,8 +5320,8 @@
       localStorage.setItem(TRACK_KEY, JSON.stringify(items.slice(-400)));
     }
 
-    const FEED_LS_KEY = "hapogea_feed_v5";
-    const FEED_LS_MAX_AGE_MS = 4 * 60 * 60 * 1000; // 4 hours
+    const FEED_LS_KEY = "hapogea_feed_v6";
+    const FEED_LS_MAX_AGE_MS = 20 * 60 * 1000; // 20 minutes
 
     function saveFeedLocally(feed) {
       try {
@@ -5338,11 +5338,20 @@
         // Invalidate cache if the feed's today date no longer matches the current Israeli date
         const currentDate = israelDayString();
         if (feed.tabs?.today?.date && feed.tabs.today.date !== currentDate) return null;
-        // Invalidate if today has zero games — today should never stay cached as empty
-        // because games appear as the day progresses and a stale today=0 would persist
-        // even when the server now has real games (cache stays alive while tomorrow>0).
+        // Invalidate if today has zero games
         const todayCount = (feed.tabs?.today?.sports?.football?.length || 0) + (feed.tabs?.today?.sports?.basketball?.length || 0);
         if (todayCount === 0) return null;
+        // Invalidate if any today game has already started more than 15 minutes ago
+        const allTodayRows = [
+          ...(feed.tabs?.today?.sports?.football || []),
+          ...(feed.tabs?.today?.sports?.basketball || []),
+        ];
+        const hasStale = allTodayRows.some(r => {
+          if (!r.day || !r.time || !/^\d{2}:\d{2}$/.test(r.time)) return false;
+          const gameStart = new Date(`${r.day}T${r.time}:00+03:00`);
+          return Date.now() > gameStart.getTime() + 15 * 60 * 1000;
+        });
+        if (hasStale) return null;
         return { feed, at };
       } catch (_) { return null; }
     }
