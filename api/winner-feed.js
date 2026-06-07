@@ -96,6 +96,8 @@ const BASKETBALL_ODDS_MAX_MONEYLINE = 1.75;
 const BASKETBALL_ODDS_MAX_SPREAD = 1.95;
 // Football 3-way: all other outcomes (draw + loser) must be at or above this threshold
 const MIN_OPPONENT_ODDS = 3.0;
+// Basketball 2-way: the non-picked team must be at or above this threshold
+const MIN_BASKETBALL_OPPONENT_ODDS = 2.6;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
@@ -1226,14 +1228,15 @@ function scoreOutcome(market, outcome) {
   if (!odds || odds <= oddsMin || odds >= oddsMax) return null;
   const oddsBook = marketOddsBook(market);
 
-  // Football 3-way + basketball moneyline: all opponents must be >= 3.0
+  // Football 3-way + basketball moneyline: all opponents must be above the threshold
   if (!isSpread) {
+    const minOpp = isBasketball ? MIN_BASKETBALL_OPPONENT_ODDS : MIN_OPPONENT_ODDS;
     const pickedDesc = cleanText(outcome.desc);
     const otherOdds = oddsBook.outcomes
       .filter((o) => o.desc !== pickedDesc)
       .map((o) => o.odds)
       .filter(Boolean);
-    if (otherOdds.length > 0 && otherOdds.some((o) => o < MIN_OPPONENT_ODDS)) return null;
+    if (otherOdds.length > 0 && otherOdds.some((o) => o < minOpp)) return null;
   }
   const reliability = marketReliability(market.mp, market.sId);
   const implied = 1 / odds;
@@ -2687,7 +2690,8 @@ function passesOpponentGate(r) {
     .filter((o) => cleanText(o.desc) !== pickClean)
     .map((o) => o.odds)
     .filter(Boolean);
-  return otherOdds.length === 0 || otherOdds.every((o) => o >= MIN_OPPONENT_ODDS);
+  const minOdds = Number(r.sportId) === WINNER_BASKETBALL_ID ? MIN_BASKETBALL_OPPONENT_ODDS : MIN_OPPONENT_ODDS;
+  return otherOdds.length === 0 || otherOdds.every((o) => o >= minOdds);
 }
 
 function finalOpenRowsByDay(rows) {
