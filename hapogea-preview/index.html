@@ -2635,6 +2635,33 @@
     #ai-root .ai-img-upload:disabled { opacity: .35; cursor: default; }
     #ai-root .ai-composer-foot { text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 9px; }
     #ai-root .ai-composer-foot b { color: var(--text-muted); font-weight: 600; }
+    #ai-root .ai-locked-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 var(--pad) var(--pad);
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+    }
+    #ai-root .ai-locked-icon { font-size: 22px; flex-shrink: 0; }
+    #ai-root .ai-locked-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    #ai-root .ai-locked-text b { font: 700 13.5px/1 Heebo, sans-serif; color: var(--text); }
+    #ai-root .ai-locked-text span { font-size: 12px; color: var(--text-muted); }
+    #ai-root .ai-locked-btn {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #4F46E5);
+      color: #fff;
+      font: 800 12px/1 Heebo, sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .15s;
+    }
+    #ai-root .ai-locked-btn:hover { opacity: .88; }
     #ai-root .ai-scroll-btn {
       position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%);
       width: 38px; height: 38px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong);
@@ -5005,6 +5032,7 @@
   <script>
     const PREMIUM_LS_KEY = 'hapogea_premium_v3';
     const PREMIUM_EXP_KEY = 'hapogea_premium_exp_v3';
+    const AI_FREE_KEY = 'hapogea_ai_free_used_v1'; // count of free AI messages used
     function isPremiumUser() {
       if (localStorage.getItem(PREMIUM_LS_KEY) !== 'active') return false;
       const exp = Number(localStorage.getItem(PREMIUM_EXP_KEY) || 0);
@@ -7427,11 +7455,12 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: blur/overlay all cards beyond the first for free users
+      // Premium lock: blur/overlay all cards beyond the first 5 for free users
       if (!state.isPremium) {
         const allCards = cards.querySelectorAll('article.card');
+        const FREE_CARDS = 5;
         allCards.forEach((card, i) => {
-          if (i === 0) return; // first card is free
+          if (i < FREE_CARDS) return; // first 5 cards are free
           card.style.position = 'relative';
           card.style.overflow = 'hidden';
           if (!card.querySelector('.premium-lock-overlay')) {
@@ -7441,14 +7470,14 @@
             const outcomeLabel = card.dataset.outcomeLabel || 'ממתין לתוצאה';
             const clsMap = { hit: 'hit', miss: 'miss', pending: 'wait', closed: 'closed' };
             const outcomeCls = clsMap[outcome] || 'wait';
-            overlay.innerHTML = `<span class="verdict ${outcomeCls}" style="margin-bottom:10px;font-size:13px;padding:5px 14px">${outcomeLabel}</span><span class="lock-icon">🔒</span><span class="lock-label">זמין למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">קנה פרימיום</button>`;
+            overlay.innerHTML = `<span class="verdict ${outcomeCls}" style="margin-bottom:10px;font-size:13px;padding:5px 14px">${outcomeLabel}</span><span class="lock-icon">🔒</span><span class="lock-label">זמין למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()">שדרג לפרימיום</button>`;
             card.appendChild(overlay);
           }
         });
-        if (allCards.length > 1) {
+        if (allCards.length > FREE_CARDS) {
           const banner = document.createElement('div');
           banner.style.cssText = 'text-align:center;padding:20px;color:rgba(255,255,255,.5);font-size:13px;font-weight:800';
-          banner.innerHTML = `🔒 ${allCards.length - 1} ניתוחים נוספים זמינים בפרימיום — <button onclick="openPremiumModal()" style="background:none;border:none;color:#55d6ff;cursor:pointer;font:800 13px Heebo,sans-serif;text-decoration:underline">פתח גישה</button>`;
+          banner.innerHTML = `🔒 ${allCards.length - FREE_CARDS} ניתוחים נוספים זמינים בפרימיום — <button onclick="openPremiumModal()" style="background:none;border:none;color:#55d6ff;cursor:pointer;font:800 13px Heebo,sans-serif;text-decoration:underline">שדרג לפרימיום</button>`;
           cards.appendChild(banner);
         }
       }
@@ -9958,6 +9987,8 @@ function AiMessage({m,idx,onToggle}) {
   );
 }
 
+const AI_FREE_LIMIT = 1; // free users get 1 AI message total
+
 function AiApp() {
   const user = useHapUser();
   const [messages,setMessages] = React.useState([]);
@@ -9968,6 +9999,12 @@ function AiApp() {
   const scrollRef = React.useRef(null);
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
+  // Free message counter — persists in localStorage across sessions
+  const [aiMsgUsed, setAiMsgUsed] = React.useState(() => {
+    try { return Number(localStorage.getItem(window.AI_FREE_KEY || 'hapogea_ai_free_used_v1') || 0); } catch { return 0; }
+  });
+  const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
+  const isAiLocked = !isPrem() && aiMsgUsed >= AI_FREE_LIMIT;
 
   // Per-user chat history: load the saved thread when the account changes,
   // and persist completed threads back to that user's slot.
@@ -10030,6 +10067,7 @@ function AiApp() {
 
   const send=async(text)=>{
     if(busy)return;
+    if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
     const historySnap=messages.slice(-6).map(m=>({role:m.role,text:m.role==="user"?m.text:(m.intro||"")}));
@@ -10088,6 +10126,7 @@ function AiApp() {
         }
         patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
+        if(!isPrem()){const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
         setBusy(false);
         return;
       }
@@ -10103,6 +10142,7 @@ function AiApp() {
         patchAi({streamLen:n});
       }
       patchAi({streamLen:introText.length,phase:"done"});
+      if(!isPrem()){const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
       setBusy(false);
     }catch(err){
       clearTimeout(tid);clearInterval(stepTimer);
@@ -10116,6 +10156,7 @@ function AiApp() {
 
   const sendImage=async(file,note)=>{
     if(busy)return;
+    if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
     setBusy(true);
     const userText=note?`[תמונה] ${note}`:"[תמונה] נתח את הטופס/צילום הזה";
     setMessages(m=>[...m,
@@ -10171,7 +10212,18 @@ function AiApp() {
         <button className={"ai-scroll-btn"+(showScrollBtn?" show":"")} onClick={()=>scrollDown()} aria-label="גלול למטה">
           <AiIcon name="chevron" size={18}/>
         </button>
-        <AiComposer onSend={send} onSendImage={sendImage} busy={busy} showChips={empty}/>
+        {isAiLocked ? (
+          <div className="ai-locked-bar">
+            <span className="ai-locked-icon">🔒</span>
+            <div className="ai-locked-text">
+              <b>ניצלת את ההודעה החינמית שלך</b>
+              <span>שדרג לפרימיום לשיחות ללא הגבלה</span>
+            </div>
+            <button className="ai-locked-btn" onClick={()=>typeof openPremiumModal==="function"&&openPremiumModal()}>שדרג</button>
+          </div>
+        ) : (
+          <AiComposer onSend={send} onSendImage={sendImage} busy={busy} showChips={empty}/>
+        )}
       </div>
     </div>
   );
