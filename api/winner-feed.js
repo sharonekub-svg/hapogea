@@ -1225,7 +1225,7 @@ function scoreOutcome(market, outcome) {
   const oddsMax = isBasketball
     ? (isSpread ? BASKETBALL_ODDS_MAX_SPREAD : BASKETBALL_ODDS_MAX_MONEYLINE)
     : ODDS_MAX;
-  if (!odds || odds <= oddsMin || odds >= oddsMax) return null;
+  if (!odds || odds < oddsMin || odds >= oddsMax) return null;
   const oddsBook = marketOddsBook(market);
 
   // Football 3-way + basketball moneyline: all opponents must be above the threshold
