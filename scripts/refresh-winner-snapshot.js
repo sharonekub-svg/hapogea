@@ -18,7 +18,8 @@ function summarize(payload) {
     const tab = payload.tabs?.[day];
     for (const sport of ["football", "basketball"]) {
       const rows = tab?.sports?.[sport] || [];
-      lines.push(`${day}.${sport}: rows=${rows.length}, recommended=${countRecommendations(rows)}`);
+      const upcoming = rows.filter((r) => r.status === "ממתין" && !["final","live","ht"].includes(r.matchPhase)).length;
+      lines.push(`${day}.${sport}: rows=${rows.length}, recommended=${countRecommendations(rows)}, upcoming=${upcoming}`);
     }
   }
   return lines.join("\n");
