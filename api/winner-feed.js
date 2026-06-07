@@ -85,17 +85,17 @@ const ODDS_API_SPORTS = [
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ODDS_MIN = 1.35;
-const ODDS_MAX = 1.70;
-const SOFT_ODDS_MIN = 1.22;
-const SOFT_ODDS_MAX = 1.90;
+const ODDS_MIN = 1.40;
+const ODDS_MAX = 1.75;
+const SOFT_ODDS_MIN = 1.25;
+const SOFT_ODDS_MAX = 1.95;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
 const BASKETBALL_ODDS_MAX_MONEYLINE = 1.75;
 const BASKETBALL_ODDS_MAX_SPREAD = 1.95;
 // Football 3-way: all other outcomes (draw + loser) must be at or above this threshold
-const MIN_OPPONENT_ODDS = 3.0;
+const MIN_OPPONENT_ODDS = 2.6;
 // Basketball 2-way: the non-picked team must be at or above this threshold
 const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
 /** Top Winner picks shown per day (verified line + odds in range). */
@@ -2661,7 +2661,7 @@ function capPerLeague(rows, max = 5) {
 
 function finalOpenRows(rows) {
   const sorted = (rows || [])
-    .filter((row) => row.recommended && row.odds && (row.status === "ממתין" || row.matchPhase === "final" || row.matchPhase === "live" || row.matchPhase === "ht"))
+    .filter((row) => row.recommended && row.odds && row.status === "ממתין" && !["final", "live", "ht"].includes(row.matchPhase))
     .sort((a, b) => {
       return (b.recommendationScore || 0) - (a.recommendationScore || 0)
         || (b.probability || 0) - (a.probability || 0)
