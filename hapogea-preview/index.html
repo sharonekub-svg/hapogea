@@ -6243,72 +6243,96 @@
 
       if (!state.wcOpen) {
         wcStopCountdown();
+        // Show 3 upcoming fixtures as a teaser
+        const upcoming = WC2026_FIXTURES.filter(f => !f.status || f.status === 'ממתין').slice(0, 3);
         target.innerHTML = `
           <div class="wc-head">
             <div>
-              <h3>תצוגת טורניר מהירה</h3>
-              <p>לחיצה על הבאנר פותחת מרכז מונדיאל מלא: ספירה לאחור, דגלים, שלבים, תאריך, שעה, סטטוס ונתוני ווינר כשהם זמינים.</p>
+              <h3>מונדיאל 2026 — לוח משחקים</h3>
+              <p>לחץ על הבאנר למרכז הטורניר המלא עם ${WC2026_FIXTURES.length} משחקים, דגלים ויחסי ווינר.</p>
             </div>
-            <span class="pill">${WC2026_FIXTURES.length} משחקים · World Cup</span>
+            <span class="pill">${WC2026_FIXTURES.length} משחקים · 48 נבחרות</span>
           </div>
-          <div class="wc-grid">
-            ${WC2026_FIXTURES.slice(0, 4).map(item => `
-              <article class="wc-card compact" data-wc-open="true">
-                <div class="wc-card-top">
-                  <span class="wc-stage">${escapeHtml(item.stage)}</span>
-                  <span class="wc-status ${wcStatus(item).cls}">${wcStatus(item).label}</span>
-                </div>
-                <div class="wc-teams">
-                  <div class="wc-team">${flagImg(item.hc, item.home)}<b>${escapeHtml(item.home)}</b></div>
-                  <div class="wc-prediction"><span>VS</span><b>${escapeHtml(wcDateLabel(item.date).short)}</b><span>${escapeHtml(wcTimeLabel(item))}</span></div>
-                  <div class="wc-team">${flagImg(item.ac, item.away)}<b>${escapeHtml(item.away)}</b></div>
-                </div>
-                <div class="wc-meta">${escapeHtml(item.venue)}. ${item.odds && item.pick ? `יחס ווינר ${formatOdds(item.odds[item.pick])}` : "אין יחס ווינר פתוח כרגע; לא מוצג יחס מומצא"}.</div>
-              </article>
-            `).join("")}
-          </div>
-        `;
+          <div class="wc-match-grid">
+            ${upcoming.map(wcFixtureCard).join('')}
+          </div>`;
         return;
       }
 
-      // Group by stage (בית A, B, C...) for tab navigation
+      // All unique groups, sorted A→L
       const allGroups = [...new Set(WC2026_FIXTURES.map(f => f.stage))].filter(Boolean).sort((a, b) => {
-        const la = a.replace(/[^A-Za-zא-ת]/g, '').slice(-1);
-        const lb = b.replace(/[^A-Za-zא-ת]/g, '').slice(-1);
+        const la = a.slice(-1), lb = b.slice(-1);
         return la.localeCompare(lb);
       });
-      const activeGroupKey = state.wcActiveGroup || allGroups[0] || '';
-      if (!state.wcActiveGroup) state.wcActiveGroup = activeGroupKey;
-      const groupTabs = allGroups.map(g =>
-        `<button class="wc-day-pill${g===activeGroupKey?' active':''}" data-wc-group="${escapeHtml(g)}" type="button">${escapeHtml(g)}</button>`
-      ).join('');
-      const groupFixtures = WC2026_FIXTURES.filter(f => f.stage === activeGroupKey);
-      const groupCards = groupFixtures.length
-        ? groupFixtures.map(wcFixtureCard).join('')
-        : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בבית זה</div>`;
+      if (!state.wcActiveGroup) state.wcActiveGroup = '__all__';
+      const activeGroup = state.wcActiveGroup;
+
+      // Group letter grid
+      const groupLetterGrid = allGroups.map(g => {
+        const letter = g.replace(/[^A-Za-z]/g, '') || g.slice(-1);
+        const count = WC2026_FIXTURES.filter(f => f.stage === g).length;
+        return `<button class="wc-group-pill${g === activeGroup ? ' active' : ''}" data-wc-group="${escapeHtml(g)}" type="button">
+          <span class="wc-group-pill-letter">${escapeHtml(letter)}</span>
+          <span class="wc-group-pill-count">${count} משחקים</span>
+        </button>`;
+      }).join('');
+
+      let matchesHtml = '';
+      if (activeGroup === '__all__') {
+        // Group by date
+        const byDate = new Map();
+        WC2026_FIXTURES.forEach(f => {
+          if (!byDate.has(f.date)) byDate.set(f.date, []);
+          byDate.get(f.date).push(f);
+        });
+        const todayStr = new Date().toISOString().slice(0, 10);
+        matchesHtml = [...byDate.entries()].map(([date, games]) => {
+          const [yr, mo, dy] = date.split('-');
+          const isToday = date === todayStr;
+          const label = isToday ? `📅 היום · ${dy}.${mo}` : `${dy}.${mo}.${yr}`;
+          return `
+            <div class="wc-date-header">
+              <span class="wc-date-header-label${isToday ? ' wc-date-header-today' : ''}">${label}</span>
+              <div class="wc-date-header-line"></div>
+            </div>
+            <div class="wc-match-grid">${games.map(wcFixtureCard).join('')}</div>`;
+        }).join('');
+      } else {
+        const groupFixtures = WC2026_FIXTURES.filter(f => f.stage === activeGroup);
+        matchesHtml = groupFixtures.length
+          ? `<div class="wc-match-grid">${groupFixtures.map(wcFixtureCard).join('')}</div>`
+          : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בבית זה</div>`;
+      }
 
       target.innerHTML = `
         ${worldCupHubMarkup()}
         <div class="wc-head wc-head-open">
           <div>
-            <span class="wc-kicker">World Cup 2026 · לוח משחקים לפי בתים</span>
-            <h3>בחר בית</h3>
+            <span class="wc-kicker">World Cup 2026 · FIFA Official</span>
+            <h3>לוח משחקים מלא</h3>
           </div>
-          <button class="wc-enter" type="button" data-wc-close="true">חזרה לסיכום <span aria-hidden="true">↑</span></button>
+          <button class="wc-enter" type="button" data-wc-close="true">סגור ↑</button>
         </div>
-        <div class="wc-day-tabs" id="wcGroupTabs" style="overflow-x:auto;display:flex;gap:6px;padding:10px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch">${groupTabs}</div>
-        <div class="wc-match-grid" id="wcGroupGrid">${groupCards}</div>
+        <div class="wc-nav-tabs">
+          <button class="wc-nav-tab${activeGroup === '__all__' ? ' active' : ''}" data-wc-group="__all__" type="button">📅 לפי תאריך</button>
+          <button class="wc-nav-tab${activeGroup !== '__all__' ? ' active' : ''}" data-wc-group="${escapeHtml(allGroups[0] || 'בית A')}" type="button" id="wcGroupsTabBtn">🏟️ לפי בית</button>
+        </div>
+        ${activeGroup !== '__all__' ? `<div class="wc-group-grid">${groupLetterGrid}</div>` : ''}
+        ${matchesHtml}
       `;
       wcStartCountdown();
       requestAnimationFrame(() => { target.classList.add("wc-body-in"); });
     }
 
     document.addEventListener("click", (e) => {
-      const groupPill = e.target.closest && e.target.closest(".wc-day-pill[data-wc-group]");
-      if (groupPill) {
-        state.wcActiveGroup = groupPill.getAttribute('data-wc-group');
-        renderWorldCup();
-        return;
+      const groupPill = e.target.closest && e.target.closest("[data-wc-group]");
+      if (groupPill && !e.target.closest("[data-wc-close]")) {
+        const val = groupPill.getAttribute('data-wc-group');
+        if (val) {
+          state.wcActiveGroup = val;
+          renderWorldCup();
+          return;
+        }
       }
       const chip = e.target.closest && e.target.closest(".wc-stage-chip[data-wc-stage]");
       if (!chip) return;
@@ -6319,6 +6343,27 @@
       root.querySelectorAll(".wc-stage-block").forEach((b) => {
         b.style.display = (key === "all" || b.getAttribute("data-wc-block") === key) ? "" : "none";
       });
+    });
+
+    // WC AI analyze button
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest && e.target.closest(".wcm-ai-btn[data-ai-match]");
+      if (!btn) return;
+      const query = decodeURIComponent(btn.getAttribute("data-ai-match") || "");
+      if (!query) return;
+      // Switch to AI tab and pre-fill
+      state.sportTab = "ai";
+      state.reuvenOpen = true;
+      render();
+      setTimeout(() => {
+        const inp = document.getElementById("reuvenInput");
+        if (inp) {
+          inp.value = query;
+          inp.focus();
+        }
+        const aiSection = document.getElementById("aiSection");
+        if (aiSection) aiSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     });
 
     function renderDaily() {
