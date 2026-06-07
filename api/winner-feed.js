@@ -1230,6 +1230,8 @@ function scoreOutcome(market, outcome) {
 
   // Football 3-way + basketball moneyline: all opponents must be above the threshold
   if (!isSpread) {
+    // Futures/outright markets (>3 outcomes) are not head-to-head games — skip them
+    if (isBasketball && oddsBook.outcomes.length > 3) return null;
     const minOpp = isBasketball ? MIN_BASKETBALL_OPPONENT_ODDS : MIN_OPPONENT_ODDS;
     const pickedDesc = cleanText(outcome.desc);
     const otherOdds = oddsBook.outcomes
