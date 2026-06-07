@@ -7,7 +7,6 @@ const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
 const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
 const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
-const BRAVE_API_KEY = process.env.BRAVE_KEY;
 
 // ── In-process AI response cache ──────────────────────────────────────────────
 const _aiCache = new Map();
@@ -282,27 +281,36 @@ async function fetchOddsApiData(home, away, competition) {
   return null;
 }
 
-// ── Brave Web Search ──────────────────────────────────────────────────────────
+// ── DuckDuckGo Web Search (free, no API key) ──────────────────────────────────
 async function fetchBraveSearch(home, away) {
-  if (!BRAVE_API_KEY) return null;
   try {
     const homeEn = translateTeamName(home);
     const awayEn = translateTeamName(away);
-    const q = encodeURIComponent(`${homeEn} vs ${awayEn} preview injury form 2025 2026`);
-    const url = `https://api.search.brave.com/res/v1/web/search?q=${q}&count=5&search_lang=en&result_filter=web`;
-    const data = await fetch(url, {
-      headers: { "Accept": "application/json", "X-Subscription-Token": BRAVE_API_KEY },
-      signal: AbortSignal.timeout(8000),
+
+    const snippets = [];
+
+    // Query 1: match preview/form
+    const q1 = encodeURIComponent(`${homeEn} vs ${awayEn} match preview 2025 2026`);
+    const d1 = await fetch(`https://api.duckduckgo.com/?q=${q1}&format=json&no_html=1&skip_disambig=1`, {
+      headers: { "User-Agent": "HaPogea/1.0" },
+      signal: AbortSignal.timeout(7000),
     }).then(r => r.ok ? r.json() : null).catch(() => null);
 
-    const results = data?.web?.results;
-    if (!results?.length) return null;
+    if (d1?.AbstractText) snippets.push(`• ${d1.AbstractText.slice(0, 300)}`);
+    if (d1?.RelatedTopics?.length) {
+      d1.RelatedTopics.slice(0, 3).forEach(t => {
+        if (t.Text) snippets.push(`• ${t.Text.slice(0, 200)}`);
+      });
+    }
 
-    const snippets = results.slice(0, 4).map(r => {
-      const title = (r.title || "").slice(0, 80);
-      const desc = (r.description || "").replace(/<[^>]+>/g, "").slice(0, 200);
-      return `• ${title}: ${desc}`;
-    }).filter(Boolean);
+    // Query 2: injuries / team news
+    const q2 = encodeURIComponent(`${homeEn} injuries squad news 2026`);
+    const d2 = await fetch(`https://api.duckduckgo.com/?q=${q2}&format=json&no_html=1&skip_disambig=1`, {
+      headers: { "User-Agent": "HaPogea/1.0" },
+      signal: AbortSignal.timeout(7000),
+    }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+    if (d2?.AbstractText) snippets.push(`• ${homeEn} news: ${d2.AbstractText.slice(0, 250)}`);
 
     return snippets.length ? snippets.join("\n") : null;
   } catch {
