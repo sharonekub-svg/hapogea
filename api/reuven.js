@@ -558,7 +558,7 @@ async function callClaude(userMessage, conversationHistory) {
     system: SYSTEM_PROMPT,
     messages: buildMessages(userMessage, conversationHistory),
     max_tokens: 2500,
-    temperature: 0.1,
+    temperature: 0,
   };
 
   const RETRY_DELAYS = [3000, 6000, 12000];
@@ -594,7 +594,7 @@ async function streamClaude(res, userMessage, conversationHistory) {
     system: SYSTEM_PROMPT,
     messages: buildMessages(userMessage, conversationHistory),
     max_tokens: 2500,
-    temperature: 0.1,
+    temperature: 0,
     stream: true,
   };
 
