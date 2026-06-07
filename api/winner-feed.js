@@ -3424,6 +3424,23 @@ async function buildOddsApiFeed() {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Remove picks whose scheduled start time has passed by more than 15 minutes.
+// Applied to snapshot tabs so stale picks don't show up as "active".
+function filterPastPicksFromTabs(tabs) {
+  for (const tabKey of ["today", "tomorrow"]) {
+    const tab = tabs?.[tabKey];
+    if (!tab) continue;
+    for (const sport of ["football", "basketball"]) {
+      if (!tab.sports?.[sport]) continue;
+      tab.sports[sport] = tab.sports[sport].filter((r) => {
+        if (!r.day || !r.time || !/^\d{2}:\d{2}$/.test(r.time)) return true;
+        const gameStart = new Date(`${r.day}T${r.time}:00+03:00`);
+        return Date.now() <= gameStart.getTime() + 15 * 60 * 1000;
+      });
+    }
+  }
+}
+
 function normalizeFallbackRows(payload) {
   const verifiedAt = payload.generatedAt || new Date().toISOString();
   const copy = JSON.parse(JSON.stringify(payload));
@@ -3572,6 +3589,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
       }
     }
+    filterPastPicksFromTabs(snapshotNorm0.tabs);
     const snapshotCountReal = (tab) =>
       [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
     const snapshotHasPicks = payloadMatchesIsraelDates(snapshotNorm0) &&
@@ -3594,6 +3612,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
       }
     }
+    filterPastPicksFromTabs(snapshotNorm1.tabs);
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
