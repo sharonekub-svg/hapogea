@@ -27879,7 +27879,9 @@
           "leagueLogoSource": "generated league badge",
           "accepted": true,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -27949,7 +27951,9 @@
           "leagueLogoSource": "generated league badge",
           "accepted": true,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -27998,7 +28002,9 @@
           "leagueLogoSource": "generated league badge",
           "accepted": true,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -30993,7 +30999,1962 @@
           "leagueLogoSource": "generated league badge",
           "accepted": true,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4667285",
+          "eventId": "365-4667285",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "V-league",
+          "match": "ויטל - Công An Hà Nội",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4668377",
+          "eventId": "365-4668377",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "V-league",
+          "match": "סונג לאם - PVF-CAND",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4688118",
+          "eventId": "365-4688118",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "Niva Dolbizno - Orsha",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4733081",
+          "eventId": "365-4733081",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "אפגניסטן - פקיסטן",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4688513",
+          "eventId": "365-4688513",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "סלוטסקסחר - Molodechno",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651721",
+          "eventId": "365-4651721",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "Fortuna Yaounde - PWD Bamenda",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4681788",
+          "eventId": "365-4681788",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית ב'",
+          "match": "Independente SP - Santacruzense",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4683601",
+          "eventId": "365-4683601",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית ג'",
+          "match": "Audax Osasco - ווטוראטי",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4683602",
+          "eventId": "365-4683602",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית ב'",
+          "match": "Catanduvense - מוגי מירים",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4683603",
+          "eventId": "365-4683603",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית ב'",
+          "match": "Matonense - São Carlos",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4714461",
+          "eventId": "365-4714461",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה - Intermediate",
+          "match": "פרוגרסו - Albion",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4714669",
+          "eventId": "365-4714669",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "ליכטנשטיין - קפריסין",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4730412",
+          "eventId": "365-4730412",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "אנרגטיק בגו - Gomel II",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4731214",
+          "eventId": "365-4731214",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Campeonato Femenino A",
+          "match": "City Torque (W) - San Jacinto Albion (W)",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4731311",
+          "eventId": "365-4731311",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "עומאן - מוזמביק",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4732825",
+          "eventId": "365-4732825",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "גביע נורבגי",
+          "match": "Ready - Union Carl Berner",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4712286",
+          "eventId": "365-4712286",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "שחטיור סוליגורסק - סלונים",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4727990",
+          "eventId": "365-4727990",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Copa Sul-Sudeste - גמר",
+          "match": "שאפקוונסה - אבאי",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4731722",
+          "eventId": "365-4731722",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - Santa Cruz",
+          "match": "Virginia USC - Los Angeles FC (Cotoca)",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4732817",
+          "eventId": "365-4732817",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "גביע נורבגי",
+          "match": "פרויה - Gneist",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4726674",
+          "eventId": "365-4726674",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - פלייאוף עלייה",
+          "match": "סלטה ויגו ב - CE Europa",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651719",
+          "eventId": "365-4651719",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "Stade Renard - יוניספורט בפאנג",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651720",
+          "eventId": "365-4651720",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "פנתר - Victoria United Fc",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651722",
+          "eventId": "365-4651722",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "אייל רויאל - Gazelle",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651723",
+          "eventId": "365-4651723",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "Dynamo Douala - קוטון ספורט גארואה",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4638170",
+          "eventId": "365-4638170",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "רנאים - סטרומן",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4651724",
+          "eventId": "365-4651724",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "קאנון יאונדה - Colombe",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4679608",
+          "eventId": "365-4679608",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "ליאטאבה ג'ונאבה - FK Minija Kretinga",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4726926",
+          "eventId": "365-4726926",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות עד 21",
+          "match": "אסטוניה עד 21 - ליטא עד 21",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4727693",
+          "eventId": "365-4727693",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "סרייה ג' - Playoffs",
+          "match": "אסקולי - אוניון ברשיה",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4729753",
+          "eventId": "365-4729753",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - עונה סדירה",
+          "match": "סריטו - אטנאס סאן קרלוס",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4729978",
+          "eventId": "365-4729978",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "ג'יונס מאסירה - Amal Tiznit",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4729979",
+          "eventId": "365-4729979",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "ראק קזבלנקה - בנגריר",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4705486",
+          "eventId": "365-4705486",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Copa de la Liga",
+          "match": "לה סרנה - לה קאלרה",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4705489",
+          "eventId": "365-4705489",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Copa de la Liga",
+          "match": "אוניברסידד דה צ'ילה - אודקס איטליאנו",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4714670",
+          "eventId": "365-4714670",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "דנמרק - אוקראינה",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4726673",
+          "eventId": "365-4726673",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - פלייאוף עלייה",
+          "match": "זמורה - ויאריאל ב",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4728846",
+          "eventId": "365-4728846",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "טורניר טולון",
+          "match": "סין עד 20 - טוניסיה עד 23",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4688682",
+          "eventId": "365-4688682",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera Division A",
+          "match": "Cd Imperial Unido - מאלקו אונידו",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4729977",
+          "eventId": "365-4729977",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "צ'אבב חניפרה - SCC Mohammédia",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4731318",
+          "eventId": "365-4731318",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "אליפות אירופה (עד גיל 17) - גמר",
+          "match": "בלגיה עד17 - איטליה עד 17",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4639218",
+          "eventId": "365-4639218",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - מטרופוליטנה",
+          "match": "דפורטיבו לה-פרר - ספורטיבו דוק סוד",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4639652",
+          "eventId": "365-4639652",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה רביעית - מטרופוליטנה - Zone A",
+          "match": "ויקטוריאנו ארנאס - דפנסורס קמבסרס",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4643879",
+          "eventId": "365-4643879",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "דפורטיבו מורון - אלמיראנטה בראון",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4643882",
+          "eventId": "365-4643882",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "סאן טלמו - דפורטיבו מדרין",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4664882",
+          "eventId": "365-4664882",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Inter Toronto FC - Forge FC",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4682625",
+          "eventId": "365-4682625",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - ארחנטינו א'",
+          "match": "חובנטוד אונידה - Costa Brava (Gral Pico)",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4682633",
+          "eventId": "365-4682633",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - ארחנטינו א'",
+          "match": "Germinal - סירקולו דפורטיבו",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4682635",
+          "eventId": "365-4682635",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - ארחנטינו א'",
+          "match": "אלוורדו - סול דה מאיו",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4682636",
+          "eventId": "365-4682636",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית - ארחנטינו א'",
+          "match": "אולימפו דה באיה - גיג'רמו בראון",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4683600",
+          "eventId": "365-4683600",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית ג'",
+          "match": "Paulinense - Flamengo-SP",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4683604",
+          "eventId": "365-4683604",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Paulista Serie B - בית א'",
+          "match": "José Bonifácio - Riopretano",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4685949",
+          "eventId": "365-4685949",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Catarinense - Serie B",
+          "match": "Guarani de Palhoça - Tubarão",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4685950",
+          "eventId": "365-4685950",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Catarinense - Serie B",
+          "match": "יובנטוס (ברזיל) - Caravaggio",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "sched-365-365-4686465",
+          "eventId": "365-4686465",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Catarinense - Serie B",
+          "match": "Hercilio Luz - Nação",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4659261",
+          "eventId": "365-4659261",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "MLS Next Pro",
+          "match": "Inter Miami II - New York City II",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4677433",
+          "eventId": "365-4677433",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "LDU Portoviejo - Gualaceo SC",
+          "pick": "LDU Portoviejo",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4688685",
+          "eventId": "365-4688685",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera Division A",
+          "match": "Quintero Unido - נאוול",
+          "pick": "Quintero Unido",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4688688",
+          "eventId": "365-4688688",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera Division A",
+          "match": "Comunal Cabrero - Cd Constitución Unido",
+          "pick": "Comunal Cabrero",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4730055",
+          "eventId": "365-4730055",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות עד 20",
+          "match": "צ'ילה עד 20 - ברזיל עד 20",
+          "pick": "ברזיל עד 20",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4732908",
+          "eventId": "365-4732908",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "ג'מייקה - דרום אפריקה",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4696341",
+          "eventId": "365-4696341",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "נאסיונל פוטוסי - קלאב אורורה",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4705362",
+          "eventId": "365-4705362",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות (נשים)",
+          "match": "ברזיל (נשים) - ארה\"ב (נ)",
+          "pick": "ברזיל (נשים)",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4714459",
+          "eventId": "365-4714459",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה - Intermediate",
+          "match": "נאסיונל - חובנטוד",
+          "pick": "נאסיונל",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4731734",
+          "eventId": "365-4731734",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera División B - North",
+          "match": "Glorias Navales - Curacaví",
+          "pick": "Glorias Navales",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4643890",
+          "eventId": "365-4643890",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "טריסטון סוארז - אלמרגרו",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4675316",
+          "eventId": "365-4675316",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "ברזיל - מצרים",
+          "pick": "ברזיל",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4684783",
+          "eventId": "365-4684783",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שלישית",
+          "match": "רנגו - לוטה שוואגר",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4705488",
+          "eventId": "365-4705488",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Copa de la Liga",
+          "match": "נובלנסה - אוניברסידד קונספסיון",
+          "pick": "נובלנסה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4705490",
+          "eventId": "365-4705490",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Copa de la Liga",
+          "match": "אונ' קתוליקה - קוברסל",
+          "pick": "אונ' קתוליקה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4712158",
+          "eventId": "365-4712158",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "ונצואלה - טורקיה",
+          "pick": "טורקיה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4727218",
+          "eventId": "365-4727218",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "12 De Junio Vh - דפורטיבו קפיאטה",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4659263",
+          "eventId": "365-4659263",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "MLS Next Pro",
+          "match": "צ'טאנוגה - New York Red Bulls II",
+          "pick": "צ'טאנוגה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4659264",
+          "eventId": "365-4659264",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "MLS Next Pro",
+          "match": "Atlanta United II - Chicago Fire II",
+          "pick": "Atlanta United II",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4664883",
+          "eventId": "365-4664883",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Cavalry - HFX Wanderers",
+          "pick": "Cavalry",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4665223",
+          "eventId": "365-4665223",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Supra du Québec - Pacific",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4731736",
+          "eventId": "365-4731736",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera División B - North",
+          "match": "Audax de Paipote - Municipal Ovalle",
+          "pick": "Audax de Paipote",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4731737",
+          "eventId": "365-4731737",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Tercera División B - North",
+          "match": "Deportes Ovalle - Unión Compañías",
+          "pick": "Deportes Ovalle",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4696338",
+          "eventId": "365-4696338",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Real Oruro - אוניברסיטת וינטו",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4659259",
+          "eventId": "365-4659259",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "MLS Next Pro",
+          "match": "Colorado Rapids II - St. Louis City II",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4710299",
+          "eventId": "365-4710299",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "ארגנטינה - הונדורס",
+          "pick": "ארגנטינה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4712157",
+          "eventId": "365-4712157",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות נבחרות",
+          "match": "קורסאו - Aruba",
+          "pick": "קורסאו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4729752",
+          "eventId": "365-4729752",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - עונה סדירה",
+          "match": "רנטיסטאס - Colon",
+          "pick": "Colon",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4656662",
+          "eventId": "365-4656662",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "ריינג'רס דה טלקה - Deportes Santa Cruz",
+          "pick": "Deportes Santa Cruz",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4656664",
+          "eventId": "365-4656664",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה",
+          "match": "דפורטס איקיקה - Deportes Recoleta",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4678851",
+          "eventId": "365-4678851",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "FC Western - Wellington Phoenix II",
+          "pick": "FC Western",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4728878",
+          "eventId": "365-4728878",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "LPR Pro - חצי גמר",
+          "match": "Academia Quintana - Puerto Rico Surf",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4659262",
+          "eventId": "365-4659262",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "MLS Next Pro",
+          "match": "Ventura County FC - Houston Dynamo Academy",
+          "pick": "Ventura County FC",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4681855",
+          "eventId": "365-4681855",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "פרמייר ליג",
+          "match": "Coastal Spirit - Nelson Suburbs",
+          "pick": "Nelson Suburbs",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4728916",
+          "eventId": "365-4728916",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - פלייאוף מיקום",
+          "match": "וונראורה האצ'ינואה - אימאברי",
+          "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4728508",
+          "eventId": "365-4728508",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - פלייאוף מיקום",
+          "match": "טוקושימה - Iwaki FC",
+          "pick": "טוקושימה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4728743",
+          "eventId": "365-4728743",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - פלייאוף מיקום",
+          "match": "זווייגן קנזאווה - ת'ספה גונמה",
+          "pick": "זווייגן קנזאווה",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4728744",
+          "eventId": "365-4728744",
+          "day": "2026-06-07",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה שנייה - פלייאוף מיקום",
+          "match": "בלאובליץ אקיטה - Kagoshima United",
+          "pick": "Kagoshima United",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         }
       ],
@@ -35478,7 +37439,800 @@
               "initials": "א",
               "logoSource": "generated league badge"
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639654",
+            "eventId": "365-4639654",
+            "eventId365": "4639654",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה רביעית - מטרופוליטנה - Zone B",
+            "country": "",
+            "match": "אטלס - פניקס",
+            "home": "אטלס",
+            "away": "פניקס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11934",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/13693",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+            "resultKey": "240:2026-06-06:אטלס:פניקס",
+            "market": "1X2",
+            "pick": "תיקו",
+            "winnerPick": "תיקו",
+            "actualWinner": "תיקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "1:1",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "1:1",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "תיקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא תיקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "אטלס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11934",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פניקס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/13693",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה רביעית - מטרופוליטנה - Zone B",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639222",
+            "eventId": "365-4639222",
+            "eventId365": "4639222",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה שלישית - מטרופוליטנה",
+            "country": "",
+            "match": "אקסורסיוניסטאס - סן מרטין בוזאקו",
+            "home": "אקסורסיוניסטאס",
+            "away": "סן מרטין בוזאקו",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/10747",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14374",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+            "resultKey": "240:2026-06-06:אקסורסיוניסטאס:סן מרטין בוזאקו",
+            "market": "1X2",
+            "pick": "אקסורסיוניסטאס",
+            "winnerPick": "אקסורסיוניסטאס",
+            "actualWinner": "אקסורסיוניסטאס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "2:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "2:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "אקסורסיוניסטאס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא אקסורסיוניסטאס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "אקסורסיוניסטאס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/10747",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "סן מרטין בוזאקו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14374",
+              "initials": "ס",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שלישית - מטרופוליטנה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4626094",
+            "eventId": "365-4626094",
+            "eventId365": "4626094",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ידידות נבחרות",
+            "country": "",
+            "match": "ארה\"ב - גרמניה",
+            "home": "ארה\"ב",
+            "away": "גרמניה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/2389",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/2372",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/570",
+            "resultKey": "240:2026-06-06:ארה ב:גרמניה",
+            "market": "1X2",
+            "pick": "גרמניה",
+            "winnerPick": "גרמניה",
+            "actualWinner": "גרמניה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "1:2",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "1:2",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "גרמניה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא גרמניה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "ארה\"ב",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/2389",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "גרמניה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/2372",
+              "initials": "ג",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ידידות נבחרות",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/570",
+              "initials": "י",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639221",
+            "eventId": "365-4639221",
+            "eventId365": "4639221",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה שלישית - מטרופוליטנה",
+            "country": "",
+            "match": "ארחנטינו מרלו - Camioneros",
+            "home": "ארחנטינו מרלו",
+            "away": "Camioneros",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/13683",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17402",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+            "resultKey": "240:2026-06-06:ארחנטינו מרלו:camioneros",
+            "market": "1X2",
+            "pick": "תיקו",
+            "winnerPick": "תיקו",
+            "actualWinner": "תיקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "תיקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא תיקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "ארחנטינו מרלו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/13683",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Camioneros",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17402",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שלישית - מטרופוליטנה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639651",
+            "eventId": "365-4639651",
+            "eventId365": "4639651",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה רביעית - מטרופוליטנה - Zone A",
+            "country": "",
+            "match": "ארחנטינו רוסאריו - לוגאנו",
+            "home": "ארחנטינו רוסאריו",
+            "away": "לוגאנו",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11939",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14373",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+            "resultKey": "240:2026-06-06:ארחנטינו רוסאריו:לוגאנו",
+            "market": "1X2",
+            "pick": "ארחנטינו רוסאריו",
+            "winnerPick": "ארחנטינו רוסאריו",
+            "actualWinner": "ארחנטינו רוסאריו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "2:1",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "2:1",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "ארחנטינו רוסאריו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא ארחנטינו רוסאריו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "ארחנטינו רוסאריו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11939",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "לוגאנו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14373",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה רביעית - מטרופוליטנה - Zone A",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639219",
+            "eventId": "365-4639219",
+            "eventId365": "4639219",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה שלישית - מטרופוליטנה",
+            "country": "",
+            "match": "דפורטיבו ארמניו - דפנסורס אונידוס",
+            "home": "דפורטיבו ארמניו",
+            "away": "דפנסורס אונידוס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7109",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11932",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+            "resultKey": "240:2026-06-06:דפורטיבו ארמניו:דפנסורס אונידוס",
+            "market": "1X2",
+            "pick": "דפורטיבו ארמניו",
+            "winnerPick": "דפורטיבו ארמניו",
+            "actualWinner": "דפורטיבו ארמניו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "3:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "3:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "דפורטיבו ארמניו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא דפורטיבו ארמניו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "דפורטיבו ארמניו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7109",
+              "initials": "ד",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "דפנסורס אונידוס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11932",
+              "initials": "ד",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שלישית - מטרופוליטנה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639224",
+            "eventId": "365-4639224",
+            "eventId365": "4639224",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה שלישית - מטרופוליטנה",
+            "country": "",
+            "match": "וייה דאלמין - ויז'ה סן קרלוס",
+            "home": "וייה דאלמין",
+            "away": "ויז'ה סן קרלוס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/9808",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7107",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+            "resultKey": "240:2026-06-06:וייה דאלמין:ויז ה סן קרלוס",
+            "market": "1X2",
+            "pick": "תיקו",
+            "winnerPick": "תיקו",
+            "actualWinner": "תיקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "תיקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא תיקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "וייה דאלמין",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/9808",
+              "initials": "ו",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "ויז'ה סן קרלוס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7107",
+              "initials": "ו",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שלישית - מטרופוליטנה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639647",
+            "eventId": "365-4639647",
+            "eventId365": "4639647",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה רביעית - מטרופוליטנה - Zone A",
+            "country": "",
+            "match": "חוסטו חוזה אורקיזה - פוארטו נואבו",
+            "home": "חוסטו חוזה אורקיזה",
+            "away": "פוארטו נואבו",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/15949",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11901",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+            "resultKey": "240:2026-06-06:חוסטו חוזה אורקיזה:פוארטו נואבו",
+            "market": "1X2",
+            "pick": "פוארטו נואבו",
+            "winnerPick": "פוארטו נואבו",
+            "actualWinner": "פוארטו נואבו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:1",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:1",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "פוארטו נואבו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא פוארטו נואבו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "חוסטו חוזה אורקיזה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/15949",
+              "initials": "ח",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פוארטו נואבו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11901",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה רביעית - מטרופוליטנה - Zone A",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4639216",
+            "eventId": "365-4639216",
+            "eventId365": "4639216",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה שלישית - מטרופוליטנה",
+            "country": "",
+            "match": "פלאנדריה - ארחנטינו קילמס",
+            "home": "פלאנדריה",
+            "away": "ארחנטינו קילמס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7114",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11936",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+            "resultKey": "240:2026-06-06:פלאנדריה:ארחנטינו קילמס",
+            "market": "1X2",
+            "pick": "ארחנטינו קילמס",
+            "winnerPick": "ארחנטינו קילמס",
+            "actualWinner": "ארחנטינו קילמס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:1",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:1",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "ארחנטינו קילמס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא ארחנטינו קילמס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "פלאנדריה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7114",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "ארחנטינו קילמס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11936",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שלישית - מטרופוליטנה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5077",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-10668896",
@@ -42071,12 +44825,14 @@
               "logoTier": 1
             },
             "leagueAsset": {
-              "name": "שבדית שלישית",
-              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XqTwvdGV4dD48L3N2Zz4=",
-              "initials": "ש",
-              "logoSource": "generated league badge"
+              "name": "Paulista Serie B - בית א'",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8088",
+              "initials": "P",
+              "logoSource": "365Scores",
+              "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "winner-10598214",
@@ -43715,9 +46471,2131 @@
               "initials": "ש",
               "logoSource": "generated league badge"
             },
-            "logoVerified": false
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4713616",
+            "eventId": "365-4713616",
+            "eventId365": "4713616",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "Paulista U20 - שלב ראשון - Grupo 3",
+            "country": "",
+            "match": "Cfa De Porto Ferreira U20 - Tanabi/Sp Youth",
+            "home": "Cfa De Porto Ferreira U20",
+            "away": "Tanabi/Sp Youth",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/79805",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/28768",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7841",
+            "resultKey": "240:2026-06-06:cfa de porto ferreira u20:tanabi sp youth",
+            "market": "1X2",
+            "pick": "תיקו",
+            "winnerPick": "תיקו",
+            "actualWinner": "תיקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "תיקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא תיקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Cfa De Porto Ferreira U20",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/79805",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Tanabi/Sp Youth",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/28768",
+              "initials": "T",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "Paulista U20 - שלב ראשון - Grupo 3",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7841",
+              "initials": "P",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4731210",
+            "eventId": "365-4731210",
+            "eventId365": "4731210",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "Campeonato Femenino A",
+            "country": "",
+            "match": "Defensor Sporting (W) - Danubio (W)",
+            "home": "Defensor Sporting (W)",
+            "away": "Danubio (W)",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/71725",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/79956",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8114",
+            "resultKey": "240:2026-06-06:defensor sporting:danubio",
+            "market": "1X2",
+            "pick": "תיקו",
+            "winnerPick": "תיקו",
+            "actualWinner": "תיקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "0:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "0:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "תיקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא תיקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Defensor Sporting (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/71725",
+              "initials": "D",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Danubio (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/79956",
+              "initials": "D",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "Campeonato Femenino A",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8114",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4730048",
+            "eventId": "365-4730048",
+            "eventId365": "4730048",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגת החובבים - טורניר פתיחה",
+            "country": "",
+            "match": "Deportivo Italiano - Mar de Fondo",
+            "home": "Deportivo Italiano",
+            "away": "Mar de Fondo",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70246",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70238",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7592",
+            "resultKey": "240:2026-06-06:deportivo italiano:mar de fondo",
+            "market": "1X2",
+            "pick": "Deportivo Italiano",
+            "winnerPick": "Deportivo Italiano",
+            "actualWinner": "Deportivo Italiano",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "3:1",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "3:1",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "Deportivo Italiano",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא Deportivo Italiano.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Deportivo Italiano",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70246",
+              "initials": "D",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Mar de Fondo",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70238",
+              "initials": "M",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת החובבים - טורניר פתיחה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7592",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4730053",
+            "eventId": "365-4730053",
+            "eventId365": "4730053",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.149Z",
+            "finishedAt": "2026-06-07T06:36:45.149Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגת החובבים - טורניר פתיחה",
+            "country": "",
+            "match": "Durazno - Club Atlético Artigas",
+            "home": "Durazno",
+            "away": "Club Atlético Artigas",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70110",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/67152",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7592",
+            "resultKey": "240:2026-06-06:durazno:atlético artigas",
+            "market": "1X2",
+            "pick": "Durazno",
+            "winnerPick": "Durazno",
+            "actualWinner": "Durazno",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "2:0",
+            "matchPhase": "final",
+            "matchMinute": 90,
+            "result": "2:0",
+            "resultVerifiedAt": "2026-06-07T06:36:45.149Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורגל מ-365Scores",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "Durazno",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורגל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא Durazno.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Durazno",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/70110",
+              "initials": "D",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Club Atlético Artigas",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/67152",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת החובבים - טורניר פתיחה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7592",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
           }
         ],
+        "basketball": [
+          {
+            "id": "result-365-4726418",
+            "eventId": "365-4726418",
+            "eventId365": "4726418",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "23:30",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "LBF",
+            "country": "",
+            "match": "Unimed Campinas (W) - Salvador Basketball (W)",
+            "home": "Unimed Campinas (W)",
+            "away": "Salvador Basketball (W)",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/51000",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94309",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5955",
+            "resultKey": "227:2026-06-06:unimed campinas:salvador",
+            "market": "המנצח",
+            "pick": "Unimed Campinas (W)",
+            "winnerPick": "Unimed Campinas (W)",
+            "actualWinner": "Unimed Campinas (W)",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "97:61",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "97:61",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "Unimed Campinas (W)",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא Unimed Campinas (W).",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Unimed Campinas (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/51000",
+              "initials": "U",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Salvador Basketball (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94309",
+              "initials": "S",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "LBF",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5955",
+              "initials": "L",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4729965",
+            "eventId": "365-4729965",
+            "eventId365": "4729965",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "23:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "National League Women - רבע גמר",
+            "country": "",
+            "match": "Puente Alto (W) - Gimnastico (W)",
+            "home": "Puente Alto (W)",
+            "away": "Gimnastico (W)",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/87638",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/87636",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8648",
+            "resultKey": "227:2026-06-06:puente alto:gimnastico",
+            "market": "המנצח",
+            "pick": "Puente Alto (W)",
+            "winnerPick": "Puente Alto (W)",
+            "actualWinner": "Puente Alto (W)",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "82:71",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "82:71",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "Puente Alto (W)",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא Puente Alto (W).",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Puente Alto (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/87638",
+              "initials": "P",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Gimnastico (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/87636",
+              "initials": "G",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "National League Women - רבע גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8648",
+              "initials": "N",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4729061",
+            "eventId": "365-4729061",
+            "eventId365": "4729061",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "22:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "Superliga Femenina - גמר",
+            "country": "",
+            "match": "Hidrocarburos de Caracas (W) - Costaneras de Puerto Cabello (W)",
+            "home": "Hidrocarburos de Caracas (W)",
+            "away": "Costaneras de Puerto Cabello (W)",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94357",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94355",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/9027",
+            "resultKey": "227:2026-06-06:hidrocarburos de caracas:costaneras de puerto cabello",
+            "market": "המנצח",
+            "pick": "Hidrocarburos de Caracas (W)",
+            "winnerPick": "Hidrocarburos de Caracas (W)",
+            "actualWinner": "Hidrocarburos de Caracas (W)",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "75:63",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "75:63",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "Hidrocarburos de Caracas (W)",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא Hidrocarburos de Caracas (W).",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "Hidrocarburos de Caracas (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94357",
+              "initials": "H",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Costaneras de Puerto Cabello (W)",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/94355",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "Superliga Femenina - גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/9027",
+              "initials": "S",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4659701",
+            "eventId": "365-4659701",
+            "eventId365": "4659701",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "22:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "WNBA",
+            "country": "",
+            "match": "לאס וגאס אייסס - גולדן סטייט ואליקריס",
+            "home": "לאס וגאס אייסס",
+            "away": "גולדן סטייט ואליקריס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/51448",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/84701",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/106",
+            "resultKey": "227:2026-06-06:לאס וגאס אייסס:גולדן סטייט ואליקריס",
+            "market": "המנצח",
+            "pick": "לאס וגאס אייסס",
+            "winnerPick": "לאס וגאס אייסס",
+            "actualWinner": "לאס וגאס אייסס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "84:79",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "84:79",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "לאס וגאס אייסס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא לאס וגאס אייסס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "לאס וגאס אייסס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/51448",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "גולדן סטייט ואליקריס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/84701",
+              "initials": "ג",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "WNBA",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/106",
+              "initials": "W",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4731319",
+            "eventId": "365-4731319",
+            "eventId365": "4731319",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "22:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה ראשונה - רבע גמר",
+            "country": "",
+            "match": "מורסיה - ברצלונה",
+            "home": "מורסיה",
+            "away": "ברצלונה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/214",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/206",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/14",
+            "resultKey": "227:2026-06-06:מורסיה:ברצלונה",
+            "market": "המנצח",
+            "pick": "ברצלונה",
+            "winnerPick": "ברצלונה",
+            "actualWinner": "ברצלונה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "76:100",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "76:100",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "ברצלונה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא ברצלונה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "מורסיה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/214",
+              "initials": "מ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "ברצלונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/206",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה - רבע גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/14",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4729084",
+            "eventId": "365-4729084",
+            "eventId365": "4729084",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:30",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "BNXT League - פלייאוף",
+            "country": "",
+            "match": "אוסטנד - אנטוורפ ג'יאנטס",
+            "home": "אוסטנד",
+            "away": "אנטוורפ ג'יאנטס",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/5669",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6906",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7776",
+            "resultKey": "227:2026-06-06:אוסטנד:אנטוורפ ג יאנטס",
+            "market": "המנצח",
+            "pick": "אוסטנד",
+            "winnerPick": "אוסטנד",
+            "actualWinner": "אוסטנד",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "79:69",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "79:69",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "אוסטנד",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא אוסטנד.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "אוסטנד",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/5669",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "אנטוורפ ג'יאנטס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6906",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "BNXT League - פלייאוף",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7776",
+              "initials": "B",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728534",
+            "eventId": "365-4728534",
+            "eventId365": "4728534",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:15",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה שנייה - חצי גמר",
+            "country": "",
+            "match": "מוביסטאר אסטודיאנטס - פיננסיירה אוביידו",
+            "home": "מוביסטאר אסטודיאנטס",
+            "away": "פיננסיירה אוביידו",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/220",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14049",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5552",
+            "resultKey": "227:2026-06-06:מוביסטאר אסטודיאנטס:פיננסיירה אוביידו",
+            "market": "המנצח",
+            "pick": "מוביסטאר אסטודיאנטס",
+            "winnerPick": "מוביסטאר אסטודיאנטס",
+            "actualWinner": "מוביסטאר אסטודיאנטס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "79:71",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "79:71",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "מוביסטאר אסטודיאנטס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא מוביסטאר אסטודיאנטס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "מוביסטאר אסטודיאנטס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/220",
+              "initials": "מ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פיננסיירה אוביידו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14049",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שנייה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5552",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4729060",
+            "eventId": "365-4729060",
+            "eventId365": "4729060",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה ראשונה - חצי גמר",
+            "country": "",
+            "match": "ונציה - וירטוס בולוניה",
+            "home": "ונציה",
+            "away": "וירטוס בולוניה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6951",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/288",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/19",
+            "resultKey": "227:2026-06-06:ונציה:וירטוס בולוניה",
+            "market": "המנצח",
+            "pick": "ונציה",
+            "winnerPick": "ונציה",
+            "actualWinner": "ונציה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "90:83",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "90:83",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "ונציה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא ונציה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "ונציה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6951",
+              "initials": "ו",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "וירטוס בולוניה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/288",
+              "initials": "ו",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/19",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4727759",
+            "eventId": "365-4727759",
+            "eventId365": "4727759",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגת ווינר - פלייאוף תחתון",
+            "country": "",
+            "match": "מכבי רעננה - אליצור עירוני נתניה",
+            "home": "מכבי רעננה",
+            "away": "אליצור עירוני נתניה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/27893",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/655",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/47",
+            "resultKey": "227:2026-06-06:מכבי רעננה:אליצור עירוני נתניה",
+            "market": "המנצח",
+            "pick": "מכבי רעננה",
+            "winnerPick": "מכבי רעננה",
+            "actualWinner": "מכבי רעננה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "95:79",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "95:79",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "מכבי רעננה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא מכבי רעננה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "מכבי רעננה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/27893",
+              "initials": "מ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "אליצור עירוני נתניה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/655",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת ווינר - פלייאוף תחתון",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/47",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728755",
+            "eventId": "365-4728755",
+            "eventId365": "4728755",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "21:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה שנייה - גמר",
+            "country": "",
+            "match": "נאנט - פויטייר",
+            "home": "נאנט",
+            "away": "פויטייר",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/15991",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6346",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5835",
+            "resultKey": "227:2026-06-06:נאנט:פויטייר",
+            "market": "המנצח",
+            "pick": "פויטייר",
+            "winnerPick": "פויטייר",
+            "actualWinner": "פויטייר",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "79:88",
+            "matchPhase": "final",
+            "matchMinute": "לאחר הארכה",
+            "result": "79:88",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "פויטייר",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא פויטייר.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "נאנט",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/15991",
+              "initials": "נ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פויטייר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6346",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שנייה - גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5835",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728259",
+            "eventId": "365-4728259",
+            "eventId365": "4728259",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "20:50",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגת ווינר - פלייאוף תחתון",
+            "country": "",
+            "match": "הפועל גליל עליון - עירוני נס ציונה",
+            "home": "הפועל גליל עליון",
+            "away": "עירוני נס ציונה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/10884",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/686",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/47",
+            "resultKey": "227:2026-06-06:הפועל גליל עליון:עירוני נס ציונה",
+            "market": "המנצח",
+            "pick": "עירוני נס ציונה",
+            "winnerPick": "עירוני נס ציונה",
+            "actualWinner": "עירוני נס ציונה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "83:92",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "83:92",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "עירוני נס ציונה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא עירוני נס ציונה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "הפועל גליל עליון",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/10884",
+              "initials": "ה",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "עירוני נס ציונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/686",
+              "initials": "ע",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת ווינר - פלייאוף תחתון",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/47",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728500",
+            "eventId": "365-4728500",
+            "eventId365": "4728500",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "20:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "סופרליגה - חצי גמר",
+            "country": "",
+            "match": "באצ'שהיר - בשיקטאש",
+            "home": "באצ'שהיר",
+            "away": "בשיקטאש",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/49974",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/967",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/79",
+            "resultKey": "227:2026-06-06:באצ שהיר:בשיקטאש",
+            "market": "המנצח",
+            "pick": "באצ'שהיר",
+            "winnerPick": "באצ'שהיר",
+            "actualWinner": "באצ'שהיר",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "98:95",
+            "matchPhase": "final",
+            "matchMinute": "לאחר הארכה",
+            "result": "98:95",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "באצ'שהיר",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא באצ'שהיר.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "באצ'שהיר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/49974",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "בשיקטאש",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/967",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "סופרליגה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/79",
+              "initials": "ס",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4659700",
+            "eventId": "365-4659700",
+            "eventId365": "4659700",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "20:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "WNBA",
+            "country": "",
+            "match": "מינסוטה לינקס - סיאטל סטורם",
+            "home": "מינסוטה לינקס",
+            "away": "סיאטל סטורם",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/1361",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/1351",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/106",
+            "resultKey": "227:2026-06-06:מינסוטה לינקס:סיאטל סטורם",
+            "market": "המנצח",
+            "pick": "מינסוטה לינקס",
+            "winnerPick": "מינסוטה לינקס",
+            "actualWinner": "מינסוטה לינקס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "88:68",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "88:68",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "מינסוטה לינקס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא מינסוטה לינקס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "מינסוטה לינקס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/1361",
+              "initials": "מ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "סיאטל סטורם",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/1351",
+              "initials": "ס",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "WNBA",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/106",
+              "initials": "W",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4727757",
+            "eventId": "365-4727757",
+            "eventId365": "4727757",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "19:30",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "בונדסליגה - חצי גמר",
+            "country": "",
+            "match": "באמברג - אלבה ברלין",
+            "home": "באמברג",
+            "away": "אלבה ברלין",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/375",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/372",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/27",
+            "resultKey": "227:2026-06-06:באמברג:אלבה ברלין",
+            "market": "המנצח",
+            "pick": "באמברג",
+            "winnerPick": "באמברג",
+            "actualWinner": "באמברג",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "81:67",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "81:67",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "באמברג",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא באמברג.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "באמברג",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/375",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "אלבה ברלין",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/372",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "בונדסליגה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/27",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4731323",
+            "eventId": "365-4731323",
+            "eventId365": "4731323",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "19:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה ראשונה - מקום 3",
+            "country": "",
+            "match": "באסקטבול ברנו - אופבה",
+            "home": "באסקטבול ברנו",
+            "away": "אופבה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6837",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6840",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/399",
+            "resultKey": "227:2026-06-06:באסקטבול ברנו:אופבה",
+            "market": "המנצח",
+            "pick": "אופבה",
+            "winnerPick": "אופבה",
+            "actualWinner": "אופבה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "101:102",
+            "matchPhase": "final",
+            "matchMinute": "לאחר הארכה",
+            "result": "101:102",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "אופבה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא אופבה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "באסקטבול ברנו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6837",
+              "initials": "ב",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "אופבה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6840",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה - מקום 3",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/399",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728258",
+            "eventId": "365-4728258",
+            "eventId365": "4728258",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "19:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "הליגה האדריאטית",
+            "country": "",
+            "match": "דובאי - פרטיזן בלגרד",
+            "home": "דובאי",
+            "away": "פרטיזן בלגרד",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/83343",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/5509",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/548",
+            "resultKey": "227:2026-06-06:דובאי:פרטיזן בלגרד",
+            "market": "המנצח",
+            "pick": "דובאי",
+            "winnerPick": "דובאי",
+            "actualWinner": "דובאי",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "86:81",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "86:81",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "דובאי",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא דובאי.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "דובאי",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/83343",
+              "initials": "ד",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פרטיזן בלגרד",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/5509",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "הליגה האדריאטית",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/548",
+              "initials": "ה",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4731345",
+            "eventId": "365-4731345",
+            "eventId365": "4731345",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "19:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "סופר ליגה - גמר",
+            "country": "",
+            "match": "קאפנברג בולס - Oberwart Gunners",
+            "home": "קאפנברג בולס",
+            "away": "Oberwart Gunners",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17432",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17428",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5893",
+            "resultKey": "227:2026-06-06:קאפנברג בולס:oberwart gunners",
+            "market": "המנצח",
+            "pick": "קאפנברג בולס",
+            "winnerPick": "קאפנברג בולס",
+            "actualWinner": "קאפנברג בולס",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "94:80",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "94:80",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "קאפנברג בולס",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא קאפנברג בולס.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "קאפנברג בולס",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17432",
+              "initials": "ק",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Oberwart Gunners",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/17428",
+              "initials": "O",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "סופר ליגה - גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5893",
+              "initials": "ס",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728567",
+            "eventId": "365-4728567",
+            "eventId365": "4728567",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "19:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה ראשונה - רבע גמר",
+            "country": "",
+            "match": "ריאל מדריד - טנריפה",
+            "home": "ריאל מדריד",
+            "away": "טנריפה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/204",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/9899",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/14",
+            "resultKey": "227:2026-06-06:ריאל מדריד:טנריפה",
+            "market": "המנצח",
+            "pick": "טנריפה",
+            "winnerPick": "טנריפה",
+            "actualWinner": "טנריפה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "95:107",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "95:107",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "טנריפה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא טנריפה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "ריאל מדריד",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/204",
+              "initials": "ר",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "טנריפה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/9899",
+              "initials": "ט",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה - רבע גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/14",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728535",
+            "eventId": "365-4728535",
+            "eventId365": "4728535",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "18:30",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה שנייה - חצי גמר",
+            "country": "",
+            "match": "לייטמה נאטורה - פאלנסיה",
+            "home": "לייטמה נאטורה",
+            "away": "פאלנסיה",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14052",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14046",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5552",
+            "resultKey": "227:2026-06-06:לייטמה נאטורה:פאלנסיה",
+            "market": "המנצח",
+            "pick": "לייטמה נאטורה",
+            "winnerPick": "לייטמה נאטורה",
+            "actualWinner": "לייטמה נאטורה",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "92:81",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "92:81",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "לייטמה נאטורה",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא לייטמה נאטורה.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "לייטמה נאטורה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14052",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פאלנסיה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14046",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה שנייה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5552",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          },
+          {
+            "id": "result-365-4728612",
+            "eventId": "365-4728612",
+            "eventId365": "4728612",
+            "source": "365Scores Results",
+            "verifiedAt": "2026-06-07T06:36:45.151Z",
+            "finishedAt": "2026-06-07T06:36:45.151Z",
+            "bettingStatus": "closed",
+            "resultVerified": true,
+            "day": "2026-06-06",
+            "time": "18:00",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "ליגה ראשונה - חצי גמר",
+            "country": "",
+            "match": "נאנטר - מונאקו",
+            "home": "נאנטר",
+            "away": "מונאקו",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/8655",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/16001",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/38",
+            "resultKey": "227:2026-06-06:נאנטר:מונאקו",
+            "market": "המנצח",
+            "pick": "מונאקו",
+            "winnerPick": "מונאקו",
+            "actualWinner": "מונאקו",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "נסגר",
+            "liveScore": "61:83",
+            "matchPhase": "final",
+            "matchMinute": "הסתיים",
+            "result": "61:83",
+            "resultVerifiedAt": "2026-06-07T06:36:45.151Z",
+            "signals": [
+              "תוצאה מ-365Scores",
+              "כיסוי כדורסל לכל הליגות",
+              "משמש לסגירת תחזיות Winner"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "המנצח",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": [
+                  {
+                    "outcomeId": null,
+                    "desc": "מונאקו",
+                    "price": null,
+                    "spread": "",
+                    "probability": null,
+                    "score": null
+                  }
+                ]
+              }
+            ],
+            "explanation": [
+              "זהו משחק כדורסל מארכיון התוצאות של 365Scores.",
+              "התוצאה הרשמית לפי 365Scores היא מונאקו.",
+              "היחסים והצד שנבחן עדיין מגיעים מ-Winner; 365Scores משמש רק לסגירת התוצאה."
+            ],
+            "homeAsset": {
+              "name": "נאנטר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/8655",
+              "initials": "נ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "מונאקו",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/16001",
+              "initials": "מ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה - חצי גמר",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/38",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "logoVerified": true,
+            "pickTeam": ""
+          }
+        ]
+      }
+    },
+    "today": {
+      "label": "היום",
+      "date": "2026-06-07",
+      "sports": {
+        "football": [],
         "basketball": []
       }
     },
