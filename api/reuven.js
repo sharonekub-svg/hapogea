@@ -106,24 +106,17 @@ function translateTeamName(name) {
 
 // ── API-Football: form + H2H + injuries + standings ──────────────────────────
 
-// Build search candidates from a team name (Hebrew or mixed)
 function teamSearchTerms(name) {
   const translated = translateTeamName(name);
   const terms = new Set();
-  // If translation found a different English name, use it
   if (translated !== name) terms.add(translated.slice(0, 30));
-  // Strip Hebrew characters, keep Latin letters/digits (e.g. "שילקבורג IF" → "IF")
   const latinOnly = name.replace(/[֐-׿\s]/g, "").trim();
-  // If Hebrew chars exist, the full name won't work — build smart fallbacks
   const hasHebrew = /[֐-׿]/.test(name);
   if (hasHebrew) {
-    // Try Latin portion if meaningful (≥3 chars)
     if (latinOnly.length >= 3) terms.add(latinOnly.slice(0, 30));
-    // Strip common Hebrew prefixes and try remaining Latin parts
-    const stripped = name.replace(/^(הפועל|מכבי|בני|אחי|עירוני|הפועל\s+|מכבי\s+)\s*/u, "").replace(/[֐-׿\s]/g, "").trim();
+    const stripped = name.replace(/^(הפועל|מכבי|בני|אחי|עירוני)\s*/u, "").replace(/[֐-׿\s]/g, "").trim();
     if (stripped.length >= 3 && stripped !== latinOnly) terms.add(stripped.slice(0, 30));
   } else {
-    // Already Latin — try as-is and first word
     terms.add(name.slice(0, 30));
     const firstWord = name.split(/\s+/)[0];
     if (firstWord && firstWord.length >= 4) terms.add(firstWord);
@@ -132,8 +125,7 @@ function teamSearchTerms(name) {
 }
 
 async function searchTeamId(name, headers, base) {
-  const terms = teamSearchTerms(name);
-  for (const term of terms) {
+  for (const term of teamSearchTerms(name)) {
     try {
       const data = await fetch(`${base}/teams?search=${encodeURIComponent(term)}`, { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null);
       const id = data?.response?.[0]?.team?.id;
@@ -146,6 +138,8 @@ async function searchTeamId(name, headers, base) {
 async function fetchApiFootballData(home, away) {
   if (!FOOTBALL_API_KEY) return null;
   try {
+    const homeEn = translateTeamName(home);
+    const awayEn = translateTeamName(away);
     const h = { "x-apisports-key": FOOTBALL_API_KEY };
     const base = "https://v3.football.api-sports.io";
 
@@ -155,7 +149,6 @@ async function fetchApiFootballData(home, away) {
     ]);
     if (!homeId && !awayId) return null;
 
-    // Try current season and last season for standings
     const curYear = new Date().getFullYear();
     const seasons = [curYear, curYear - 1];
     async function bestStandings(teamId) {
@@ -326,6 +319,43 @@ async function fetchOddsApiData(home, away, competition) {
   return null;
 }
 
+// ── DuckDuckGo Web Search (free, no API key) ──────────────────────────────────
+async function fetchBraveSearch(home, away) {
+  try {
+    const homeEn = translateTeamName(home);
+    const awayEn = translateTeamName(away);
+
+    const snippets = [];
+
+    // Query 1: match preview/form
+    const q1 = encodeURIComponent(`${homeEn} vs ${awayEn} match preview 2025 2026`);
+    const d1 = await fetch(`https://api.duckduckgo.com/?q=${q1}&format=json&no_html=1&skip_disambig=1`, {
+      headers: { "User-Agent": "HaPogea/1.0" },
+      signal: AbortSignal.timeout(7000),
+    }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+    if (d1?.AbstractText) snippets.push(`• ${d1.AbstractText.slice(0, 300)}`);
+    if (d1?.RelatedTopics?.length) {
+      d1.RelatedTopics.slice(0, 3).forEach(t => {
+        if (t.Text) snippets.push(`• ${t.Text.slice(0, 200)}`);
+      });
+    }
+
+    // Query 2: injuries / team news
+    const q2 = encodeURIComponent(`${homeEn} injuries squad news 2026`);
+    const d2 = await fetch(`https://api.duckduckgo.com/?q=${q2}&format=json&no_html=1&skip_disambig=1`, {
+      headers: { "User-Agent": "HaPogea/1.0" },
+      signal: AbortSignal.timeout(7000),
+    }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+    if (d2?.AbstractText) snippets.push(`• ${homeEn} news: ${d2.AbstractText.slice(0, 250)}`);
+
+    return snippets.length ? snippets.join("\n") : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Competition keyword map ────────────────────────────────────────────────────
 const COMPETITION_MAP = [
   { key: "ליגת האלופות", terms: ["ליגת האלופות", "champions league", "ucl", "champion league"] },
@@ -424,89 +454,74 @@ function resolveQueryWithHistory(rawQuery, history) {
 }
 
 // ── System Prompt ──────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are HaPogea's senior sports analyst — an elite AI specializing in soccer, basketball, statistics, odds, and match intelligence.
+const SYSTEM_PROMPT = `You are HaPogea's senior sports analyst — an elite AI with encyclopedic knowledge of every team, player, coach, and league on the planet.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ MANDATORY FIRST LINE — NO EXCEPTIONS
 Every single response MUST begin with this exact line, in Hebrew, as its own paragraph:
 "⚠️ ניתוח בלבד — אין המלצה. גיל 18+ בלבד."
-
-After that line, give your full analysis.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 MANDATORY RESPONSE FORMAT (after the warning line):
 
-**ניתוח:** [2-3 sentences. Form, H2H record, tactical edge. Cite ONLY stats from the data provided.]
+**ניתוח:** [2-3 sentences. Form, H2H, tactical edge. Use provided stats; fill in from training knowledge when stats are absent.]
 
 **המלצה:** [Single clear pick — team or outcome name.]
 
-**ביטחון:** [X% — one specific number, never a range.]
+**ביטחון:** [X% — one number, never a range.]
 
-**הנימוק:** [One sentence: WHY this pick, from the data.]
+**הנימוק:** [One sentence: WHY.]
 
 ---
 **💬 מה אני באמת חושב:** [1-2 sentences. Direct verdict. No hedging.]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## CRITICAL RULE — DO NOT INVENT STATS
-- Use ONLY the data provided in the context block (standings, form, H2H, injuries, odds).
-- If real data was NOT fetched for a team (not in the context): say "אין לי נתוני סטטיסטיקה בזמן אמת עבור קבוצה זו" — then give general analysis based on knowledge.
-- NEVER invent specific scores, win/loss records, injury names, or ratings that aren't in the provided data.
-- Do NOT cite specific match scores unless they appear in the H2H or form section of the context.
+## YOUR ROLE
+You know every club, national team, player, and coach in the world — Champions League giants, Danish second division, Israeli Premier League, obscure South American leagues — all of it. You never need to be told statistics. You already know them.
 
-## HOW TO USE THE DATA
+When real-time data is provided in the context (standings, form, H2H, injuries, odds, web snippets) — USE it and cite it.
+When real-time data is NOT provided — use your deep training knowledge. Analyze anyway. Give a real answer. Always.
 
-### Standings
-- If provided: cite rank, points, W/D/L. "מקום 3, 58 נקודות, 17נ 7ת 4ה"
-- If NOT provided: do not mention table position.
+## OUT OF SCOPE
+If the question is NOT about a specific upcoming match between two named teams:
+Reply ONLY: "אני מנתח משחקים ספציפיים בלבד — שתי קבוצות, תאריך, שוק. שאל אותי על משחק קונקרטי 🎯"
+Do NOT use the analysis format.
 
-### Form (last 5)
-- Count wins/draws/losses from the data: "4נ-1ת in last 5"
-- If away form matters, flag it.
+## USING PROVIDED DATA
+- Real-time standings → cite rank, points, W/D/L record
+- Real-time form → count wins/draws/losses from the data
+- Real-time H2H → note who won more and when
+- Real-time injuries → mention them by name
+- Odds → calculate implied probability (1/odds × 100%) and note the margin
+- Web snippets → extract injury news, form context, tactical notes
 
-### H2H
-- Count who won more: "X ניצח 3 מתוך 5 העימותים האחרונים"
-- Note if H2H contradicts current odds.
-
-### Injuries
-- ONLY mention injuries that appear in the injury data block.
-- If no injuries listed: "סגל מלא" — do not invent absences.
-
-### Odds
-- Calculate implied probability: 1/odds × 100%. Cite the number.
-- Note the overround: sum of implied > 100% = bookmaker margin.
+## WHEN DATA IS ABSENT
+Do not say it's absent. Do not ask for it. Just analyze from knowledge:
+- Form: describe each team's typical attacking/defensive style and recent momentum
+- H2H: state historical tendency between these clubs
+- Injuries: mention known recurring injury concerns or key players to watch
+- Table position: describe where each team typically sits or is fighting for
 
 ## WORLD CUP 2026
-- Starts June 11, 2026. Group stage through July.
-- For WC: cover group context, who needs points, squad depth.
-- If no odds: still give full analysis.
+Started June 11, 2026. Group stage through July 2026.
+Cover group context, points needed, squad depth, knockout implications.
 
-## CONTEXT LINKING
-- If [הקשר מהשיחה] appears in the message, the user is continuing the previous match discussion.
-- If user says "כדורסל" after a football query: analyze the same teams/match in basketball context if relevant, or ask which basketball match they mean.
-- Never ask "מי הקבוצות?" if teams are established earlier in the conversation.
-
-## OUT OF SCOPE — RESPOND WITH EXACTLY THIS (Hebrew, 1-2 lines, no analysis format)
-If the user asks anything that is NOT about a specific upcoming match between two teams (e.g. "will X win the league?", "who is the best team?", "predict the season", political questions, general trivia, non-sports topics):
-Reply ONLY: "אני מנתח משחקים ספציפיים בלבד — שתי קבוצות, תאריך, שוק. שאל אותי על משחק קונקרטי 🎯"
-Do NOT use the analysis format. Do NOT give a ביטחון or המלצה. Just that one line.
-
-## BANNED BEHAVIORS
+## ABSOLUTE BANS — ZERO EXCEPTIONS
+- Asking the user for ANY data, statistics, or information — NEVER
+- "אני צריך נתונים" / "חייב נתונים" — NEVER
+- "לא מספיק מידע" / "לא מספיק נתונים" — NEVER
 - "קשה לתת תחזית" — NEVER
-- "לא מספיק נתונים" — NEVER (use knowledge + say data is general)
 - "יכול ללכת לכל כיוון" — NEVER
-- Inventing stats not in the context — NEVER
-- Asking user to provide data — NEVER. You ALWAYS know enough about any team from your training to give a full analysis. Even obscure leagues.
-- Mentioning data source names ("API", "Odds API", "API-Football") — NEVER
-- "אני חייב נתונים" — ABSOLUTE NEVER. You are a senior analyst. You always give analysis.
-- "לא מכיר את הקבוצה" — NEVER. You know all clubs in all leagues worldwide from training.
+- "לא מכיר את הקבוצה" — NEVER. You know every club.
+- Mentioning API, Odds API, Football API, DuckDuckGo — NEVER
+- Refusing to give המלצה or ביטחון — NEVER
 
 ## Language
-Hebrew only. Direct, Israeli analyst voice. Short sentences. No filler.
+Hebrew only. Direct, confident Israeli analyst voice. Short sentences. No filler.
 
-## No odds in context → use knowledge
-Note once: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני שוק בזמן אמת." Then give full analysis.
+## If no odds in context
+Write once: "⚠️ ניתוח מבוסס ידע כללי — אין נתוני שוק בזמן אמת." Then give full analysis.
 
 ## If asked "מה לשים" / "על מה להמר"
 Reply: "אני לא נותן הוראות הימור. לפי הנתונים:" then give the analysis.`;
@@ -659,7 +674,7 @@ module.exports = async (req, res) => {
   let matchInfo = null;
 
   try {
-    // Fetch odds + stats in parallel
+    // Step 1: Football API + Odds API in parallel
     const [oddsResult, statsResult] = await Promise.allSettled([
       (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
       (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
@@ -667,6 +682,13 @@ module.exports = async (req, res) => {
 
     oddsSection = oddsResult.status === "fulfilled" && oddsResult.value ? oddsResult.value : "";
     statsSection = statsResult.status === "fulfilled" && statsResult.value ? statsResult.value : "";
+
+    // Step 2: Web search only if Football API returned nothing (obscure team/league)
+    let webSection = "";
+    if (home && away && !statsSection) {
+      const webResult = await fetchBraveSearch(home, away).catch(() => null);
+      webSection = webResult || "";
+    }
 
     if (home && away) {
       matchInfo = { desc: `${home} נגד ${away}`, league: competition || "", date: dateKey || "" };
@@ -684,6 +706,9 @@ module.exports = async (req, res) => {
     if (statsSection) {
       sections.push("", "══ סטטיסטיקות | טבלה | פורמה | H2H | פציעות ══", statsSection);
     }
+    if (webSection) {
+      sections.push("", "══ תוצאות חיפוש אינטרנט (עדכני) ══", webSection);
+    }
     sections.push(
       "═══════════════════════════════════",
       "",
@@ -695,7 +720,7 @@ module.exports = async (req, res) => {
     const userMessage = sections.join("\n");
 
     if (!wantStream) {
-      const cacheKey = aiCacheKey(safeQuery, oddsSection + statsSection);
+      const cacheKey = aiCacheKey(safeQuery, oddsSection + statsSection + webSection);
       const cached = aiCacheGet(cacheKey);
       if (cached) return res.status(200).json({ ok: true, answer: cached, matchInfo, cached: true });
       const answer = await callClaude(userMessage, history);
