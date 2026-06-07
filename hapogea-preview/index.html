@@ -10010,6 +10010,7 @@ function AiApp() {
     try { return Number(localStorage.getItem(window.AI_FREE_KEY || 'hapogea_ai_free_used_v1') || 0); } catch { return 0; }
   });
   const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
+  const isLoggedIn = !!user;
   const isAiLocked = !isPrem() && aiMsgUsed >= AI_FREE_LIMIT;
 
   // Per-user chat history: load the saved thread when the account changes,
@@ -10073,6 +10074,7 @@ function AiApp() {
 
   const send=async(text)=>{
     if(busy)return;
+    if(!isLoggedIn){typeof HapAuth!=="undefined"&&HapAuth.openModal();return;}
     if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
@@ -10162,6 +10164,7 @@ function AiApp() {
 
   const sendImage=async(file,note)=>{
     if(busy)return;
+    if(!isLoggedIn){typeof HapAuth!=="undefined"&&HapAuth.openModal();return;}
     if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
     setBusy(true);
     const userText=note?`[תמונה] ${note}`:"[תמונה] נתח את הטופס/צילום הזה";
@@ -10218,7 +10221,16 @@ function AiApp() {
         <button className={"ai-scroll-btn"+(showScrollBtn?" show":"")} onClick={()=>scrollDown()} aria-label="גלול למטה">
           <AiIcon name="chevron" size={18}/>
         </button>
-        {isAiLocked ? (
+        {!isLoggedIn ? (
+          <div className="ai-locked-bar">
+            <span className="ai-locked-icon">🔒</span>
+            <div className="ai-locked-text">
+              <b>התחבר כדי לדבר עם הפוגע</b>
+              <span>כניסה עם Google — הודעה ראשונה חינם</span>
+            </div>
+            <button className="ai-locked-btn" onClick={()=>typeof HapAuth!=="undefined"&&HapAuth.openModal()}>כניסה</button>
+          </div>
+        ) : isAiLocked ? (
           <div className="ai-locked-bar">
             <span className="ai-locked-icon">🔒</span>
             <div className="ai-locked-text">
