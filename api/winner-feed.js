@@ -3648,22 +3648,23 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
             (oddsTab.sports?.basketball?.length || 0);
           oddsCountByDay[dayKey] = oddsCount;
 
-          if (dayCount < MIN_PREMIUM_ROWS_PER_DAY && oddsCount > dayCount) {
-            // Too few games overall — replace the tab entirely
-            newTabs[dayKey] = oddsTab;
-            usedOdds = true;
-          } else if (dayLeagues.size < MIN_LEAGUES && oddsCount > 0) {
-            // Enough games but only 1-2 leagues — merge in games from leagues not in Winner
+          const needsSupplement = (dayCount < MIN_PREMIUM_ROWS_PER_DAY || dayLeagues.size < MIN_LEAGUES) && oddsCount > 0;
+          if (needsSupplement) {
+            const existing = newTabs[dayKey];
             const oddsRows = [
               ...(oddsTab.sports?.football || []),
               ...(oddsTab.sports?.basketball || []),
             ];
-            const freshRows = oddsRows.filter((r) => {
-              const league = String(r.league || "").trim().toLowerCase();
-              return league && !dayLeagues.has(league);
-            });
+            // When Winner already has real picks, only add Odds API rows from new leagues
+            // (prevents Odds API rows from replacing curated Winner picks).
+            // When there are no Winner picks at all, use all Odds API rows.
+            const freshRows = dayCount > 0
+              ? oddsRows.filter((r) => {
+                  const league = String(r.league || "").trim().toLowerCase();
+                  return league && !dayLeagues.has(league);
+                })
+              : oddsRows;
             if (freshRows.length > 0) {
-              const existing = newTabs[dayKey];
               newTabs[dayKey] = {
                 ...existing,
                 sports: {
