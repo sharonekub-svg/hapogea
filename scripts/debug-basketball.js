@@ -9,6 +9,12 @@ function israelDate(offset = 0) {
   const d = new Date(Date.now() + offset * 86400000);
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(d);
 }
+// e_date is a 6-digit number: YYMMDD → "20YY-MM-DD"
+function winnerDateToIso(v) {
+  const s = String(v || "");
+  if (s.length !== 6) return "";
+  return `20${s.slice(0,2)}-${s.slice(2,4)}-${s.slice(4,6)}`;
+}
 const decimal = p => { const n = Number(p); return n > 1 ? n : null; };
 const clean = t => String(t || "").replace(/[‎‏]/g, "").trim();
 
@@ -32,27 +38,20 @@ async function main() {
   const today = israelDate(0);
   console.log("Today:", today);
 
-  // Step 1: get hashes
   const hashMsg = JSON.stringify({ prevCurrentVersion: null, reason: "Initiated" });
-  const hashRes = await fetch("https://api.winner.co.il/v2/publicapi/GetCMobileHashes", {
-    headers: headers({ HashesMessage: hashMsg }),
-  });
+  const hashRes = await fetch("https://api.winner.co.il/v2/publicapi/GetCMobileHashes", { headers: headers({ HashesMessage: hashMsg }) });
   if (!hashRes.ok) { console.error("Hashes failed:", hashRes.status); return; }
   const hashes = await hashRes.json();
 
-  // Step 2: get full line
   const lineMsg = JSON.stringify({ prevCurrentVersion: null, newCurrentVersion: hashes.currentVersion, lineNewHash: hashes.lineChecksum, reason: "Hashes not equal" });
-  const lineRes = await fetch(`https://api.winner.co.il/v2/publicapi/GetCMobileLine?lineChecksum=${encodeURIComponent(hashes.lineChecksum)}`, {
-    headers: headers({ HashesMessage: lineMsg }),
-  });
+  const lineRes = await fetch(`https://api.winner.co.il/v2/publicapi/GetCMobileLine?lineChecksum=${encodeURIComponent(hashes.lineChecksum)}`, { headers: headers({ HashesMessage: lineMsg }) });
   if (!lineRes.ok) { console.error("Line failed:", lineRes.status); return; }
   const line = await lineRes.json();
   const markets = (line.markets || []).filter(m => Number(m.sId) === WINNER_BASKETBALL_ID);
 
-  // Group by event
   const events = new Map();
   for (const m of markets) {
-    const date = m.e_date ? m.e_date.slice(0, 10) : "";
+    const date = winnerDateToIso(m.e_date);
     if (date !== today) continue;
     if (!events.has(m.eId)) events.set(m.eId, { desc: m.desc, markets: [] });
     events.get(m.eId).markets.push(m);
@@ -69,7 +68,8 @@ async function main() {
     if (!odds.length) continue;
     const maxOpp = Math.max(...odds.map(o => o.v));
     const gate = maxOpp >= 2.6 ? "✅" : maxOpp >= 2.0 ? `⚠️ ` : `❌`;
-    console.log(`${gate} ${ev.desc}  →  ${odds.map(o => `${o.d}: ${o.v}`).join("  |  ")}`);
+    console.log(`${gate} ${ev.desc}`);
+    console.log(`   ${odds.map(o => `${o.d}: ${o.v}`).join("  |  ")}`);
   }
 }
 
