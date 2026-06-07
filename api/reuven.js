@@ -105,30 +105,75 @@ function translateTeamName(name) {
 }
 
 // ── API-Football: form + H2H + injuries + standings ──────────────────────────
+
+// Build search candidates from a team name (Hebrew or mixed)
+function teamSearchTerms(name) {
+  const translated = translateTeamName(name);
+  const terms = new Set();
+  // If translation found a different English name, use it
+  if (translated !== name) terms.add(translated.slice(0, 30));
+  // Strip Hebrew characters, keep Latin letters/digits (e.g. "שילקבורג IF" → "IF")
+  const latinOnly = name.replace(/[֐-׿\s]/g, "").trim();
+  // If Hebrew chars exist, the full name won't work — build smart fallbacks
+  const hasHebrew = /[֐-׿]/.test(name);
+  if (hasHebrew) {
+    // Try Latin portion if meaningful (≥3 chars)
+    if (latinOnly.length >= 3) terms.add(latinOnly.slice(0, 30));
+    // Strip common Hebrew prefixes and try remaining Latin parts
+    const stripped = name.replace(/^(הפועל|מכבי|בני|אחי|עירוני|הפועל\s+|מכבי\s+)\s*/u, "").replace(/[֐-׿\s]/g, "").trim();
+    if (stripped.length >= 3 && stripped !== latinOnly) terms.add(stripped.slice(0, 30));
+  } else {
+    // Already Latin — try as-is and first word
+    terms.add(name.slice(0, 30));
+    const firstWord = name.split(/\s+/)[0];
+    if (firstWord && firstWord.length >= 4) terms.add(firstWord);
+  }
+  return [...terms].filter(Boolean);
+}
+
+async function searchTeamId(name, headers, base) {
+  const terms = teamSearchTerms(name);
+  for (const term of terms) {
+    try {
+      const data = await fetch(`${base}/teams?search=${encodeURIComponent(term)}`, { headers, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null);
+      const id = data?.response?.[0]?.team?.id;
+      if (id) return id;
+    } catch (_) {}
+  }
+  return null;
+}
+
 async function fetchApiFootballData(home, away) {
   if (!FOOTBALL_API_KEY) return null;
   try {
-    const homeEn = translateTeamName(home);
-    const awayEn = translateTeamName(away);
     const h = { "x-apisports-key": FOOTBALL_API_KEY };
     const base = "https://v3.football.api-sports.io";
 
-    const [homeSearch, awaySearch] = await Promise.allSettled([
-      fetch(`${base}/teams?search=${encodeURIComponent(homeEn.slice(0, 30))}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null),
-      fetch(`${base}/teams?search=${encodeURIComponent(awayEn.slice(0, 30))}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null),
+    const [homeId, awayId] = await Promise.all([
+      searchTeamId(home, h, base),
+      searchTeamId(away, h, base),
     ]);
-    const homeId = homeSearch.status === "fulfilled" ? homeSearch.value?.response?.[0]?.team?.id : null;
-    const awayId = awaySearch.status === "fulfilled" ? awaySearch.value?.response?.[0]?.team?.id : null;
     if (!homeId && !awayId) return null;
+
+    // Try current season and last season for standings
+    const curYear = new Date().getFullYear();
+    const seasons = [curYear, curYear - 1];
+    async function bestStandings(teamId) {
+      for (const s of seasons) {
+        const d = await fetch(`${base}/standings?team=${teamId}&season=${s}`, { headers: h, signal: AbortSignal.timeout(8000) }).then(r => r.ok ? r.json() : null).catch(() => null);
+        if (d?.response?.length) return d;
+      }
+      return null;
+    }
 
     const [homeForm, awayForm, h2h, homeInj, awayInj, homeStand, awayStand] = await Promise.allSettled([
       homeId ? fetch(`${base}/fixtures?team=${homeId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       awayId ? fetch(`${base}/fixtures?team=${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
       (homeId && awayId) ? fetch(`${base}/fixtures/headtohead?h2h=${homeId}-${awayId}&last=5`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
-      homeId ? fetch(`${base}/injuries?team=${homeId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
-      awayId ? fetch(`${base}/injuries?team=${awayId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
-      homeId ? fetch(`${base}/standings?team=${homeId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
-      awayId ? fetch(`${base}/standings?team=${awayId}&season=2026`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      homeId ? fetch(`${base}/injuries?team=${homeId}&season=${curYear}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      awayId ? fetch(`${base}/injuries?team=${awayId}&season=${curYear}`, { headers: h, signal: AbortSignal.timeout(9000) }).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+      homeId ? bestStandings(homeId) : Promise.resolve(null),
+      awayId ? bestStandings(awayId) : Promise.resolve(null),
     ]);
 
     const parts = [];
@@ -452,8 +497,10 @@ Do NOT use the analysis format. Do NOT give a ביטחון or המלצה. Just t
 - "לא מספיק נתונים" — NEVER (use knowledge + say data is general)
 - "יכול ללכת לכל כיוון" — NEVER
 - Inventing stats not in the context — NEVER
-- Asking user to provide data — NEVER
+- Asking user to provide data — NEVER. You ALWAYS know enough about any team from your training to give a full analysis. Even obscure leagues.
 - Mentioning data source names ("API", "Odds API", "API-Football") — NEVER
+- "אני חייב נתונים" — ABSOLUTE NEVER. You are a senior analyst. You always give analysis.
+- "לא מכיר את הקבוצה" — NEVER. You know all clubs in all leagues worldwide from training.
 
 ## Language
 Hebrew only. Direct, Israeli analyst voice. Short sentences. No filler.
