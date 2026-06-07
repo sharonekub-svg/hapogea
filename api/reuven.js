@@ -7,6 +7,7 @@ const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
 const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
 const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
+const BRAVE_API_KEY = process.env.BRAVE_KEY;
 
 // ── In-process AI response cache ──────────────────────────────────────────────
 const _aiCache = new Map();
@@ -281,6 +282,34 @@ async function fetchOddsApiData(home, away, competition) {
   return null;
 }
 
+// ── Brave Web Search ──────────────────────────────────────────────────────────
+async function fetchBraveSearch(home, away) {
+  if (!BRAVE_API_KEY) return null;
+  try {
+    const homeEn = translateTeamName(home);
+    const awayEn = translateTeamName(away);
+    const q = encodeURIComponent(`${homeEn} vs ${awayEn} preview injury form 2025 2026`);
+    const url = `https://api.search.brave.com/res/v1/web/search?q=${q}&count=5&search_lang=en&result_filter=web`;
+    const data = await fetch(url, {
+      headers: { "Accept": "application/json", "X-Subscription-Token": BRAVE_API_KEY },
+      signal: AbortSignal.timeout(8000),
+    }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+    const results = data?.web?.results;
+    if (!results?.length) return null;
+
+    const snippets = results.slice(0, 4).map(r => {
+      const title = (r.title || "").slice(0, 80);
+      const desc = (r.description || "").replace(/<[^>]+>/g, "").slice(0, 200);
+      return `• ${title}: ${desc}`;
+    }).filter(Boolean);
+
+    return snippets.length ? snippets.join("\n") : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Competition keyword map ────────────────────────────────────────────────────
 const COMPETITION_MAP = [
   { key: "ליגת האלופות", terms: ["ליגת האלופות", "champions league", "ucl", "champion league"] },
@@ -391,7 +420,7 @@ After that line, give your full analysis.
 
 MANDATORY RESPONSE FORMAT (after the warning line):
 
-**ניתוח:** [2-3 sentences. Form, H2H record, tactical edge. Cite ONLY stats from the data provided.]
+**ניתוח:** [2-3 sentences. Form, H2H record, tactical edge. Use provided stats when available, otherwise use your training knowledge about these teams.]
 
 **המלצה:** [Single clear pick — team or outcome name.]
 
@@ -404,11 +433,13 @@ MANDATORY RESPONSE FORMAT (after the warning line):
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## CRITICAL RULE — DO NOT INVENT STATS
-- Use ONLY the data provided in the context block (standings, form, H2H, injuries, odds).
-- If real data was NOT fetched for a team (not in the context): say "אין לי נתוני סטטיסטיקה בזמן אמת עבור קבוצה זו" — then give general analysis based on knowledge.
-- NEVER invent specific scores, win/loss records, injury names, or ratings that aren't in the provided data.
-- Do NOT cite specific match scores unless they appear in the H2H or form section of the context.
+## HOW TO USE YOUR KNOWLEDGE AND PROVIDED DATA
+- You are a senior analyst with deep knowledge of ALL teams, leagues, and players worldwide — use it.
+- ALWAYS give a full, confident analysis using your training knowledge. Never say you need more data.
+- When the context block contains real-time stats (standings, form, H2H, injuries, odds, web snippets): use them and cite them directly.
+- When web search snippets are provided: extract relevant injury news, form info, and tactical context from them.
+- If the context has NO data for a team: analyze from your training knowledge (recent form you know, historical strength, playing style, key players, head-to-head history). Do not announce this — just give the analysis.
+- NEVER invent specific recent match scores that aren't in the provided data. Use your knowledge for general patterns, not fabricated specifics.
 
 ## HOW TO USE THE DATA
 
@@ -607,14 +638,16 @@ module.exports = async (req, res) => {
   let matchInfo = null;
 
   try {
-    // Fetch odds + stats in parallel
-    const [oddsResult, statsResult] = await Promise.allSettled([
+    // Fetch odds + stats + web search in parallel
+    const [oddsResult, statsResult, webResult] = await Promise.allSettled([
       (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
       (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
+      (home && away) ? fetchBraveSearch(home, away) : Promise.resolve(null),
     ]);
 
     oddsSection = oddsResult.status === "fulfilled" && oddsResult.value ? oddsResult.value : "";
     statsSection = statsResult.status === "fulfilled" && statsResult.value ? statsResult.value : "";
+    const webSection = webResult.status === "fulfilled" && webResult.value ? webResult.value : "";
 
     if (home && away) {
       matchInfo = { desc: `${home} נגד ${away}`, league: competition || "", date: dateKey || "" };
@@ -632,6 +665,9 @@ module.exports = async (req, res) => {
     if (statsSection) {
       sections.push("", "══ סטטיסטיקות | טבלה | פורמה | H2H | פציעות ══", statsSection);
     }
+    if (webSection) {
+      sections.push("", "══ תוצאות חיפוש אינטרנט (עדכני) ══", webSection);
+    }
     sections.push(
       "═══════════════════════════════════",
       "",
@@ -643,7 +679,7 @@ module.exports = async (req, res) => {
     const userMessage = sections.join("\n");
 
     if (!wantStream) {
-      const cacheKey = aiCacheKey(safeQuery, oddsSection + statsSection);
+      const cacheKey = aiCacheKey(safeQuery, oddsSection + statsSection + webSection);
       const cached = aiCacheGet(cacheKey);
       if (cached) return res.status(200).json({ ok: true, answer: cached, matchInfo, cached: true });
       const answer = await callClaude(userMessage, history);
