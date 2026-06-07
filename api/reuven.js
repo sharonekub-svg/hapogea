@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const { rateLimit, sanitizeInput } = require("./_rate-limit");
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
+const CLAUDE_MODEL = "claude-sonnet-4-6";
 
 const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
@@ -775,7 +775,8 @@ module.exports = async (req, res) => {
       "",
       hasOdds
         ? "יש יחסי שוק — חשב הסתברות גלומה לכל תוצאה."
-        : "אין יחסי שוק — נתח לפי ידע כללי ונתוני הסטטיסטיקה שסופקו.",
+        : "אין יחסי שוק — נתח לפי ידע כללי.",
+      "⚠️ MANDATORY: Give the full analysis NOW. Do NOT ask the user for any data. Do NOT say you need more information. Use everything in this context plus your training knowledge. Pick one team and commit.",
       "ענה בעברית בלבד. אל תיתן הוראות הימור."
     );
     const userMessage = sections.join("\n");
