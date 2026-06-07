@@ -150,11 +150,15 @@ function translateTeamName(name) {
 }
 
 // ── TheSportsDB: free, no API key, form + next fixture ────────────────────────
-async function fetchSportsDB(home, away) {
+async function fetchSportsDB(home, away, sport = "Soccer") {
   try {
     const homeEn = translateTeamName(home);
     const awayEn = translateTeamName(away);
     const base = "https://www.thesportsdb.com/api/v1/json/3";
+
+    // Detect sport from team names / query keywords
+    const isBasketball = /כדורסל|basketball|nba|euroleague/i.test(home + " " + away);
+    const sportFilter = isBasketball ? "Basketball" : "Soccer";
 
     async function searchTeam(name) {
       const terms = teamSearchTerms(name);
@@ -163,8 +167,11 @@ async function fetchSportsDB(home, away) {
           const d = await fetch(`${base}/searchteams.php?t=${encodeURIComponent(term)}`, {
             signal: AbortSignal.timeout(7000),
           }).then(r => r.ok ? r.json() : null).catch(() => null);
-          const id = d?.teams?.[0]?.idTeam;
-          if (id) return { id, name: d.teams[0].strTeam };
+          // Pick the team matching the right sport
+          const team = (d?.teams || []).find(t =>
+            t.strSport && t.strSport.toLowerCase().includes(sportFilter.toLowerCase())
+          ) || d?.teams?.[0];
+          if (team?.idTeam) return { id: team.idTeam, name: team.strTeam, sport: team.strSport };
         } catch (_) {}
       }
       return null;
@@ -183,7 +190,10 @@ async function fetchSportsDB(home, away) {
         const d = await fetch(`${base}/eventslast.php?id=${team.id}`, {
           signal: AbortSignal.timeout(7000),
         }).then(r => r.ok ? r.json() : null).catch(() => null);
-        const events = (d?.results || []).slice(0, 5);
+        // Filter events to same sport as the team
+        const events = (d?.results || [])
+          .filter(e => !e.strSport || e.strSport === team.sport)
+          .slice(0, 5);
         if (!events.length) return "";
         const lines = events.map(e => {
           const isHome = e.strHomeTeam === team.name;
@@ -192,7 +202,7 @@ async function fetchSportsDB(home, away) {
           const scored = isHome ? gs : ga;
           const conceded = isHome ? ga : gs;
           const res = scored > conceded ? "נצ'" : scored < conceded ? "הפסד" : "תיקו";
-          return `  ${(e.dateEvent||"").slice(0,10)}: ${e.strHomeTeam} ${gs}:${ga} ${e.strAwayTeam} [${res}]`;
+          return `  ${(e.dateEvent||"").slice(0,10)}: ${e.strHomeTeam} ${gs}:${ga} ${e.strAwayTeam} [${res}] (${e.strLeague||""})`;
         });
         return `📊 פורמה — ${labelHe} (5 אחרונים):\n${lines.join("\n")}`;
       } catch { return ""; }
@@ -204,7 +214,7 @@ async function fetchSportsDB(home, away) {
         const d = await fetch(`${base}/eventsnext.php?id=${team.id}`, {
           signal: AbortSignal.timeout(7000),
         }).then(r => r.ok ? r.json() : null).catch(() => null);
-        const e = d?.events?.[0];
+        const e = (d?.events || []).find(ev => !ev.strSport || ev.strSport === team.sport) || d?.events?.[0];
         if (!e) return "";
         return `📅 משחק הבא — ${labelHe}: ${(e.dateEvent||"").slice(0,10)} | ${e.strHomeTeam} vs ${e.strAwayTeam} (${e.strLeague||""})`;
       } catch { return ""; }
@@ -637,7 +647,7 @@ Use EXACTLY what is provided. Do not round, estimate, or change numbers.
 You know every club, national team, player, coach, and competition worldwide — Israeli Premier League, Danish second division, World Cup groups, NBA, Euroleague, everything.
 Fill in what the live data doesn't cover: tactical style, key players, squad depth, historical tendency, motivation, coaching philosophy, group stage stakes.
 
-**RULE: Never fabricate a current result.** You may reference a team's general form or historical tendency without citing a specific score. If the context has form data, cite THOSE exact results. Never invent a result like "ניצח 2:0 לפני שלושה ימים" unless it appears in the context.
+**CRITICAL RULE — ZERO TOLERANCE:** Never cite a specific match result (score, date, opponent) unless it appears WORD FOR WORD in the context block above. If form data is in the context, use it. If it is NOT in the context, describe general tendencies only — never invent "ניצח 96:83", "הפסיד 0:2", or any specific scoreline.
 
 ## OUT OF SCOPE
 Only applies if user asks something with NO team names and NO match context:
