@@ -8,36 +8,34 @@ const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
 const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
 
-// ── Shared AI response cache (Vercel KV → fallback to in-process Map) ─────────
-const KV_URL   = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
-const KV_TTL   = 30 * 60; // 30 minutes in seconds
+// ── Shared AI response cache (Supabase → fallback to in-process Map) ──────────
+const SB_URL  = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
+const SB_KEY  = process.env.SUPABASE_ANON_KEY || "";
+const SB_TTL_MIN = 30; // minutes
 
 // In-memory fallback
 const _aiCache = new Map();
-const AI_CACHE_TTL_MS = 30 * 60 * 1000;
+const AI_CACHE_TTL_MS = SB_TTL_MIN * 60 * 1000;
 
 function aiCacheKey(query) {
-  // Key on query text only — same question always returns same cached answer
   const normalized = query.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 300);
-  return "ai:" + crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 24);
+  return crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 32);
 }
 
 async function aiCacheGet(key) {
-  // Try Vercel KV first
-  if (KV_URL && KV_TOKEN) {
+  if (SB_URL && SB_KEY) {
     try {
-      const r = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-        headers: { Authorization: `Bearer ${KV_TOKEN}` },
-        signal: AbortSignal.timeout(2000),
-      });
+      const now = new Date().toISOString();
+      const r = await fetch(
+        `${SB_URL}/rest/v1/ai_cache?key=eq.${encodeURIComponent(key)}&expires_at=gt.${encodeURIComponent(now)}&select=value&limit=1`,
+        { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }, signal: AbortSignal.timeout(2000) }
+      );
       if (r.ok) {
-        const d = await r.json();
-        if (d.result) return d.result;
+        const rows = await r.json();
+        if (rows?.[0]?.value) return rows[0].value;
       }
     } catch (_) {}
   }
-  // Fallback: in-memory
   const entry = _aiCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.exp) { _aiCache.delete(key); return null; }
@@ -45,16 +43,19 @@ async function aiCacheGet(key) {
 }
 
 async function aiCacheSet(key, value) {
-  // Write to Vercel KV (fire and forget)
-  if (KV_URL && KV_TOKEN) {
-    fetch(`${KV_URL}/pipeline`, {
+  if (SB_URL && SB_KEY) {
+    const expiresAt = new Date(Date.now() + AI_CACHE_TTL_MS).toISOString();
+    fetch(`${SB_URL}/rest/v1/ai_cache`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${KV_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify([["SET", key, value, "EX", String(KV_TTL)]]),
+      headers: {
+        apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ key, value, expires_at: expiresAt }),
       signal: AbortSignal.timeout(3000),
     }).catch(() => {});
   }
-  // Always also write in-memory
   if (_aiCache.size > 500) { _aiCache.delete(_aiCache.keys().next().value); }
   _aiCache.set(key, { value, exp: Date.now() + AI_CACHE_TTL_MS });
 }
