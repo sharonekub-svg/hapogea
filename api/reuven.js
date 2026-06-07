@@ -8,19 +8,53 @@ const FOOTBALL_API_KEY = process.env.FOOTBALL_KEY;
 const ODDS_API_KEY_EXT = process.env.ODDS_API_KEY;
 const ODDS_API_EXT = "https://api.the-odds-api.com/v4";
 
-// ── In-process AI response cache ──────────────────────────────────────────────
+// ── Shared AI response cache (Vercel KV → fallback to in-process Map) ─────────
+const KV_URL   = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const KV_TTL   = 30 * 60; // 30 minutes in seconds
+
+// In-memory fallback
 const _aiCache = new Map();
-const AI_CACHE_TTL_MS = 4 * 60 * 1000;
-function aiCacheKey(query, dataSection) {
-  return crypto.createHash("sha256").update(`${query}|${(dataSection || "").slice(0, 500)}`).digest("hex").slice(0, 16);
+const AI_CACHE_TTL_MS = 30 * 60 * 1000;
+
+function aiCacheKey(query) {
+  // Key on query text only — same question always returns same cached answer
+  const normalized = query.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 300);
+  return "ai:" + crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 24);
 }
-function aiCacheGet(key) {
+
+async function aiCacheGet(key) {
+  // Try Vercel KV first
+  if (KV_URL && KV_TOKEN) {
+    try {
+      const r = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
+        headers: { Authorization: `Bearer ${KV_TOKEN}` },
+        signal: AbortSignal.timeout(2000),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        if (d.result) return d.result;
+      }
+    } catch (_) {}
+  }
+  // Fallback: in-memory
   const entry = _aiCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.exp) { _aiCache.delete(key); return null; }
   return entry.value;
 }
-function aiCacheSet(key, value) {
+
+async function aiCacheSet(key, value) {
+  // Write to Vercel KV (fire and forget)
+  if (KV_URL && KV_TOKEN) {
+    fetch(`${KV_URL}/pipeline`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${KV_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify([["SET", key, value, "EX", String(KV_TTL)]]),
+      signal: AbortSignal.timeout(3000),
+    }).catch(() => {});
+  }
+  // Always also write in-memory
   if (_aiCache.size > 500) { _aiCache.delete(_aiCache.keys().next().value); }
   _aiCache.set(key, { value, exp: Date.now() + AI_CACHE_TTL_MS });
 }
@@ -745,11 +779,11 @@ module.exports = async (req, res) => {
     const userMessage = sections.join("\n");
 
     if (!wantStream) {
-      const cacheKey = aiCacheKey(safeQuery, oddsSection + statsSection + webSection);
-      const cached = aiCacheGet(cacheKey);
+      const cacheKey = aiCacheKey(resolvedQuery);
+      const cached = await aiCacheGet(cacheKey);
       if (cached) return res.status(200).json({ ok: true, answer: cached, matchInfo, cached: true });
       const answer = await callClaude(userMessage, history);
-      aiCacheSet(cacheKey, answer);
+      await aiCacheSet(cacheKey, answer);
       return res.status(200).json({ ok: true, answer, matchInfo });
     }
 
