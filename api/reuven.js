@@ -149,6 +149,83 @@ function translateTeamName(name) {
   return name;
 }
 
+// ── TheSportsDB: free, no API key, form + next fixture ────────────────────────
+async function fetchSportsDB(home, away) {
+  try {
+    const homeEn = translateTeamName(home);
+    const awayEn = translateTeamName(away);
+    const base = "https://www.thesportsdb.com/api/v1/json/3";
+
+    async function searchTeam(name) {
+      const terms = teamSearchTerms(name);
+      for (const term of terms) {
+        try {
+          const d = await fetch(`${base}/searchteams.php?t=${encodeURIComponent(term)}`, {
+            signal: AbortSignal.timeout(7000),
+          }).then(r => r.ok ? r.json() : null).catch(() => null);
+          const id = d?.teams?.[0]?.idTeam;
+          if (id) return { id, name: d.teams[0].strTeam };
+        } catch (_) {}
+      }
+      return null;
+    }
+
+    const [homeTeam, awayTeam] = await Promise.all([
+      searchTeam(home),
+      searchTeam(away),
+    ]);
+
+    const parts = [];
+
+    async function getForm(team, labelHe) {
+      if (!team) return "";
+      try {
+        const d = await fetch(`${base}/eventslast.php?id=${team.id}`, {
+          signal: AbortSignal.timeout(7000),
+        }).then(r => r.ok ? r.json() : null).catch(() => null);
+        const events = (d?.results || []).slice(0, 5);
+        if (!events.length) return "";
+        const lines = events.map(e => {
+          const isHome = e.strHomeTeam === team.name;
+          const gs = parseInt(e.intHomeScore ?? 0);
+          const ga = parseInt(e.intAwayScore ?? 0);
+          const scored = isHome ? gs : ga;
+          const conceded = isHome ? ga : gs;
+          const res = scored > conceded ? "נצ'" : scored < conceded ? "הפסד" : "תיקו";
+          return `  ${(e.dateEvent||"").slice(0,10)}: ${e.strHomeTeam} ${gs}:${ga} ${e.strAwayTeam} [${res}]`;
+        });
+        return `📊 פורמה — ${labelHe} (5 אחרונים):\n${lines.join("\n")}`;
+      } catch { return ""; }
+    }
+
+    async function getNext(team, labelHe) {
+      if (!team) return "";
+      try {
+        const d = await fetch(`${base}/eventsnext.php?id=${team.id}`, {
+          signal: AbortSignal.timeout(7000),
+        }).then(r => r.ok ? r.json() : null).catch(() => null);
+        const e = d?.events?.[0];
+        if (!e) return "";
+        return `📅 משחק הבא — ${labelHe}: ${(e.dateEvent||"").slice(0,10)} | ${e.strHomeTeam} vs ${e.strAwayTeam} (${e.strLeague||""})`;
+      } catch { return ""; }
+    }
+
+    const [homeForm, awayForm, homeNext, awayNext] = await Promise.all([
+      getForm(homeTeam, homeEn),
+      getForm(awayTeam, awayEn),
+      getNext(homeTeam, homeEn),
+      getNext(awayTeam, awayEn),
+    ]);
+
+    if (homeNext) parts.push(homeNext);
+    if (awayNext && awayNext !== homeNext) parts.push(awayNext);
+    if (homeForm) parts.push(homeForm);
+    if (awayForm) parts.push(awayForm);
+
+    return parts.length ? parts.join("\n\n") : null;
+  } catch { return null; }
+}
+
 // ── API-Football: form + H2H + injuries + standings ──────────────────────────
 
 function teamSearchTerms(name) {
@@ -735,16 +812,20 @@ module.exports = async (req, res) => {
   let matchInfo = null;
 
   try {
-    // Step 1: Football API + Odds API in parallel
-    const [oddsResult, statsResult] = await Promise.allSettled([
+    // Step 1: Odds API + Football API + TheSportsDB in parallel
+    const [oddsResult, statsResult, sportsDbResult] = await Promise.allSettled([
       (home || away) ? fetchOddsApiData(home || "", away || "", competition) : Promise.resolve(null),
       (home && away) ? fetchApiFootballData(home, away) : Promise.resolve(null),
+      (home && away) ? fetchSportsDB(home, away) : Promise.resolve(null),
     ]);
 
     oddsSection = oddsResult.status === "fulfilled" && oddsResult.value ? oddsResult.value : "";
-    statsSection = statsResult.status === "fulfilled" && statsResult.value ? statsResult.value : "";
+    const footballStats = statsResult.status === "fulfilled" && statsResult.value ? statsResult.value : "";
+    const sportsDbStats = sportsDbResult.status === "fulfilled" && sportsDbResult.value ? sportsDbResult.value : "";
+    // Merge: Football API first (richer), TheSportsDB fills gaps
+    statsSection = [footballStats, sportsDbStats].filter(Boolean).join("\n\n") || "";
 
-    // Step 2: Web search only if Football API returned nothing (obscure team/league)
+    // Step 2: Web search only if both APIs returned nothing
     let webSection = "";
     if (home && away && !statsSection) {
       const webResult = await fetchBraveSearch(home, away).catch(() => null);
