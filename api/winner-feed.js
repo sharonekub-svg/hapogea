@@ -2661,7 +2661,17 @@ function capPerLeague(rows, max = 5) {
 
 function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
   const sorted = (rows || [])
-    .filter((row) => row.recommended && row.odds && row.status === "ממתין" && !["final", "live", "ht"].includes(row.matchPhase))
+    .filter((row) => {
+      if (!row.recommended || !row.odds) return false;
+      if (row.status !== "ממתין") return false;
+      if (["final", "live", "ht"].includes(row.matchPhase)) return false;
+      // Hide games whose scheduled start time has passed by more than 15 minutes
+      if (row.day && row.time && /^\d{2}:\d{2}$/.test(row.time)) {
+        const gameStart = new Date(`${row.day}T${row.time}:00+03:00`);
+        if (Date.now() > gameStart.getTime() + 15 * 60 * 1000) return false;
+      }
+      return true;
+    })
     .sort((a, b) => {
       return (b.recommendationScore || 0) - (a.recommendationScore || 0)
         || (b.probability || 0) - (a.probability || 0)
