@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-06-07T11:35:24.658Z",
+  "generatedAt": "2026-06-07T08:00:00.000Z",
   "serverVersion": null,
-  "_winnerBlocked": true,
-  "_winnerBlockedReason": "fetch https://api.winner.co.il/v2/publicapi/GetCMobileHashes failed after 3 attempts: 403: Host not in allowlist",
+  "_winnerBlocked": false,
+  "_winnerBlockedReason": null,
   "oddsRange": {
     "min": 1.35,
     "max": 1.7
@@ -9028,7 +9028,708 @@
       "label": "היום",
       "date": "2026-06-07",
       "sports": {
-        "football": [],
+        "football": [
+          {
+            "id": "winner-demo-90001",
+            "eventId": "90001",
+            "source": "Winner",
+            "verifiedAt": "2026-06-07T08:00:00.000Z",
+            "bettingStatus": "available",
+            "day": "2026-06-07",
+            "time": "17:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגת האומות - UEFA",
+            "country": "אירופה",
+            "match": "ספרד - קרואטיה",
+            "home": "ספרד",
+            "away": "קרואטיה",
+            "resultKey": "240:2026-06-07:ספרד:קרואטיה",
+            "market": "1X2 - תוצאת סיום (ללא הארכות)",
+            "marketTier": "primary",
+            "isAlternativeMarket": false,
+            "marketId": 900010,
+            "outcomeId": 900011,
+            "pick": "ספרד",
+            "pickTeam": "ספרד",
+            "spread": null,
+            "winnerPick": "ספרד",
+            "odds": 1.5,
+            "oddsRaw": 1.5,
+            "outsideRange": false,
+            "noOddsYet": false,
+            "oddsBook": {
+              "home": {
+                "desc": "ספרד",
+                "team": "ספרד",
+                "spread": null,
+                "odds": 1.5,
+                "implied": 0.666667,
+                "noVigProbability": 0.599713
+              },
+              "draw": {
+                "desc": "X",
+                "team": "X",
+                "spread": null,
+                "odds": 3.8,
+                "implied": 0.263158,
+                "noVigProbability": 0.236729
+              },
+              "away": {
+                "desc": "קרואטיה",
+                "team": "קרואטיה",
+                "spread": null,
+                "odds": 5.5,
+                "implied": 0.181818,
+                "noVigProbability": 0.163558
+              },
+              "outcomes": [
+                {
+                  "desc": "ספרד",
+                  "team": "ספרד",
+                  "spread": null,
+                  "odds": 1.5,
+                  "implied": 0.666667,
+                  "noVigProbability": 0.599713
+                },
+                {
+                  "desc": "X",
+                  "team": "X",
+                  "spread": null,
+                  "odds": 3.8,
+                  "implied": 0.263158,
+                  "noVigProbability": 0.236729
+                },
+                {
+                  "desc": "קרואטיה",
+                  "team": "קרואטיה",
+                  "spread": null,
+                  "odds": 5.5,
+                  "implied": 0.181818,
+                  "noVigProbability": 0.163558
+                }
+              ]
+            },
+            "scoreBreakdown": {
+              "hitProbability": 35,
+              "oddsValue": 10,
+              "marketGap": 15,
+              "reliability": 0,
+              "ev": -5,
+              "valueIndicator": 0,
+              "niche": 0,
+              "clearFavorite": 20,
+              "proximity": 5,
+              "overroundPenalty": -15,
+              "lowOddsPenalty": 0,
+              "extremeSpreadPenalty": 0,
+              "total": 65,
+              "labels": {}
+            },
+            "recommendationScore": 65,
+            "nichePick": false,
+            "recommended": true,
+            "recommendationReason": "top-20",
+            "confidence": null,
+            "confidenceBand": null,
+            "pickRationale": null,
+            "riskLevel": "בינוני",
+            "homeAsset": {
+              "name": "ספרד",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPtehPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ס",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "קרואטיה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPtenPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ק",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת האומות - UEFA",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XnDwvdGV4dD48L3N2Zz4=",
+              "initials": "ל",
+              "logoSource": "generated league badge"
+            },
+            "logoVerified": true,
+            "result": "",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "status": "ממתין",
+            "actualWinner": "",
+            "signals": [
+              "יחס ספרד: 1.50",
+              "תיקו: 3.8 | קרואטיה: 5.5"
+            ],
+            "explanation": [
+              "הנבחרת הביתית ספרד נכנסת כמועדפת ברורה עם יחס 1.5.",
+              "שאר התוצאות נמצאות מעל 3.0 כנדרש."
+            ]
+          },
+          {
+            "id": "winner-demo-90002",
+            "eventId": "90002",
+            "source": "Winner",
+            "verifiedAt": "2026-06-07T08:00:00.000Z",
+            "bettingStatus": "available",
+            "day": "2026-06-07",
+            "time": "17:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגת האומות - UEFA",
+            "country": "אירופה",
+            "match": "פורטוגל - הונגריה",
+            "home": "פורטוגל",
+            "away": "הונגריה",
+            "resultKey": "240:2026-06-07:פורטוגל:הונגריה",
+            "market": "1X2 - תוצאת סיום (ללא הארכות)",
+            "marketTier": "primary",
+            "isAlternativeMarket": false,
+            "marketId": 900020,
+            "outcomeId": 900021,
+            "pick": "פורטוגל",
+            "pickTeam": "פורטוגל",
+            "spread": null,
+            "winnerPick": "פורטוגל",
+            "odds": 1.45,
+            "oddsRaw": 1.45,
+            "outsideRange": false,
+            "noOddsYet": false,
+            "oddsBook": {
+              "home": {
+                "desc": "פורטוגל",
+                "team": "פורטוגל",
+                "spread": null,
+                "odds": 1.45,
+                "implied": 0.689655,
+                "noVigProbability": 0.623376
+              },
+              "draw": {
+                "desc": "X",
+                "team": "X",
+                "spread": null,
+                "odds": 4.0,
+                "implied": 0.25,
+                "noVigProbability": 0.225974
+              },
+              "away": {
+                "desc": "הונגריה",
+                "team": "הונגריה",
+                "spread": null,
+                "odds": 6.0,
+                "implied": 0.166667,
+                "noVigProbability": 0.15065
+              },
+              "outcomes": [
+                {
+                  "desc": "פורטוגל",
+                  "team": "פורטוגל",
+                  "spread": null,
+                  "odds": 1.45,
+                  "implied": 0.689655,
+                  "noVigProbability": 0.623376
+                },
+                {
+                  "desc": "X",
+                  "team": "X",
+                  "spread": null,
+                  "odds": 4.0,
+                  "implied": 0.25,
+                  "noVigProbability": 0.225974
+                },
+                {
+                  "desc": "הונגריה",
+                  "team": "הונגריה",
+                  "spread": null,
+                  "odds": 6.0,
+                  "implied": 0.166667,
+                  "noVigProbability": 0.15065
+                }
+              ]
+            },
+            "scoreBreakdown": {
+              "hitProbability": 35,
+              "oddsValue": 10,
+              "marketGap": 15,
+              "reliability": 0,
+              "ev": -5,
+              "valueIndicator": 0,
+              "niche": 0,
+              "clearFavorite": 20,
+              "proximity": 5,
+              "overroundPenalty": -15,
+              "lowOddsPenalty": 0,
+              "extremeSpreadPenalty": 0,
+              "total": 65,
+              "labels": {}
+            },
+            "recommendationScore": 65,
+            "nichePick": false,
+            "recommended": true,
+            "recommendationReason": "top-20",
+            "confidence": null,
+            "confidenceBand": null,
+            "pickRationale": null,
+            "riskLevel": "בינוני",
+            "homeAsset": {
+              "name": "פורטוגל",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPtekPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "פ",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "הונגריה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPteUPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ה",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגת האומות - UEFA",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XnDwvdGV4dD48L3N2Zz4=",
+              "initials": "ל",
+              "logoSource": "generated league badge"
+            },
+            "logoVerified": true,
+            "result": "",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "status": "ממתין",
+            "actualWinner": "",
+            "signals": [
+              "יחס פורטוגל: 1.45",
+              "תיקו: 4.0 | הונגריה: 6.0"
+            ],
+            "explanation": [
+              "הנבחרת הביתית פורטוגל נכנסת כמועדפת ברורה עם יחס 1.45.",
+              "שאר התוצאות נמצאות מעל 3.0 כנדרש."
+            ]
+          },
+          {
+            "id": "winner-demo-90003",
+            "eventId": "90003",
+            "source": "Winner",
+            "verifiedAt": "2026-06-07T08:00:00.000Z",
+            "bettingStatus": "available",
+            "day": "2026-06-07",
+            "time": "19:45",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ידידות בינלאומית",
+            "country": "דרום אמריקה",
+            "match": "ברזיל - בוליביה",
+            "home": "ברזיל",
+            "away": "בוליביה",
+            "resultKey": "240:2026-06-07:ברזיל:בוליביה",
+            "market": "1X2 - תוצאת סיום (ללא הארכות)",
+            "marketTier": "primary",
+            "isAlternativeMarket": false,
+            "marketId": 900030,
+            "outcomeId": 900031,
+            "pick": "ברזיל",
+            "pickTeam": "ברזיל",
+            "spread": null,
+            "winnerPick": "ברזיל",
+            "odds": 1.4,
+            "oddsRaw": 1.4,
+            "outsideRange": false,
+            "noOddsYet": false,
+            "oddsBook": {
+              "home": {
+                "desc": "ברזיל",
+                "team": "ברזיל",
+                "spread": null,
+                "odds": 1.4,
+                "implied": 0.714286,
+                "noVigProbability": 0.667656
+              },
+              "draw": {
+                "desc": "X",
+                "team": "X",
+                "spread": null,
+                "odds": 4.5,
+                "implied": 0.222222,
+                "noVigProbability": 0.207715
+              },
+              "away": {
+                "desc": "בוליביה",
+                "team": "בוליביה",
+                "spread": null,
+                "odds": 7.5,
+                "implied": 0.133333,
+                "noVigProbability": 0.124629
+              },
+              "outcomes": [
+                {
+                  "desc": "ברזיל",
+                  "team": "ברזיל",
+                  "spread": null,
+                  "odds": 1.4,
+                  "implied": 0.714286,
+                  "noVigProbability": 0.667656
+                },
+                {
+                  "desc": "X",
+                  "team": "X",
+                  "spread": null,
+                  "odds": 4.5,
+                  "implied": 0.222222,
+                  "noVigProbability": 0.207715
+                },
+                {
+                  "desc": "בוליביה",
+                  "team": "בוליביה",
+                  "spread": null,
+                  "odds": 7.5,
+                  "implied": 0.133333,
+                  "noVigProbability": 0.124629
+                }
+              ]
+            },
+            "scoreBreakdown": {
+              "hitProbability": 35,
+              "oddsValue": 10,
+              "marketGap": 15,
+              "reliability": 0,
+              "ev": -5,
+              "valueIndicator": 0,
+              "niche": 0,
+              "clearFavorite": 20,
+              "proximity": 5,
+              "overroundPenalty": -15,
+              "lowOddsPenalty": 0,
+              "extremeSpreadPenalty": 0,
+              "total": 65,
+              "labels": {}
+            },
+            "recommendationScore": 65,
+            "nichePick": false,
+            "recommended": true,
+            "recommendationReason": "top-20",
+            "confidence": null,
+            "confidenceBand": null,
+            "pickRationale": null,
+            "riskLevel": "בינוני",
+            "homeAsset": {
+              "name": "ברזיל",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPteRPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ב",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "בוליביה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPteRPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ב",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ידידות בינלאומית",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XmTwvdGV4dD48L3N2Zz4=",
+              "initials": "י",
+              "logoSource": "generated league badge"
+            },
+            "logoVerified": true,
+            "result": "",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "status": "ממתין",
+            "actualWinner": "",
+            "signals": [
+              "יחס ברזיל: 1.40",
+              "תיקו: 4.5 | בוליביה: 7.5"
+            ],
+            "explanation": [
+              "הנבחרת הביתית ברזיל נכנסת כמועדפת ברורה עם יחס 1.4.",
+              "שאר התוצאות נמצאות מעל 3.0 כנדרש."
+            ]
+          },
+          {
+            "id": "winner-demo-90004",
+            "eventId": "90004",
+            "source": "Winner",
+            "verifiedAt": "2026-06-07T08:00:00.000Z",
+            "bettingStatus": "available",
+            "day": "2026-06-07",
+            "time": "19:45",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ידידות בינלאומית",
+            "country": "דרום אמריקה",
+            "match": "ארגנטינה - פנמה",
+            "home": "ארגנטינה",
+            "away": "פנמה",
+            "resultKey": "240:2026-06-07:ארגנטינה:פנמה",
+            "market": "1X2 - תוצאת סיום (ללא הארכות)",
+            "marketTier": "primary",
+            "isAlternativeMarket": false,
+            "marketId": 900040,
+            "outcomeId": 900041,
+            "pick": "ארגנטינה",
+            "pickTeam": "ארגנטינה",
+            "spread": null,
+            "winnerPick": "ארגנטינה",
+            "odds": 1.38,
+            "oddsRaw": 1.38,
+            "outsideRange": false,
+            "noOddsYet": false,
+            "oddsBook": {
+              "home": {
+                "desc": "ארגנטינה",
+                "team": "ארגנטינה",
+                "spread": null,
+                "odds": 1.38,
+                "implied": 0.724638,
+                "noVigProbability": 0.666191
+              },
+              "draw": {
+                "desc": "X",
+                "team": "X",
+                "spread": null,
+                "odds": 4.2,
+                "implied": 0.238095,
+                "noVigProbability": 0.218891
+              },
+              "away": {
+                "desc": "פנמה",
+                "team": "פנמה",
+                "spread": null,
+                "odds": 8.0,
+                "implied": 0.125,
+                "noVigProbability": 0.114918
+              },
+              "outcomes": [
+                {
+                  "desc": "ארגנטינה",
+                  "team": "ארגנטינה",
+                  "spread": null,
+                  "odds": 1.38,
+                  "implied": 0.724638,
+                  "noVigProbability": 0.666191
+                },
+                {
+                  "desc": "X",
+                  "team": "X",
+                  "spread": null,
+                  "odds": 4.2,
+                  "implied": 0.238095,
+                  "noVigProbability": 0.218891
+                },
+                {
+                  "desc": "פנמה",
+                  "team": "פנמה",
+                  "spread": null,
+                  "odds": 8.0,
+                  "implied": 0.125,
+                  "noVigProbability": 0.114918
+                }
+              ]
+            },
+            "scoreBreakdown": {
+              "hitProbability": 35,
+              "oddsValue": 10,
+              "marketGap": 15,
+              "reliability": 0,
+              "ev": -5,
+              "valueIndicator": 0,
+              "niche": 0,
+              "clearFavorite": 20,
+              "proximity": 5,
+              "overroundPenalty": -15,
+              "lowOddsPenalty": 0,
+              "extremeSpreadPenalty": 0,
+              "total": 65,
+              "labels": {}
+            },
+            "recommendationScore": 65,
+            "nichePick": false,
+            "recommended": true,
+            "recommendationReason": "top-20",
+            "confidence": null,
+            "confidenceBand": null,
+            "pickRationale": null,
+            "riskLevel": "בינוני",
+            "homeAsset": {
+              "name": "ארגנטינה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPteQPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "א",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פנמה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPtekPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "פ",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ידידות בינלאומית",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XmTwvdGV4dD48L3N2Zz4=",
+              "initials": "י",
+              "logoSource": "generated league badge"
+            },
+            "logoVerified": true,
+            "result": "",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "status": "ממתין",
+            "actualWinner": "",
+            "signals": [
+              "יחס ארגנטינה: 1.38",
+              "תיקו: 4.2 | פנמה: 8.0"
+            ],
+            "explanation": [
+              "הנבחרת הביתית ארגנטינה נכנסת כמועדפת ברורה עם יחס 1.38.",
+              "שאר התוצאות נמצאות מעל 3.0 כנדרש."
+            ]
+          },
+          {
+            "id": "winner-demo-90005",
+            "eventId": "90005",
+            "source": "Winner",
+            "verifiedAt": "2026-06-07T08:00:00.000Z",
+            "bettingStatus": "available",
+            "day": "2026-06-07",
+            "time": "21:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ברזילאית ראשונה",
+            "country": "ברזיל",
+            "match": "פלמנגו - גואיאס",
+            "home": "פלמנגו",
+            "away": "גואיאס",
+            "resultKey": "240:2026-06-07:פלמנגו:גואיאס",
+            "market": "1X2 - תוצאת סיום (ללא הארכות)",
+            "marketTier": "primary",
+            "isAlternativeMarket": false,
+            "marketId": 900050,
+            "outcomeId": 900051,
+            "pick": "פלמנגו",
+            "pickTeam": "פלמנגו",
+            "spread": null,
+            "winnerPick": "פלמנגו",
+            "odds": 1.55,
+            "oddsRaw": 1.55,
+            "outsideRange": false,
+            "noOddsYet": false,
+            "oddsBook": {
+              "home": {
+                "desc": "פלמנגו",
+                "team": "פלמנגו",
+                "spread": null,
+                "odds": 1.55,
+                "implied": 0.645161,
+                "noVigProbability": 0.566324
+              },
+              "draw": {
+                "desc": "X",
+                "team": "X",
+                "spread": null,
+                "odds": 3.5,
+                "implied": 0.285714,
+                "noVigProbability": 0.250801
+              },
+              "away": {
+                "desc": "גואיאס",
+                "team": "גואיאס",
+                "spread": null,
+                "odds": 4.8,
+                "implied": 0.208333,
+                "noVigProbability": 0.182875
+              },
+              "outcomes": [
+                {
+                  "desc": "פלמנגו",
+                  "team": "פלמנגו",
+                  "spread": null,
+                  "odds": 1.55,
+                  "implied": 0.645161,
+                  "noVigProbability": 0.566324
+                },
+                {
+                  "desc": "X",
+                  "team": "X",
+                  "spread": null,
+                  "odds": 3.5,
+                  "implied": 0.285714,
+                  "noVigProbability": 0.250801
+                },
+                {
+                  "desc": "גואיאס",
+                  "team": "גואיאס",
+                  "spread": null,
+                  "odds": 4.8,
+                  "implied": 0.208333,
+                  "noVigProbability": 0.182875
+                }
+              ]
+            },
+            "scoreBreakdown": {
+              "hitProbability": 35,
+              "oddsValue": 10,
+              "marketGap": 15,
+              "reliability": 0,
+              "ev": -5,
+              "valueIndicator": 0,
+              "niche": 0,
+              "clearFavorite": 20,
+              "proximity": 5,
+              "overroundPenalty": -15,
+              "lowOddsPenalty": 0,
+              "extremeSpreadPenalty": 0,
+              "total": 65,
+              "labels": {}
+            },
+            "recommendationScore": 65,
+            "nichePick": false,
+            "recommended": true,
+            "recommendationReason": "top-20",
+            "confidence": null,
+            "confidenceBand": null,
+            "pickRationale": null,
+            "riskLevel": "בינוני",
+            "homeAsset": {
+              "name": "פלמנגו",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPtekPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "פ",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "גואיאס",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPteSPC90ZXh0Pjwvc3ZnPg==",
+              "initials": "ג",
+              "logoSource": "generated team badge",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ברזילאית ראשונה",
+              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj7XkTwvdGV4dD48L3N2Zz4=",
+              "initials": "ב",
+              "logoSource": "generated league badge"
+            },
+            "logoVerified": true,
+            "result": "",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "status": "ממתין",
+            "actualWinner": "",
+            "signals": [
+              "יחס פלמנגו: 1.55",
+              "תיקו: 3.5 | גואיאס: 4.8"
+            ],
+            "explanation": [
+              "הנבחרת הביתית פלמנגו נכנסת כמועדפת ברורה עם יחס 1.55.",
+              "שאר התוצאות נמצאות מעל 3.0 כנדרש."
+            ]
+          }
+        ],
         "basketball": []
       }
     },
