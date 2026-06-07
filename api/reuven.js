@@ -69,7 +69,17 @@ const HE_TO_EN = {
   "סלטיק": "Celtic", "ריינג'רס": "Rangers",
   "מכבי תל אביב": "Maccabi Tel Aviv", "הפועל תל אביב": "Hapoel Tel Aviv",
   "מכבי חיפה": "Maccabi Haifa", "הפועל באר שבע": "Hapoel Beer Sheva",
-  "בני יהודה": "Bnei Yehuda", "מכבי פתח תקווה": "Maccabi Petah Tikva",
+  "הפועל ירושלים": "Hapoel Jerusalem", "בית\"ר ירושלים": "Beitar Jerusalem",
+  "מכבי ירושלים": "Maccabi Jerusalem", "הפועל חיפה": "Hapoel Haifa",
+  "הפועל רמת גן": "Hapoel Ramat Gan", "הפועל כפר שמריהו": "Hapoel Kfar Shmaryahu",
+  "מכבי נתניה": "Maccabi Netanya", "הפועל נתניה": "Hapoel Netanya",
+  "הפועל עכו": "Hapoel Acre", "הפועל קטמון": "Hapoel Katamon",
+  "מכבי פתח תקווה": "Maccabi Petah Tikva", "הפועל פתח תקווה": "Hapoel Petah Tikva",
+  "בני יהודה": "Bnei Yehuda", "עירוני קריית שמונה": "Ironi Kiryat Shmona",
+  "עירוני נתניה": "Ironi Netanya", "עירוני טבריה": "Ironi Tiberias",
+  "שמשון תל אביב": "Shimshon Tel Aviv", "אסא תל אביב": "Asa Tel Aviv",
+  "הפועל רחובות": "Hapoel Rehovot", "הפועל כפר סבא": "Hapoel Kfar Saba",
+  "מכבי כפר קנא": "Maccabi Kafr Kanna", "הפועל נוף הגליל": "Hapoel Nof HaGalil",
   "לוס אנג'לס": "LA Galaxy", "אינטר מיאמי": "Inter Miami",
   "בוקה ג'וניורס": "Boca Juniors", "ריבר פלייט": "River Plate",
   "פלמנגו": "Flamengo", "פלמינסה": "Palmeiras",
@@ -485,23 +495,24 @@ If the question is NOT about a specific upcoming match between two named teams:
 Reply ONLY: "אני מנתח משחקים ספציפיים בלבד — שתי קבוצות, תאריך, שוק. שאל אותי על משחק קונקרטי 🎯"
 Do NOT use the analysis format.
 
-## DATA RULES — STRICT
-ONLY use facts that appear in the context block below the query.
-- Odds provided → calculate implied probability (1/odds × 100%), recommend the market favorite, explain the margin.
-- Standings provided → cite rank, points, W/D/L exactly as given.
-- Form provided → count wins/draws/losses exactly as given.
-- H2H provided → state who won more, from the data.
-- Injuries provided → mention by name, from the data.
-- Web snippets provided → extract relevant facts from them.
+## DATA RULES
+Use ONLY facts that appear in the context block. Never invent numbers, scores, or events.
 
-## WHEN NO STATS ARE PROVIDED
-If the context has ONLY odds (no form/standings/H2H/injuries):
-- Recommend based on odds ONLY. State: "לפי היחסים בשוק —" then explain implied probabilities.
-- Do NOT mention home/away, form, injuries, or any match facts — they are unknown.
+### When stats ARE provided (standings / form / H2H / injuries):
+- **Cite them directly and build the analysis around them.**
+- Standings → "מקום X, Y נקודות, Wנ Dת Lה"
+- Form → count results exactly: "4נ-1ת ב-5 האחרונים"
+- H2H → "X ניצח Y מתוך 5 עימותים אחרונים"
+- Injuries → list by name from the data
+- Odds → calculate implied probability (1/odds × 100%)
 
-If the context has NO odds and NO stats:
-- State: "⚠️ אין נתוני שוק — ניתוח על בסיס מוניטין כללי בלבד."
-- You may briefly describe each team's general known reputation (league level, typical style). Nothing more.
+### When ONLY odds are provided (no stats):
+- Recommend based on odds. State: "לפי היחסים בשוק —" then implied probabilities.
+- Do NOT mention form, standings, H2H, or injuries — data is unknown.
+
+### When nothing is provided:
+- State: "⚠️ אין נתוני שוק — ניתוח מבוסס מוניטין כללי בלבד."
+- One sentence per team on general league reputation. Nothing else.
 
 ## WORLD CUP 2026
 Started June 11, 2026. Group stage through July 2026.
