@@ -97,7 +97,7 @@ const BASKETBALL_ODDS_MAX_SPREAD = 1.95;
 // Football 3-way: all other outcomes (draw + loser) must be at or above this threshold
 const MIN_OPPONENT_ODDS = 3.0;
 // Basketball 2-way: the non-picked team must be at or above this threshold
-const MIN_BASKETBALL_OPPONENT_ODDS = 2.6;
+const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
