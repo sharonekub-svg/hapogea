@@ -1199,109 +1199,238 @@
       gap: 6px;
       flex-wrap: wrap;
     }
-    /* ── New World Cup match cards ─────────────────────────── */
+    /* ── WC match cards v2 ────────────────────────────────────── */
+    .wc-match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 12px; }
+    @media (max-width: 600px) { .wc-match-grid { grid-template-columns: 1fr; } }
+
     .wcm {
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      padding: 13px 14px;
-      transition: border-color .15s, background .15s, transform .15s;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color .18s, box-shadow .18s, transform .15s;
+      cursor: default;
     }
-    .wcm:hover { border-color: rgba(255,200,87,.25); background: rgba(255,255,255,.05); transform: translateY(-1px); }
-    .wcm[data-status="live"] { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.04); }
-    .wcm[data-status="finished"] { opacity: .72; }
+    .wcm:hover { border-color: rgba(255,200,87,.30); box-shadow: 0 4px 24px rgba(0,0,0,.18); transform: translateY(-2px); }
+    .wcm[data-status="live"] { border-color: rgba(52,211,153,.35); box-shadow: 0 0 0 1px rgba(52,211,153,.15); }
+    .wcm[data-status="finished"] { opacity: .68; }
+    .wcm-has-pick { border-color: rgba(255,200,87,.35); }
+    .wcm-has-pick:hover { border-color: rgba(255,200,87,.6); }
+
     .wcm-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      padding: 9px 14px 0;
     }
     .wcm-group {
-      font: 700 9.5px/1 Heebo, sans-serif;
-      letter-spacing: .08em;
+      font: 700 9px/1 Heebo, sans-serif;
+      letter-spacing: .1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.35);
+      color: rgba(255,200,87,.7);
     }
     .wcm-status {
-      font: 700 10px/1 Heebo, sans-serif;
-      padding: 3px 8px;
+      font: 700 9.5px/1 Heebo, sans-serif;
+      padding: 3px 9px;
       border-radius: 20px;
       background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.45);
+      color: rgba(255,255,255,.38);
       border: 1px solid rgba(255,255,255,.08);
     }
-    .wcm-status.live { background: rgba(52,211,153,.15); color: #34d399; border-color: rgba(52,211,153,.3); }
-    .wcm-status.finished { background: rgba(255,255,255,.04); color: rgba(255,255,255,.3); }
-    .wcm-status.upcoming { background: rgba(99,102,241,.12); color: rgba(165,167,255,.8); border-color: rgba(99,102,241,.2); }
-    .wcm-body {
-      display: flex;
+    .wcm-status.live { background: rgba(52,211,153,.18); color: #34d399; border-color: rgba(52,211,153,.35); animation: pulse-live 1.4s infinite; }
+    .wcm-status.finished { background: rgba(255,255,255,.04); color: rgba(255,255,255,.28); }
+    .wcm-status.hit { background: rgba(49,209,135,.18); color: #31d187; border-color: rgba(49,209,135,.4); }
+    .wcm-status.miss { background: rgba(239,83,80,.15); color: #ef5350; border-color: rgba(239,83,80,.35); }
+
+    .wcm-matchup {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      padding: 14px 14px 10px;
+      direction: ltr;
     }
     .wcm-team {
-      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       text-align: center;
     }
     .wcm-team.away { }
-    .wcm-team .team-flag img, .wcm-team .team-logo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .wcm-flag {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 4px 12px rgba(0,0,0,.22);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .wcm-flag img { width: 100%; height: 100%; object-fit: cover; }
     .wcm-name {
-      font: 700 12px/1.2 Heebo, sans-serif;
-      color: rgba(255,255,255,.85);
-    }
-    .wcm-odds {
-      font: 600 11px/1 Assistant, sans-serif;
-      color: rgba(255,255,255,.35);
-      background: rgba(255,255,255,.05);
-      border-radius: 6px;
-      padding: 2px 7px;
-    }
-    .wcm-odds-pick {
-      background: rgba(255,200,87,.15);
-      color: #ffc857;
-      border: 1px solid rgba(255,200,87,.3);
+      font: 700 13px/1.25 Heebo, sans-serif;
+      color: rgba(255,255,255,.82);
+      max-width: 100px;
     }
     .wcm-team.picked .wcm-name { color: #ffc857; }
-    .wcm-mid {
-      flex: 0 0 64px;
+    .wcm-odds-pill {
+      font: 700 12px/1 Assistant, sans-serif;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.45);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: background .15s;
+    }
+    .wcm-odds-pill.is-pick {
+      background: rgba(255,200,87,.18);
+      color: #ffc857;
+      border-color: rgba(255,200,87,.4);
+    }
+
+    .wcm-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 58px;
+    }
+    .wcm-score {
+      font: 900 22px/1 Heebo, sans-serif;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+    .wcm-vs {
+      font: 700 10px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.22);
+    }
+    .wcm-datetime {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+    .wcm-time {
+      font: 700 15px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.75);
+    }
+    .wcm-date {
+      font: 500 10px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.28);
+    }
+    .wcm-draw-odds {
+      font: 600 10px/1 Heebo, sans-serif;
+      color: rgba(255,200,87,.5);
+      margin-top: 2px;
+    }
+    .wcm-draw-odds.is-pick { color: #ffc857; font-weight: 800; }
+
+    .wcm-footer {
+      padding: 0 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .wcm-venue {
+      font: 400 10px/1.3 Heebo, sans-serif;
+      color: rgba(255,255,255,.2);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .wcm-ai-btn {
+      flex-shrink: 0;
+      background: rgba(139,92,246,.16);
+      border: 1px solid rgba(139,92,246,.28);
+      color: rgba(167,139,250,.85);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font: 700 10px/1 Heebo, sans-serif;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .wcm-ai-btn:hover { background: rgba(139,92,246,.28); border-color: rgba(139,92,246,.5); color: #c4b5fd; }
+
+    /* group letter grid */
+    .wc-group-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    @media (max-width: 400px) { .wc-group-grid { grid-template-columns: repeat(4, 1fr); } }
+    .wc-group-pill {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 10px;
+      padding: 10px 4px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 3px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      min-width: 0;
     }
-    .wcm-score {
-      font: 900 20px/1 Heebo, sans-serif;
-      color: #fff;
-      letter-spacing: 1px;
+    .wc-group-pill:hover { border-color: rgba(255,200,87,.35); background: rgba(255,200,87,.06); }
+    .wc-group-pill.active {
+      border-color: rgba(255,200,87,.5);
+      background: rgba(255,200,87,.10);
     }
-    .wcm-vs {
+    .wc-group-pill-letter {
+      font: 900 18px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.85);
+    }
+    .wc-group-pill.active .wc-group-pill-letter { color: #ffc857; }
+    .wc-group-pill-count {
+      font: 500 9px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.3);
+    }
+
+    /* date section header */
+    .wc-date-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 8px;
+    }
+    .wc-date-header-label {
+      font: 800 12px/1 Heebo, sans-serif;
+      color: rgba(255,255,255,.5);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .wc-date-header-today {
+      color: #ffc857;
+    }
+    .wc-date-header-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.06);
+    }
+    .wc-nav-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .wc-nav-tab {
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.5);
       font: 700 11px/1 Heebo, sans-serif;
-      color: rgba(255,255,255,.25);
+      cursor: pointer;
+      transition: all .15s;
     }
-    .wcm-time {
-      font: 600 12px/1 Heebo, sans-serif;
-      color: rgba(255,255,255,.6);
-    }
-    .wcm-date {
-      font: 500 10px/1 Heebo, sans-serif;
-      color: rgba(255,255,255,.3);
-    }
-    .wcm-draw {
-      font: 600 10px/1 Heebo, sans-serif;
-      color: rgba(255,255,255,.3);
-      margin-top: 2px;
-    }
-    .wcm-venue {
-      margin-top: 10px;
-      font: 400 10.5px/1 Heebo, sans-serif;
-      color: rgba(255,255,255,.22);
-      text-align: center;
-    }
-    .wc-match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 10px; }
-    @media (max-width: 540px) { .wc-match-grid { grid-template-columns: 1fr; } }
+    .wc-nav-tab:hover { border-color: rgba(255,200,87,.3); color: rgba(255,255,255,.8); }
+    .wc-nav-tab.active { border-color: rgba(255,200,87,.5); background: rgba(255,200,87,.1); color: #ffc857; }
     .footer { padding-top: 18px; padding-bottom: 24px; color: var(--soft); font-size: 12px; line-height: 1.6; }
     .footer-privacy-link { background: none; border: none; padding: 0; color: inherit; font: inherit; cursor: pointer; text-decoration: underline; opacity: .8; }
     .footer-privacy-link:hover { opacity: 1; }
@@ -5904,43 +6033,52 @@
     function wcFixtureCard(item) {
       const status = wcStatus(item);
       const date = wcDateLabel(item.date);
-      const hasOdds = item.odds && item.pick;
-      const isLive = status.cls === 'live';
-      const isDone = status.cls === 'finished';
-      const homeOdds = item.odds ? formatOdds(item.odds['1'] || item.odds[item.hc] || '') : null;
-      const drawOdds = item.odds ? formatOdds(item.odds['X'] || item.odds['x'] || '') : null;
-      const awayOdds = item.odds ? formatOdds(item.odds['2'] || item.odds[item.ac] || '') : null;
-      const pickedHome = hasOdds && (item.pick === '1' || item.pick === item.hc);
-      const pickedDraw = hasOdds && (item.pick === 'X' || item.pick === 'x');
-      const pickedAway = hasOdds && (item.pick === '2' || item.pick === item.ac);
+      const isDone = status.cls === 'finished' || status.cls === 'hit' || status.cls === 'miss';
+      const hasPick = !!(item.pick && item.odds);
+      const homeOdds = item.odds ? (item.odds['1'] || item.odds.home || item.odds[item.hc]) : null;
+      const drawOdds = item.odds ? (item.odds['X'] || item.odds.x || item.odds.draw) : null;
+      const awayOdds = item.odds ? (item.odds['2'] || item.odds.away || item.odds[item.ac]) : null;
+      const pickedHome = hasPick && (item.pick === '1' || item.pick === 'home' || item.pick === item.hc);
+      const pickedDraw = hasPick && (item.pick === 'X' || item.pick === 'x' || item.pick === 'draw');
+      const pickedAway = hasPick && (item.pick === '2' || item.pick === 'away' || item.pick === item.ac);
+      const fmtOdds = v => v != null ? (+v).toFixed(2) : null;
+      const hOdds = fmtOdds(homeOdds);
+      const dOdds = fmtOdds(drawOdds);
+      const aOdds = fmtOdds(awayOdds);
+      // AI chat prompt
+      const aiQuery = encodeURIComponent(`${item.home} נגד ${item.away}`);
       return `
-        <article class="wcm" data-status="${status.cls}">
+        <article class="wcm${hasPick ? ' wcm-has-pick' : ''}" data-status="${status.cls}">
           <div class="wcm-top">
             <span class="wcm-group">${escapeHtml(item.group || item.stage || '')}</span>
-            <span class="wcm-status ${status.cls}">${isLive ? '● ' : ''}${status.label}</span>
+            <span class="wcm-status ${status.cls}">${status.cls === 'live' ? '● ' : ''}${status.label}</span>
           </div>
-          <div class="wcm-body">
-            <div class="wcm-team ${pickedHome ? 'picked' : ''}">
-              ${flagImg(item.hc, item.home)}
+          <div class="wcm-matchup">
+            <div class="wcm-team${pickedHome ? ' picked' : ''}">
+              <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.hc}.png`, item.home, 'flag')}</div>
               <span class="wcm-name">${escapeHtml(item.home)}</span>
-              ${homeOdds ? `<span class="wcm-odds${pickedHome?' wcm-odds-pick':''}">${homeOdds}</span>` : ''}
+              ${hOdds ? `<span class="wcm-odds-pill${pickedHome ? ' is-pick' : ''}">${hOdds}</span>` : ''}
             </div>
-            <div class="wcm-mid">
+            <div class="wcm-center">
               ${isDone && item.score ? `<div class="wcm-score">${escapeHtml(item.score)}</div>` : ''}
-              <div class="wcm-vs">VS</div>
-              <div class="wcm-time">${escapeHtml(wcTimeLabel(item))}</div>
-              <div class="wcm-date">${escapeHtml(date.short)}</div>
-              ${drawOdds ? `<div class="wcm-draw${pickedDraw?' wcm-odds-pick':''}">X ${drawOdds}</div>` : ''}
+              ${!isDone ? `<div class="wcm-vs">VS</div>` : ''}
+              <div class="wcm-datetime">
+                <span class="wcm-time">${escapeHtml(item.time || '—')}</span>
+                <span class="wcm-date">${escapeHtml(date.short)}</span>
+              </div>
+              ${dOdds ? `<div class="wcm-draw-odds${pickedDraw ? ' is-pick' : ''}">X ${dOdds}</div>` : ''}
             </div>
-            <div class="wcm-team away ${pickedAway ? 'picked' : ''}">
-              ${flagImg(item.ac, item.away)}
+            <div class="wcm-team away${pickedAway ? ' picked' : ''}">
+              <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.ac}.png`, item.away, 'flag')}</div>
               <span class="wcm-name">${escapeHtml(item.away)}</span>
-              ${awayOdds ? `<span class="wcm-odds${pickedAway?' wcm-odds-pick':''}">${awayOdds}</span>` : ''}
+              ${aOdds ? `<span class="wcm-odds-pill${pickedAway ? ' is-pick' : ''}">${aOdds}</span>` : ''}
             </div>
           </div>
-          <div class="wcm-venue">${escapeHtml(item.venue || '')}</div>
-        </article>
-      `;
+          <div class="wcm-footer">
+            <span class="wcm-venue">${escapeHtml(item.venue || '')}</span>
+            <button class="wcm-ai-btn" data-ai-match="${aiQuery}" type="button">🤖 ניתח</button>
+          </div>
+        </article>`;
     }
 
     /* ============ WORLD CUP 2026 HUB (factual scaffolding + real fixtures) ============ */
