@@ -1520,13 +1520,13 @@ function hasSingleClearFavorite(row) {
   if (Number(row.sportId) === WINNER_BASKETBALL_ID && row.marketTier === "spread") {
     return Number(row.normalizedProbability || 0) >= 0.47 || Number(row.marketGap || 0) >= 0.01;
   }
-  // Basketball moneyline clear favorites have very high normalizedProbability
+  // Basketball moneyline: any game where one team is favored is eligible
   if (Number(row.sportId) === WINNER_BASKETBALL_ID) {
     const info = favoriteInfo(row);
     return info.isFavorite && (
-      Number(row.normalizedProbability || 0) >= 0.52 ||
-      Number(info.oddsGap || 0) >= 0.15 ||
-      Number(row.marketGap || 0) >= 0.04
+      Number(row.normalizedProbability || 0) >= 0.50 ||
+      Number(info.oddsGap || 0) >= 0.05 ||
+      Number(row.marketGap || 0) >= 0.01
     );
   }
   const info = favoriteInfo(row);
@@ -2699,7 +2699,6 @@ function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
-    .filter((r) => !/NBA|WNBA/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
   const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet));
