@@ -3692,6 +3692,14 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     }
   }
 
+  // Hard-cap football to 5 per day (top by recommendationScore — already sorted)
+  for (const tabKey of ["today", "tomorrow"]) {
+    const tab = payload.tabs?.[tabKey];
+    if (tab?.sports?.football?.length > 5) {
+      tab.sports.football = tab.sports.football.slice(0, 5);
+    }
+  }
+
   if (!payloadMatchesIsraelDates(payload)) {
     const snapshotNorm2 = normalizeFallbackRows(SNAPSHOT);
     const snapshot = payloadMatchesIsraelDates(snapshotNorm2)
