@@ -85,19 +85,19 @@ const ODDS_API_SPORTS = [
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ODDS_MIN = 1.30;
-const ODDS_MAX = 2.10;
-const SOFT_ODDS_MIN = 1.20;
-const SOFT_ODDS_MAX = 2.30;
-const MIN_PREMIUM_ROWS_PER_DAY = 10;
+const ODDS_MIN = 1.40;
+const ODDS_MAX = 1.85;
+const SOFT_ODDS_MIN = 1.25;
+const SOFT_ODDS_MAX = 2.00;
+const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
-const BASKETBALL_ODDS_MIN = 1.15;
-const BASKETBALL_ODDS_MAX_MONEYLINE = 1.95;
-const BASKETBALL_ODDS_MAX_SPREAD = 2.10;
+const BASKETBALL_ODDS_MIN = 1.20;
+const BASKETBALL_ODDS_MAX_MONEYLINE = 1.75;
+const BASKETBALL_ODDS_MAX_SPREAD = 1.95;
 // Football 3-way: all other outcomes (draw + loser) must be at or above this threshold
-const MIN_OPPONENT_ODDS = 1.70;
+const MIN_OPPONENT_ODDS = 2.2;
 // Basketball 2-way: the non-picked team must be at or above this threshold
-const MIN_BASKETBALL_OPPONENT_ODDS = 1.55;
+const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
@@ -1956,9 +1956,7 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
         "היחס משמש כנתון שוק בלבד; אין כאן הוראת פעולה.",
       ],
     }));
-  const selectionPool = strictCandidates.length >= 10
-    ? strictCandidates
-    : [...strictCandidates, ...softCandidates];
+  const selectionPool = strictCandidates;
   return selectionPool
     .map((row) => ({
       ...row,
