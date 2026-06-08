@@ -2663,12 +2663,12 @@ function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
   const sorted = (rows || [])
     .filter((row) => {
       if (!row.recommended || !row.odds) return false;
-      if (row.status !== "ממתין") return false;
-      if (["final", "live", "ht"].includes(row.matchPhase)) return false;
-      // Hide games whose scheduled start time has passed by more than 15 minutes
+      if (!["ממתין", "live", "ht"].includes(row.status) && row.status) return false;
+      if (row.matchPhase === "final") return false;
+      // Hide only if the match window is fully over (200 min covers 90+ET+processing)
       if (row.day && row.time && /^\d{2}:\d{2}$/.test(row.time)) {
         const gameStart = new Date(`${row.day}T${row.time}:00+03:00`);
-        if (Date.now() > gameStart.getTime() + 15 * 60 * 1000) return false;
+        if (Date.now() > gameStart.getTime() + 200 * 60 * 1000) return false;
       }
       return true;
     })
