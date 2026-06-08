@@ -5294,7 +5294,18 @@
   <script>
     const PREMIUM_LS_KEY = 'hapogea_premium_v3';
     const PREMIUM_EXP_KEY = 'hapogea_premium_exp_v3';
-    const AI_FREE_KEY = 'hapogea_ai_free_used_v1'; // count of free AI messages used
+    const AI_FREE_KEY = 'hapogea_ai_free_used_v1';
+    // Reset free counter if it's a new day
+    (function resetAiFreeDaily() {
+      try {
+        const today = new Date().toLocaleDateString('en-CA');
+        const savedDate = localStorage.getItem('hapogea_ai_free_date');
+        if (savedDate !== today) {
+          localStorage.removeItem(AI_FREE_KEY);
+          localStorage.setItem('hapogea_ai_free_date', today);
+        }
+      } catch {}
+    })();
     function isPremiumUser() {
       if (localStorage.getItem(PREMIUM_LS_KEY) !== 'active') return false;
       const exp = Number(localStorage.getItem(PREMIUM_EXP_KEY) || 0);
