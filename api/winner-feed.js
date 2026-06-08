@@ -2680,13 +2680,9 @@ function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
     });
   const strict = sorted.filter((row) => rejectionReasons(row).length === 0);
   const strictIds = new Set(strict.map((row) => row.id));
-  const logoFill = sorted
-    .filter((row) => !strictIds.has(row.id))
-    .filter((row) => {
-      const hardReasons = rejectionReasons(row).filter((reason) => !reason.includes("לוגו"));
-      return hardReasons.length === 0;
-    });
-  return capPerLeague([...strict, ...logoFill])
+  // Include ALL remaining recommended rows — user wants to see every match
+  const rest = sorted.filter((row) => !strictIds.has(row.id));
+  return capPerLeague([...strict, ...rest])
     .slice(0, limit)
     .map((row) => ({
       ...row,

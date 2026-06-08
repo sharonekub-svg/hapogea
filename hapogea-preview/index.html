@@ -2313,6 +2313,40 @@
     .dt-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); color:var(--muted); border-radius:8px; padding:7px 16px; font:800 13px Heebo,sans-serif; cursor:pointer; transition:.15s ease; }
     .dt-btn.active { background:rgba(37,99,235,.15); border-color:rgba(37,99,235,.35); color:#93bbff; }
     .dt-btn:hover:not(.active) { background:rgba(255,255,255,.09); color:var(--text); }
+    .dt-btn.live-btn { border-color:rgba(239,68,68,.35); color:#fca5a5; }
+    .dt-btn.live-btn.active { background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.65); color:#ff6b6b; }
+    .dt-btn.live-btn .live-dot { display:inline-block; width:7px; height:7px; background:#ef4444; border-radius:50%; margin-inline-end:5px; animation:pulse-dot 1.4s ease infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+
+    /* ── Live scores section ── */
+    #liveSection { display:none; margin-top:4px; }
+    .live-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+    .live-sport-toggle { display:flex; gap:6px; }
+    .live-sport-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); color:var(--muted); border-radius:8px; padding:6px 13px; font:800 12px Heebo,sans-serif; cursor:pointer; }
+    .live-sport-btn.active { background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.28); }
+    .live-count-badge { font-size:12px; color:var(--muted); font-weight:700; }
+    .live-count-badge b { color:#ef4444; }
+    .live-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+    .lv-card {
+      background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08);
+      border-radius:10px; padding:10px 12px; display:grid; gap:7px; transition:.15s;
+    }
+    .lv-card.is-live { border-color:rgba(239,68,68,.30); background:rgba(239,68,68,.05); }
+    .lv-card.is-finished { opacity:.72; }
+    .lv-card:hover { border-color:rgba(255,255,255,.18); transform:translateY(-1px); }
+    .lv-meta { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+    .lv-league { font-size:11px; color:var(--muted); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+    .lv-status { font-size:11px; font-weight:900; white-space:nowrap; padding:2px 6px; border-radius:4px; }
+    .lv-status.st-live { background:rgba(239,68,68,.15); color:#ef4444; }
+    .lv-status.st-done { background:rgba(255,255,255,.07); color:var(--muted); }
+    .lv-status.st-soon { background:rgba(37,99,235,.12); color:#93bbff; }
+    .lv-teams { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; }
+    .lv-team { font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lv-team.home { text-align:end; }
+    .lv-score { font:900 20px/1 Heebo,sans-serif; color:#fff; text-align:center; min-width:48px; }
+    .lv-score.no-score { color:var(--muted); font-size:13px; }
+    .lv-minute { font-size:11px; color:#fca5a5; font-weight:700; text-align:center; }
+    .lv-empty { text-align:center; color:var(--muted); padding:32px; font-size:14px; }
 
     /* ── Sport page header ── */
     .sport-page-header { padding:0; margin-bottom:4px; }
@@ -5127,6 +5161,7 @@
             </div>
             <div class="day-toggle" id="dayToggle" style="display:none">
               <button class="dt-btn active" data-day="today">היום</button>
+              <button class="dt-btn live-btn" id="liveTabBtn" onclick="openLiveTab()"><span class="live-dot"></span>לייב</button>
             </div>
           </div>
         </div>
@@ -5144,6 +5179,18 @@
           <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:88%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
           <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:55%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:76%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
           <article class="card skeleton-card"><div class="card-head"><div class="skeleton-line" style="width:63%"></div><div class="skeleton-line" style="width:42px"></div></div><div class="card-body"><div class="skeleton-block"></div><div class="skeleton-line" style="width:82%"></div><div class="skeleton-block" style="height:58px"></div></div></article>
+        </div>
+
+        <!-- ════ Live scores section (Sofascore) ════ -->
+        <div id="liveSection">
+          <div class="live-toolbar">
+            <div class="live-sport-toggle">
+              <button class="live-sport-btn active" data-sport="football" onclick="setLiveSport('football')">⚽ כדורגל</button>
+              <button class="live-sport-btn" data-sport="basketball" onclick="setLiveSport('basketball')">🏀 כדורסל</button>
+            </div>
+            <span class="live-count-badge" id="liveCountBadge"></span>
+          </div>
+          <div class="live-grid" id="liveGrid"><div class="lv-empty">טוען...</div></div>
         </div>
       </section>
     </section>
@@ -7854,6 +7901,131 @@
         const text = `${row.match} ${row.league} ${row.pick} ${(row.reasons || []).join(" ")}`.toLowerCase();
         return !query || text.includes(query);
       });
+    }
+
+    // ── Live scores (Sofascore) ──────────────────────────────────────────────
+    const _live = {
+      sport: "football",
+      data: null,
+      loading: false,
+      timer: null,
+    };
+
+    function openLiveTab() {
+      // Hide picks, show live
+      const cardsSection = document.getElementById("cards");
+      const liveSection  = document.getElementById("liveSection");
+      const titleBox     = document.getElementById("sectionTitleBox");
+      const statsHeader  = document.getElementById("stats-header");
+      const pickStats    = document.getElementById("pick-stats");
+      if (cardsSection) cardsSection.style.display = "none";
+      if (titleBox)     titleBox.style.display = "none";
+      if (statsHeader)  statsHeader.style.display = "none";
+      if (pickStats)    pickStats.style.display = "none";
+      if (liveSection)  liveSection.style.display = "";
+      // Mark live tab active
+      document.querySelectorAll("#dayToggle .dt-btn").forEach(b => b.classList.remove("active"));
+      const liveBtn = document.getElementById("liveTabBtn");
+      if (liveBtn) liveBtn.classList.add("active");
+      // Fetch & auto-refresh
+      fetchLive();
+      if (_live.timer) clearInterval(_live.timer);
+      _live.timer = setInterval(fetchLive, 60000);
+    }
+
+    function closeLiveTab() {
+      const cardsSection = document.getElementById("cards");
+      const liveSection  = document.getElementById("liveSection");
+      const titleBox     = document.getElementById("sectionTitleBox");
+      if (cardsSection) cardsSection.style.display = "";
+      if (liveSection)  liveSection.style.display = "none";
+      if (titleBox && (state.sportTab === "football" || state.sportTab === "basketball")) {
+        titleBox.style.display = "";
+      }
+      if (_live.timer) { clearInterval(_live.timer); _live.timer = null; }
+      const liveBtn = document.getElementById("liveTabBtn");
+      if (liveBtn) liveBtn.classList.remove("active");
+    }
+
+    function setLiveSport(sport) {
+      _live.sport = sport;
+      _live.data = null;
+      document.querySelectorAll(".live-sport-btn").forEach(b =>
+        b.classList.toggle("active", b.dataset.sport === sport)
+      );
+      fetchLive();
+    }
+
+    async function fetchLive() {
+      if (_live.loading) return;
+      _live.loading = true;
+      try {
+        const res = await fetch(`/api/sofascore?sport=${_live.sport}`);
+        const data = await res.json().catch(() => ({ ok: false, events: [] }));
+        _live.data = data;
+        renderLive();
+      } catch (e) {
+        renderLive(true);
+      } finally {
+        _live.loading = false;
+      }
+    }
+
+    function renderLive(error = false) {
+      const grid  = document.getElementById("liveGrid");
+      const badge = document.getElementById("liveCountBadge");
+      if (!grid) return;
+      if (error || !_live.data?.ok) {
+        grid.innerHTML = `<div class="lv-empty">לא ניתן לטעון נתונים כרגע. ננסה שוב בעוד דקה.</div>`;
+        return;
+      }
+      const events = _live.data.events || [];
+      const liveCount = events.filter(e => e.live).length;
+      if (badge) {
+        badge.innerHTML = liveCount > 0
+          ? `<b>${liveCount}</b> משחקים חיים · ${events.length} היום`
+          : `${events.length} משחקים היום`;
+      }
+      if (!events.length) {
+        grid.innerHTML = `<div class="lv-empty">אין משחקים היום בספורט זה.</div>`;
+        return;
+      }
+      grid.innerHTML = events.map(ev => {
+        const isLive     = ev.live;
+        const isFinished = ev.finished;
+        const statusCls  = isLive ? "st-live" : isFinished ? "st-done" : "st-soon";
+        const cardCls    = isLive ? "is-live" : isFinished ? "is-finished" : "";
+        const scoreHtml  = ev.score
+          ? `<span class="lv-score">${escapeHtml(ev.score)}</span>`
+          : `<span class="lv-score no-score">—</span>`;
+        const minuteHtml = isLive && ev.minute != null
+          ? `<div class="lv-minute">${ev.minute}'</div>`
+          : "";
+        const timeStr = ev.startTs
+          ? new Date(ev.startTs * 1000).toLocaleTimeString("he-IL", { hour:"2-digit", minute:"2-digit", timeZone:"Asia/Jerusalem" })
+          : "";
+        const statusText = isLive ? (ev.statusLabel || "חי") : isFinished ? "נגמר" : timeStr;
+        const leagueText = ev.country ? `${ev.country} · ${ev.league}` : ev.league;
+        return `
+          <div class="lv-card ${cardCls}">
+            <div class="lv-meta">
+              <span class="lv-league">${escapeHtml(leagueText)}</span>
+              <span class="lv-status ${statusCls}">${escapeHtml(statusText)}</span>
+            </div>
+            <div class="lv-teams">
+              <span class="lv-team home">${escapeHtml(ev.home)}</span>
+              ${scoreHtml}
+              <span class="lv-team">${escapeHtml(ev.away)}</span>
+            </div>
+            ${minuteHtml}
+          </div>`;
+      }).join("");
+    }
+
+    // When switching sport tabs, close live tab if open
+    function maybeCloseLive() {
+      const liveSection = document.getElementById("liveSection");
+      if (liveSection && liveSection.style.display !== "none") closeLiveTab();
     }
 
     function renderDebug() {
