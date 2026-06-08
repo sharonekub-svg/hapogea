@@ -45,7 +45,6 @@
     { "source": "/((?!wc-splash.mp4).*)", "destination": "/index.html" }
   ],
   "crons": [
-    { "path": "/api/winner-cron", "schedule": "0 15 * * *" },
     { "path": "/api/winner-cron", "schedule": "0 21 * * *" },
     { "path": "/api/recommendation-bot", "schedule": "5 21 * * *" }
   ]

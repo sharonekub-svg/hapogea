@@ -1956,7 +1956,8 @@ function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, res
         "היחס משמש כנתון שוק בלבד; אין כאן הוראת פעולה.",
       ],
     }));
-  const selectionPool = strictCandidates;
+  // When there are zero strict picks, fall back to soft-range so the day isn't empty
+  const selectionPool = strictCandidates.length > 0 ? strictCandidates : softCandidates;
   return selectionPool
     .map((row) => ({
       ...row,
