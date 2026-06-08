@@ -7,7 +7,6 @@
   "functions": {
     "api/winner-feed.js": { "maxDuration": 30 },
     "api/winner-cron.js": { "maxDuration": 30 },
-    "api/winner-cron-midnight.js": { "maxDuration": 30 },
     "api/recommendation-bot.js": { "maxDuration": 60 },
     "api/recommendation-stats.js": { "maxDuration": 60 },
     "api/reuven.js": { "maxDuration": 45 },
@@ -46,7 +45,7 @@
     { "source": "/((?!wc-splash.mp4).*)", "destination": "/index.html" }
   ],
   "crons": [
-    { "path": "/api/winner-cron-midnight", "schedule": "0 21 * * *" },
+    { "path": "/api/winner-cron", "schedule": "0 21 * * *" },
     { "path": "/api/recommendation-bot", "schedule": "5 21 * * *" }
   ]
 }
