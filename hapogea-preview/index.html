@@ -2021,6 +2021,9 @@
       word-break: break-word;
     }
     .chat-bubble-ai { width: 100%; }
+    /* ── Daily announcement ── */
+    .chat-msg.daily-announcement { border: 1px solid rgba(255,200,87,.30); border-radius: 14px; background: rgba(255,200,87,.05); padding: 4px 0 2px; margin-bottom: 10px; }
+    .daily-pin { font: 700 11.5px/1 Heebo,sans-serif; color: rgba(255,200,87,.7); padding: 8px 14px 4px; letter-spacing: .02em; }
     /* ── AI SECTIONS ── */
     .ai-sections { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .ai-section {
@@ -7571,7 +7574,8 @@
         const chipsHtml = (message.suggestions || []).length
           ? `<div class="suggestion-chips">${(message.suggestions || []).map(s => `<button class="suggestion-chip" data-chip="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join("")}</div>`
           : "";
-        return `<div class="chat-msg ai"><div class="chat-msg-label">הפוגע AI</div><div class="chat-bubble-ai"><div class="ai-sections">${sectionsHtml}</div>${chipsHtml}</div></div>`;
+        const dailyCls = message.daily ? ' daily-announcement' : '';
+        return `<div class="chat-msg ai${dailyCls}">${message.daily ? '<div class="daily-pin">📌 הודעה יומית</div>' : '<div class="chat-msg-label">הפוגע AI</div>'}<div class="chat-bubble-ai"><div class="ai-sections">${sectionsHtml}</div>${chipsHtml}</div></div>`;
       }
       const aiPlain = escapeHtml(stripEmoji(message.text || ""))
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -7611,6 +7615,47 @@
       `;
     }
 
+    // ── Daily promo message for free users ───────────────────────
+    const DAILY_MSG_KEY = 'hapogea_daily_msg_seen';
+    function getDailyMsgDate() {
+      return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    }
+    function shouldShowDailyMsg() {
+      if (state.isPremium) return false;
+      try {
+        const seen = localStorage.getItem(DAILY_MSG_KEY);
+        return seen !== getDailyMsgDate();
+      } catch { return false; }
+    }
+    function markDailyMsgSeen() {
+      try { localStorage.setItem(DAILY_MSG_KEY, getDailyMsgDate()); } catch {}
+    }
+    function injectDailyMsg() {
+      if (!shouldShowDailyMsg()) return;
+      markDailyMsgSeen();
+      const footballCount = (daySportRows(state.day, 'football') || []).filter(r => !r.noOddsYet).length;
+      const bballCount   = (daySportRows(state.day, 'basketball') || []).filter(r => !r.noOddsYet).length;
+      const total = footballCount + bballCount;
+      const picksText = total > 0
+        ? `היום יש **${total} ניתוחים** — ${footballCount} כדורגל${bballCount ? ` + ${bballCount} כדורסל` : ''}. 3 הראשונים חינם, השאר בפרימיום.`
+        : 'הניתוחים של היום יתחדשו בקרוב — ווינר טרם פרסם קווים לכל המשחקים.';
+      const msg = {
+        role: 'ai',
+        daily: true,
+        sections: [{
+          type: 'verdict',
+          title: '📢 עדכון יומי',
+          content: `${picksText}\n\nשאל אותי על כל משחק — אנליזה מלאה בחינם.\nלכל הניתוחים + ניתוחים ללא הגבלה: שדרג לפרימיום 🔓`
+        }],
+        suggestions: ['איזה משחק כדאי היום?', 'הסבר לי על Value', 'תנתח לי משחק'],
+        text: 'עדכון יומי'
+      };
+      if (!state.reubenMessages.length || state.reubenMessages[0].daily) {
+        state.reubenMessages = state.reubenMessages.filter(m => !m.daily);
+      }
+      state.reubenMessages.unshift(msg);
+    }
+
     // ── Chat history persistence ──────────────────────────────────
     const CHAT_HISTORY_KEY = 'hapogea_chat_history';
     function loadChatHistory() {
@@ -7640,6 +7685,7 @@
     }
 
     function renderReubenAI() {
+      injectDailyMsg();
       const messages = state.reubenMessages.length
         ? state.reubenMessages
         : [{ role: "ai", sections: [
