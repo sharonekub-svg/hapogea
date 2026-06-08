@@ -5160,7 +5160,8 @@
               <p class="sport-page-sub" id="sportPageSub"></p>
             </div>
             <div class="day-toggle" id="dayToggle" style="display:none">
-              <button class="dt-btn active" data-day="today">היום</button>
+              <button class="dt-btn" data-day="today">היום</button>
+              <button class="dt-btn active" data-day="tomorrow">מחר</button>
               <button class="dt-btn live-btn" id="liveTabBtn" onclick="openLiveTab()"><span class="live-dot"></span>לייב</button>
             </div>
           </div>
@@ -5412,7 +5413,7 @@
     const TRACK_KEY = "hapogea_prediction_tracker_today_v1";
     const state = {
       feed: null,
-      day: "today",
+      day: "tomorrow",
       sportTab: "football",
       sort: "score",
       search: "",
@@ -7869,7 +7870,7 @@
       // Premium lock: blur/overlay all cards beyond the first 5 for free users
       if (!state.isPremium) {
         const allCards = cards.querySelectorAll('article.card');
-        const FREE_CARDS = 5;
+        const FREE_CARDS = 3;
         allCards.forEach((card, i) => {
           if (i < FREE_CARDS) return; // first 5 cards are free
           card.style.position = 'relative';
@@ -9478,7 +9479,13 @@
         render();
       });
     });
-    // Day always stays "today" — no toggle needed
+    document.querySelectorAll("#dayToggle .dt-btn[data-day]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        closeLiveTab();
+        state.day = btn.dataset.day;
+        render();
+      });
+    });
 
     function syncPageSections() {
       const VALID_TABS = new Set(['football', 'basketball', 'worldcup', 'ai', 'home', 'about', 'reuben']);
