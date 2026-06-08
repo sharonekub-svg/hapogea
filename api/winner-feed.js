@@ -3465,31 +3465,15 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
   const away = ev.awayTeam?.name || "";
   if (!home || !away) return null;
 
-  let homeOdds = null, drawOdds = null, awayOdds = null;
-
-  // 1. embedded odds in scheduled-events response
-  if (ev.odds) {
-    homeOdds = ev.odds.homeOdds ? Number(ev.odds.homeOdds) : null;
-    drawOdds = ev.odds.drawOdds ? Number(ev.odds.drawOdds) : null;
-    awayOdds = ev.odds.awayOdds ? Number(ev.odds.awayOdds) : null;
-  }
-  // 2. fetched per-event odds endpoint
-  if (!homeOdds && oddsData?.markets?.length) {
-    const mkt = oddsData.markets.find(
-      (m) => (m.fk_id === 1 || /full.?time|1x2|match.?result/i.test(m.marketName || "")) && !m.isLive
-    );
-    if (mkt?.choices?.length) {
-      homeOdds = Number(mkt.choices.find((c) => c.name === "1")?.odds) || null;
-      drawOdds = Number(mkt.choices.find((c) => c.name === "X")?.odds) || null;
-      awayOdds = Number(mkt.choices.find((c) => c.name === "2")?.odds) || null;
-    }
-  }
-  if (!homeOdds || !awayOdds) return null;
-
   const isFootball = sfSport === "football";
   const league = ev.tournament?.name || (isFootball ? "כדורגל" : "כדורסל");
   const country = ev.tournament?.category?.country?.name || "";
   if (/\bNBA\b/i.test(league)) return null;
+
+  // Status: 0=scheduled, 6-11=live/HT/ET, 100=finished, 31=postponed, 41=cancelled
+  const statusCode = ev.status?.code ?? 0;
+  const isFinished = statusCode === 100;
+  const isLiveNow = [6, 7, 8, 9, 10, 11].includes(statusCode);
 
   let time = "00:00";
   if (ev.startTimestamp) {
@@ -3502,11 +3486,67 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
     time = `${ilParts.hour}:${ilParts.minute}`;
   }
 
+  // Extract final score if available
+  const hs = ev.homeScore?.current ?? null;
+  const as_ = ev.awayScore?.current ?? null;
+  const hasScore = hs !== null && as_ !== null;
+  const liveScore = hasScore ? `${hs}:${as_}` : "";
+  let actualWinner = null;
+  if (isFinished && hasScore) {
+    if (hs > as_) actualWinner = home;
+    else if (as_ > hs) actualWinner = away;
+    else if (isFootball) actualWinner = "תיקו";
+  }
+
+  // Odds extraction
+  let homeOdds = null, drawOdds = null, awayOdds = null;
+  if (ev.odds) {
+    homeOdds = ev.odds.homeOdds ? Number(ev.odds.homeOdds) : null;
+    drawOdds = ev.odds.drawOdds ? Number(ev.odds.drawOdds) : null;
+    awayOdds = ev.odds.awayOdds ? Number(ev.odds.awayOdds) : null;
+  }
+  if (!homeOdds && oddsData?.markets?.length) {
+    const mkt = oddsData.markets.find(
+      (m) => (m.fk_id === 1 || /full.?time|1x2|match.?result/i.test(m.marketName || "")) && !m.isLive
+    );
+    if (mkt?.choices?.length) {
+      homeOdds = Number(mkt.choices.find((c) => c.name === "1")?.odds) || null;
+      drawOdds = Number(mkt.choices.find((c) => c.name === "X")?.odds) || null;
+      awayOdds = Number(mkt.choices.find((c) => c.name === "2")?.odds) || null;
+    }
+  }
+
+  const sportId = isFootball ? WINNER_FOOTBALL_ID : WINNER_BASKETBALL_ID;
+  const baseRow = {
+    id: `sf-${ev.id}`,
+    eventId: String(ev.id),
+    source: "SofaScore",
+    day, time,
+    sport: isFootball ? "כדורגל" : "כדורסל",
+    sportId, league, country,
+    match: `${home} - ${away}`,
+    home, away,
+    liveScore, result: liveScore,
+    actualWinner,
+    matchPhase: isFinished ? "final" : isLiveNow ? "live" : "scheduled",
+    status: isFinished ? "סגור" : isLiveNow ? "לייב" : "ממתין",
+    bettingStatus: isFinished ? "settled" : "available",
+    resultKey: `${sportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
+    verifiedAt: new Date().toISOString(),
+  };
+
+  // No odds → show result only (no pick)
+  if (!homeOdds || !awayOdds) {
+    if (!isFinished && !isLiveNow) return null;
+    return { ...baseRow, recommended: false, outsideRange: true, noOddsYet: false };
+  }
+
+  // Build pick
   const allCandidates = isFootball
     ? [
-        { name: home,   odds: homeOdds },
+        { name: home, odds: homeOdds },
         drawOdds ? { name: "תיקו", odds: drawOdds } : null,
-        { name: away,   odds: awayOdds },
+        { name: away, odds: awayOdds },
       ].filter(Boolean)
     : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
 
@@ -3527,16 +3567,8 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
       : `${pick.name} (${pick.odds.toFixed(2)}, ${Math.round(prob * 100)}%) — קרוב ביותר לטווח האידיאלי.`,
     "הניתוח מבוסס על יחסי שוק בלבד.",
   ];
-  const sportId = isFootball ? WINNER_FOOTBALL_ID : WINNER_BASKETBALL_ID;
   return {
-    id: `sf-${ev.id}`,
-    eventId: String(ev.id),
-    source: "SofaScore",
-    day, time,
-    sport: isFootball ? "כדורגל" : "כדורסל",
-    sportId, league, country,
-    match: `${home} - ${away}`,
-    home, away,
+    ...baseRow,
     pick: pick.name, pickTeam: pick.name, winnerPick: pick.name,
     odds: pick.odds, oddsRaw: pick.odds,
     homeOdds, drawOdds: drawOdds || null, awayOdds,
@@ -3544,11 +3576,8 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
     recommendationScore: score, score,
     recommended: inRange.length > 0,
     outsideRange: inRange.length === 0,
-    status: "ממתין", matchPhase: "scheduled", bettingStatus: "available",
     riskLevel: score >= 70 ? "נמוך" : score >= 50 ? "בינוני" : "גבוה",
     explanation, signals: [explanation[1]],
-    resultKey: `${sportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
-    verifiedAt: new Date().toISOString(),
   };
 }
 

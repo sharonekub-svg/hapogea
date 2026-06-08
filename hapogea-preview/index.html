@@ -1492,6 +1492,7 @@
     .live-score-main { font: 900 20px/1 Heebo,Assistant,sans-serif; color: var(--text); letter-spacing: 1px; }
     .live-minute { font-size: 11px; color: var(--red); font-weight: 900; }
     .live-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    .winner-badge { display:inline-block; margin-top:4px; font:700 12px/1.4 Heebo,sans-serif; color:#15803D; background:rgba(21,128,61,.10); border:1px solid rgba(21,128,61,.25); border-radius:6px; padding:2px 8px; }
 
     /* ── Verified timestamp ── */
     .card-verified {
@@ -8384,9 +8385,13 @@
       const minute = row.matchMinute ? `${row.matchMinute}'` : "";
       const phaseClass = row.matchPhase === "final" ? "phase-final" : row.matchPhase === "ht" ? "phase-ht" : row.matchPhase === "live" ? "" : "phase-scheduled";
       const scoreText = score || (row.matchPhase === "final" ? "אין תוצאה מאומתת" : row.matchPhase === "live" ? "נתוני חי לא זמינים" : row.time || "טרם התחיל");
+      const winnerBadge = (row.matchPhase === "final" && row.actualWinner)
+        ? `<span class="winner-badge">${row.actualWinner === "תיקו" ? "⚖ תיקו" : `🏆 ניצח: ${escapeHtml(row.actualWinner)}`}</span>`
+        : "";
       return `<div class="card-live-area ${phaseClass}">
         <span class="live-label">${match.label}${minute ? ` · ${minute}` : ""}</span>
         <span class="live-score-main">${scoreText}</span>
+        ${winnerBadge}
       </div>`;
     }
 
