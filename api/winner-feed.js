@@ -3651,8 +3651,9 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   const todayLeagues = tabLeagueSet(payload.tabs?.today);
   const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
   // Supplement when count is low OR league variety is low (e.g. only Brazil at end of European season)
+  // Allow even when Winner is blocked (fallback=true) as long as the date is current (not stale)
   const MIN_LEAGUES = 3;
-  const needsOdds = !payload.fallback && (
+  const needsOdds = !payload.staleDate && (
     todayCount < MIN_PREMIUM_ROWS_PER_DAY ||
     tomorrowCount < MIN_PREMIUM_ROWS_PER_DAY ||
     todayLeagues.size < MIN_LEAGUES ||
