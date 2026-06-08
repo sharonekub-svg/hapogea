@@ -7889,25 +7889,28 @@
       const sortedRows = sortByTime(rows);
       let visibleRows = sortedRows.filter(r => !r.noOddsYet);
       const pendingCount = sortedRows.length - visibleRows.length;
-      // When no real picks exist, show scheduled "waiting for lines" cards instead of blank
+      // When today has no real picks, try tomorrow first, then fall back to pending cards
       let scheduledFallback = false;
-      if (visibleRows.length === 0 && pendingCount > 0 && isOpenDay()) {
-        visibleRows = sortedRows.filter(r => r.noOddsYet).slice(0, 20);
-        scheduledFallback = true;
-      }
-      // When today is completely empty, fall back to showing tomorrow's picks
       let tomorrowFallback = false;
-      if (visibleRows.length === 0 && pendingCount === 0 && state.day === "today") {
+      let tomorrowFallbackReason = "";
+      if (visibleRows.length === 0 && state.day === "today") {
         const tomorrowRows = sortByTime(
           (daySportRows("tomorrow", state.sportTab) || []).filter(r => !r.noOddsYet)
         ).slice(0, 20);
         if (tomorrowRows.length > 0) {
           visibleRows = tomorrowRows;
           tomorrowFallback = true;
+          tomorrowFallbackReason = pendingCount > 0
+            ? `היום יש ${pendingCount} משחקים שקווי ההימורים שלהם טרם נפתחו`
+            : "אין משחקים פתוחים להיום";
+        } else if (pendingCount > 0 && isOpenDay()) {
+          // No tomorrow picks either — show the pending cards as last resort
+          visibleRows = sortedRows.filter(r => r.noOddsYet).slice(0, 20);
+          scheduledFallback = true;
         }
       }
       const tomorrowBanner = tomorrowFallback
-        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 אין משחקים פתוחים להיום — מוצגים משחקי <b>מחר</b></div>`
+        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 ${tomorrowFallbackReason} — מוצגים משחקי <b>מחר</b></div>`
         : "";
       cards.innerHTML = banners + tomorrowBanner + (visibleRows.length
         ? visibleRows.map(rowCard).join("")
