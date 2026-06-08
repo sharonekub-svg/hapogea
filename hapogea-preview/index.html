@@ -5861,6 +5861,11 @@
         // noOddsYet (no lines) always last
         if (a.noOddsYet && !b.noOddsYet) return 1;
         if (!a.noOddsYet && b.noOddsYet) return -1;
+        // Finished matches go below pending/upcoming ones
+        const aFinal = a.matchPhase === "final";
+        const bFinal = b.matchPhase === "final";
+        if (!aFinal && bFinal) return -1;
+        if (aFinal && !bFinal) return 1;
         // In-range picks first, then outside-range
         if (!a.outsideRange && b.outsideRange) return -1;
         if (a.outsideRange && !b.outsideRange) return 1;

@@ -2725,9 +2725,18 @@ function finalOpenRowsByDay(rows) {
     ? basketball.filter((r) => r.noOddsYet).slice(0, TARGET_PICKS_PER_SPORT)
     : [];
 
+  // Keep finished matches that had picks — show hit/miss result on today tab
+  const openIds = new Set([...pickedFootball, ...pickedBasketball].map((r) => r.id));
+  const finishedPicksFootball = football
+    .filter((r) => !r.noOddsYet && r.matchPhase === "final" && r.recommended && r.odds && !openIds.has(r.id));
+  const finishedPicksBasketball = basketball
+    .filter((r) => !r.noOddsYet && r.matchPhase === "final" && r.recommended && r.odds && !openIds.has(r.id));
+
   return [
     ...pickedFootball,
     ...pickedBasketball,
+    ...finishedPicksFootball,
+    ...finishedPicksBasketball,
     ...scheduledFootball,
     ...scheduledBasketball,
   ];
