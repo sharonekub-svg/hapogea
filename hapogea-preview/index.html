@@ -7922,12 +7922,14 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: blur/overlay all cards beyond the first 5 for free users
+      // Premium lock: free users see 3 football cards and 1 basketball card
       if (!state.isPremium) {
         const allCards = cards.querySelectorAll('article.card');
-        const FREE_CARDS = 3;
-        allCards.forEach((card, i) => {
-          if (i < FREE_CARDS) return; // first 5 cards are free
+        let footballSeen = 0, basketballSeen = 0;
+        allCards.forEach((card) => {
+          const isBasketball = String(card.dataset.sport || '').trim() === String(227);
+          if (isBasketball) { basketballSeen++; if (basketballSeen <= 1) return; }
+          else { footballSeen++; if (footballSeen <= 3) return; }
           card.style.position = 'relative';
           card.style.overflow = 'hidden';
           if (!card.querySelector('.premium-lock-overlay')) {
@@ -7941,10 +7943,11 @@
             card.appendChild(overlay);
           }
         });
-        if (allCards.length > FREE_CARDS) {
+        const lockedCount = cards.querySelectorAll('.premium-lock-overlay').length;
+        if (lockedCount > 0) {
           const banner = document.createElement('div');
           banner.style.cssText = 'text-align:center;padding:20px;color:rgba(255,255,255,.5);font-size:13px;font-weight:800';
-          banner.innerHTML = `🔒 ${allCards.length - FREE_CARDS} ניתוחים נוספים זמינים בפרימיום — <button onclick="openPremiumModal()" style="background:none;border:none;color:#55d6ff;cursor:pointer;font:800 13px Heebo,sans-serif;text-decoration:underline">שדרג לפרימיום</button>`;
+          banner.innerHTML = `🔒 ${lockedCount} ניתוחים נוספים זמינים בפרימיום — <button onclick="openPremiumModal()" style="background:none;border:none;color:#55d6ff;cursor:pointer;font:800 13px Heebo,sans-serif;text-decoration:underline">שדרג לפרימיום</button>`;
           cards.appendChild(banner);
         }
       }
