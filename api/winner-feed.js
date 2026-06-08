@@ -3403,8 +3403,9 @@ async function buildOddsApiFeed() {
 
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
-  const pickedToday    = sortByScore(todayRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
+  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
@@ -3700,12 +3701,12 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
             // When Winner already has real picks, only add Odds API rows from new leagues
             // (prevents Odds API rows from replacing curated Winner picks).
             // When there are no Winner picks at all, use all Odds API rows.
-            const freshRows = dayCount > 0
+            const freshRows = (dayCount > 0
               ? oddsRows.filter((r) => {
                   const league = String(r.league || "").trim().toLowerCase();
                   return league && !dayLeagues.has(league);
                 })
-              : oddsRows;
+              : oddsRows).filter((r) => !/\bNBA\b/i.test(r.league || ""));
             if (freshRows.length > 0) {
               newTabs[dayKey] = {
                 ...existing,
