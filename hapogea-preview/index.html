@@ -5160,8 +5160,6 @@
               <p class="sport-page-sub" id="sportPageSub"></p>
             </div>
             <div class="day-toggle" id="dayToggle" style="display:none">
-              <button class="dt-btn" data-day="today">היום</button>
-              <button class="dt-btn active" data-day="tomorrow">מחר</button>
               <button class="dt-btn live-btn" id="liveTabBtn" onclick="openLiveTab()"><span class="live-dot"></span>לייב</button>
             </div>
           </div>
@@ -9476,13 +9474,6 @@
         if (page === "home" || page === "about") { goToLanding(); return; }
         state.sportTab = page;
         toggleAiSection();
-        render();
-      });
-    });
-    document.querySelectorAll("#dayToggle .dt-btn[data-day]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        closeLiveTab();
-        state.day = btn.dataset.day;
         render();
       });
     });
