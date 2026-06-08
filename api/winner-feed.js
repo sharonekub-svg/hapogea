@@ -3660,14 +3660,14 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     tomorrowLeagues.size < MIN_LEAGUES
   );
 
-  console.info(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
+  console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
     if (!ODDS_API_KEY) {
       console.warn("[winner-feed] needsOdds=true but ODDS_API_KEY is not set — skipping Odds API");
       payload = { ...payload, _oddsApiStatus: "key_missing" };
     } else {
       try {
-        console.info("[winner-feed] Calling Odds API (today=%d tomorrow=%d leagues=%d/%d)", todayCount, tomorrowCount, todayLeagues.size, tomorrowLeagues.size);
+        console.warn("[winner-feed] Calling Odds API (today=%d tomorrow=%d leagues=%d/%d)", todayCount, tomorrowCount, todayLeagues.size, tomorrowLeagues.size);
         const oddsFeed = await buildOddsApiFeed();
         const newTabs = { ...payload.tabs };
         let usedOdds = false;
