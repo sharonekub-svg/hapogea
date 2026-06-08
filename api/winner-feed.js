@@ -3400,11 +3400,16 @@ async function buildOddsApiFeed() {
   const pickedToday    = sortByScore(todayRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
   const pickedTomorrow = sortByScore(tomorrowRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
-  // Snapshot for yesterday only
+  // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
     label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
   };
+  if (yesterdayTab.sports?.basketball) {
+    yesterdayTab.sports.basketball = yesterdayTab.sports.basketball.filter(
+      (r) => !/\bNBA\b/i.test(r.league || "")
+    );
+  }
 
   const now = new Date().toISOString();
   return {
