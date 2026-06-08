@@ -376,7 +376,7 @@ function israelNowParts(date = new Date()) {
 
 function cacheKeyForToday() {
   const today = israelDate(0);
-  return `winner-feed:v4:${today}`;
+  return `winner-feed:v5:${today}`;
 }
 
 function isFreshCache(entry, maxAgeMs) {
@@ -3802,19 +3802,23 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
 
   // If Winner API was blocked (returned no markets due to IP restriction), prefer the local snapshot
   // which contains real Winner odds refreshed from an Israeli IP.
+  const filterSnapshotTabs = (norm) => {
+    for (const tabKey of ["yesterday", "today", "tomorrow"]) {
+      const tab = norm.tabs?.[tabKey];
+      if (!tab) continue;
+      if (tab.sports?.football)
+        tab.sports.football = tab.sports.football.filter(passesOpponentGate);
+      if (tab.sports?.basketball)
+        tab.sports.basketball = tab.sports.basketball
+          .filter(passesOpponentGate)
+          .filter((r) => !/\bNBA\b/i.test(r.league || ""));
+    }
+  };
+
   if (payload?._winnerBlocked) {
     console.info("[winner-feed] Winner blocked — checking snapshot for today's picks");
     const snapshotNorm0 = normalizeFallbackRows(SNAPSHOT);
-    // Apply passesOpponentGate to snapshot tabs so invalid picks never leak through
-    for (const tabKey of ["yesterday", "today", "tomorrow"]) {
-      const tab = snapshotNorm0.tabs?.[tabKey];
-      if (tab?.sports?.football) {
-        tab.sports.football = tab.sports.football.filter(passesOpponentGate);
-      }
-      if (tab?.sports?.basketball) {
-        tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
-      }
-    }
+    filterSnapshotTabs(snapshotNorm0);
     filterPastPicksFromTabs(snapshotNorm0.tabs);
     const snapshotCountReal = (tab) =>
       [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet && r.odds).length;
@@ -3829,15 +3833,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   if (!payload) {
     // buildWinnerFeedPayload threw — prefer the local snapshot (real Winner data) over Odds API.
     const snapshotNorm1 = normalizeFallbackRows(SNAPSHOT);
-    for (const tabKey of ["yesterday", "today", "tomorrow"]) {
-      const tab = snapshotNorm1.tabs?.[tabKey];
-      if (tab?.sports?.football) {
-        tab.sports.football = tab.sports.football.filter(passesOpponentGate);
-      }
-      if (tab?.sports?.basketball) {
-        tab.sports.basketball = tab.sports.basketball.filter(passesOpponentGate);
-      }
-    }
+    filterSnapshotTabs(snapshotNorm1);
     filterPastPicksFromTabs(snapshotNorm1.tabs);
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
