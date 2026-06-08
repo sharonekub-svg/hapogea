@@ -3436,6 +3436,191 @@ async function buildOddsApiFeed() {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── SofaScore Odds Feed ───────────────────────────────────────────────────────
+const SF_HDR = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  Accept: "application/json, text/plain, */*",
+  "Accept-Language": "he-IL,he;q=0.9,en-US;q=0.8",
+  Referer: "https://www.sofascore.com/",
+  Origin: "https://www.sofascore.com",
+  "Cache-Control": "no-cache",
+};
+async function sfApiFetch(path) {
+  return fetchJson(`https://api.sofascore.com/api/v1${path}`, {
+    headers: SF_HDR,
+    retryAttempts: 1,
+    retryBaseDelay: 600,
+  });
+}
+async function sfScheduled(sport, date) {
+  try { return (await sfApiFetch(`/sport/${sport}/scheduled-events/${date}`)).events || []; }
+  catch { return []; }
+}
+async function sfEventOdds(eventId) {
+  try { return await sfApiFetch(`/event/${eventId}/odds/1/featured`); }
+  catch { return null; }
+}
+function sfEventToRow(ev, oddsData, sfSport, day) {
+  const home = ev.homeTeam?.name || "";
+  const away = ev.awayTeam?.name || "";
+  if (!home || !away) return null;
+
+  let homeOdds = null, drawOdds = null, awayOdds = null;
+
+  // 1. embedded odds in scheduled-events response
+  if (ev.odds) {
+    homeOdds = ev.odds.homeOdds ? Number(ev.odds.homeOdds) : null;
+    drawOdds = ev.odds.drawOdds ? Number(ev.odds.drawOdds) : null;
+    awayOdds = ev.odds.awayOdds ? Number(ev.odds.awayOdds) : null;
+  }
+  // 2. fetched per-event odds endpoint
+  if (!homeOdds && oddsData?.markets?.length) {
+    const mkt = oddsData.markets.find(
+      (m) => (m.fk_id === 1 || /full.?time|1x2|match.?result/i.test(m.marketName || "")) && !m.isLive
+    );
+    if (mkt?.choices?.length) {
+      homeOdds = Number(mkt.choices.find((c) => c.name === "1")?.odds) || null;
+      drawOdds = Number(mkt.choices.find((c) => c.name === "X")?.odds) || null;
+      awayOdds = Number(mkt.choices.find((c) => c.name === "2")?.odds) || null;
+    }
+  }
+  if (!homeOdds || !awayOdds) return null;
+
+  const isFootball = sfSport === "football";
+  const league = ev.tournament?.name || (isFootball ? "כדורגל" : "כדורסל");
+  const country = ev.tournament?.category?.country?.name || "";
+  if (/\bNBA\b/i.test(league)) return null;
+
+  let time = "00:00";
+  if (ev.startTimestamp) {
+    const ilParts = Object.fromEntries(
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Jerusalem",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+      }).formatToParts(new Date(ev.startTimestamp * 1000)).map((p) => [p.type, p.value])
+    );
+    time = `${ilParts.hour}:${ilParts.minute}`;
+  }
+
+  const allCandidates = isFootball
+    ? [
+        { name: home,   odds: homeOdds },
+        drawOdds ? { name: "תיקו", odds: drawOdds } : null,
+        { name: away,   odds: awayOdds },
+      ].filter(Boolean)
+    : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
+
+  const inRange = allCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.80);
+  const pool = inRange.length > 0 ? inRange : allCandidates;
+  const pick = [...pool].sort((a, b) => Math.abs(a.odds - 1.65) - Math.abs(b.odds - 1.65))[0];
+  const prob = 1 / pick.odds;
+  const score = Math.round(prob * 100);
+  const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
+  const oppSummary = allCandidates
+    .filter((c) => c.name !== pick.name)
+    .map((c) => `${c.name} ${c.odds.toFixed(2)}`)
+    .join(", ");
+  const explanation = [
+    `מקור: SofaScore — ${league}${country ? " (" + country + ")" : ""}`,
+    isFav
+      ? `${pick.name} הפייבוריט (${pick.odds.toFixed(2)}, ${Math.round(prob * 100)}%)${oppSummary ? ` — ${oppSummary}` : ""}.`
+      : `${pick.name} (${pick.odds.toFixed(2)}, ${Math.round(prob * 100)}%) — קרוב ביותר לטווח האידיאלי.`,
+    "הניתוח מבוסס על יחסי שוק בלבד.",
+  ];
+  const sportId = isFootball ? WINNER_FOOTBALL_ID : WINNER_BASKETBALL_ID;
+  return {
+    id: `sf-${ev.id}`,
+    eventId: String(ev.id),
+    source: "SofaScore",
+    day, time,
+    sport: isFootball ? "כדורגל" : "כדורסל",
+    sportId, league, country,
+    match: `${home} - ${away}`,
+    home, away,
+    pick: pick.name, pickTeam: pick.name, winnerPick: pick.name,
+    odds: pick.odds, oddsRaw: pick.odds,
+    homeOdds, drawOdds: drawOdds || null, awayOdds,
+    probability: prob, normalizedProbability: prob,
+    recommendationScore: score, score,
+    recommended: inRange.length > 0,
+    outsideRange: inRange.length === 0,
+    status: "ממתין", matchPhase: "scheduled", bettingStatus: "available",
+    riskLevel: score >= 70 ? "נמוך" : score >= 50 ? "בינוני" : "גבוה",
+    explanation, signals: [explanation[1]],
+    resultKey: `${sportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
+    verifiedAt: new Date().toISOString(),
+  };
+}
+
+async function buildSofascoreFeed() {
+  const today    = israelDate(0);
+  const tomorrow = israelDate(1);
+
+  const [fbToday, fbTomorrow, bbToday, bbTomorrow] = await Promise.all([
+    sfScheduled("football", today),
+    sfScheduled("football", tomorrow),
+    sfScheduled("basketball", today),
+    sfScheduled("basketball", tomorrow),
+  ]);
+
+  const allEvents = [
+    ...fbToday.map((ev) => ({ ev, sfSport: "football", day: today })),
+    ...fbTomorrow.map((ev) => ({ ev, sfSport: "football", day: tomorrow })),
+    ...bbToday.map((ev) => ({ ev, sfSport: "basketball", day: today })),
+    ...bbTomorrow.map((ev) => ({ ev, sfSport: "basketball", day: tomorrow })),
+  ];
+
+  const withEmbedded = allEvents.filter(({ ev }) => ev.odds?.homeOdds);
+  const withoutOdds  = allEvents.filter(({ ev }) => !ev.odds?.homeOdds);
+
+  const allRows = [];
+  for (const { ev, sfSport, day } of withEmbedded) {
+    const row = sfEventToRow(ev, null, sfSport, day);
+    if (row) allRows.push(row);
+  }
+
+  // Fetch individual event odds in batches (max 80 events to stay within function timeout)
+  const toFetch = withoutOdds.slice(0, 80);
+  const BATCH = 10;
+  for (let i = 0; i < toFetch.length; i += BATCH) {
+    const batch = toFetch.slice(i, i + BATCH);
+    const fetched = await Promise.allSettled(batch.map(({ ev }) => sfEventOdds(ev.id)));
+    for (let j = 0; j < batch.length; j++) {
+      const { ev, sfSport, day } = batch[j];
+      const oddsData = fetched[j].status === "fulfilled" ? fetched[j].value : null;
+      const row = sfEventToRow(ev, oddsData, sfSport, day);
+      if (row) allRows.push(row);
+    }
+    if (i + BATCH < toFetch.length) await sleep(150);
+  }
+
+  if (allRows.length === 0) throw new Error("SofaScore: no odds rows found");
+
+  const sorted = (rows) => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
+  const todayRows    = sorted(allRows.filter((r) => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+
+  const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
+  const yesterdayTab = snapshotNorm.tabs?.yesterday || {
+    label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
+  };
+  if (yesterdayTab.sports?.basketball)
+    yesterdayTab.sports.basketball = yesterdayTab.sports.basketball.filter((r) => !/\bNBA\b/i.test(r.league || ""));
+
+  return {
+    ok: true,
+    generatedAt:  new Date().toISOString(),
+    oddsSource:   "SofaScore",
+    tabs: {
+      yesterday: { ...yesterdayTab, date: israelDate(-1) },
+      today:     { label: "היום", date: today,    sports: splitBySport(todayRows) },
+      tomorrow:  { label: "מחר",  date: tomorrow, sports: splitBySport(tomorrowRows) },
+    },
+    reuvenSchedule: [], audit: {}, trackingResults: [], faq: [],
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Remove picks whose scheduled start time has passed by more than 15 minutes.
 // Applied to snapshot tabs so stale picks don't show up as "active".
 function filterPastPicksFromTabs(tabs) {
@@ -3628,18 +3813,29 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
-      // Snapshot is stale — fall back to Odds API.
+      // Snapshot is stale — try SofaScore, then Odds API.
+      let fallbackOk = false;
       try {
-        payload = await buildOddsApiFeed();
-      } catch (oddsError) {
-        console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
-        payload = {
-          ...markStaleDatePayload(snapshotNorm1, "טעינת Winner ו-The Odds API נכשלה וה-snapshot המקומי שייך לתאריך אחר, לכן לא מוצגים משחקים ישנים בתור היום."),
-          ok: true,
-          fallback: true,
-          fallbackReason: "Winner ו-The Odds API לא זמינים, נטען snapshot רק אם הוא תואם לתאריך ישראל הנוכחי.",
-          oddsError: oddsError.message,
-        };
+        console.warn("[winner-feed] Snapshot stale — trying SofaScore");
+        payload = await buildSofascoreFeed();
+        fallbackOk = true;
+      } catch (sfErr) {
+        console.warn("[winner-feed] SofaScore failed:", sfErr?.message);
+      }
+      if (!fallbackOk) {
+        try {
+          payload = await buildOddsApiFeed();
+          fallbackOk = true;
+        } catch (oddsError) {
+          console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
+          payload = {
+            ...markStaleDatePayload(snapshotNorm1, "טעינת Winner, SofaScore ו-The Odds API נכשלו וה-snapshot המקומי שייך לתאריך אחר."),
+            ok: true,
+            fallback: true,
+            fallbackReason: "כל מקורות הנתונים לא זמינים.",
+            oddsError: oddsError.message,
+          };
+        }
       }
     }
   }
@@ -3669,13 +3865,30 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
 
   console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
-    if (!ODDS_API_KEY) {
-      console.warn("[winner-feed] needsOdds=true but ODDS_API_KEY is not set — skipping Odds API");
-      payload = { ...payload, _oddsApiStatus: "key_missing" };
-    } else {
+    // Try SofaScore first (no API key needed, already works from Vercel), then fall back to ODDS_API
+    let supplementFeed = null;
+    try {
+      console.warn("[winner-feed] needsOdds — trying SofaScore supplement");
+      supplementFeed = await buildSofascoreFeed();
+      console.warn("[winner-feed] SofaScore supplement OK");
+    } catch (sfErr) {
+      console.warn("[winner-feed] SofaScore supplement failed:", sfErr?.message);
+    }
+    if (!supplementFeed && ODDS_API_KEY) {
       try {
-        console.warn("[winner-feed] Calling Odds API (today=%d tomorrow=%d leagues=%d/%d)", todayCount, tomorrowCount, todayLeagues.size, tomorrowLeagues.size);
-        const oddsFeed = await buildOddsApiFeed();
+        console.warn("[winner-feed] Falling back to Odds API supplement");
+        supplementFeed = await buildOddsApiFeed();
+      } catch (oddsErr) {
+        console.error("[winner-feed] Odds API supplement also failed:", oddsErr?.message);
+        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
+      }
+    } else if (!supplementFeed && !ODDS_API_KEY) {
+      console.warn("[winner-feed] needsOdds=true but both SofaScore and ODDS_API_KEY unavailable");
+      payload = { ...payload, _oddsApiStatus: "key_missing" };
+    }
+    if (supplementFeed) {
+      try {
+        const oddsFeed = supplementFeed;
         const newTabs = { ...payload.tabs };
         let usedOdds = false;
         const oddsCountByDay = {};
@@ -3725,12 +3938,13 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
             }
           }
         }
-        console.info("[winner-feed] Odds API returned today=%d tomorrow=%d, usedOdds=%s", oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
+        const srcName = oddsFeed.oddsSource || "SofaScore";
+        console.info("[winner-feed] %s supplement returned today=%d tomorrow=%d, usedOdds=%s", srcName, oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
         payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay };
-        if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: "The Odds API" };
-      } catch (oddsErr) {
-        console.error("[winner-feed] Odds API error:", oddsErr?.message);
-        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
+        if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: srcName };
+      } catch (supplementErr) {
+        console.error("[winner-feed] supplement merge error:", supplementErr?.message);
+        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: supplementErr?.message?.slice(0, 200) };
       }
     }
   }
