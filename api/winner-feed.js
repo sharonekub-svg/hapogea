@@ -376,7 +376,7 @@ function israelNowParts(date = new Date()) {
 
 function cacheKeyForToday() {
   const today = israelDate(0);
-  return `winner-feed:v3:${today}`;
+  return `winner-feed:v4:${today}`;
 }
 
 function isFreshCache(entry, maxAgeMs) {
