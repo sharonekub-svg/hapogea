@@ -5303,7 +5303,8 @@
       const btn = document.querySelector('#premiumModal button[data-submit]');
       if (btn) { btn.disabled = true; btn.textContent = 'בודק...'; }
       try {
-        const userEmail = (window.HAP_USER?.email || "").trim().toLowerCase();
+        const fieldEmail = (document.getElementById('premiumEmailInput')?.value || "").trim().toLowerCase();
+        const userEmail = fieldEmail || (window.HAP_USER?.email || "").trim().toLowerCase();
         const res = await fetch('/api/premium-validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -5342,6 +5343,10 @@
     }
     function openPremiumModal() {
       document.getElementById('premiumModal').classList.remove('hidden');
+      const emailField = document.getElementById('premiumEmailInput');
+      if (emailField && !emailField.value && window.HAP_USER?.email) {
+        emailField.value = window.HAP_USER.email;
+      }
     }
     function closePremiumModal() {
       document.getElementById('premiumModal').classList.add('hidden');
@@ -10167,13 +10172,14 @@
         <li><span class="pm-feat-icon">✦</span> לוח מונדיאל 2026 + ניתוחים מלאים</li>
       </ul>
       <input id="premiumCodeInput" class="pm-input" type="text" placeholder="קוד פרימיום" autocomplete="off">
+      <input id="premiumEmailInput" class="pm-input" type="email" placeholder="האימייל שלך (אם הקוד מחייב)" autocomplete="email" style="margin-top:8px">
       <p id="premiumCodeError" class="pm-error"></p>
       <button class="pm-submit" data-submit onclick="
         const errEl = document.getElementById('premiumCodeError');
         errEl.textContent = '';
         const code = document.getElementById('premiumCodeInput').value;
         activatePremium(code).then(ok => {
-          if (!ok) errEl.textContent = 'קוד שגוי או נוצל כבר — בדוק שוב';
+          if (!ok) errEl.textContent = 'קוד שגוי, פג תוקף, או מיועד לאימייל אחר';
         });
       ">פתח גישה מלאה 🔓</button>
       <div class="pm-footer">
