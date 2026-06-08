@@ -34,7 +34,9 @@ module.exports = async function handler(req, res) {
 
   if (rateLimit(req, res, { max: 10, windowMs: 60_000, message: "יותר מדי ניסיונות. נסה שוב בעוד דקה." })) return;
 
-  const code = String((req.body || {}).code || "").trim().toUpperCase();
+  const code  = String((req.body || {}).code  || "").trim().toUpperCase();
+  const email = String((req.body || {}).email || "").trim().toLowerCase();
+
   if (!code || code.length < 3) {
     return res.status(200).json({ ok: false, error: "קוד לא תקין" });
   }
@@ -44,9 +46,23 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, plan: "premium" });
   }
 
-  // Check KV for the code
-  const kvValue = await kvGet(`premium:${code}`).catch(() => null);
+  // Static issued codes (no KV required)
+  const STATIC_CODES = {
+    "6PQLCU4M": { plan: "monthly", expiresAt: 1783555200000, email: "kubovskys@gmail.com" },
+  };
+  if (STATIC_CODES[code]) {
+    const s = STATIC_CODES[code];
+    if (Date.now() > s.expiresAt) {
+      return res.status(200).json({ ok: false, error: "קוד פג תוקף" });
+    }
+    if (s.email && s.email.toLowerCase() !== email) {
+      return res.status(200).json({ ok: false, error: "הקוד מיועד לאימייל אחר" });
+    }
+    return res.status(200).json({ ok: true, expiresAt: s.expiresAt, plan: s.plan });
+  }
 
+  // Fetch code from KV
+  const kvValue = await kvGet(`premium:${code}`).catch(() => null);
   if (!kvValue) {
     return res.status(200).json({ ok: false, error: "קוד לא נמצא" });
   }
@@ -58,9 +74,27 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: false, error: "קוד כבר נוצל" });
   }
 
-  // Mark code as used (keep record for 1 year)
-  await kvSet(`premium:${code}`, JSON.stringify({ ...meta, used: true, usedAt: new Date().toISOString() }), 365 * 24 * 3600).catch(() => {});
+  // Email check — if code was issued for a specific email, enforce it
+  if (meta.email) {
+    if (!email) {
+      return res.status(200).json({ ok: false, error: "יש להתחבר עם האימייל שלך לפני שימוש בקוד זה" });
+    }
+    if (meta.email.toLowerCase() !== email) {
+      return res.status(200).json({ ok: false, error: "הקוד מיועד לאימייל אחר" });
+    }
+  }
 
-  const expiresAt = Date.now() + (meta.days || 30) * 24 * 3600 * 1000;
+  // Mark code as used (keep record for 1 year)
+  await kvSet(
+    `premium:${code}`,
+    JSON.stringify({ ...meta, used: true, usedAt: new Date().toISOString(), usedBy: email }),
+    365 * 24 * 3600
+  ).catch(() => {});
+
+  // Use stored expiresAt if present (more accurate), else compute from days
+  const expiresAt = meta.expiresAt
+    ? Number(meta.expiresAt)
+    : Date.now() + (meta.days || 30) * 24 * 3600 * 1000;
+
   return res.status(200).json({ ok: true, expiresAt, plan: meta.plan || "premium" });
 };
