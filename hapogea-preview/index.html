@@ -5179,6 +5179,8 @@
       btn.style.display = (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL) ? 'block' : 'none';
     }
     document.addEventListener('hap:userchange', syncAdminBtn);
+    // Also check on load (user may already be signed in from previous session)
+    document.addEventListener('DOMContentLoaded', () => setTimeout(syncAdminBtn, 800));
     function openAdminPanel() {
       document.getElementById('adminPanel').classList.remove('hidden');
       document.getElementById('adminResult').classList.remove('visible');

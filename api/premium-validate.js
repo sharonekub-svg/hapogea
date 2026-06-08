@@ -46,6 +46,21 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, plan: "premium" });
   }
 
+  // Static issued codes (no KV required)
+  const STATIC_CODES = {
+    "6PQLCU4M": { plan: "monthly", expiresAt: 1783555200000, email: "kubovskys@gmail.com" },
+  };
+  if (STATIC_CODES[code]) {
+    const s = STATIC_CODES[code];
+    if (Date.now() > s.expiresAt) {
+      return res.status(200).json({ ok: false, error: "קוד פג תוקף" });
+    }
+    if (s.email && s.email.toLowerCase() !== email) {
+      return res.status(200).json({ ok: false, error: "הקוד מיועד לאימייל אחר" });
+    }
+    return res.status(200).json({ ok: true, expiresAt: s.expiresAt, plan: s.plan });
+  }
+
   // Fetch code from KV
   const kvValue = await kvGet(`premium:${code}`).catch(() => null);
   if (!kvValue) {
