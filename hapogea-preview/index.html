@@ -6751,19 +6751,23 @@
       const sortedRows = sortByTime(rows);
       let visibleRows = sortedRows.filter(r => !r.noOddsYet);
       const pendingCount = sortedRows.length - visibleRows.length;
-      // When today is completely empty, fall back to showing tomorrow's picks
+      // When today has no real picks (empty or all noOddsYet), fall back to tomorrow
       let tomorrowFallback = false;
-      if (visibleRows.length === 0 && pendingCount === 0 && state.day === "today") {
+      let tomorrowFallbackReason = "";
+      if (visibleRows.length === 0 && state.day === "today") {
         const tomorrowRows = sortByTime(
           (daySportRows("tomorrow", state.sportTab) || []).filter(r => !r.noOddsYet)
         ).slice(0, 20);
         if (tomorrowRows.length > 0) {
           visibleRows = tomorrowRows;
           tomorrowFallback = true;
+          tomorrowFallbackReason = pendingCount > 0
+            ? `היום יש ${pendingCount} משחקים שקווי ההימורים שלהם טרם נפתחו`
+            : "אין משחקים פתוחים להיום";
         }
       }
       const tomorrowBanner = tomorrowFallback
-        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 אין משחקים פתוחים להיום — מוצגים משחקי <b>מחר</b></div>`
+        ? `<div class="fallback-banner" style="margin-bottom:12px">📅 ${tomorrowFallbackReason} — מוצגים משחקי <b>מחר</b></div>`
         : "";
       cards.innerHTML = banners + tomorrowBanner + (visibleRows.length
         ? visibleRows.map(rowCard).join("")
