@@ -49,6 +49,7 @@ module.exports = async function handler(req, res) {
   // Static issued codes (no KV required)
   const STATIC_CODES = {
     "6PQLCU4M": { plan: "monthly", expiresAt: 1783555200000, email: "kubovskys@gmail.com" },
+    "Q338GRT6": { plan: "weekly",  expiresAt: 1781567999000, email: "liordavid8590@gmail.com" },
   };
   if (STATIC_CODES[code]) {
     const s = STATIC_CODES[code];
