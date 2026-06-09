@@ -10799,6 +10799,28 @@ function AiMessage({m,idx,onToggle,onRephrase}) {
 const AI_FREE_LIMIT = 1;      // free users: 1 message per day
 const AI_PREMIUM_LIMIT = 100; // premium users: 100 messages per day
 
+// AI usage is tracked PER USER and resets at midnight (Israel local date).
+// This guarantees every account gets its own daily allowance — a brand-new
+// email that never used the site always starts with a fresh free message,
+// even on a browser where another account already used theirs.
+function aiUsageDate() { return new Date().toLocaleDateString('en-CA'); }
+function aiUsageKey(user) { return 'hapogea_ai_usage_' + (user && user.id ? user.id : 'guest'); }
+function readAiUsage(user) {
+  const today = aiUsageDate();
+  try {
+    const rec = JSON.parse(localStorage.getItem(aiUsageKey(user)) || '{}');
+    if (rec.date !== today) return { date: today, free: 0, prem: 0 }; // new day → reset
+    return { date: today, free: Number(rec.free) || 0, prem: Number(rec.prem) || 0 };
+  } catch { return { date: today, free: 0, prem: 0 }; }
+}
+function writeAiUsage(user, rec) {
+  try {
+    localStorage.setItem(aiUsageKey(user), JSON.stringify({
+      date: aiUsageDate(), free: Number(rec.free) || 0, prem: Number(rec.prem) || 0,
+    }));
+  } catch {}
+}
+
 function AiApp() {
   const user = useHapUser();
   const [messages,setMessages] = React.useState([]);
@@ -10809,16 +10831,30 @@ function AiApp() {
   const scrollRef = React.useRef(null);
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
-  // Free message counter — persists in localStorage across sessions
-  const [aiMsgUsed, setAiMsgUsed] = React.useState(() => {
-    try { return Number(localStorage.getItem(window.AI_FREE_KEY || 'hapogea_ai_free_used_v1') || 0); } catch { return 0; }
-  });
-  const [premAiUsed, setPremAiUsed] = React.useState(() => {
-    try { return Number(localStorage.getItem('hapogea_ai_premium_used_v1') || 0); } catch { return 0; }
-  });
   const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
   const isLoggedIn = !!user;
-  const isAiLocked = isPrem() ? premAiUsed >= AI_PREMIUM_LIMIT : aiMsgUsed >= AI_FREE_LIMIT;
+  // Per-user daily AI usage ({date, free, prem}), resets automatically at midnight.
+  const [usage, setUsage] = React.useState(() => readAiUsage(user));
+  // Reload usage when the signed-in account changes — each account has its own quota.
+  React.useEffect(() => { setUsage(readAiUsage(user)); }, [user && user.id]);
+  const isAiLocked = isPrem() ? usage.prem >= AI_PREMIUM_LIMIT : usage.free >= AI_FREE_LIMIT;
+  // Count one successful message. Re-reads first so a midnight rollover resets cleanly.
+  const bumpUsage = React.useCallback(() => {
+    const fresh = readAiUsage(user);
+    const next = isPrem() ? { ...fresh, prem: fresh.prem + 1 } : { ...fresh, free: fresh.free + 1 };
+    writeAiUsage(user, next);
+    setUsage(next);
+  }, [user]);
+  // Gate a send: opens login or upgrade modal and returns true if blocked.
+  // Re-reads usage at call time so a just-passed midnight unlocks immediately.
+  const gateBlocked = () => {
+    if (!isLoggedIn) { typeof HapAuth !== "undefined" && HapAuth.openModal(); return true; }
+    const fresh = readAiUsage(user);
+    setUsage(fresh);
+    const locked = isPrem() ? fresh.prem >= AI_PREMIUM_LIMIT : fresh.free >= AI_FREE_LIMIT;
+    if (locked) { openPremiumModal && openPremiumModal(); return true; }
+    return false;
+  };
 
   // Per-user chat history: load the saved thread when the account changes,
   // and persist completed threads back to that user's slot.
@@ -10881,8 +10917,7 @@ function AiApp() {
 
   const send=async(text)=>{
     if(busy)return;
-    if(!isLoggedIn){typeof HapAuth!=="undefined"&&HapAuth.openModal();return;}
-    if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
+    if(gateBlocked())return;
     const run=++runRef.current;
     setBusy(true);atBottom.current=true;
     const historySnap=messages.slice(-6).map(m=>({role:m.role,text:m.role==="user"?m.text:(m.intro||"")}));
@@ -10941,7 +10976,7 @@ function AiApp() {
         }
         patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
-        if(isPrem()){const n=premAiUsed+1;setPremAiUsed(n);try{localStorage.setItem('hapogea_ai_premium_used_v1',String(n));}catch{}}else{const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
+        bumpUsage();
         setBusy(false);
         return;
       }
@@ -10957,7 +10992,7 @@ function AiApp() {
         patchAi({streamLen:n});
       }
       patchAi({streamLen:introText.length,phase:"done"});
-      if(!isPrem()){const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
+      bumpUsage();
       setBusy(false);
     }catch(err){
       clearTimeout(tid);clearInterval(stepTimer);
@@ -10971,8 +11006,7 @@ function AiApp() {
 
   const sendImage=async(file,note)=>{
     if(busy)return;
-    if(!isLoggedIn){typeof HapAuth!=="undefined"&&HapAuth.openModal();return;}
-    if(isAiLocked){openPremiumModal&&openPremiumModal();return;}
+    if(gateBlocked())return;
     setBusy(true);
     const userText=note?`[תמונה] ${note}`:"[תמונה] נתח את הטופס/צילום הזה";
     setMessages(m=>[...m,
@@ -10988,6 +11022,7 @@ function AiApp() {
       const data=await resp.json().catch(()=>({}));
       const ans=data.answer||"לא הצלחתי לנתח את התמונה. תנסה להעלות שוב או לכתוב את הנתונים בטקסט.";
       setMessages(m=>[...m.slice(0,-1),{role:"ai",phase:"done",intro:ans,streamLen:ans.length,analysis:[],revealed:0,open:{},showFinal:false}]);
+      bumpUsage();
     }catch(err){
       const msg="שגיאה בעיבוד התמונה — "+err.message;
       setMessages(m=>[...m.slice(0,-1),{role:"ai",phase:"done",intro:msg,streamLen:msg.length,analysis:[],revealed:0,open:{},showFinal:false}]);
@@ -11041,10 +11076,10 @@ function AiApp() {
           <div className="ai-locked-bar">
             <span className="ai-locked-icon">🔒</span>
             <div className="ai-locked-text">
-              <b>ניצלת את ההודעה החינמית שלך</b>
-              <span>שדרג לפרימיום לשיחות ללא הגבלה</span>
+              <b>{isPrem() ? "הגעת ל-100 ההודעות היומיות" : "ניצלת את ההודעה החינמית שלך"}</b>
+              <span>{isPrem() ? "המכסה מתאפסת בחצות" : "שדרג לפרימיום ל-100 הודעות ביום"}</span>
             </div>
-            <button className="ai-locked-btn" onClick={()=>typeof openPremiumModal==="function"&&openPremiumModal()}>שדרג</button>
+            {!isPrem() && <button className="ai-locked-btn" onClick={()=>typeof openPremiumModal==="function"&&openPremiumModal()}>שדרג</button>}
           </div>
         ) : (
           <AiComposer onSend={send} onSendImage={sendImage} busy={busy} showChips={empty}/>
