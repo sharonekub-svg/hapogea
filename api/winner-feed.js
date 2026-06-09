@@ -4031,10 +4031,96 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   };
 }
 
+// ── /api/winner-feed?format=picks — ranked picks JSON ────────────────────────
+const FREE_PICKS_PER_SPORT = 2;
+const PICKS_TARGET = 15;
+const PICKS_MIN = 10;
+let _picksCache = null;
+let _picksCacheTime = 0;
+const PICKS_CACHE_TTL = 5 * 60 * 1000;
+
+function _pickRankScore(row) { return scoreBreakdown(row).total; }
+
+function _buildRationale(row) {
+  const prob = Math.round((row.normalizedProbability || 0) * 100);
+  const gap  = Math.round((row.marketGap || 0) * 100);
+  const ev   = typeof row.ev === "number" ? (row.ev * 100).toFixed(1) : null;
+  const parts = [];
+  if (prob >= 55) parts.push(`הסתברות ${prob}%`);
+  if (gap >= 8)   parts.push(`פער שוק ${gap}%`);
+  if (ev && Number(ev) > 0) parts.push(`EV+${ev}%`);
+  if (row.valueIndicator === "winner_higher") parts.push("Winner מתמחר מעל השוק ההוגן");
+  if (!parts.length && row.oddsRaw) parts.push(`פייבוריט ב-${row.oddsRaw}`);
+  return parts.join(" | ");
+}
+
+function _selectPicks(rows) {
+  const byScore = (a, b) => _pickRankScore(b) - _pickRankScore(a);
+  const recommended = [...rows.filter((r) => r.recommended && r.odds)].sort(byScore);
+  if (recommended.length >= PICKS_MIN) return recommended.slice(0, PICKS_TARGET);
+  const outside = [...rows.filter((r) => !r.recommended && !r.noOddsYet && r.oddsRaw)].sort(byScore);
+  return [...recommended, ...outside].slice(0, Math.max(recommended.length, PICKS_MIN));
+}
+
+function _formatPicks(rows, sportLabel) {
+  return _selectPicks(rows).map((row, i) => ({
+    rank: i + 1,
+    sport: sportLabel,
+    match: row.match || `${row.home} - ${row.away}`,
+    league: row.league || "",
+    country: row.country || "",
+    pick: row.winnerPick || row.pick || "",
+    odds: row.odds ?? row.oddsRaw ?? null,
+    probability: Math.round((row.normalizedProbability || row.probability || 0) * 100),
+    rationale: _buildRationale(row),
+    score: _pickRankScore(row),
+    tier: i < FREE_PICKS_PER_SPORT ? "free" : "premium",
+    day: row.day,
+    time: row.time || "",
+    isOutsideRange: row.outsideRange || false,
+  }));
+}
+
+async function buildPicksPayload() {
+  const payload = await buildWinnerFeedPayload({ withLogos: false });
+  const football = _formatPicks([
+    ...(payload.tabs?.today?.sports?.football    || []),
+    ...(payload.tabs?.tomorrow?.sports?.football || []),
+  ], "football");
+  const basketball = _formatPicks([
+    ...(payload.tabs?.today?.sports?.basketball    || []),
+    ...(payload.tabs?.tomorrow?.sports?.basketball || []),
+  ], "basketball");
+  return {
+    generatedAt: new Date().toISOString(),
+    date: payload.israelDate || new Date().toISOString().slice(0, 10),
+    oddsSource: payload.oddsSource || "Winner",
+    football:   { total: football.length,   picks: football },
+    basketball: { total: basketball.length, picks: basketball },
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=86400");
   // 30 requests per IP per minute — feed is heavily cached so this is generous
   if (rateLimit(req, res, { max: 30, windowMs: 60_000 })) return;
+
+  // ?format=picks — ranked picks for football + basketball
+  if (String(req?.query?.format || "").toLowerCase() === "picks") {
+    try {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      const now = Date.now();
+      if (!_picksCache || now - _picksCacheTime > PICKS_CACHE_TTL) {
+        _picksCache = await buildPicksPayload();
+        _picksCacheTime = now;
+      }
+      return res.status(200).json(_picksCache);
+    } catch (err) {
+      return res.status(500).json({ error: "picks error", message: err.message });
+    }
+  }
+
   try {
     const force = String(req?.query?.force || "").toLowerCase() === "1";
     const payload = await buildCachedWinnerFeedPayload({ force });

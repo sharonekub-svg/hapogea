@@ -15,8 +15,7 @@
     "api/premium-validate.js": { "maxDuration": 10 },
     "api/premium-create.js": { "maxDuration": 10 },
     "api/manual-results.js": { "maxDuration": 15 },
-    "api/sofascore.js": { "maxDuration": 15 },
-    "api/picks.js": { "maxDuration": 35 }
+    "api/sofascore.js": { "maxDuration": 15 }
   },
   "headers": [
     {
