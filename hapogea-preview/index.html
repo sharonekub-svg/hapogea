@@ -6298,81 +6298,114 @@
       `;
     }
 
+    // Flag inside the regular card's logo slot so WC cards match game cards
+    function wcFlagSlot(code, name) {
+      return `<div class="logo-wrap" style="border-radius:7px;overflow:hidden;background:rgba(255,255,255,.06)">${imageWithFallback(`https://flagcdn.com/w160/${code}.png`, name, 'flag')}</div>`;
+    }
+
     function wcFixtureCard(item) {
       const date = wcDateLabel(item.date);
-      // Premium-locked: show teams + flag but lock the pick
+      const status = wcStatus(item);
+      const isDone = status.cls === 'finished' || status.cls === 'hit' || status.cls === 'miss';
+      const isLive = status.cls === 'live';
+      const drawOdds = item.odds ? (item.odds['X'] || item.odds.x || item.odds.draw) : null;
+      const dOdds = drawOdds != null ? (+drawOdds).toFixed(2) : null;
+      const pickedHome = item.pick === '1' || item.pick === 'home' || item.pick === item.hc;
+      const pickedDraw = item.pick === 'X' || item.pick === 'x' || item.pick === 'draw';
+      const pickedAway = item.pick === '2' || item.pick === 'away' || item.pick === item.ac;
+      const pickName = pickedDraw ? 'תיקו' : pickedAway ? item.away : item.home;
+      const conf = Number(item.conf) || null;
+      const statusBadge = `<span class="verdict ${status.cls === 'wait' ? 'wait' : status.cls}" style="font-size:11px;padding:3px 10px">${isLive ? '● ' : ''}${status.label}</span>`;
+
+      // Center of the teams line: score when done, תיקו when draw pick, else VS — plus draw odds
+      const centerMain = (isDone && item.score)
+        ? `<span class="versus-main">${escapeHtml(item.score)}</span>`
+        : `<span class="versus-main">${pickedDraw ? 'תיקו' : 'VS'}</span>`;
+      const teamsLine = `
+        <div class="teams-line">
+          <div class="team-side ${pickedHome ? 'selected' : ''}">
+            ${wcFlagSlot(item.hc, item.home)}
+            <div class="team-name">${escapeHtml(item.home)}</div>
+          </div>
+          <div class="versus ${pickedDraw ? 'selected' : ''}">
+            ${centerMain}
+            ${dOdds ? `<div class="team-odd"><small>X</small>${dOdds}</div>` : ''}
+          </div>
+          <div class="team-side ${pickedAway ? 'selected' : ''}">
+            ${wcFlagSlot(item.ac, item.away)}
+            <div class="team-name">${escapeHtml(item.away)}</div>
+          </div>
+        </div>`;
+
+      const head = `
+        <div class="card-head">
+          <div class="card-topline" style="width:100%">
+            <div class="card-meta-stack">
+              <div class="league" style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:14px">🏆</span>
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">מונדיאל 2026 · ${escapeHtml(item.stage || '')}</span>
+              </div>
+              <div class="card-badge-row">${statusBadge}</div>
+            </div>
+            <div class="card-time-box">
+              <span>${escapeHtml(date.short)}</span>
+              <b>${escapeHtml(item.time || '—')}</b>
+              <span>כדורגל</span>
+            </div>
+          </div>
+        </div>`;
+
+      // Premium-locked (everything except מקסיקו vs דרום אפריקה): blur the pick, keep the card look
       if (item.premium && !state.isPremium) {
         return `
-          <article class="wcm" data-status="upcoming" style="position:relative;overflow:hidden">
-            <div class="wcm-top">
-              <span class="wcm-group">${escapeHtml(item.stage || '')}</span>
-              <span class="wcm-status upcoming">ממתין</span>
-            </div>
-            <div class="wcm-matchup" style="filter:blur(3px);pointer-events:none;user-select:none">
-              <div class="wcm-team">
-                <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.hc}.png`, item.home, 'flag')}</div>
-                <span class="wcm-name">${escapeHtml(item.home)}</span>
-              </div>
-              <div class="wcm-center">
-                <div class="wcm-vs">VS</div>
-                <div class="wcm-datetime"><span class="wcm-date">${escapeHtml(date.short)}</span></div>
-              </div>
-              <div class="wcm-team away">
-                <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.ac}.png`, item.away, 'flag')}</div>
-                <span class="wcm-name">${escapeHtml(item.away)}</span>
+          <article class="card no-pick" data-status="${status.cls}" data-wc="1" style="position:relative;overflow:hidden">
+            ${head}
+            <div class="card-body">
+              <div class="card-section" style="filter:blur(3px);pointer-events:none;user-select:none">${teamsLine}</div>
+              <div class="card-section pick-section" style="filter:blur(4px);pointer-events:none;user-select:none">
+                <div class="pick-hero">
+                  <div class="pick-hero-top">
+                    <span class="pick-hero-label">✦ הפוגע בוחר</span>
+                    <span class="pick-market-chip">מנצח</span>
+                  </div>
+                  <div class="pick-hero-main">
+                    <strong class="pick-hero-name">●●●●●●</strong>
+                    <div class="pick-hero-odds"><b>●●%</b><small>ביטחון</small></div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="premium-lock-overlay" style="border-radius:12px">
+            <div class="premium-lock-overlay">
               <span class="lock-icon">🔒</span>
               <span class="lock-label">ניתוח פרימיום</span>
               <button class="lock-btn" onclick="openPremiumModal()">שדרג לפרימיום</button>
             </div>
           </article>`;
       }
-      const status = wcStatus(item);
-      const isDone = status.cls === 'finished' || status.cls === 'hit' || status.cls === 'miss';
-      const hasPick = !!(item.pick && item.odds);
-      const homeOdds = item.odds ? (item.odds['1'] || item.odds.home || item.odds[item.hc]) : null;
-      const drawOdds = item.odds ? (item.odds['X'] || item.odds.x || item.odds.draw) : null;
-      const awayOdds = item.odds ? (item.odds['2'] || item.odds.away || item.odds[item.ac]) : null;
-      const pickedHome = hasPick && (item.pick === '1' || item.pick === 'home' || item.pick === item.hc);
-      const pickedDraw = hasPick && (item.pick === 'X' || item.pick === 'x' || item.pick === 'draw');
-      const pickedAway = hasPick && (item.pick === '2' || item.pick === 'away' || item.pick === item.ac);
-      const fmtOdds = v => v != null ? (+v).toFixed(2) : null;
-      const hOdds = fmtOdds(homeOdds);
-      const dOdds = fmtOdds(drawOdds);
-      const aOdds = fmtOdds(awayOdds);
-      // AI chat prompt
-      const aiQuery = encodeURIComponent(`${item.home} נגד ${item.away}`);
+
+      const why = item.note ? `<div class="pick-hero-why">${escapeHtml(item.note)}</div>` : '';
       return `
-        <article class="wcm${hasPick ? ' wcm-has-pick' : ''}" data-status="${status.cls}">
-          <div class="wcm-top">
-            <span class="wcm-group">${escapeHtml(item.group || item.stage || '')}</span>
-            <span class="wcm-status ${status.cls}">${status.cls === 'live' ? '● ' : ''}${status.label}</span>
-          </div>
-          <div class="wcm-matchup">
-            <div class="wcm-team${pickedHome ? ' picked' : ''}">
-              <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.hc}.png`, item.home, 'flag')}</div>
-              <span class="wcm-name">${escapeHtml(item.home)}</span>
-              ${hOdds ? `<span class="wcm-odds-pill${pickedHome ? ' is-pick' : ''}">${hOdds}</span>` : ''}
-            </div>
-            <div class="wcm-center">
-              ${isDone && item.score ? `<div class="wcm-score">${escapeHtml(item.score)}</div>` : ''}
-              ${!isDone ? `<div class="wcm-vs">VS</div>` : ''}
-              <div class="wcm-datetime">
-                <span class="wcm-time">${escapeHtml(item.time || '—')}</span>
-                <span class="wcm-date">${escapeHtml(date.short)}</span>
+        <article class="card has-pick" data-status="${status.cls}" data-wc="1">
+          ${head}
+          <div class="card-body">
+            <div class="card-section">${teamsLine}</div>
+            <div class="card-section pick-section">
+              <div class="pick-hero">
+                <div class="pick-hero-top">
+                  <span class="pick-hero-label">✦ הפוגע בוחר</span>
+                  <span class="pick-market-chip">מנצח</span>
+                </div>
+                <div class="pick-hero-main">
+                  <strong class="pick-hero-name">${escapeHtml(pickName)}</strong>
+                  <div class="pick-hero-odds">
+                    <b>${conf != null ? conf + '%' : '—'}</b>
+                    <small>ביטחון</small>
+                  </div>
+                </div>
+                ${why}
               </div>
-              ${dOdds ? `<div class="wcm-draw-odds${pickedDraw ? ' is-pick' : ''}">X ${dOdds}</div>` : ''}
             </div>
-            <div class="wcm-team away${pickedAway ? ' picked' : ''}">
-              <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.ac}.png`, item.away, 'flag')}</div>
-              <span class="wcm-name">${escapeHtml(item.away)}</span>
-              ${aOdds ? `<span class="wcm-odds-pill${pickedAway ? ' is-pick' : ''}">${aOdds}</span>` : ''}
-            </div>
-          </div>
-          <div class="wcm-footer">
-            <span class="wcm-venue">${escapeHtml(item.venue || '')}</span>
+            ${item.venue ? `<div class="card-section" style="padding:8px 11px;font-size:11px;color:var(--muted)">📍 ${escapeHtml(item.venue)}</div>` : ''}
           </div>
         </article>`;
     }
@@ -8141,21 +8174,29 @@
         grid.innerHTML = `<div class="lv-empty">אין משחקים היום בספורט זה.</div>`;
         return;
       }
-      // Build pick lookup from feed recommendations for live card overlay
-      const _livePicks = {};
+      // Collect feed picks so live cards can still show what we chose.
+      // SofaScore (live) and Winner (feed) team names can differ slightly, so
+      // we fuzzy-match by team name instead of requiring an exact string.
+      const _livePickRows = [];
       try {
-        const normT = (s) => String(s || "").toLowerCase().trim();
         for (const day of ["today", "tomorrow"]) {
           for (const sport of ["football", "basketball"]) {
             (state.feed?.tabs?.[day]?.sports?.[sport] || [])
-              .filter(r => r.recommended && r.winnerPick)
-              .forEach(r => {
-                _livePicks[`${normT(r.home)}_${normT(r.away)}`] = r.winnerPick;
-                _livePicks[`${normT(r.away)}_${normT(r.home)}`] = r.winnerPick;
-              });
+              .filter(r => r.winnerPick && (r.recommended || r.odds))
+              .forEach(r => _livePickRows.push({ home: r.home, away: r.away, pick: r.winnerPick }));
           }
         }
       } catch {}
+      function findLivePick(ev) {
+        let best = null, bestScore = 0;
+        for (const r of _livePickRows) {
+          const direct  = (teamNameScoreLocal(ev.home, r.home) + teamNameScoreLocal(ev.away, r.away)) / 2;
+          const swapped = (teamNameScoreLocal(ev.home, r.away) + teamNameScoreLocal(ev.away, r.home)) / 2;
+          const score = Math.max(direct, swapped);
+          if (score > bestScore) { bestScore = score; best = r; }
+        }
+        return bestScore >= 0.6 ? best.pick : null;
+      }
 
       grid.innerHTML = events.map(ev => {
         const isLive     = ev.live;
@@ -8173,8 +8214,7 @@
           : "";
         const statusText = isLive ? (ev.statusLabel || "חי") : isFinished ? "נגמר" : timeStr;
         const leagueText = ev.country ? `${ev.country} · ${ev.league}` : ev.league;
-        const normT = (s) => String(s || "").toLowerCase().trim();
-        const matchedPick = _livePicks[`${normT(ev.home)}_${normT(ev.away)}`];
+        const matchedPick = findLivePick(ev);
         const pickBadge = matchedPick
           ? `<div class="lv-pick">✦ הפוגע בוחר: <b>${escapeHtml(matchedPick)}</b></div>`
           : "";
