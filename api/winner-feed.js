@@ -3457,8 +3457,13 @@ async function sfScheduled(sport, date) {
   catch { return []; }
 }
 async function sfEventOdds(eventId) {
-  try { return await sfApiFetch(`/event/${eventId}/odds/1/featured`); }
-  catch { return null; }
+  for (const pid of [1, 2, 16, 11]) {
+    try {
+      const data = await sfApiFetch(`/event/${eventId}/odds/${pid}/featured`);
+      if (data?.markets?.length) return data;
+    } catch {}
+  }
+  return null;
 }
 function sfEventToRow(ev, oddsData, sfSport, day) {
   const home = ev.homeTeam?.name || "";
@@ -3506,13 +3511,19 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
     awayOdds = ev.odds.awayOdds ? Number(ev.odds.awayOdds) : null;
   }
   if (!homeOdds && oddsData?.markets?.length) {
-    const mkt = oddsData.markets.find(
-      (m) => (m.fk_id === 1 || /full.?time|1x2|match.?result/i.test(m.marketName || "")) && !m.isLive
-    );
+    const mkt = oddsData.markets.find((m) => {
+      if (m.isLive) return false;
+      if (m.fk_id === 1) return true;
+      return /full.?time|1x2|match.?result|home.?away|money.?line|winner|הבית|בית|אורח/i.test(m.marketName || "");
+    }) || oddsData.markets.find((m) => !m.isLive && (m.choices || []).some((c) => c.name === "1"));
     if (mkt?.choices?.length) {
       homeOdds = Number(mkt.choices.find((c) => c.name === "1")?.odds) || null;
       drawOdds = Number(mkt.choices.find((c) => c.name === "X")?.odds) || null;
       awayOdds = Number(mkt.choices.find((c) => c.name === "2")?.odds) || null;
+      if (!homeOdds || !awayOdds) {
+        homeOdds = Number(mkt.choices[0]?.odds) || null;
+        awayOdds = Number(mkt.choices[mkt.choices.length - 1]?.odds) || null;
+      }
     }
   }
 
@@ -3599,8 +3610,9 @@ async function buildSofascoreFeed() {
     ...bbTomorrow.map((ev) => ({ ev, sfSport: "basketball", day: tomorrow })),
   ];
 
-  const withEmbedded = allEvents.filter(({ ev }) => ev.odds?.homeOdds);
-  const withoutOdds  = allEvents.filter(({ ev }) => !ev.odds?.homeOdds);
+  // embedded odds or embedded awayOdds (basketball has no drawOdds)
+  const withEmbedded = allEvents.filter(({ ev }) => ev.odds?.homeOdds && ev.odds?.awayOdds);
+  const withoutOdds  = allEvents.filter(({ ev }) => !(ev.odds?.homeOdds && ev.odds?.awayOdds));
 
   const allRows = [];
   for (const { ev, sfSport, day } of withEmbedded) {
