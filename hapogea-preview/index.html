@@ -6697,13 +6697,22 @@
 
     function topTips(n = 5) {
       const rows = daySportRows("today", "all").filter(row => row.status === "ממתין" && row.odds);
-      return rows
-        .sort((a, b) =>
-          (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0) ||
-          (b.probability || 0) - (a.probability || 0) ||
-          (b.odds || 0) - (a.odds || 0)
-        )
-        .slice(0, n);
+      // Daily tips shown to everyone should fall within 10:00–23:00 — early-morning
+      // games (e.g. 02:00–03:00) shouldn't be the public free tip of the day.
+      const inDaytime = (row) => {
+        const m = String(row.time || '').match(/^(\d{1,2}):(\d{2})$/);
+        if (!m) return false;
+        const h = Number(m[1]) + Number(m[2]) / 60;
+        return h >= 10 && h < 23;
+      };
+      const byScore = (a, b) =>
+        (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0) ||
+        (b.probability || 0) - (a.probability || 0) ||
+        (b.odds || 0) - (a.odds || 0);
+      const daytime = rows.filter(inDaytime).sort(byScore);
+      const other   = rows.filter(r => !inDaytime(r)).sort(byScore);
+      // Prefer daytime tips; only fall back to off-hours games if there aren't enough.
+      return [...daytime, ...other].slice(0, n);
     }
     function renderDaily() {
       const tips = topTips(5);
