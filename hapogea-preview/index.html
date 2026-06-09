@@ -2350,6 +2350,8 @@
     .lv-score { font:900 20px/1 Heebo,sans-serif; color:#fff; text-align:center; min-width:48px; }
     .lv-score.no-score { color:var(--muted); font-size:13px; }
     .lv-minute { font-size:11px; color:#fca5a5; font-weight:700; text-align:center; }
+    .lv-pick { font-size:12px; font-weight:800; color:#31d187; text-align:center; padding:4px 0 2px; letter-spacing:.3px; }
+    .lv-pick b { color:#fff; }
     .lv-empty { text-align:center; color:var(--muted); padding:32px; font-size:14px; }
 
     /* ── Sport page header ── */
@@ -5296,13 +5298,14 @@
     const PREMIUM_LS_KEY = 'hapogea_premium_v3';
     const PREMIUM_EXP_KEY = 'hapogea_premium_exp_v3';
     const AI_FREE_KEY = 'hapogea_ai_free_used_v1';
-    // Reset free counter if it's a new day
+    // Reset free + premium counters if it's a new day
     (function resetAiFreeDaily() {
       try {
         const today = new Date().toLocaleDateString('en-CA');
         const savedDate = localStorage.getItem('hapogea_ai_free_date');
         if (savedDate !== today) {
           localStorage.removeItem(AI_FREE_KEY);
+          localStorage.removeItem('hapogea_ai_premium_used_v1');
           localStorage.setItem('hapogea_ai_free_date', today);
         }
       } catch {}
@@ -7926,14 +7929,14 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: free users see 3 football cards and 1 basketball card
+      // Premium lock: free users see 2 cards per sport
       if (!state.isPremium) {
         const allCards = cards.querySelectorAll('article.card');
         let footballSeen = 0, basketballSeen = 0;
         allCards.forEach((card) => {
           const isBasketball = String(card.dataset.sport || '').trim() === String(227);
-          if (isBasketball) { basketballSeen++; if (basketballSeen <= 1) return; }
-          else { footballSeen++; if (footballSeen <= 3) return; }
+          if (isBasketball) { basketballSeen++; if (basketballSeen <= 2) return; }
+          else { footballSeen++; if (footballSeen <= 2) return; }
           card.style.position = 'relative';
           card.style.overflow = 'hidden';
           if (!card.querySelector('.premium-lock-overlay')) {
@@ -8058,6 +8061,22 @@
         grid.innerHTML = `<div class="lv-empty">אין משחקים היום בספורט זה.</div>`;
         return;
       }
+      // Build pick lookup from feed recommendations for live card overlay
+      const _livePicks = {};
+      try {
+        const normT = (s) => String(s || "").toLowerCase().trim();
+        for (const day of ["today", "tomorrow"]) {
+          for (const sport of ["football", "basketball"]) {
+            (state.feed?.tabs?.[day]?.sports?.[sport] || [])
+              .filter(r => r.recommended && r.winnerPick)
+              .forEach(r => {
+                _livePicks[`${normT(r.home)}_${normT(r.away)}`] = r.winnerPick;
+                _livePicks[`${normT(r.away)}_${normT(r.home)}`] = r.winnerPick;
+              });
+          }
+        }
+      } catch {}
+
       grid.innerHTML = events.map(ev => {
         const isLive     = ev.live;
         const isFinished = ev.finished;
@@ -8074,6 +8093,11 @@
           : "";
         const statusText = isLive ? (ev.statusLabel || "חי") : isFinished ? "נגמר" : timeStr;
         const leagueText = ev.country ? `${ev.country} · ${ev.league}` : ev.league;
+        const normT = (s) => String(s || "").toLowerCase().trim();
+        const matchedPick = _livePicks[`${normT(ev.home)}_${normT(ev.away)}`];
+        const pickBadge = matchedPick
+          ? `<div class="lv-pick">✦ הפוגע בוחר: <b>${escapeHtml(matchedPick)}</b></div>`
+          : "";
         return `
           <div class="lv-card ${cardCls}">
             <div class="lv-meta">
@@ -8085,6 +8109,7 @@
               ${scoreHtml}
               <span class="lv-team">${escapeHtml(ev.away)}</span>
             </div>
+            ${pickBadge}
             ${minuteHtml}
           </div>`;
       }).join("");
@@ -10651,7 +10676,8 @@ function AiMessage({m,idx,onToggle,onRephrase}) {
   );
 }
 
-const AI_FREE_LIMIT = 1; // free users get 1 AI message total
+const AI_FREE_LIMIT = 1;      // free users: 1 message per day
+const AI_PREMIUM_LIMIT = 100; // premium users: 100 messages per day
 
 function AiApp() {
   const user = useHapUser();
@@ -10667,9 +10693,12 @@ function AiApp() {
   const [aiMsgUsed, setAiMsgUsed] = React.useState(() => {
     try { return Number(localStorage.getItem(window.AI_FREE_KEY || 'hapogea_ai_free_used_v1') || 0); } catch { return 0; }
   });
+  const [premAiUsed, setPremAiUsed] = React.useState(() => {
+    try { return Number(localStorage.getItem('hapogea_ai_premium_used_v1') || 0); } catch { return 0; }
+  });
   const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
   const isLoggedIn = !!user;
-  const isAiLocked = !isPrem() && aiMsgUsed >= AI_FREE_LIMIT;
+  const isAiLocked = isPrem() ? premAiUsed >= AI_PREMIUM_LIMIT : aiMsgUsed >= AI_FREE_LIMIT;
 
   // Per-user chat history: load the saved thread when the account changes,
   // and persist completed threads back to that user's slot.
@@ -10792,7 +10821,7 @@ function AiApp() {
         }
         patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
-        if(!isPrem()){const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
+        if(isPrem()){const n=premAiUsed+1;setPremAiUsed(n);try{localStorage.setItem('hapogea_ai_premium_used_v1',String(n));}catch{}}else{const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
         setBusy(false);
         return;
       }

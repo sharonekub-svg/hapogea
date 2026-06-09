@@ -3561,9 +3561,12 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
       ].filter(Boolean)
     : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
 
-  const inRange = allCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.80);
-  const pool = inRange.length > 0 ? inRange : allCandidates;
-  const pick = [...pool].sort((a, b) => Math.abs(a.odds - 1.65) - Math.abs(b.odds - 1.65))[0];
+  // Never pick draw — only teams
+  const teamCandidates = allCandidates.filter((c) => c.name !== "תיקו");
+  if (teamCandidates.length === 0) return null;
+  const inRange = teamCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.50);
+  const pool = inRange.length > 0 ? inRange : teamCandidates;
+  const pick = [...pool].sort((a, b) => a.odds - b.odds)[0]; // lowest odds = favourite
   const prob = 1 / pick.odds;
   const score = Math.round(prob * 100);
   const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
@@ -3620,8 +3623,22 @@ async function buildSofascoreFeed() {
     if (row) allRows.push(row);
   }
 
-  // Fetch individual event odds in batches (max 80 events to stay within function timeout)
-  const toFetch = withoutOdds.slice(0, 80);
+  // Score league priority so popular leagues are fetched first
+  function sfLeaguePriority(ev) {
+    const n = (ev.tournament?.name || "").toLowerCase();
+    if (/premier league|la liga|bundesliga|serie a|ligue 1|champions league|europa league|europa conf|world cup|nations league|euro|copa america|gold cup/i.test(n)) return 100;
+    if (/primera|eredivisie|primeira liga|süper lig|mls|brasileirao|brasileiro|serie b|championship|segunda|a-league|j1 league|k league/i.test(n)) return 70;
+    if (/cup|copa|pokal|coupe|coppa|fa cup|league cup|carabao|supercup|super cup/i.test(n)) return 50;
+    if (/reserve|youth|u-?18|u-?20|u-?21|u-?23|women|feminin|amateur|junior|sub-?20|sub-?23/i.test(n)) return 2;
+    return 30;
+  }
+
+  // Fetch individual event odds in batches — prioritise popular leagues, skip reserve/youth
+  const toFetch = withoutOdds
+    .map((x) => ({ ...x, _pri: sfLeaguePriority(x.ev) }))
+    .filter((x) => x._pri > 5)
+    .sort((a, b) => b._pri - a._pri)
+    .slice(0, 150);
   const BATCH = 10;
   for (let i = 0; i < toFetch.length; i += BATCH) {
     const batch = toFetch.slice(i, i + BATCH);
