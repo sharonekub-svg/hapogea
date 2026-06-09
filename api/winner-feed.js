@@ -100,6 +100,9 @@ const MIN_OPPONENT_ODDS = 2.2;
 const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
+/** Minimum games shown per sport per day — stretch the board with the best
+ *  in-range non-strategy games when the strict strategy yields fewer than this. */
+const DISPLAY_MIN_PER_SPORT = 10;
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 const SPORTS = {
@@ -2703,6 +2706,22 @@ function passesOpponentGate(r) {
   return otherOdds.length === 0 || otherOdds.every((o) => o >= minOdds);
 }
 
+// Stretch a sport's board to a minimum count. When the strict strategy yields
+// fewer than `min` picks, pad with the best in-range games (soft odds band,
+// lowest odds first = strongest favourites) so the daily board stays full.
+function padToMinimum(picked, pool, min = DISPLAY_MIN_PER_SPORT) {
+  if (picked.length >= min) return picked;
+  const have = new Set(picked.map((r) => r.id));
+  const filler = (pool || [])
+    .filter((r) => !have.has(r.id) && !r.noOddsYet && r.odds && r.matchPhase !== "final")
+    .filter((r) => Number(r.oddsRaw || r.odds) >= SOFT_ODDS_MIN && Number(r.oddsRaw || r.odds) <= SOFT_ODDS_MAX)
+    .sort((a, b) =>
+      (b.recommendationScore || 0) - (a.recommendationScore || 0) ||
+      (Number(a.odds) || 99) - (Number(b.odds) || 99))
+    .map((row) => ({ ...row, logoVerified: hasVerifiedTeamLogos(row) }));
+  return [...picked, ...filler.slice(0, min - picked.length)];
+}
+
 function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
@@ -2710,8 +2729,10 @@ function finalOpenRowsByDay(rows) {
     .filter((r) => !/\bNBA\b/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
-  const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet), 5);
-  const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
+  // 10-15 games per sport: football used to be hard-capped at 5 — now both sports
+  // use the full target and are stretched to DISPLAY_MIN_PER_SPORT on thin days.
+  const pickedFootball   = padToMinimum(finalOpenRows(football.filter((r) => !r.noOddsYet)), football);
+  const pickedBasketball = padToMinimum(finalOpenRows(basketball.filter((r) => !r.noOddsYet)), basketball);
 
   // When Winner has no open lines, fall back to 365Scores scheduled placeholders so the
   // user sees upcoming games even before odds are published.
