@@ -5852,7 +5852,7 @@
     }
 
     function hasPick(row) {
-      return row.noOddsYet || row.recommended === true || (!!row.odds && !row.outsideRange);
+      return row.noOddsYet || row.recommended === true || !!row.odds;
     }
 
     function trackedResultKeys() {

@@ -6,7 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { buildWinnerFeedPayload, buildOddsApiFeed } = require("../api/winner-feed");
+const { buildWinnerFeedPayload, buildOddsApiFeed, buildSofascoreFeed } = require("../api/winner-feed");
 
 function countRecommendations(rows = []) {
   return rows.filter((row) => row.recommended || (row.odds && !row.outsideRange)).length;
@@ -42,17 +42,26 @@ async function main() {
   console.log("Fetching Winner line...");
   let payload = await buildWinnerFeedPayload({ withLogos: true });
 
-  if (picksCount(payload) === 0 && process.env.ODDS_API_KEY) {
-    console.log("Winner returned 0 real picks — trying The Odds API...");
+  if (picksCount(payload) === 0) {
+    console.log("Winner returned 0 real picks — trying SofaScore...");
     try {
-      payload = await buildOddsApiFeed();
-      console.log("Odds API succeeded, picks:", picksCount(payload));
-    } catch (oddsErr) {
-      console.warn("Odds API fallback failed:", oddsErr.message);
-      console.log("Keeping Winner payload (noOddsYet rows).");
+      payload = await buildSofascoreFeed();
+      console.log("SofaScore succeeded, picks:", picksCount(payload));
+    } catch (sfErr) {
+      console.warn("SofaScore fallback failed:", sfErr.message);
+      if (process.env.ODDS_API_KEY) {
+        console.log("Trying The Odds API...");
+        try {
+          payload = await buildOddsApiFeed();
+          console.log("Odds API succeeded, picks:", picksCount(payload));
+        } catch (oddsErr) {
+          console.warn("Odds API fallback failed:", oddsErr.message);
+          console.log("Keeping Winner payload (noOddsYet rows).");
+        }
+      } else {
+        console.warn("ODDS_API_KEY not set — snapshot will have noOddsYet rows only.");
+      }
     }
-  } else if (picksCount(payload) === 0) {
-    console.warn("0 real picks and ODDS_API_KEY not set — snapshot will have noOddsYet rows only.");
   }
 
   fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
