@@ -8042,14 +8042,35 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: free users see 2 cards per sport
+      // Premium lock: free users see 2 cards per sport, chosen from games
+      // between 10:00–23:00 so early-morning games don't consume the free slots.
       if (!state.isPremium) {
-        const allCards = cards.querySelectorAll('article.card');
-        let footballSeen = 0, basketballSeen = 0;
+        const allCards = [...cards.querySelectorAll('article.card')];
+        // Score each card: daytime window 10:00–23:00 scores 1, outside scores 0.
+        // Within each bucket keep DOM order (already score-sorted).
+        function cardHour(card) {
+          const t = String(card.dataset.time || '');
+          const m = t.match(/^(\d{1,2}):(\d{2})$/);
+          return m ? Number(m[1]) + Number(m[2]) / 60 : null;
+        }
+        function isReasonableHour(card) {
+          const h = cardHour(card);
+          return h !== null && h >= 10 && h < 23;
+        }
+        // For each sport, collect reasonable-hour cards first, then others.
+        const fbCards = allCards.filter(c => String(c.dataset.sport||'').trim() !== String(227));
+        const bbCards = allCards.filter(c => String(c.dataset.sport||'').trim() === String(227));
+        function freeSet(sportCards) {
+          const good  = sportCards.filter(isReasonableHour);
+          const other = sportCards.filter(c => !isReasonableHour(c));
+          return new Set([...good, ...other].slice(0, 2));
+        }
+        const fbFree = freeSet(fbCards);
+        const bbFree = freeSet(bbCards);
         allCards.forEach((card) => {
           const isBasketball = String(card.dataset.sport || '').trim() === String(227);
-          if (isBasketball) { basketballSeen++; if (basketballSeen <= 2) return; }
-          else { footballSeen++; if (footballSeen <= 2) return; }
+          const freeForSport = isBasketball ? bbFree : fbFree;
+          if (freeForSport.has(card)) return;
           card.style.position = 'relative';
           card.style.overflow = 'hidden';
           if (!card.querySelector('.premium-lock-overlay')) {
@@ -8659,7 +8680,7 @@
           : "ללא יתרון סטטיסטי";
       const why = (row.explanation || [])[1] || (row.signals || []).slice(0, 2).join(" · ");
       return `
-        <article class="card ${row.noOddsYet ? "no-pick no-odds-yet" : hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${row.noOddsYet ? "pending" : rowOutcome(row).key}" data-outcome-label="${row.noOddsYet ? "ממתין לקווים" : escapeHtml(rowOutcome(row).label)}" data-home="${escapeHtml(row.home || "")}" data-away="${escapeHtml(row.away || "")}" data-sport="${escapeHtml(row.sportId || "football")}">
+        <article class="card ${row.noOddsYet ? "no-pick no-odds-yet" : hasRecommendation ? "has-pick" : "no-pick"}" data-id="${row.id}" data-outcome="${row.noOddsYet ? "pending" : rowOutcome(row).key}" data-outcome-label="${row.noOddsYet ? "ממתין לקווים" : escapeHtml(rowOutcome(row).label)}" data-home="${escapeHtml(row.home || "")}" data-away="${escapeHtml(row.away || "")}" data-sport="${escapeHtml(row.sportId || "football")}" data-time="${escapeHtml(row.time || '')}">
           <div class="card-head">
             <div class="card-topline" style="width:100%">
               <div class="card-meta-stack">
