@@ -5445,7 +5445,7 @@
       reubenSidebarOpen: false,
       debugMode: location.pathname.includes("debug"),
       isPremium: localStorage.getItem('hapogea_premium_v2') === 'active',
-      reubenFreeUsed: 0,
+      reubenFreeUsed: (() => { try { return Number(localStorage.getItem('hapogea_ai_free_used_v1') || 0); } catch { return 0; } })(),
       backendStats: null,
     };
     let lastLoadTime = 0;
@@ -10093,6 +10093,7 @@
           state.reubenLoading = false;
           if (!state.isPremium) {
             state.reubenFreeUsed = (state.reubenFreeUsed || 0) + 1;
+            try { localStorage.setItem('hapogea_ai_free_used_v1', String(state.reubenFreeUsed)); } catch {}
           }
           renderCards();
           scrollReuvenOutput();
