@@ -100,6 +100,9 @@ const MIN_OPPONENT_ODDS = 2.2;
 const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
+/** Minimum games shown per sport per day — stretch the board with the best
+ *  in-range non-strategy games when the strict strategy yields fewer than this. */
+const DISPLAY_MIN_PER_SPORT = 10;
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://jgcmtrlviuivbtimtqjq.supabase.co";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 const SPORTS = {
@@ -2703,6 +2706,22 @@ function passesOpponentGate(r) {
   return otherOdds.length === 0 || otherOdds.every((o) => o >= minOdds);
 }
 
+// Stretch a sport's board to a minimum count. When the strict strategy yields
+// fewer than `min` picks, pad with the best in-range games (soft odds band,
+// lowest odds first = strongest favourites) so the daily board stays full.
+function padToMinimum(picked, pool, min = DISPLAY_MIN_PER_SPORT) {
+  if (picked.length >= min) return picked;
+  const have = new Set(picked.map((r) => r.id));
+  const filler = (pool || [])
+    .filter((r) => !have.has(r.id) && !r.noOddsYet && r.odds && r.matchPhase !== "final")
+    .filter((r) => Number(r.oddsRaw || r.odds) >= SOFT_ODDS_MIN && Number(r.oddsRaw || r.odds) <= SOFT_ODDS_MAX)
+    .sort((a, b) =>
+      (b.recommendationScore || 0) - (a.recommendationScore || 0) ||
+      (Number(a.odds) || 99) - (Number(b.odds) || 99))
+    .map((row) => ({ ...row, logoVerified: hasVerifiedTeamLogos(row) }));
+  return [...picked, ...filler.slice(0, min - picked.length)];
+}
+
 function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
@@ -2710,8 +2729,10 @@ function finalOpenRowsByDay(rows) {
     .filter((r) => !/\bNBA\b/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
-  const pickedFootball   = finalOpenRows(football.filter((r) => !r.noOddsYet), 5);
-  const pickedBasketball = finalOpenRows(basketball.filter((r) => !r.noOddsYet));
+  // 10-15 games per sport: football used to be hard-capped at 5 — now both sports
+  // use the full target and are stretched to DISPLAY_MIN_PER_SPORT on thin days.
+  const pickedFootball   = padToMinimum(finalOpenRows(football.filter((r) => !r.noOddsYet)), football);
+  const pickedBasketball = padToMinimum(finalOpenRows(basketball.filter((r) => !r.noOddsYet)), basketball);
 
   // When Winner has no open lines, fall back to 365Scores scheduled placeholders so the
   // user sees upcoming games even before odds are published.
@@ -3457,8 +3478,13 @@ async function sfScheduled(sport, date) {
   catch { return []; }
 }
 async function sfEventOdds(eventId) {
-  try { return await sfApiFetch(`/event/${eventId}/odds/1/featured`); }
-  catch { return null; }
+  for (const pid of [1, 2, 16, 11]) {
+    try {
+      const data = await sfApiFetch(`/event/${eventId}/odds/${pid}/featured`);
+      if (data?.markets?.length) return data;
+    } catch {}
+  }
+  return null;
 }
 function sfEventToRow(ev, oddsData, sfSport, day) {
   const home = ev.homeTeam?.name || "";
@@ -3506,13 +3532,19 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
     awayOdds = ev.odds.awayOdds ? Number(ev.odds.awayOdds) : null;
   }
   if (!homeOdds && oddsData?.markets?.length) {
-    const mkt = oddsData.markets.find(
-      (m) => (m.fk_id === 1 || /full.?time|1x2|match.?result/i.test(m.marketName || "")) && !m.isLive
-    );
+    const mkt = oddsData.markets.find((m) => {
+      if (m.isLive) return false;
+      if (m.fk_id === 1) return true;
+      return /full.?time|1x2|match.?result|home.?away|money.?line|winner|הבית|בית|אורח/i.test(m.marketName || "");
+    }) || oddsData.markets.find((m) => !m.isLive && (m.choices || []).some((c) => c.name === "1"));
     if (mkt?.choices?.length) {
       homeOdds = Number(mkt.choices.find((c) => c.name === "1")?.odds) || null;
       drawOdds = Number(mkt.choices.find((c) => c.name === "X")?.odds) || null;
       awayOdds = Number(mkt.choices.find((c) => c.name === "2")?.odds) || null;
+      if (!homeOdds || !awayOdds) {
+        homeOdds = Number(mkt.choices[0]?.odds) || null;
+        awayOdds = Number(mkt.choices[mkt.choices.length - 1]?.odds) || null;
+      }
     }
   }
 
@@ -3550,9 +3582,12 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
       ].filter(Boolean)
     : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
 
-  const inRange = allCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.80);
-  const pool = inRange.length > 0 ? inRange : allCandidates;
-  const pick = [...pool].sort((a, b) => Math.abs(a.odds - 1.65) - Math.abs(b.odds - 1.65))[0];
+  // Never pick draw — only teams
+  const teamCandidates = allCandidates.filter((c) => c.name !== "תיקו");
+  if (teamCandidates.length === 0) return null;
+  const inRange = teamCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.50);
+  const pool = inRange.length > 0 ? inRange : teamCandidates;
+  const pick = [...pool].sort((a, b) => a.odds - b.odds)[0]; // lowest odds = favourite
   const prob = 1 / pick.odds;
   const score = Math.round(prob * 100);
   const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
@@ -3599,8 +3634,9 @@ async function buildSofascoreFeed() {
     ...bbTomorrow.map((ev) => ({ ev, sfSport: "basketball", day: tomorrow })),
   ];
 
-  const withEmbedded = allEvents.filter(({ ev }) => ev.odds?.homeOdds);
-  const withoutOdds  = allEvents.filter(({ ev }) => !ev.odds?.homeOdds);
+  // embedded odds or embedded awayOdds (basketball has no drawOdds)
+  const withEmbedded = allEvents.filter(({ ev }) => ev.odds?.homeOdds && ev.odds?.awayOdds);
+  const withoutOdds  = allEvents.filter(({ ev }) => !(ev.odds?.homeOdds && ev.odds?.awayOdds));
 
   const allRows = [];
   for (const { ev, sfSport, day } of withEmbedded) {
@@ -3608,8 +3644,22 @@ async function buildSofascoreFeed() {
     if (row) allRows.push(row);
   }
 
-  // Fetch individual event odds in batches (max 80 events to stay within function timeout)
-  const toFetch = withoutOdds.slice(0, 80);
+  // Score league priority so popular leagues are fetched first
+  function sfLeaguePriority(ev) {
+    const n = (ev.tournament?.name || "").toLowerCase();
+    if (/premier league|la liga|bundesliga|serie a|ligue 1|champions league|europa league|europa conf|world cup|nations league|euro|copa america|gold cup/i.test(n)) return 100;
+    if (/primera|eredivisie|primeira liga|süper lig|mls|brasileirao|brasileiro|serie b|championship|segunda|a-league|j1 league|k league/i.test(n)) return 70;
+    if (/cup|copa|pokal|coupe|coppa|fa cup|league cup|carabao|supercup|super cup/i.test(n)) return 50;
+    if (/reserve|youth|u-?18|u-?20|u-?21|u-?23|women|feminin|amateur|junior|sub-?20|sub-?23/i.test(n)) return 2;
+    return 30;
+  }
+
+  // Fetch individual event odds in batches — prioritise popular leagues, skip reserve/youth
+  const toFetch = withoutOdds
+    .map((x) => ({ ...x, _pri: sfLeaguePriority(x.ev) }))
+    .filter((x) => x._pri > 5)
+    .sort((a, b) => b._pri - a._pri)
+    .slice(0, 150);
   const BATCH = 10;
   for (let i = 0; i < toFetch.length; i += BATCH) {
     const batch = toFetch.slice(i, i + BATCH);
@@ -4002,10 +4052,96 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   };
 }
 
+// ── /api/winner-feed?format=picks — ranked picks JSON ────────────────────────
+const FREE_PICKS_PER_SPORT = 2;
+const PICKS_TARGET = 15;
+const PICKS_MIN = 10;
+let _picksCache = null;
+let _picksCacheTime = 0;
+const PICKS_CACHE_TTL = 5 * 60 * 1000;
+
+function _pickRankScore(row) { return scoreBreakdown(row).total; }
+
+function _buildRationale(row) {
+  const prob = Math.round((row.normalizedProbability || 0) * 100);
+  const gap  = Math.round((row.marketGap || 0) * 100);
+  const ev   = typeof row.ev === "number" ? (row.ev * 100).toFixed(1) : null;
+  const parts = [];
+  if (prob >= 55) parts.push(`הסתברות ${prob}%`);
+  if (gap >= 8)   parts.push(`פער שוק ${gap}%`);
+  if (ev && Number(ev) > 0) parts.push(`EV+${ev}%`);
+  if (row.valueIndicator === "winner_higher") parts.push("Winner מתמחר מעל השוק ההוגן");
+  if (!parts.length && row.oddsRaw) parts.push(`פייבוריט ב-${row.oddsRaw}`);
+  return parts.join(" | ");
+}
+
+function _selectPicks(rows) {
+  const byScore = (a, b) => _pickRankScore(b) - _pickRankScore(a);
+  const recommended = [...rows.filter((r) => r.recommended && r.odds)].sort(byScore);
+  if (recommended.length >= PICKS_MIN) return recommended.slice(0, PICKS_TARGET);
+  const outside = [...rows.filter((r) => !r.recommended && !r.noOddsYet && r.oddsRaw)].sort(byScore);
+  return [...recommended, ...outside].slice(0, Math.max(recommended.length, PICKS_MIN));
+}
+
+function _formatPicks(rows, sportLabel) {
+  return _selectPicks(rows).map((row, i) => ({
+    rank: i + 1,
+    sport: sportLabel,
+    match: row.match || `${row.home} - ${row.away}`,
+    league: row.league || "",
+    country: row.country || "",
+    pick: row.winnerPick || row.pick || "",
+    odds: row.odds ?? row.oddsRaw ?? null,
+    probability: Math.round((row.normalizedProbability || row.probability || 0) * 100),
+    rationale: _buildRationale(row),
+    score: _pickRankScore(row),
+    tier: i < FREE_PICKS_PER_SPORT ? "free" : "premium",
+    day: row.day,
+    time: row.time || "",
+    isOutsideRange: row.outsideRange || false,
+  }));
+}
+
+async function buildPicksPayload() {
+  const payload = await buildWinnerFeedPayload({ withLogos: false });
+  const football = _formatPicks([
+    ...(payload.tabs?.today?.sports?.football    || []),
+    ...(payload.tabs?.tomorrow?.sports?.football || []),
+  ], "football");
+  const basketball = _formatPicks([
+    ...(payload.tabs?.today?.sports?.basketball    || []),
+    ...(payload.tabs?.tomorrow?.sports?.basketball || []),
+  ], "basketball");
+  return {
+    generatedAt: new Date().toISOString(),
+    date: payload.israelDate || new Date().toISOString().slice(0, 10),
+    oddsSource: payload.oddsSource || "Winner",
+    football:   { total: football.length,   picks: football },
+    basketball: { total: basketball.length, picks: basketball },
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=86400");
   // 30 requests per IP per minute — feed is heavily cached so this is generous
   if (rateLimit(req, res, { max: 30, windowMs: 60_000 })) return;
+
+  // ?format=picks — ranked picks for football + basketball
+  if (String(req?.query?.format || "").toLowerCase() === "picks") {
+    try {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      const now = Date.now();
+      if (!_picksCache || now - _picksCacheTime > PICKS_CACHE_TTL) {
+        _picksCache = await buildPicksPayload();
+        _picksCacheTime = now;
+      }
+      return res.status(200).json(_picksCache);
+    } catch (err) {
+      return res.status(500).json({ error: "picks error", message: err.message });
+    }
+  }
+
   try {
     const force = String(req?.query?.force || "").toLowerCase() === "1";
     const payload = await buildCachedWinnerFeedPayload({ force });
@@ -4049,5 +4185,7 @@ module.exports = async function handler(req, res) {
 module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
 module.exports.buildOddsApiFeed = buildOddsApiFeed;
+module.exports.buildSofascoreFeed = buildSofascoreFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
+module.exports.scoreBreakdown = scoreBreakdown;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;

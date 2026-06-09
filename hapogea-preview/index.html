@@ -2350,6 +2350,8 @@
     .lv-score { font:900 20px/1 Heebo,sans-serif; color:#fff; text-align:center; min-width:48px; }
     .lv-score.no-score { color:var(--muted); font-size:13px; }
     .lv-minute { font-size:11px; color:#fca5a5; font-weight:700; text-align:center; }
+    .lv-pick { font-size:12px; font-weight:800; color:#31d187; text-align:center; padding:4px 0 2px; letter-spacing:.3px; }
+    .lv-pick b { color:#fff; }
     .lv-empty { text-align:center; color:var(--muted); padding:32px; font-size:14px; }
 
     /* ── Sport page header ── */
@@ -5296,13 +5298,14 @@
     const PREMIUM_LS_KEY = 'hapogea_premium_v3';
     const PREMIUM_EXP_KEY = 'hapogea_premium_exp_v3';
     const AI_FREE_KEY = 'hapogea_ai_free_used_v1';
-    // Reset free counter if it's a new day
+    // Reset free + premium counters if it's a new day
     (function resetAiFreeDaily() {
       try {
         const today = new Date().toLocaleDateString('en-CA');
         const savedDate = localStorage.getItem('hapogea_ai_free_date');
         if (savedDate !== today) {
           localStorage.removeItem(AI_FREE_KEY);
+          localStorage.removeItem('hapogea_ai_premium_used_v1');
           localStorage.setItem('hapogea_ai_free_date', today);
         }
       } catch {}
@@ -5445,7 +5448,7 @@
       reubenSidebarOpen: false,
       debugMode: location.pathname.includes("debug"),
       isPremium: localStorage.getItem('hapogea_premium_v2') === 'active',
-      reubenFreeUsed: 0,
+      reubenFreeUsed: (() => { try { return Number(localStorage.getItem('hapogea_ai_free_used_v1') || 0); } catch { return 0; } })(),
       backendStats: null,
     };
     let lastLoadTime = 0;
@@ -5463,30 +5466,81 @@
     ];
 
     const WC2026_FIXTURES = [
-      { date: "2026-06-11", stage: "בית A", home: "מקסיקו", away: "דרום אפריקה", hc: "mx", ac: "za", venue: "Mexico City Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-11", stage: "בית A", home: "קוריאה הדרומית", away: "צ'כיה", hc: "kr", ac: "cz", venue: "Estadio Guadalajara", source: "FIFA", odds: null },
-      { date: "2026-06-12", stage: "בית B", home: "קנדה", away: "בוסניה והרצגובינה", hc: "ca", ac: "ba", venue: "Toronto Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-12", stage: "בית D", home: "ארצות הברית", away: "פרגוואי", hc: "us", ac: "py", venue: "Los Angeles Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-13", stage: "בית C", home: "האיטי", away: "סקוטלנד", hc: "ht", ac: "gb-sct", venue: "Boston Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-13", stage: "בית D", home: "אוסטרליה", away: "טורקיה", hc: "au", ac: "tr", venue: "BC Place Vancouver", source: "FIFA", odds: null },
-      { date: "2026-06-13", stage: "בית C", home: "ברזיל", away: "מרוקו", hc: "br", ac: "ma", venue: "New York New Jersey Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-13", stage: "בית B", home: "קטאר", away: "שווייץ", hc: "qa", ac: "ch", venue: "San Francisco Bay Area Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-14", stage: "בית E", home: "חוף השנהב", away: "אקוודור", hc: "ci", ac: "ec", venue: "Philadelphia Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-14", stage: "בית E", home: "גרמניה", away: "קוראסאו", hc: "de", ac: "cw", venue: "Houston Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-14", stage: "בית F", home: "הולנד", away: "יפן", hc: "nl", ac: "jp", venue: "Dallas Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-14", stage: "בית F", home: "שבדיה", away: "תוניסיה", hc: "se", ac: "tn", venue: "Estadio Monterrey", source: "FIFA", odds: null },
-      { date: "2026-06-15", stage: "בית H", home: "ערב הסעודית", away: "אורוגוואי", hc: "sa", ac: "uy", venue: "Miami Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-15", stage: "בית H", home: "ספרד", away: "כף ורדה", hc: "es", ac: "cv", venue: "Atlanta Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-15", stage: "בית G", home: "איראן", away: "ניו זילנד", hc: "ir", ac: "nz", venue: "Los Angeles Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-15", stage: "בית G", home: "בלגיה", away: "מצרים", hc: "be", ac: "eg", venue: "Seattle Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-16", stage: "בית I", home: "צרפת", away: "סנגל", hc: "fr", ac: "sn", venue: "New York New Jersey Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-16", stage: "בית I", home: "עיראק", away: "נורווגיה", hc: "iq", ac: "no", venue: "Boston Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-16", stage: "בית J", home: "ארגנטינה", away: "אלג'יריה", hc: "ar", ac: "dz", venue: "Kansas City Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-16", stage: "בית J", home: "אוסטריה", away: "ירדן", hc: "at", ac: "jo", venue: "San Francisco Bay Area Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-17", stage: "בית L", home: "גאנה", away: "פנמה", hc: "gh", ac: "pa", venue: "Toronto Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-17", stage: "בית L", home: "אנגליה", away: "קרואטיה", hc: "gb-eng", ac: "hr", venue: "Dallas Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-17", stage: "בית K", home: "פורטוגל", away: "הרפובליקה הדמוקרטית של קונגו", hc: "pt", ac: "cd", venue: "Houston Stadium", source: "FIFA", odds: null },
-      { date: "2026-06-17", stage: "בית K", home: "אוזבקיסטן", away: "קולומביה", hc: "uz", ac: "co", venue: "Mexico City Stadium", source: "FIFA", odds: null }
+      // ── Round 1 ──
+      {date:"2026-06-11",stage:"בית A",home:"מקסיקו",             away:"דרום אפריקה",                       hc:"mx",    ac:"za",    venue:"Estadio Azteca, Mexico City",     odds:{draw:4.55}, pick:"home", conf:60, note:"מקסיקו על שדה ביתי — יתרון ורמת סגל גבוהה יותר",         premium:false},
+      {date:"2026-06-11",stage:"בית A",home:"קוריאה הדרומית",     away:"צ'כיה",                             hc:"kr",    ac:"cz",    venue:"Estadio Guadalajara",             odds:{draw:3.16}, pick:"home", conf:55, note:"קוריאה — פיזיות ומהירות מול צ'כיה",                      premium:true},
+      {date:"2026-06-12",stage:"בית B",home:"קנדה",               away:"בוסניה והרצגובינה",                 hc:"ca",    ac:"ba",    venue:"BMO Field, Toronto",              odds:{draw:3.65}, pick:"home", conf:57, note:"קנדה ביתית — סגל מהפרמייר ליג ועלייה מרשימה",           premium:true},
+      {date:"2026-06-13",stage:"בית B",home:"קטאר",               away:"שווייץ",                            hc:"qa",    ac:"ch",    venue:"Levi's Stadium, San Francisco",   odds:{draw:7.00}, pick:"away", conf:67, note:"שווייץ מנוסה — קטאר הוכיחה חולשה ב-2022",              premium:true},
+      {date:"2026-06-13",stage:"בית C",home:"האיטי",              away:"סקוטלנד",                           hc:"ht",    ac:"gb-sct",venue:"Gillette Stadium, Boston",        odds:{draw:4.40}, pick:"away", conf:59, note:"סקוטלנד עם שחקנים מהפרמייר ליג — פער ברור",            premium:true},
+      {date:"2026-06-13",stage:"בית C",home:"ברזיל",              away:"מרוקו",                             hc:"br",    ac:"ma",    venue:"MetLife Stadium, New York",       odds:{draw:3.76}, pick:"home", conf:57, note:"ברזיל מועמדת לתואר — עומק סגל ללא מתחרה",              premium:true},
+      {date:"2026-06-12",stage:"בית D",home:"ארצות הברית",        away:"פרגוואי",                           hc:"us",    ac:"py",    venue:"SoFi Stadium, Los Angeles",       odds:{draw:3.50}, pick:"home", conf:57, note:"ארה\"ב ביתית — שחקנים מהליגות האירופיות המובילות",     premium:true},
+      {date:"2026-06-13",stage:"בית D",home:"אוסטרליה",           away:"טורקיה",                            hc:"au",    ac:"tr",    venue:"BC Place, Vancouver",             odds:{draw:3.85}, pick:"away", conf:58, note:"טורקיה עולה — ניצחה נבחרות חזקות לאחרונה",             premium:true},
+      {date:"2026-06-14",stage:"בית E",home:"חוף השנהב",          away:"אקוודור",                           hc:"ci",    ac:"ec",    venue:"Lincoln Financial Field, Phila.", odds:{draw:2.83}, pick:"home", conf:54, note:"קרוב מאוד — חוף השנהב עם ניסיון AFCON עדכני",          premium:true},
+      {date:"2026-06-14",stage:"בית E",home:"גרמניה",             away:"קוראסאו",                           hc:"de",    ac:"cw",    venue:"NRG Stadium, Houston",            odds:{draw:17.0}, pick:"home", conf:91, note:"פער כישרונות עצום — גרמניה אחת מגדולות הכדורגל",       premium:true},
+      {date:"2026-06-14",stage:"בית F",home:"הולנד",              away:"יפן",                               hc:"nl",    ac:"jp",    venue:"AT&T Stadium, Dallas",            odds:{draw:3.62}, pick:"home", conf:57, note:"הולנד כיתה א' — עומק ובניית משחק מעולים",             premium:true},
+      {date:"2026-06-14",stage:"בית F",home:"שבדיה",              away:"תוניסיה",                           hc:"se",    ac:"tn",    venue:"Estadio BBVA, Monterrey",         odds:{draw:3.52}, pick:"home", conf:57, note:"שבדיה עקבית — שחקנים מהליגות האירופיות",              premium:true},
+      {date:"2026-06-15",stage:"בית G",home:"איראן",              away:"ניו זילנד",                         hc:"ir",    ac:"nz",    venue:"Lumen Field, Seattle",            odds:{draw:3.49}, pick:"home", conf:56, note:"איראן כוח אסייתי — יציבה הגנתית חזקה",               premium:true},
+      {date:"2026-06-15",stage:"בית G",home:"בלגיה",              away:"מצרים",                             hc:"be",    ac:"eg",    venue:"Lumen Field, Seattle",            odds:{draw:3.90}, pick:"home", conf:58, note:"בלגיה מנוסה — דה-ברוינה ואחרים ברמה עולמית",           premium:true},
+      {date:"2026-06-15",stage:"בית H",home:"ערב הסעודית",        away:"אורוגוואי",                         hc:"sa",    ac:"uy",    venue:"Hard Rock Stadium, Miami",        odds:{draw:4.55}, pick:"away", conf:60, note:"אורוגוואי ניסיון עולמי — נואן, לבניה, עומק גדול",      premium:true},
+      {date:"2026-06-15",stage:"בית H",home:"ספרד",               away:"כף ורדה",                           hc:"es",    ac:"cv",    venue:"Mercedes-Benz Stadium, Atlanta",  odds:{draw:11.0}, pick:"home", conf:79, note:"ספרד אחת מנבחרות העשור — כישרון ובישול כדורגל ייחודי",premium:true},
+      {date:"2026-06-16",stage:"בית I",home:"צרפת",               away:"סנגל",                              hc:"fr",    ac:"sn",    venue:"MetLife Stadium, New York",       odds:{draw:4.40}, pick:"home", conf:59, note:"צרפת מלאת כישרונות — מבאפה לתחום",                   premium:true},
+      {date:"2026-06-16",stage:"בית I",home:"עיראק",              away:"נורווגיה",                          hc:"iq",    ac:"no",    venue:"Gillette Stadium, Boston",        odds:{draw:6.75}, pick:"away", conf:66, note:"נורווגיה עם האלנד — עליונות ברורה על עיראק",           premium:true},
+      {date:"2026-06-16",stage:"בית J",home:"ארגנטינה",           away:"אלג'יריה",                          hc:"ar",    ac:"dz",    venue:"Arrowhead Stadium, Kansas City",  odds:{draw:4.55}, pick:"home", conf:60, note:"ארגנטינה אלופת העולם — מסי ממשיך להוביל",            premium:true},
+      {date:"2026-06-16",stage:"בית J",home:"אוסטריה",            away:"ירדן",                              hc:"at",    ac:"jo",    venue:"Levi's Stadium, San Francisco",   odds:{draw:5.50}, pick:"home", conf:63, note:"אוסטריה כוח אירופי — פער ברור מול ירדן",             premium:true},
+      {date:"2026-06-17",stage:"בית K",home:"פורטוגל",            away:"הרפובליקה הדמוקרטית של קונגו",      hc:"pt",    ac:"cd",    venue:"NRG Stadium, Houston",            odds:{draw:6.00}, pick:"home", conf:64, note:"פורטוגל רמה עולמית — רוניאלדו ובמחל",               premium:true},
+      {date:"2026-06-17",stage:"בית K",home:"אוזבקיסטן",          away:"קולומביה",                          hc:"uz",    ac:"co",    venue:"Estadio Azteca, Mexico City",     odds:{draw:4.55}, pick:"away", conf:60, note:"קולומביה קופה — מהירות ואיכות טכנית עליונה",          premium:true},
+      {date:"2026-06-17",stage:"בית L",home:"אנגליה",             away:"קרואטיה",                           hc:"gb-eng",ac:"hr",    venue:"AT&T Stadium, Dallas",            odds:{draw:3.84}, pick:"home", conf:58, note:"אנגליה רוצה לסגור חשבון — פיינל 2020",              premium:true},
+      {date:"2026-06-17",stage:"בית L",home:"גאנה",               away:"פנמה",                              hc:"gh",    ac:"pa",    venue:"BMO Field, Toronto",              odds:{draw:3.62}, pick:"home", conf:57, note:"גאנה כוח אפריקאי — שחקנים מהליגות המובילות",         premium:true},
+      // ── Round 2 ──
+      {date:"2026-06-18",stage:"בית A",home:"צ'כיה",              away:"דרום אפריקה",                       hc:"cz",    ac:"za",    venue:"Estadio Guadalajara",             odds:{draw:3.30}, pick:"home", conf:56, note:"צ'כיה איכות אירופית — כדורגל טכני ומאורגן",            premium:true},
+      {date:"2026-06-19",stage:"בית A",home:"מקסיקו",             away:"קוריאה הדרומית",                    hc:"mx",    ac:"kr",    venue:"Estadio Azteca, Mexico City",     odds:{draw:3.50}, pick:"home", conf:57, note:"מקסיקו שוב ביתי — לחץ עם יתרון",                     premium:true},
+      {date:"2026-06-18",stage:"בית B",home:"שווייץ",             away:"בוסניה והרצגובינה",                 hc:"ch",    ac:"ba",    venue:"Levi's Stadium, San Francisco",   odds:{draw:3.90}, pick:"home", conf:58, note:"שווייץ מאורגנת — הגנה ומעבר מהיר חזקים",             premium:true},
+      {date:"2026-06-19",stage:"בית B",home:"קנדה",               away:"קטאר",                              hc:"ca",    ac:"qa",    venue:"BMO Field, Toronto",              odds:{draw:4.90}, pick:"home", conf:61, note:"קנדה ביתית מול קטאר — עדיפות ברורה",                 premium:true},
+      {date:"2026-06-20",stage:"בית C",home:"סקוטלנד",            away:"מרוקו",                             hc:"gb-sct",ac:"ma",    venue:"Gillette Stadium, Boston",        odds:{draw:3.15}, pick:"away", conf:55, note:"מרוקו חצי גמר 2022 — כוח אפריקאי שמפתיע",             premium:true},
+      {date:"2026-06-20",stage:"בית C",home:"ברזיל",              away:"האיטי",                             hc:"br",    ac:"ht",    venue:"MetLife Stadium, New York",       odds:{draw:13.0}, pick:"home", conf:85, note:"פער עצום — ברזיל תנצח בנוחות",                       premium:true},
+      {date:"2026-06-20",stage:"בית D",home:"ארצות הברית",        away:"אוסטרליה",                          hc:"us",    ac:"au",    venue:"SoFi Stadium, Los Angeles",       odds:{draw:4.00}, pick:"home", conf:58, note:"ארה\"ב ביתית — כוח צעיר ועולה",                      premium:true},
+      {date:"2026-06-20",stage:"בית D",home:"טורקיה",             away:"פרגוואי",                           hc:"tr",    ac:"py",    venue:"BC Place, Vancouver",             odds:{draw:3.35}, pick:"home", conf:56, note:"טורקיה עולה — הפריעה לנבחרות חזקות לאחרונה",         premium:true},
+      {date:"2026-06-21",stage:"בית E",home:"הולנד",              away:"שבדיה",                             hc:"nl",    ac:"se",    venue:"AT&T Stadium, Dallas",            odds:{draw:3.95}, pick:"home", conf:58, note:"הולנד בשיא — ואן-דיין, גאקפו, ולנד",                 premium:true},
+      {date:"2026-06-21",stage:"בית E",home:"גרמניה",             away:"חוף השנהב",                         hc:"de",    ac:"ci",    venue:"NRG Stadium, Houston",            odds:{draw:4.10}, pick:"home", conf:58, note:"גרמניה תשמור על עמדתה — איכות אירופית עליונה",        premium:true},
+      {date:"2026-06-21",stage:"בית E",home:"אקוודור",            away:"קוראסאו",                           hc:"ec",    ac:"cw",    venue:"Lincoln Financial Field, Phila.", odds:{draw:6.50}, pick:"home", conf:66, note:"אקוודור סאו-אמריקאית — פער ברור מול קוראסאו",         premium:true},
+      {date:"2026-06-21",stage:"בית F",home:"תוניסיה",            away:"יפן",                               hc:"tn",    ac:"jp",    venue:"Estadio BBVA, Monterrey",         odds:{draw:3.60}, pick:"away", conf:57, note:"יפן הכתה ספרד וגרמניה ב-2022 — דיסציפלינה מעולה",    premium:true},
+      {date:"2026-06-22",stage:"בית G",home:"בלגיה",              away:"איראן",                             hc:"be",    ac:"ir",    venue:"Lumen Field, Seattle",            odds:{draw:4.59}, pick:"home", conf:60, note:"בלגיה עדיין כוח אירופי מנוסה",                       premium:true},
+      {date:"2026-06-22",stage:"בית G",home:"ניו זילנד",          away:"מצרים",                             hc:"nz",    ac:"eg",    venue:"Lumen Field, Seattle",            odds:{draw:3.60}, pick:"away", conf:57, note:"מצרים כוח אפריקאי ותיק — סלאח ושות'",              premium:true},
+      {date:"2026-06-22",stage:"בית H",home:"ספרד",               away:"ערב הסעודית",                       hc:"es",    ac:"sa",    venue:"Mercedes-Benz Stadium, Atlanta",  odds:{draw:10.9}, pick:"home", conf:79, note:"ספרד הרבה מעל — יחסים מדברים בעד עצמם",               premium:true},
+      {date:"2026-06-22",stage:"בית H",home:"אורוגוואי",          away:"כף ורדה",                           hc:"uy",    ac:"cv",    venue:"Hard Rock Stadium, Miami",        odds:{draw:4.35}, pick:"home", conf:59, note:"אורוגוואי דרום אמריקה — ניסיון וביטחון",             premium:true},
+      {date:"2026-06-23",stage:"בית I",home:"ארגנטינה",           away:"אוסטריה",                           hc:"ar",    ac:"at",    venue:"Arrowhead Stadium, Kansas City",  odds:{draw:3.90}, pick:"home", conf:58, note:"ארגנטינה אלופת העולם — גם ללא מסי יש כוח",           premium:true},
+      {date:"2026-06-23",stage:"בית I",home:"צרפת",               away:"עיראק",                             hc:"fr",    ac:"iq",    venue:"MetLife Stadium, New York",       odds:{draw:8.50}, pick:"home", conf:72, note:"פער עצום בדרגות — צרפת תנצח בנוחות",                premium:true},
+      {date:"2026-06-23",stage:"בית I",home:"נורווגיה",           away:"סנגל",                              hc:"no",    ac:"sn",    venue:"Gillette Stadium, Boston",        odds:{draw:3.55}, pick:"home", conf:57, note:"נורווגיה עם האלנד — כוח התקפי עליון",               premium:true},
+      {date:"2026-06-23",stage:"בית J",home:"ירדן",               away:"אלג'יריה",                          hc:"jo",    ac:"dz",    venue:"Levi's Stadium, San Francisco",   odds:{draw:4.25}, pick:"away", conf:59, note:"אלג'יריה כוח מצפון אפריקה — ניסיון רב",             premium:true},
+      {date:"2026-06-24",stage:"בית K",home:"פורטוגל",            away:"אוזבקיסטן",                         hc:"pt",    ac:"uz",    venue:"NRG Stadium, Houston",            odds:{draw:5.60}, pick:"home", conf:63, note:"פורטוגל רמה עולמית — ניצחון צפוי",                   premium:true},
+      {date:"2026-06-24",stage:"בית L",home:"אנגליה",             away:"גאנה",                              hc:"gb-eng",ac:"gh",    venue:"AT&T Stadium, Dallas",            odds:{draw:5.10}, pick:"home", conf:61, note:"אנגליה ברורה — פער בסגל ובניסיון",                   premium:true},
+      {date:"2026-06-24",stage:"בית L",home:"פנמה",               away:"קרואטיה",                           hc:"pa",    ac:"hr",    venue:"BMO Field, Toronto",              odds:{draw:3.85}, pick:"away", conf:58, note:"קרואטיה גמר 2018 — ניסיון ורוטינה עולמית",           premium:true},
+      {date:"2026-06-24",stage:"בית K",home:"קולומביה",           away:"הרפובליקה הדמוקרטית של קונגו",      hc:"co",    ac:"cd",    venue:"Estadio Azteca, Mexico City",     odds:{draw:4.20}, pick:"home", conf:59, note:"קולומביה קופה — טכניקה ומהירות על DRC",              premium:true},
+      // ── Round 3 (simultaneous per group) ──
+      {date:"2026-06-25",stage:"בית A",home:"צ'כיה",              away:"מקסיקו",                            hc:"cz",    ac:"mx",    venue:"Estadio Guadalajara",             odds:{draw:3.15}, pick:"away", conf:55, note:"מקסיקו על שדה ביתי — יתרון אחרון",                   premium:true},
+      {date:"2026-06-25",stage:"בית A",home:"דרום אפריקה",        away:"קוריאה הדרומית",                    hc:"za",    ac:"kr",    venue:"Estadio Azteca, Mexico City",     odds:{draw:3.05}, pick:"away", conf:55, note:"קוריאה — קרוב אך ניצחון צפוי",                       premium:true},
+      {date:"2026-06-25",stage:"בית B",home:"בוסניה והרצגובינה", away:"קטאר",                              hc:"ba",    ac:"qa",    venue:"Levi's Stadium, San Francisco",   odds:{draw:4.00}, pick:"home", conf:58, note:"בוסניה עדיפה ברמה הכוללת",                           premium:true},
+      {date:"2026-06-25",stage:"בית B",home:"שווייץ",             away:"קנדה",                              hc:"ch",    ac:"ca",    venue:"BMO Field, Toronto",              odds:{draw:3.20}, pick:"home", conf:56, note:"שווייץ ניסיון — קרב עם קנדה הצעירה",               premium:true},
+      {date:"2026-06-26",stage:"בית C",home:"סקוטלנד",            away:"ברזיל",                             hc:"gb-sct",ac:"br",    venue:"Gillette Stadium, Boston",        odds:{draw:4.70}, pick:"away", conf:60, note:"ברזיל תנצח גם בחוץ — עומק שאין לו מתחרה",           premium:true},
+      {date:"2026-06-26",stage:"בית C",home:"מרוקו",              away:"האיטי",                             hc:"ma",    ac:"ht",    venue:"MetLife Stadium, New York",       odds:{draw:4.80}, pick:"home", conf:60, note:"מרוקו חזקה — האיטי חלשה בינלאומית",                 premium:true},
+      {date:"2026-06-26",stage:"בית D",home:"פרגוואי",            away:"אוסטרליה",                          hc:"py",    ac:"au",    venue:"SoFi Stadium, Los Angeles",       odds:{draw:3.05}, pick:"away", conf:55, note:"קרוב — אוסטרליה עם סגל טוב יותר",                   premium:true},
+      {date:"2026-06-26",stage:"בית D",home:"טורקיה",             away:"ארצות הברית",                       hc:"tr",    ac:"us",    venue:"BC Place, Vancouver",             odds:{draw:3.10}, pick:"home", conf:55, note:"קרוב — טורקיה עם יתרון בכישרון",                     premium:true},
+      {date:"2026-06-26",stage:"בית E",home:"קוראסאו",            away:"חוף השנהב",                         hc:"cw",    ac:"ci",    venue:"Lincoln Financial Field, Phila.", odds:{draw:5.00}, pick:"away", conf:61, note:"חוף השנהב הרבה מעל קוראסאו ברמה",                   premium:true},
+      {date:"2026-06-26",stage:"בית E",home:"אקוודור",            away:"גרמניה",                            hc:"ec",    ac:"de",    venue:"NRG Stadium, Houston",            odds:{draw:3.35}, pick:"away", conf:56, note:"גרמניה תנצח גם בחוץ — רמה אירופית עליונה",          premium:true},
+      {date:"2026-06-26",stage:"בית F",home:"יפן",                away:"שבדיה",                             hc:"jp",    ac:"se",    venue:"AT&T Stadium, Dallas",            odds:{draw:3.15}, pick:"home", conf:55, note:"יפן בכושר — הכתה ספרד וגרמניה ב-2022",              premium:true},
+      {date:"2026-06-26",stage:"בית F",home:"תוניסיה",            away:"הולנד",                             hc:"tn",    ac:"nl",    venue:"Estadio BBVA, Monterrey",         odds:{draw:3.70}, pick:"away", conf:57, note:"הולנד תנצח — רמה אירופית עליונה",                   premium:true},
+      {date:"2026-06-27",stage:"בית G",home:"ניו זילנד",          away:"בלגיה",                             hc:"nz",    ac:"be",    venue:"Lumen Field, Seattle",            odds:{draw:5.58}, pick:"away", conf:63, note:"בלגיה עדיפה — ניו זילנד לא ברמה הזאת",             premium:true},
+      {date:"2026-06-27",stage:"בית G",home:"מצרים",              away:"איראן",                             hc:"eg",    ac:"ir",    venue:"Lumen Field, Seattle",            odds:{draw:3.08}, pick:"home", conf:55, note:"קרוב — מצרים עם יתרון בניסיון ועלייה",             premium:true},
+      {date:"2026-06-27",stage:"בית H",home:"כף ורדה",            away:"ערב הסעודית",                       hc:"cv",    ac:"sa",    venue:"Mercedes-Benz Stadium, Atlanta",  odds:{draw:3.20}, pick:"away", conf:56, note:"ערב הסעודית הפתיעה ב-2022 — מועמדת לנצח",            premium:true},
+      {date:"2026-06-27",stage:"בית H",home:"אורוגוואי",          away:"ספרד",                              hc:"uy",    ac:"es",    venue:"Hard Rock Stadium, Miami",        odds:{draw:3.80}, pick:"away", conf:57, note:"ספרד שולטת בכדור — תנצח גם בחוץ",                   premium:true},
+      {date:"2026-06-27",stage:"בית I",home:"נורווגיה",           away:"צרפת",                              hc:"no",    ac:"fr",    venue:"Gillette Stadium, Boston",        odds:{draw:3.66}, pick:"away", conf:57, note:"צרפת תנצח — עומק סגל לא נגמר",                     premium:true},
+      {date:"2026-06-27",stage:"בית I",home:"סנגל",               away:"עיראק",                             hc:"sn",    ac:"iq",    venue:"MetLife Stadium, New York",       odds:{draw:4.31}, pick:"home", conf:59, note:"סנגל כוח אפריקאי — ממאנה ועד מנדי",               premium:true},
+      {date:"2026-06-27",stage:"בית J",home:"אלג'יריה",           away:"אוסטריה",                           hc:"dz",    ac:"at",    venue:"Arrowhead Stadium, Kansas City",  odds:{draw:2.90}, pick:"away", conf:53, note:"הכי קרוב בתחרות — אוסטריה אירופה ותתאמץ",           premium:true},
+      {date:"2026-06-27",stage:"בית J",home:"ירדן",               away:"ארגנטינה",                          hc:"jo",    ac:"ar",    venue:"Levi's Stadium, San Francisco",   odds:{draw:6.20}, pick:"away", conf:65, note:"ארגנטינה תנצח בנוחות — אלופת העולם",               premium:true},
+      {date:"2026-06-28",stage:"בית K",home:"הרפובליקה הדמוקרטית של קונגו",away:"אוזבקיסטן",             hc:"cd",    ac:"uz",    venue:"NRG Stadium, Houston",            odds:{draw:3.10}, pick:"home", conf:55, note:"DRC יתרון יבשת — קרוב אך צפוי",                     premium:true},
+      {date:"2026-06-28",stage:"בית K",home:"קולומביה",           away:"פורטוגל",                           hc:"co",    ac:"pt",    venue:"Estadio Azteca, Mexico City",     odds:{draw:3.30}, pick:"away", conf:56, note:"פורטוגל מהחמישייה הגדולה — תנצח גם בחוץ",            premium:true},
+      {date:"2026-06-28",stage:"בית L",home:"קרואטיה",            away:"גאנה",                              hc:"hr",    ac:"gh",    venue:"AT&T Stadium, Dallas",            odds:{draw:3.70}, pick:"home", conf:57, note:"קרואטיה גמר 2018 — ניסיון ורוטינה",               premium:true},
+      {date:"2026-06-28",stage:"בית L",home:"פנמה",               away:"אנגליה",                            hc:"pa",    ac:"gb-eng",venue:"BMO Field, Toronto",              odds:{draw:5.50}, pick:"away", conf:63, note:"אנגליה חזקה — פנמה בדרגת כניסה",                   premium:true},
     ];
 
     const statusClass = {
@@ -5852,7 +5906,7 @@
     }
 
     function hasPick(row) {
-      return row.noOddsYet || row.recommended === true || (!!row.odds && !row.outsideRange);
+      return row.noOddsYet || row.recommended === true || !!row.odds;
     }
 
     function trackedResultKeys() {
@@ -6245,8 +6299,37 @@
     }
 
     function wcFixtureCard(item) {
-      const status = wcStatus(item);
       const date = wcDateLabel(item.date);
+      // Premium-locked: show teams + flag but lock the pick
+      if (item.premium && !state.isPremium) {
+        return `
+          <article class="wcm" data-status="upcoming" style="position:relative;overflow:hidden">
+            <div class="wcm-top">
+              <span class="wcm-group">${escapeHtml(item.stage || '')}</span>
+              <span class="wcm-status upcoming">ממתין</span>
+            </div>
+            <div class="wcm-matchup" style="filter:blur(3px);pointer-events:none;user-select:none">
+              <div class="wcm-team">
+                <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.hc}.png`, item.home, 'flag')}</div>
+                <span class="wcm-name">${escapeHtml(item.home)}</span>
+              </div>
+              <div class="wcm-center">
+                <div class="wcm-vs">VS</div>
+                <div class="wcm-datetime"><span class="wcm-date">${escapeHtml(date.short)}</span></div>
+              </div>
+              <div class="wcm-team away">
+                <div class="wcm-flag">${imageWithFallback(`https://flagcdn.com/w160/${item.ac}.png`, item.away, 'flag')}</div>
+                <span class="wcm-name">${escapeHtml(item.away)}</span>
+              </div>
+            </div>
+            <div class="premium-lock-overlay" style="border-radius:12px">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-label">ניתוח פרימיום</span>
+              <button class="lock-btn" onclick="openPremiumModal()">שדרג לפרימיום</button>
+            </div>
+          </article>`;
+      }
+      const status = wcStatus(item);
       const isDone = status.cls === 'finished' || status.cls === 'hit' || status.cls === 'miss';
       const hasPick = !!(item.pick && item.odds);
       const homeOdds = item.odds ? (item.odds['1'] || item.odds.home || item.odds[item.hc]) : null;
@@ -7926,14 +8009,14 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: free users see 3 football cards and 1 basketball card
+      // Premium lock: free users see 2 cards per sport
       if (!state.isPremium) {
         const allCards = cards.querySelectorAll('article.card');
         let footballSeen = 0, basketballSeen = 0;
         allCards.forEach((card) => {
           const isBasketball = String(card.dataset.sport || '').trim() === String(227);
-          if (isBasketball) { basketballSeen++; if (basketballSeen <= 1) return; }
-          else { footballSeen++; if (footballSeen <= 3) return; }
+          if (isBasketball) { basketballSeen++; if (basketballSeen <= 2) return; }
+          else { footballSeen++; if (footballSeen <= 2) return; }
           card.style.position = 'relative';
           card.style.overflow = 'hidden';
           if (!card.querySelector('.premium-lock-overlay')) {
@@ -8058,6 +8141,22 @@
         grid.innerHTML = `<div class="lv-empty">אין משחקים היום בספורט זה.</div>`;
         return;
       }
+      // Build pick lookup from feed recommendations for live card overlay
+      const _livePicks = {};
+      try {
+        const normT = (s) => String(s || "").toLowerCase().trim();
+        for (const day of ["today", "tomorrow"]) {
+          for (const sport of ["football", "basketball"]) {
+            (state.feed?.tabs?.[day]?.sports?.[sport] || [])
+              .filter(r => r.recommended && r.winnerPick)
+              .forEach(r => {
+                _livePicks[`${normT(r.home)}_${normT(r.away)}`] = r.winnerPick;
+                _livePicks[`${normT(r.away)}_${normT(r.home)}`] = r.winnerPick;
+              });
+          }
+        }
+      } catch {}
+
       grid.innerHTML = events.map(ev => {
         const isLive     = ev.live;
         const isFinished = ev.finished;
@@ -8074,6 +8173,11 @@
           : "";
         const statusText = isLive ? (ev.statusLabel || "חי") : isFinished ? "נגמר" : timeStr;
         const leagueText = ev.country ? `${ev.country} · ${ev.league}` : ev.league;
+        const normT = (s) => String(s || "").toLowerCase().trim();
+        const matchedPick = _livePicks[`${normT(ev.home)}_${normT(ev.away)}`];
+        const pickBadge = matchedPick
+          ? `<div class="lv-pick">✦ הפוגע בוחר: <b>${escapeHtml(matchedPick)}</b></div>`
+          : "";
         return `
           <div class="lv-card ${cardCls}">
             <div class="lv-meta">
@@ -8085,6 +8189,7 @@
               ${scoreHtml}
               <span class="lv-team">${escapeHtml(ev.away)}</span>
             </div>
+            ${pickBadge}
             ${minuteHtml}
           </div>`;
       }).join("");
@@ -10093,6 +10198,7 @@
           state.reubenLoading = false;
           if (!state.isPremium) {
             state.reubenFreeUsed = (state.reubenFreeUsed || 0) + 1;
+            try { localStorage.setItem('hapogea_ai_free_used_v1', String(state.reubenFreeUsed)); } catch {}
           }
           renderCards();
           scrollReuvenOutput();
@@ -10650,7 +10756,8 @@ function AiMessage({m,idx,onToggle,onRephrase}) {
   );
 }
 
-const AI_FREE_LIMIT = 1; // free users get 1 AI message total
+const AI_FREE_LIMIT = 1;      // free users: 1 message per day
+const AI_PREMIUM_LIMIT = 100; // premium users: 100 messages per day
 
 function AiApp() {
   const user = useHapUser();
@@ -10666,9 +10773,12 @@ function AiApp() {
   const [aiMsgUsed, setAiMsgUsed] = React.useState(() => {
     try { return Number(localStorage.getItem(window.AI_FREE_KEY || 'hapogea_ai_free_used_v1') || 0); } catch { return 0; }
   });
+  const [premAiUsed, setPremAiUsed] = React.useState(() => {
+    try { return Number(localStorage.getItem('hapogea_ai_premium_used_v1') || 0); } catch { return 0; }
+  });
   const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
   const isLoggedIn = !!user;
-  const isAiLocked = !isPrem() && aiMsgUsed >= AI_FREE_LIMIT;
+  const isAiLocked = isPrem() ? premAiUsed >= AI_PREMIUM_LIMIT : aiMsgUsed >= AI_FREE_LIMIT;
 
   // Per-user chat history: load the saved thread when the account changes,
   // and persist completed threads back to that user's slot.
@@ -10791,7 +10901,7 @@ function AiApp() {
         }
         patchAi({phase:"streaming",intro:finalText,streamLen:finalText.length});
         patchAi({phase:"done"});
-        if(!isPrem()){const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
+        if(isPrem()){const n=premAiUsed+1;setPremAiUsed(n);try{localStorage.setItem('hapogea_ai_premium_used_v1',String(n));}catch{}}else{const n=aiMsgUsed+1;setAiMsgUsed(n);try{localStorage.setItem('hapogea_ai_free_used_v1',String(n));}catch{}}
         setBusy(false);
         return;
       }
