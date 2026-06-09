@@ -4063,4 +4063,5 @@ module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
 module.exports.buildOddsApiFeed = buildOddsApiFeed;
 module.exports.buildSofascoreFeed = buildSofascoreFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
+module.exports.scoreBreakdown = scoreBreakdown;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
