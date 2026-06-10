@@ -4222,17 +4222,36 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
                 })
               : oddsRows).filter((r) => !/\bNBA\b/i.test(r.league || ""));
             if (freshRows.length > 0) {
+              // Real odds picks go FIRST; noOddsYet schedule placeholders stay only as
+              // filler after them (and are dropped when the same match arrives with odds).
+              // Without this, the per-sport caps below cut the real picks and keep
+              // the odds-less placeholders, leaving the board without any tips.
+              const mergeSportRows = (existingRows, fresh) => {
+                const matchKey = (r) => {
+                  const he = (name) => ODDS_API_TEAM_HE[name] || name;
+                  return `${normalizeMatchName(he(r.home))}:${normalizeMatchName(he(r.away))}`;
+                };
+                const freshKeys = new Set(fresh.map(matchKey));
+                const kept = (existingRows || []).filter(
+                  (r) => !(r.noOddsYet && freshKeys.has(matchKey(r)))
+                );
+                return [...kept, ...fresh].sort(
+                  (a, b) =>
+                    Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
+                    (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0)
+                );
+              };
               newTabs[dayKey] = {
                 ...existing,
                 sports: {
-                  football: [
-                    ...(existing.sports?.football || []),
-                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID),
-                  ],
-                  basketball: [
-                    ...(existing.sports?.basketball || []),
-                    ...freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID),
-                  ],
+                  football: mergeSportRows(
+                    existing.sports?.football,
+                    freshRows.filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
+                  ),
+                  basketball: mergeSportRows(
+                    existing.sports?.basketball,
+                    freshRows.filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
+                  ),
                 },
               };
               usedOdds = true;
@@ -4250,11 +4269,28 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     }
   }
 
-  // Hard-cap football to 5 per day (top by recommendationScore — already sorted)
+  // Hard-cap football to 5 per day. Real picks (with odds) are kept first;
+  // noOddsYet placeholders only fill leftover slots — never displace a real pick.
+  // Basketball: no NBA on the board (placeholders included), per product rules.
   for (const tabKey of ["today", "tomorrow"]) {
     const tab = payload.tabs?.[tabKey];
-    if (tab?.sports?.football?.length > 5) {
-      tab.sports.football = tab.sports.football.slice(0, 5);
+    if (!tab?.sports) continue;
+    if (Array.isArray(tab.sports.football) && tab.sports.football.length > 5) {
+      const real = tab.sports.football.filter((r) => !r.noOddsYet);
+      const placeholders = tab.sports.football.filter((r) => r.noOddsYet);
+      tab.sports.football = [
+        ...real.slice(0, 5),
+        ...placeholders.slice(0, Math.max(0, 5 - Math.min(real.length, 5))),
+      ];
+    }
+    if (Array.isArray(tab.sports.basketball)) {
+      tab.sports.basketball = tab.sports.basketball
+        .filter((r) => !/\bNBA\b/i.test(r.league || ""))
+        .sort(
+          (a, b) =>
+            Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
+            (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0)
+        );
     }
   }
 
