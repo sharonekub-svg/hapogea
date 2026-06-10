@@ -85,19 +85,19 @@ const ODDS_API_SPORTS = [
 ];
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ODDS_MIN = 1.40;
-const ODDS_MAX = 1.85;
-const SOFT_ODDS_MIN = 1.25;
-const SOFT_ODDS_MAX = 2.00;
+const ODDS_MIN = 1.20;
+const ODDS_MAX = 2.20;
+const SOFT_ODDS_MIN = 1.10;
+const SOFT_ODDS_MAX = 2.50;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
-const BASKETBALL_ODDS_MIN = 1.20;
-const BASKETBALL_ODDS_MAX_MONEYLINE = 1.75;
-const BASKETBALL_ODDS_MAX_SPREAD = 1.95;
+const BASKETBALL_ODDS_MIN = 1.15;
+const BASKETBALL_ODDS_MAX_MONEYLINE = 2.10;
+const BASKETBALL_ODDS_MAX_SPREAD = 2.10;
 // Football 3-way: all other outcomes (draw + loser) must be at or above this threshold
-const MIN_OPPONENT_ODDS = 2.2;
+const MIN_OPPONENT_ODDS = 1.70;
 // Basketball 2-way: the non-picked team must be at or above this threshold
-const MIN_BASKETBALL_OPPONENT_ODDS = 2.0;
+const MIN_BASKETBALL_OPPONENT_ODDS = 1.60;
 /** Top Winner picks shown per day (verified line + odds in range). */
 const TARGET_PICKS_PER_SPORT = 20;
 /** Minimum games shown per sport per day — stretch the board with the best
@@ -2726,7 +2726,6 @@ function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
-    .filter((r) => !/\bNBA\b/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
   // 10-15 games per sport: football used to be hard-capped at 5 — now both sports
@@ -3424,20 +3423,13 @@ async function buildOddsApiFeed() {
 
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
-  const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedToday    = sortByScore(todayRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow = sortByScore(tomorrowRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
-  // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
     label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
   };
-  if (yesterdayTab.sports?.basketball) {
-    yesterdayTab.sports.basketball = yesterdayTab.sports.basketball.filter(
-      (r) => !/\bNBA\b/i.test(r.league || "")
-    );
-  }
 
   const now = new Date().toISOString();
   return {
@@ -3494,7 +3486,6 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
   const isFootball = sfSport === "football";
   const league = ev.tournament?.name || (isFootball ? "כדורגל" : "כדורסל");
   const country = ev.tournament?.category?.country?.name || "";
-  if (/\bNBA\b/i.test(league)) return null;
 
   // Status: 0=scheduled, 6-11=live/HT/ET, 100=finished, 31=postponed, 41=cancelled
   const statusCode = ev.status?.code ?? 0;
@@ -3659,7 +3650,7 @@ async function buildSofascoreFeed() {
     .map((x) => ({ ...x, _pri: sfLeaguePriority(x.ev) }))
     .filter((x) => x._pri > 5)
     .sort((a, b) => b._pri - a._pri)
-    .slice(0, 150);
+    .slice(0, 300);
   const BATCH = 10;
   for (let i = 0; i < toFetch.length; i += BATCH) {
     const batch = toFetch.slice(i, i + BATCH);
@@ -3683,8 +3674,6 @@ async function buildSofascoreFeed() {
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
     label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
   };
-  if (yesterdayTab.sports?.basketball)
-    yesterdayTab.sports.basketball = yesterdayTab.sports.basketball.filter((r) => !/\bNBA\b/i.test(r.league || ""));
 
   return {
     ok: true,
@@ -3860,8 +3849,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         tab.sports.football = tab.sports.football.filter(passesOpponentGate);
       if (tab.sports?.basketball)
         tab.sports.basketball = tab.sports.basketball
-          .filter(passesOpponentGate)
-          .filter((r) => !/\bNBA\b/i.test(r.league || ""));
+          .filter(passesOpponentGate);
     }
   };
 
@@ -4025,11 +4013,14 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   }
 
   // Hard-cap football to 5 per day (top by recommendationScore — already sorted)
-  for (const tabKey of ["today", "tomorrow"]) {
-    const tab = payload.tabs?.[tabKey];
-    if (tab?.sports?.football?.length > 5) {
-      tab.sports.football = tab.sports.football.slice(0, 5);
-    }
+  // Football today: expanded cap (20 instead of 5) to show more games from active leagues
+  const _todayTab = payload.tabs?.today;
+  if (_todayTab?.sports?.football?.length > 20) {
+    _todayTab.sports.football = _todayTab.sports.football.slice(0, 20);
+  }
+  // Clear tomorrow recommendations — show only when explicitly found on the day
+  if (payload.tabs?.tomorrow) {
+    payload.tabs.tomorrow.sports = { football: [], basketball: [] };
   }
 
   if (!payloadMatchesIsraelDates(payload)) {
