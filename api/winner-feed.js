@@ -90,6 +90,10 @@ const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
+// Minimum active recommendations (recommended + odds + still open) a day must carry.
+// Below this we pull odds from the fallback chain (SofaScore → The Odds API) and run
+// them through the same pick model, so a board is never just games with no המלצות.
+const MIN_RECS_PER_DAY = 4;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
 const BASKETBALL_ODDS_MAX_MONEYLINE = 1.75;
@@ -3820,6 +3824,35 @@ function markStaleDatePayload(payload, reason) {
   return copy;
 }
 
+// Match key used to dedupe a fallback row against what a day already shows.
+function supplementMatchKey(row) {
+  return `${Number(row.sportId)}:${normalizeMatchName(row.home)}:${normalizeMatchName(row.away)}`;
+}
+
+// Decide which fallback-source rows to splice into a given day. A day needs help when
+// Winner is short on games, short on league variety, or — the case this targets — short
+// on actual recommendations (games are listed but the model produced no picks). The
+// fallback rows already ran through the same odds→pick model, so they arrive with
+// `recommended` set; here we only choose which ones to merge in.
+function selectSupplementRows({ oddsRows, existingRows = [], dayCount, dayRecs, dayLeagues, minRecs = MIN_RECS_PER_DAY }) {
+  const rows = (oddsRows || []).filter((r) => !/\bNBA\b/i.test(r.league || ""));
+  // No Winner rows at all for this day — take the whole fallback board.
+  if (!dayCount) return rows;
+  // Winner listed games but (almost) no actionable pick — bring in fallback rows that DO
+  // carry a recommendation, even for leagues Winner already covers, deduped by match so
+  // the same game never shows twice. This is what guarantees recommendations appear.
+  if (dayRecs < minRecs) {
+    const have = new Set((existingRows || []).map(supplementMatchKey));
+    return rows.filter((r) => r.recommended && r.odds && !have.has(supplementMatchKey(r)));
+  }
+  // Winner has enough recommendations but the board is thin / low on variety — only widen
+  // the league spread so curated Winner picks are never replaced.
+  return rows.filter((r) => {
+    const league = String(r.league || "").trim().toLowerCase();
+    return league && (!dayLeagues || !dayLeagues.has(league));
+  });
+}
+
 async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   const key = cacheKeyForToday();
   const cached = await kvGet(key);
@@ -3919,8 +3952,12 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   // noOddsYet rows are 365Scores schedule placeholders with no odds — they don't count as real picks.
   const countReal = (tab) =>
     [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet).length;
+  const countRecs = (tab) =>
+    countRecommendedPicks([...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])]);
   const todayCount = countReal(payload.tabs?.today);
   const tomorrowCount = countReal(payload.tabs?.tomorrow);
+  const todayRecs = countRecs(payload.tabs?.today);
+  const tomorrowRecs = countRecs(payload.tabs?.tomorrow);
 
   function tabLeagueSet(tab) {
     const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
@@ -3928,17 +3965,22 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   }
   const todayLeagues = tabLeagueSet(payload.tabs?.today);
   const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
-  // Supplement when count is low OR league variety is low (e.g. only Brazil at end of European season)
+  // Supplement when a day is short on games, short on league variety (e.g. only Brazil at
+  // the end of the European season), OR short on actual recommendations — i.e. games are
+  // listed but the model produced no picks. That last case is the one that leaves a board
+  // showing matches with no המלצות; the fallback odds below fill it.
   // Allow even when Winner is blocked (fallback=true) as long as the date is current (not stale)
   const MIN_LEAGUES = 3;
   const needsOdds = !payload.staleDate && (
     todayCount < MIN_PREMIUM_ROWS_PER_DAY ||
     tomorrowCount < MIN_PREMIUM_ROWS_PER_DAY ||
     todayLeagues.size < MIN_LEAGUES ||
-    tomorrowLeagues.size < MIN_LEAGUES
+    tomorrowLeagues.size < MIN_LEAGUES ||
+    todayRecs < MIN_RECS_PER_DAY ||
+    tomorrowRecs < MIN_RECS_PER_DAY
   );
 
-  console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
+  console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount}g/${todayRecs}rec tomorrow=${tomorrowCount}g/${tomorrowRecs}rec key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
     // Try SofaScore first (no API key needed, already works from Vercel), then fall back to ODDS_API
     let supplementFeed = null;
@@ -3968,9 +4010,9 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         let usedOdds = false;
         const oddsCountByDay = {};
 
-        for (const [dayKey, dayCount, dayLeagues] of [
-          ["today",    todayCount,    todayLeagues],
-          ["tomorrow", tomorrowCount, tomorrowLeagues],
+        for (const [dayKey, dayCount, dayLeagues, dayRecs] of [
+          ["today",    todayCount,    todayLeagues,    todayRecs],
+          ["tomorrow", tomorrowCount, tomorrowLeagues, tomorrowRecs],
         ]) {
           const oddsTab = oddsFeed.tabs?.[dayKey];
           if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
@@ -3979,22 +4021,26 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
             (oddsTab.sports?.basketball?.length || 0);
           oddsCountByDay[dayKey] = oddsCount;
 
-          const needsSupplement = (dayCount < MIN_PREMIUM_ROWS_PER_DAY || dayLeagues.size < MIN_LEAGUES) && oddsCount > 0;
+          const needsSupplement =
+            (dayCount < MIN_PREMIUM_ROWS_PER_DAY ||
+             dayLeagues.size < MIN_LEAGUES ||
+             dayRecs < MIN_RECS_PER_DAY) && oddsCount > 0;
           if (needsSupplement) {
             const existing = newTabs[dayKey];
             const oddsRows = [
               ...(oddsTab.sports?.football || []),
               ...(oddsTab.sports?.basketball || []),
             ];
-            // When Winner already has real picks, only add Odds API rows from new leagues
-            // (prevents Odds API rows from replacing curated Winner picks).
-            // When there are no Winner picks at all, use all Odds API rows.
-            const freshRows = (dayCount > 0
-              ? oddsRows.filter((r) => {
-                  const league = String(r.league || "").trim().toLowerCase();
-                  return league && !dayLeagues.has(league);
-                })
-              : oddsRows).filter((r) => !/\bNBA\b/i.test(r.league || ""));
+            const existingRows = [
+              ...(existing.sports?.football || []),
+              ...(existing.sports?.basketball || []),
+            ];
+            // selectSupplementRows decides what to splice in: the whole board when Winner
+            // has nothing, recommended (deduped) rows when Winner has games but no picks,
+            // or just new-league rows when Winner already has picks and only needs breadth.
+            const freshRows = selectSupplementRows({
+              oddsRows, existingRows, dayCount, dayRecs, dayLeagues,
+            });
             if (freshRows.length > 0) {
               newTabs[dayKey] = {
                 ...existing,
@@ -4024,11 +4070,18 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     }
   }
 
-  // Hard-cap football to 5 per day (top by recommendationScore — already sorted)
+  // Hard-cap football to 5 per day. Keep active recommendations first so a board padded
+  // with no-pick games (or supplemented late) never drops the actual picks at the cap.
+  // Within each group the prior recommendationScore order is preserved.
   for (const tabKey of ["today", "tomorrow"]) {
     const tab = payload.tabs?.[tabKey];
-    if (tab?.sports?.football?.length > 5) {
-      tab.sports.football = tab.sports.football.slice(0, 5);
+    const fb = tab?.sports?.football;
+    if (fb && fb.length > 5) {
+      const isRec = (r) => r.recommended && r.odds;
+      const waitingRecs = fb.filter((r) => isRec(r) && r.status === "ממתין");
+      const otherRecs   = fb.filter((r) => isRec(r) && r.status !== "ממתין");
+      const rest        = fb.filter((r) => !isRec(r));
+      tab.sports.football = [...waitingRecs, ...otherRecs, ...rest].slice(0, 5);
     }
   }
 
@@ -4188,4 +4241,7 @@ module.exports.buildOddsApiFeed = buildOddsApiFeed;
 module.exports.buildSofascoreFeed = buildSofascoreFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.scoreBreakdown = scoreBreakdown;
+module.exports.selectSupplementRows = selectSupplementRows;
+module.exports.countRecommendedPicks = countRecommendedPicks;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
+module.exports.MIN_RECS_PER_DAY = MIN_RECS_PER_DAY;
