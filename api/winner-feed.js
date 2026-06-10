@@ -2738,7 +2738,6 @@ function finalOpenRowsByDay(rows) {
   const football   = (rows || []).filter((r) => Number(r.sportId) === WINNER_FOOTBALL_ID)
     .filter(passesOpponentGate);
   const basketball = (rows || []).filter((r) => Number(r.sportId) === WINNER_BASKETBALL_ID)
-    .filter((r) => !/\bNBA\b/i.test(r.league || ""))
     .filter(passesOpponentGate);
 
   // 10-15 games per sport: football used to be hard-capped at 5 — now both sports
@@ -3386,7 +3385,6 @@ async function buildOddsApiFeed() {
     const activeKeys = new Set(activeSports.map((s) => s.key));
     sportsToQuery = ODDS_API_SPORTS.filter((s) => activeKeys.has(s.key));
   }
-  sportsToQuery = sportsToQuery.filter((s) => !/nba/i.test(s.key));
   const soccerQ = sportsToQuery
     .filter((s) => s.sportId === WINNER_FOOTBALL_ID)
     .slice(0, ODDS_API_MAX_SOCCER);
@@ -3436,11 +3434,9 @@ async function buildOddsApiFeed() {
 
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
-  const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedToday    = sortByScore(todayRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow = sortByScore(tomorrowRows).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
-  // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
     label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
@@ -3872,8 +3868,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         tab.sports.football = tab.sports.football.filter(passesOpponentGate);
       if (tab.sports?.basketball)
         tab.sports.basketball = tab.sports.basketball
-          .filter(passesOpponentGate)
-          .filter((r) => !/\bNBA\b/i.test(r.league || ""));
+          .filter(passesOpponentGate);
     }
   };
 
@@ -4006,7 +4001,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
                   const league = String(r.league || "").trim().toLowerCase();
                   return league && !dayLeagues.has(league);
                 })
-              : oddsRows).filter((r) => !/\bNBA\b/i.test(r.league || ""));
+              : oddsRows);
             if (freshRows.length > 0) {
               newTabs[dayKey] = {
                 ...existing,
