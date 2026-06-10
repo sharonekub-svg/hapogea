@@ -5,6 +5,16 @@ const { rateLimit } = require("./_rate-limit");
 // ── The Odds API (fallback when Winner is blocked) ───────────────────────────
 const ODDS_API_KEY  = process.env.ODDS_API_KEY || "";
 const ODDS_API_BASE = "https://api.the-odds-api.com/v4";
+
+// ── The Odds API quota controls — defaults sized for the FREE tier (500 req/month).
+// Each /odds call costs (regions × markets) credits; /scores with daysFrom costs ~2.
+// With these defaults a single daily cron build spends ~11 credits (~330/month).
+// Raise these via env vars only on a paid plan.
+const ODDS_API_REGIONS        = process.env.ODDS_API_REGIONS || "eu";   // was "uk,eu,us" → 3× the cost
+const ODDS_API_MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 8);
+const ODDS_API_MAX_BASKETBALL = Number(process.env.ODDS_API_MAX_BASKETBALL || 3);
+const ODDS_API_LIVE_ENABLED   = process.env.ODDS_API_LIVE === "1";      // off → live feed serves the cron snapshot, spends 0 credits
+const ODDS_API_SCORES_ENABLED = process.env.ODDS_API_SCORES === "1";    // off → results come from free 365Scores/SofaScore
 // ── API-Sports (api-sports.io) — comprehensive results source ─────────────────
 const FOOTBALL_API_KEY   = process.env.FOOTBALL_KEY || "";
 const APISPORTS_FOOTBALL = "https://v3.football.api-sports.io";
@@ -2265,7 +2275,7 @@ function translateEnTeamToHe(name) {
 // Fetch completed match scores from Odds API and return in the internal event format.
 // Only called by the nightly cron — not on every feed build — to preserve API quota.
 async function getOddsApiScores() {
-  if (!ODDS_API_KEY) return [];
+  if (!ODDS_API_KEY || !ODDS_API_SCORES_ENABLED) return [];
   const yesterday = israelDate(-1);
   const today = israelDate(0);
   const rows = [];
@@ -3233,7 +3243,7 @@ async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
   const url =
     `${ODDS_API_BASE}/sports/${sportKey}/odds` +
     `?apiKey=${ODDS_API_KEY}` +
-    `&regions=uk,eu,us&markets=h2h&dateFormat=iso&oddsFormat=decimal` +
+    `&regions=${ODDS_API_REGIONS}&markets=h2h&dateFormat=iso&oddsFormat=decimal` +
     `&commenceTimeFrom=${dateFrom}T00:00:00Z` +
     `&commenceTimeTo=${dateTo}T23:59:59Z`;
   try {
@@ -3366,22 +3376,22 @@ async function buildOddsApiFeed() {
   // active soccer/basketball sports not in the list — friendlies,
   // playoffs, qualifications, etc.
   const activeSports = await discoverActiveSports();
-  let sportsToQuery;
+  // Free-tier quota guard: query only curated, in-season leagues, capped per sport
+  // (see ODDS_API_MAX_*). The broad "all active leagues" expansion is dropped, and
+  // NBA is skipped (it's filtered out of the results below anyway) — every query costs credits.
+  let sportsToQuery = ODDS_API_SPORTS;
   if (activeSports) {
     const activeKeys = new Set(activeSports.map((s) => s.key));
-    const fromList   = ODDS_API_SPORTS.filter((s) => activeKeys.has(s.key));
-    const listKeys   = new Set(fromList.map((s) => s.key));
-    const extra = activeSports
-      .filter((s) => (s.key.startsWith("soccer_") || s.key.startsWith("basketball_")) && !listKeys.has(s.key))
-      .map((s) => ({
-        key:      s.key,
-        label:    s.title || s.key.replace(/^(soccer|basketball)_/, "").replace(/_/g, " "),
-        sportId:  s.key.startsWith("basketball_") ? WINNER_BASKETBALL_ID : WINNER_FOOTBALL_ID,
-      }));
-    sportsToQuery = [...fromList, ...extra];
-  } else {
-    sportsToQuery = ODDS_API_SPORTS;
+    sportsToQuery = ODDS_API_SPORTS.filter((s) => activeKeys.has(s.key));
   }
+  sportsToQuery = sportsToQuery.filter((s) => !/nba/i.test(s.key));
+  const soccerQ = sportsToQuery
+    .filter((s) => s.sportId === WINNER_FOOTBALL_ID)
+    .slice(0, ODDS_API_MAX_SOCCER);
+  const basketQ = sportsToQuery
+    .filter((s) => s.sportId === WINNER_BASKETBALL_ID)
+    .slice(0, ODDS_API_MAX_BASKETBALL);
+  sportsToQuery = [...soccerQ, ...basketQ];
 
   const today    = israelDate(0);
   const tomorrow = israelDate(1);
@@ -3949,7 +3959,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     } catch (sfErr) {
       console.warn("[winner-feed] SofaScore supplement failed:", sfErr?.message);
     }
-    if (!supplementFeed && ODDS_API_KEY) {
+    if (!supplementFeed && ODDS_API_KEY && ODDS_API_LIVE_ENABLED) {
       try {
         console.warn("[winner-feed] Falling back to Odds API supplement");
         supplementFeed = await buildOddsApiFeed();
