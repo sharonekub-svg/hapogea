@@ -9,7 +9,7 @@ const assert = require("assert");
 const {
   selectSupplementRows,
   countRecommendedPicks,
-  predictWinnerFromStandings,
+  enrichPlaceholdersWithOdds,
   MIN_RECS_PER_DAY,
 } = require("../api/winner-feed");
 
@@ -98,42 +98,62 @@ const fallback = [
   ok("boundary: at threshold uses league filter (not rec filter)", healthy.length === 4);
 }
 
-// ── predictWinnerFromStandings (standings-based pick for oddless games) ───────
-console.log("predictWinnerFromStandings:");
+// ── enrichPlaceholdersWithOdds (fill "ממתין לקווים" cards with REAL SofaScore odds) ──
+console.log("enrichPlaceholdersWithOdds:");
 {
-  const standings = [{
-    rows: [
-      { competitor: { id: 10, name: "Damash Gilan" },   position: 2, points: 40 },
-      { competitor: { id: 20, name: "Mes Shahr-e Babak" }, position: 9, points: 22 },
-    ],
-  }];
-  const byId = predictWinnerFromStandings(standings, { id: 10, name: "דאמש גילן" }, { id: 20, name: "Mes Shahr-E Babak" });
-  ok("predicts the higher-ranked team by id (cross-language safe)", byId && byId.winner === "Damash Gilan");
-  ok("reports the basis (points)", byId && byId.basis === "points");
-  ok("reports favoriteSide=home so the card can use its own (Hebrew) label", byId && byId.favoriteSide === "home");
+  // Placeholder card from 365Scores (home name in Hebrew, away left in English).
+  const placeholderTab = {
+    sports: {
+      football: [{
+        id: "sched-365-1", sportId: FB, home: "דאמש גילן", away: "Mes Shahr-E Babak",
+        league: "ליגה שנייה", noOddsYet: true, outsideRange: true, odds: null, winnerPick: "",
+      }],
+      basketball: [],
+    },
+  };
+  // SofaScore row for the same game (English), Damash the favourite at 1.70.
+  const oddsTab = {
+    sports: {
+      football: [{
+        sportId: FB, source: "SofaScore", home: "Damash Gilan", away: "Mes Shahr-e Babak",
+        winnerPick: "Damash Gilan", odds: 1.70, oddsRaw: 1.70, homeOdds: 1.70, awayOdds: 4.50,
+        recommended: true, outsideRange: false, score: 59, recommendationScore: 59,
+      }],
+      basketball: [],
+    },
+  };
+  const { tab, enriched, usedKeys } = enrichPlaceholdersWithOdds(placeholderTab, oddsTab);
+  const r = tab.sports.football[0];
+  ok("enriches the placeholder (1 row)", enriched === 1);
+  ok("card is no longer noOddsYet", r.noOddsYet === false);
+  ok("real SofaScore odds attached", r.odds === 1.70 && r.oddsRaw === 1.70);
+  ok("pick shown in the card's OWN (Hebrew) label", r.winnerPick === "דאמש גילן");
+  ok("home/away side odds mapped to the card's orientation", r.homeOdds === 1.70 && r.awayOdds === 4.50);
+  ok("side-keyed oddsBook built for per-team odds display", r.oddsBook?.home?.odds === 1.70 && r.oddsBook?.away?.odds === 4.50);
+  ok("source marked as SofaScore", r.source === "SofaScore");
+  ok("recommended carried over", r.recommended === true);
+  ok("consumed the fallback row (so it is not also appended)", usedKeys.size === 1);
 
-  // Falls back to table position when points are equal
-  const samePoints = [{
-    rows: [
-      { competitor: { id: 1, name: "Top FC" },    position: 1, points: 30 },
-      { competitor: { id: 2, name: "Bottom FC" }, position: 8, points: 30 },
-    ],
-  }];
-  const byPos = predictWinnerFromStandings(samePoints, { id: 1 }, { id: 2 });
-  ok("ties on points → uses position", byPos && byPos.winner === "Top FC" && byPos.basis === "position");
+  // Swapped orientation: placeholder home == fallback away.
+  const swappedTab = {
+    sports: {
+      football: [{ id: "x", sportId: FB, home: "Mes Shahr-e Babak", away: "Damash Gilan", noOddsYet: true }],
+      basketball: [],
+    },
+  };
+  const sw = enrichPlaceholdersWithOdds(swappedTab, oddsTab).tab.sports.football[0];
+  ok("swapped: pick still resolves to Damash on the away side", sw.winnerPick === "Damash Gilan" && sw.awayOdds === 1.70);
 
-  // Name matching when ids are absent
-  const byName = predictWinnerFromStandings(standings, { name: "Damash Gilan" }, { name: "Mes Shahr-e Babak" });
-  ok("matches by normalized name when id missing", byName && byName.winner === "Damash Gilan");
+  // No shared team name → never enrich (no wrong odds attached, no guessing).
+  const unrelated = {
+    sports: { football: [{ sportId: FB, source: "SofaScore", home: "Real Madrid", away: "Barcelona", winnerPick: "Real Madrid", odds: 1.5, homeOdds: 1.5, awayOdds: 6 }], basketball: [] },
+  };
+  const noMatch = enrichPlaceholdersWithOdds(placeholderTab, unrelated);
+  ok("no shared name → not enriched, card stays a placeholder", noMatch.enriched === 0 && noMatch.tab.sports.football[0].noOddsYet === true);
 
-  // Unreadable / missing inputs
-  ok("no standings → null", predictWinnerFromStandings([], { id: 1 }, { id: 2 }) === null);
-  ok("team not in table → null", predictWinnerFromStandings(standings, { id: 999 }, { id: 20 }) === null);
-  const dead = [{ rows: [
-    { competitor: { id: 1, name: "A" }, position: 3, points: 25 },
-    { competitor: { id: 2, name: "B" }, position: 3, points: 25 },
-  ] }];
-  ok("dead heat (same pos + points) → null", predictWinnerFromStandings(dead, { id: 1 }, { id: 2 }) === null);
+  // A row that already has odds is left untouched.
+  const realTab = { sports: { football: [{ sportId: FB, home: "Damash Gilan", away: "Mes Shahr-e Babak", noOddsYet: false, odds: 2.1, winnerPick: "x" }], basketball: [] } };
+  ok("non-placeholder rows are untouched", enrichPlaceholdersWithOdds(realTab, oddsTab).enriched === 0);
 }
 
 console.log(`\nAll ${passed} assertions passed. MIN_RECS_PER_DAY=${MIN_RECS_PER_DAY}`);

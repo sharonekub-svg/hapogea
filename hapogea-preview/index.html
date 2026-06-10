@@ -8712,23 +8712,9 @@
               <div class="teams-line">${teamsMarkup(row)}</div>
             </div>
             ${row.noOddsYet
-              ? (row.predictedWinner
-                  ? `<div class="card-section pick-section">
-                       <div class="pick-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.02));border-color:rgba(245,158,11,.35)">
-                         <div class="pick-hero-top">
-                           <span class="pick-hero-label">★ הערכת מערכת</span>
-                           <span class="pick-market-chip">לפי טבלת הליגה</span>
-                         </div>
-                         <div class="pick-hero-main">
-                           <strong class="pick-hero-name">${escapeHtml(row.predictedWinner)}</strong>
-                           <div class="pick-hero-odds"><b>—</b><small>אין יחס עדיין</small></div>
-                         </div>
-                         <div class="pick-hero-why">Winner טרם פרסם יחסים — החיזוי מבוסס על מיקום הקבוצות בטבלה, לא על קו הימורים.</div>
-                       </div>
-                     </div>`
-                  : `<div class="card-section" style="opacity:.6">
-                       <p style="margin:0;font-size:12px;font-weight:700;color:var(--muted)">⌛ קווי הימורים טרם נפתחו — יעודכן אוטומטית</p>
-                     </div>`)
+              ? `<div class="card-section" style="opacity:.6">
+                   <p style="margin:0;font-size:12px;font-weight:700;color:var(--muted)">⌛ קווי הימורים טרם נפתחו — יעודכן אוטומטית</p>
+                 </div>`
               : `<div class="card-section pick-section">
               ${hasRecommendation
                 ? `<div class="pick-hero">

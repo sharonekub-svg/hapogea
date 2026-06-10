@@ -2509,7 +2509,7 @@ function build365BasketballRows(results, dateKey) {
 }
 
 // Build noOddsYet display rows from 365Scores scheduled events when Winner has no open markets
-function build365ScheduledRows(results, dateKey, winnerSportId, standingsMap365 = new Map()) {
+function build365ScheduledRows(results, dateKey, winnerSportId) {
   const now = new Date().toISOString();
   return (results || [])
     .filter((event) => {
@@ -2520,19 +2520,6 @@ function build365ScheduledRows(results, dateKey, winnerSportId, standingsMap365 
     })
     .map((event) => {
       const teams = { home: cleanText(event.teamA), away: cleanText(event.teamB) };
-      // No Winner line yet — predict the likely winner from the 365Scores league table
-      // so the card still shows who the model expects to win (not a betting line).
-      const standings = event.competitionId365 ? standingsMap365.get(String(event.competitionId365)) : null;
-      const prediction = predictWinnerFromStandings(
-        standings,
-        { id: event.homeCompetitorId, name: teams.home },
-        { id: event.awayCompetitorId, name: teams.away }
-      );
-      // Use the card's own team label (matches the displayed language) rather than the
-      // table's name, which can be in a different language.
-      const predictedWinner = prediction
-        ? (prediction.favoriteSide === "home" ? teams.home : teams.away)
-        : "";
       return {
         id: `sched-365-${event.eventid}`,
         eventId: String(event.eventid),
@@ -2561,11 +2548,6 @@ function build365ScheduledRows(results, dateKey, winnerSportId, standingsMap365 
         oddsRaw: null,
         outsideRange: true,
         noOddsYet: true,
-        // Standings-based prediction (kept separate from winnerPick/odds so it is never
-        // graded as a real bet or mistaken for a Winner line).
-        predictedWinner,
-        predictionBasis: prediction ? prediction.basis : "",
-        predictionGap: prediction ? prediction.gap : null,
         probability: null,
         normalizedProbability: null,
         score: 0,
@@ -2573,21 +2555,11 @@ function build365ScheduledRows(results, dateKey, winnerSportId, standingsMap365 
         matchPhase: "scheduled",
         result: "",
         liveScore: "",
-        signals: predictedWinner
-          ? [
-              `הערכת מערכת: ${predictedWinner} — הקבוצה המדורגת גבוה יותר בטבלה`,
-              "קווי הימורים טרם נפתחו בווינר — אין יחס רשמי עדיין",
-            ]
-          : ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
-        explanation: predictedWinner
-          ? [
-              `ווינר טרם פרסם קווי הימורים, לכן ההערכה מבוססת על טבלת הליגה: ${predictedWinner} מדורגת גבוה יותר.`,
-              "זוהי הערכת מערכת לפי מיקום הקבוצות בטבלה — לא קו הימורים ולא המלצת הימור.",
-            ]
-          : [
-              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
-            ],
+        signals: ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
+        explanation: [
+          "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+          "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
+        ],
       };
     });
 }
@@ -3010,10 +2982,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const s365today = (scores365Events || []).filter(e => e.date === today);
   console.info(`[today-fallback] live football=${liveFootballToday.length} basketball=${liveBasketballToday.length} scores365today=${s365today.length}`);
   const fallbackFootball = liveFootballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID, standingsMap365).slice(0, BOARD_PICK_LIMIT)
+    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID).slice(0, BOARD_PICK_LIMIT)
     : [];
   const fallbackBasketball = liveBasketballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID, standingsMap365).slice(0, BOARD_PICK_LIMIT)
+    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID).slice(0, BOARD_PICK_LIMIT)
     : [];
   console.info(`[today-fallback] fallbackFootball=${fallbackFootball.length} fallbackBasketball=${fallbackBasketball.length}`);
   const liveTodayPicks = [...liveFootballToday, ...liveBasketballToday, ...fallbackFootball, ...fallbackBasketball];
@@ -3232,52 +3204,6 @@ function getTeamStakeFromStandings(standings, competitorId) {
     }
   }
   return null; // team not found — keep by default
-}
-
-// Predict a likely winner for a game whose betting line has not opened yet, using the
-// 365Scores league table. The schedule row and the table come from the same 365Scores
-// source, so competitors match by id (no cross-language name guessing). Returns null for
-// cups / unreadable tables, or when the two sides are too close to call.
-function predictWinnerFromStandings(standings, home, away) {
-  if (!standings?.length) return null;
-  const locate = (team) => {
-    if (!team) return null;
-    for (const group of standings) {
-      const rows = group.rows || [];
-      for (let i = 0; i < rows.length; i++) {
-        const r = rows[i];
-        const byId = team.id != null && String(r.competitor?.id) === String(team.id);
-        const byName = team.name && normalizeMatchName(r.competitor?.name) === normalizeMatchName(team.name);
-        if (byId || byName) {
-          const position = Number.isFinite(Number(r.position)) ? Number(r.position) : i + 1;
-          const points = Number.isFinite(Number(r.points)) ? Number(r.points) : null;
-          return { name: cleanText(r.competitor?.name) || cleanText(team.name), position, points };
-        }
-      }
-    }
-    return null;
-  };
-  const h = locate(home);
-  const a = locate(away);
-  if (!h || !a) return null;
-  let favorite, basis;
-  if (h.points != null && a.points != null && h.points !== a.points) {
-    favorite = h.points > a.points ? h : a;
-    basis = "points";
-  } else if (h.position !== a.position) {
-    favorite = h.position < a.position ? h : a;
-    basis = "position";
-  } else {
-    return null; // level on the table — don't guess a winner
-  }
-  return {
-    winner: favorite.name,          // name as it appears in the table
-    favoriteSide: favorite === h ? "home" : "away", // let the caller use its own team labels
-    basis,
-    gap: Math.abs(h.position - a.position),
-    homeRank: h.position,
-    awayRank: a.position,
-  };
 }
 
 // ── The Odds API integration ─────────────────────────────────────────────────
@@ -3927,6 +3853,99 @@ function selectSupplementRows({ oddsRows, existingRows = [], dayCount, dayRecs, 
   });
 }
 
+// Fill placeholder cards (games Winner has not priced yet → "ממתין לקווים") with REAL odds
+// pulled from the fallback feed (SofaScore / The Odds API). We only enrich when at least
+// one team name is shared between the placeholder and the fallback row, so the wrong
+// game's odds are never attached — no guessing. Returns a new tab, how many rows were
+// filled, and which fallback rows were consumed (so callers do not also append them).
+function enrichPlaceholdersWithOdds(tab, oddsTab) {
+  const supRows = [
+    ...(oddsTab?.sports?.football || []),
+    ...(oddsTab?.sports?.basketball || []),
+  ].filter((s) => Number(s.odds || s.oddsRaw) && (s.winnerPick || s.pick));
+  const usedKeys = new Set();
+  if (!supRows.length || !tab?.sports) return { tab, enriched: 0, usedKeys };
+
+  let enriched = 0;
+  const enrichSport = (rows) =>
+    (rows || []).map((row) => {
+      if (!row.noOddsYet) return row;
+      const homeN = normalizeMatchName(row.home);
+      const awayN = normalizeMatchName(row.away);
+      const match = supRows.find((s) => {
+        if (Number(s.sportId) !== Number(row.sportId)) return false;
+        const sh = normalizeMatchName(s.home);
+        const sa = normalizeMatchName(s.away);
+        return (homeN && (homeN === sh || homeN === sa)) ||
+               (awayN && (awayN === sh || awayN === sa));
+      });
+      if (!match) return row;
+
+      const sh = normalizeMatchName(match.home);
+      const sa = normalizeMatchName(match.away);
+      // Orientation: do the placeholder's home/away line up with the fallback row's, or
+      // are they swapped? Use it to express the pick + side odds in the card's own labels.
+      const swapped = ((homeN && homeN === sa) || (awayN && awayN === sh)) &&
+                      !((homeN && homeN === sh) || (awayN && awayN === sa));
+      const pickN = normalizeMatchName(match.winnerPick || match.pick);
+      const pickIsSupHome = pickN && pickN === sh;
+      const pickLabel = swapped
+        ? (pickIsSupHome ? row.away : row.home)
+        : (pickIsSupHome ? row.home : row.away);
+      const rowHomeOdds = swapped ? (match.awayOdds ?? null) : (match.homeOdds ?? null);
+      const rowAwayOdds = swapped ? (match.homeOdds ?? null) : (match.awayOdds ?? null);
+
+      const oddsNum = Number(match.odds || match.oddsRaw) || null;
+      const drawOddsNum = Number(match.drawOdds) || null;
+      usedKeys.add(supplementMatchKey(match));
+      enriched++;
+      const src = match.source || "SofaScore";
+      return {
+        ...row,
+        noOddsYet: false,
+        outsideRange: !!match.outsideRange,
+        recommended: !!match.recommended,
+        source: src,
+        odds: oddsNum,
+        oddsRaw: oddsNum,
+        homeOdds: rowHomeOdds,
+        awayOdds: rowAwayOdds,
+        drawOdds: drawOddsNum,
+        // Side-keyed book so the UI shows the odds under each team (Show odds under each team).
+        oddsBook: {
+          home: rowHomeOdds ? { odds: rowHomeOdds } : null,
+          away: rowAwayOdds ? { odds: rowAwayOdds } : null,
+          draw: drawOddsNum ? { odds: drawOddsNum } : null,
+        },
+        pick: pickLabel,
+        pickTeam: pickLabel,
+        winnerPick: pickLabel,
+        probability: match.probability ?? match.normalizedProbability ?? (oddsNum ? 1 / oddsNum : null),
+        normalizedProbability: match.normalizedProbability ?? match.probability ?? (oddsNum ? 1 / oddsNum : null),
+        recommendationScore: match.recommendationScore ?? match.score ?? null,
+        score: match.score ?? match.recommendationScore ?? null,
+        riskLevel: match.riskLevel || null,
+        explanation: [
+          `היחס נמשך מ-${src} כי ל-Winner עדיין אין קו למשחק זה.`,
+          ...(Array.isArray(match.explanation) ? match.explanation.slice(1) : []),
+        ],
+        signals: Array.isArray(match.signals) && match.signals.length
+          ? match.signals
+          : [`פיק לפי יחסי ${src}: ${pickLabel}${oddsNum ? ` (${oddsNum.toFixed(2)})` : ""}`],
+      };
+    });
+
+  const newTab = {
+    ...tab,
+    sports: {
+      ...tab.sports,
+      football: enrichSport(tab.sports.football),
+      basketball: enrichSport(tab.sports.basketball),
+    },
+  };
+  return { tab: newTab, enriched, usedKeys };
+}
+
 async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   const key = cacheKeyForToday();
   const cached = await kvGet(key);
@@ -4028,10 +4047,14 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => !r.noOddsYet).length;
   const countRecs = (tab) =>
     countRecommendedPicks([...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])]);
+  const countPlaceholders = (tab) =>
+    [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])].filter(r => r.noOddsYet).length;
   const todayCount = countReal(payload.tabs?.today);
   const tomorrowCount = countReal(payload.tabs?.tomorrow);
   const todayRecs = countRecs(payload.tabs?.today);
   const tomorrowRecs = countRecs(payload.tabs?.tomorrow);
+  const todayPlaceholders = countPlaceholders(payload.tabs?.today);
+  const tomorrowPlaceholders = countPlaceholders(payload.tabs?.tomorrow);
 
   function tabLeagueSet(tab) {
     const all = [...(tab?.sports?.football || []), ...(tab?.sports?.basketball || [])];
@@ -4040,9 +4063,9 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
   const todayLeagues = tabLeagueSet(payload.tabs?.today);
   const tomorrowLeagues = tabLeagueSet(payload.tabs?.tomorrow);
   // Supplement when a day is short on games, short on league variety (e.g. only Brazil at
-  // the end of the European season), OR short on actual recommendations — i.e. games are
-  // listed but the model produced no picks. That last case is the one that leaves a board
-  // showing matches with no המלצות; the fallback odds below fill it.
+  // the end of the European season), short on actual recommendations (games listed but no
+  // picks), OR has placeholder cards we can fill with real odds. The placeholder case is the
+  // one in the screenshot: a game shown as "ממתין לקווים" that we want to fill from SofaScore.
   // Allow even when Winner is blocked (fallback=true) as long as the date is current (not stale)
   const MIN_LEAGUES = 3;
   const needsOdds = !payload.staleDate && (
@@ -4051,10 +4074,12 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     todayLeagues.size < MIN_LEAGUES ||
     tomorrowLeagues.size < MIN_LEAGUES ||
     todayRecs < MIN_RECS_PER_DAY ||
-    tomorrowRecs < MIN_RECS_PER_DAY
+    tomorrowRecs < MIN_RECS_PER_DAY ||
+    todayPlaceholders > 0 ||
+    tomorrowPlaceholders > 0
   );
 
-  console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount}g/${todayRecs}rec tomorrow=${tomorrowCount}g/${tomorrowRecs}rec key=${ODDS_API_KEY ? "set" : "missing"}`);
+  console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount}g/${todayRecs}rec/${todayPlaceholders}ph tomorrow=${tomorrowCount}g/${tomorrowRecs}rec/${tomorrowPlaceholders}ph key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
     // Try SofaScore first (no API key needed, already works from Vercel), then fall back to ODDS_API
     let supplementFeed = null;
@@ -4080,38 +4105,53 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     if (supplementFeed) {
       try {
         const oddsFeed = supplementFeed;
+        const srcName = oddsFeed.oddsSource || "SofaScore";
         const newTabs = { ...payload.tabs };
         let usedOdds = false;
+        let enrichedTotal = 0;
+        const usedSupKeys = new Set();
         const oddsCountByDay = {};
 
-        for (const [dayKey, dayCount, dayLeagues, dayRecs] of [
-          ["today",    todayCount,    todayLeagues,    todayRecs],
-          ["tomorrow", tomorrowCount, tomorrowLeagues, tomorrowRecs],
-        ]) {
+        for (const dayKey of ["today", "tomorrow"]) {
           const oddsTab = oddsFeed.tabs?.[dayKey];
           if (!oddsTab || !payloadMatchesIsraelDates(oddsFeed)) continue;
-          const oddsCount =
+          oddsCountByDay[dayKey] =
             (oddsTab.sports?.football?.length || 0) +
             (oddsTab.sports?.basketball?.length || 0);
-          oddsCountByDay[dayKey] = oddsCount;
 
+          // 1) Fill Winner's "ממתין לקווים" placeholders with REAL odds from the fallback
+          //    source (matched by a shared team name) — turns blank cards into real picks
+          //    instead of inventing one. Unmatched placeholders stay as-is (no guessing).
+          const { tab: enrichedTab, enriched, usedKeys } =
+            enrichPlaceholdersWithOdds(newTabs[dayKey], oddsTab);
+          if (enriched > 0) {
+            newTabs[dayKey] = enrichedTab;
+            usedKeys.forEach((k) => usedSupKeys.add(k));
+            enrichedTotal += enriched;
+            usedOdds = true;
+          }
+
+          // 2) Add genuinely new games for breadth / when a day still lacks picks, skipping
+          //    any fallback row already consumed by enrichment so games never double up.
+          const existing = newTabs[dayKey];
+          const existingRows = [
+            ...(existing.sports?.football || []),
+            ...(existing.sports?.basketball || []),
+          ];
+          const dayCount = existingRows.filter((r) => !r.noOddsYet).length;
+          const dayRecs = countRecommendedPicks(existingRows);
+          const dayLeagues = new Set(
+            existingRows.map((r) => String(r.league || "").trim().toLowerCase()).filter(Boolean)
+          );
+          const oddsRows = [
+            ...(oddsTab.sports?.football || []),
+            ...(oddsTab.sports?.basketball || []),
+          ].filter((r) => !usedSupKeys.has(supplementMatchKey(r)));
           const needsSupplement =
             (dayCount < MIN_PREMIUM_ROWS_PER_DAY ||
              dayLeagues.size < MIN_LEAGUES ||
-             dayRecs < MIN_RECS_PER_DAY) && oddsCount > 0;
+             dayRecs < MIN_RECS_PER_DAY) && oddsRows.length > 0;
           if (needsSupplement) {
-            const existing = newTabs[dayKey];
-            const oddsRows = [
-              ...(oddsTab.sports?.football || []),
-              ...(oddsTab.sports?.basketball || []),
-            ];
-            const existingRows = [
-              ...(existing.sports?.football || []),
-              ...(existing.sports?.basketball || []),
-            ];
-            // selectSupplementRows decides what to splice in: the whole board when Winner
-            // has nothing, recommended (deduped) rows when Winner has games but no picks,
-            // or just new-league rows when Winner already has picks and only needs breadth.
             const freshRows = selectSupplementRows({
               oddsRows, existingRows, dayCount, dayRecs, dayLeagues,
             });
@@ -4133,9 +4173,8 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
             }
           }
         }
-        const srcName = oddsFeed.oddsSource || "SofaScore";
-        console.info("[winner-feed] %s supplement returned today=%d tomorrow=%d, usedOdds=%s", srcName, oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
-        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay };
+        console.info("[winner-feed] %s supplement: enriched=%d today=%d tomorrow=%d usedOdds=%s", srcName, enrichedTotal, oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
+        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay, _enrichedPlaceholders: enrichedTotal };
         if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: srcName };
       } catch (supplementErr) {
         console.error("[winner-feed] supplement merge error:", supplementErr?.message);
@@ -4317,6 +4356,6 @@ module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.scoreBreakdown = scoreBreakdown;
 module.exports.selectSupplementRows = selectSupplementRows;
 module.exports.countRecommendedPicks = countRecommendedPicks;
-module.exports.predictWinnerFromStandings = predictWinnerFromStandings;
+module.exports.enrichPlaceholdersWithOdds = enrichPlaceholdersWithOdds;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
 module.exports.MIN_RECS_PER_DAY = MIN_RECS_PER_DAY;
