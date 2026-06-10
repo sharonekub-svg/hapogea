@@ -9,6 +9,7 @@ const assert = require("assert");
 const {
   selectSupplementRows,
   countRecommendedPicks,
+  predictWinnerFromStandings,
   MIN_RECS_PER_DAY,
 } = require("../api/winner-feed");
 
@@ -95,6 +96,44 @@ const fallback = [
   // starved → rec-filtered (3 recommended non-NBA); healthy with empty league set → all non-NBA new-league rows (4)
   ok("boundary: below threshold filters to recommended only", starved.length === 3);
   ok("boundary: at threshold uses league filter (not rec filter)", healthy.length === 4);
+}
+
+// ── predictWinnerFromStandings (standings-based pick for oddless games) ───────
+console.log("predictWinnerFromStandings:");
+{
+  const standings = [{
+    rows: [
+      { competitor: { id: 10, name: "Damash Gilan" },   position: 2, points: 40 },
+      { competitor: { id: 20, name: "Mes Shahr-e Babak" }, position: 9, points: 22 },
+    ],
+  }];
+  const byId = predictWinnerFromStandings(standings, { id: 10, name: "דאמש גילן" }, { id: 20, name: "Mes Shahr-E Babak" });
+  ok("predicts the higher-ranked team by id (cross-language safe)", byId && byId.winner === "Damash Gilan");
+  ok("reports the basis (points)", byId && byId.basis === "points");
+  ok("reports favoriteSide=home so the card can use its own (Hebrew) label", byId && byId.favoriteSide === "home");
+
+  // Falls back to table position when points are equal
+  const samePoints = [{
+    rows: [
+      { competitor: { id: 1, name: "Top FC" },    position: 1, points: 30 },
+      { competitor: { id: 2, name: "Bottom FC" }, position: 8, points: 30 },
+    ],
+  }];
+  const byPos = predictWinnerFromStandings(samePoints, { id: 1 }, { id: 2 });
+  ok("ties on points → uses position", byPos && byPos.winner === "Top FC" && byPos.basis === "position");
+
+  // Name matching when ids are absent
+  const byName = predictWinnerFromStandings(standings, { name: "Damash Gilan" }, { name: "Mes Shahr-e Babak" });
+  ok("matches by normalized name when id missing", byName && byName.winner === "Damash Gilan");
+
+  // Unreadable / missing inputs
+  ok("no standings → null", predictWinnerFromStandings([], { id: 1 }, { id: 2 }) === null);
+  ok("team not in table → null", predictWinnerFromStandings(standings, { id: 999 }, { id: 20 }) === null);
+  const dead = [{ rows: [
+    { competitor: { id: 1, name: "A" }, position: 3, points: 25 },
+    { competitor: { id: 2, name: "B" }, position: 3, points: 25 },
+  ] }];
+  ok("dead heat (same pos + points) → null", predictWinnerFromStandings(dead, { id: 1 }, { id: 2 }) === null);
 }
 
 console.log(`\nAll ${passed} assertions passed. MIN_RECS_PER_DAY=${MIN_RECS_PER_DAY}`);

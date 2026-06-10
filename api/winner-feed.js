@@ -2509,7 +2509,7 @@ function build365BasketballRows(results, dateKey) {
 }
 
 // Build noOddsYet display rows from 365Scores scheduled events when Winner has no open markets
-function build365ScheduledRows(results, dateKey, winnerSportId) {
+function build365ScheduledRows(results, dateKey, winnerSportId, standingsMap365 = new Map()) {
   const now = new Date().toISOString();
   return (results || [])
     .filter((event) => {
@@ -2520,6 +2520,19 @@ function build365ScheduledRows(results, dateKey, winnerSportId) {
     })
     .map((event) => {
       const teams = { home: cleanText(event.teamA), away: cleanText(event.teamB) };
+      // No Winner line yet — predict the likely winner from the 365Scores league table
+      // so the card still shows who the model expects to win (not a betting line).
+      const standings = event.competitionId365 ? standingsMap365.get(String(event.competitionId365)) : null;
+      const prediction = predictWinnerFromStandings(
+        standings,
+        { id: event.homeCompetitorId, name: teams.home },
+        { id: event.awayCompetitorId, name: teams.away }
+      );
+      // Use the card's own team label (matches the displayed language) rather than the
+      // table's name, which can be in a different language.
+      const predictedWinner = prediction
+        ? (prediction.favoriteSide === "home" ? teams.home : teams.away)
+        : "";
       return {
         id: `sched-365-${event.eventid}`,
         eventId: String(event.eventid),
@@ -2548,6 +2561,11 @@ function build365ScheduledRows(results, dateKey, winnerSportId) {
         oddsRaw: null,
         outsideRange: true,
         noOddsYet: true,
+        // Standings-based prediction (kept separate from winnerPick/odds so it is never
+        // graded as a real bet or mistaken for a Winner line).
+        predictedWinner,
+        predictionBasis: prediction ? prediction.basis : "",
+        predictionGap: prediction ? prediction.gap : null,
         probability: null,
         normalizedProbability: null,
         score: 0,
@@ -2555,11 +2573,21 @@ function build365ScheduledRows(results, dateKey, winnerSportId) {
         matchPhase: "scheduled",
         result: "",
         liveScore: "",
-        signals: ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
-        explanation: [
-          "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-          "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
-        ],
+        signals: predictedWinner
+          ? [
+              `הערכת מערכת: ${predictedWinner} — הקבוצה המדורגת גבוה יותר בטבלה`,
+              "קווי הימורים טרם נפתחו בווינר — אין יחס רשמי עדיין",
+            ]
+          : ["קווי הימורים טרם נפתחו בווינר עבור משחק זה", "המשחק יוצג ברגע שהיחסים יתעדכנו"],
+        explanation: predictedWinner
+          ? [
+              `ווינר טרם פרסם קווי הימורים, לכן ההערכה מבוססת על טבלת הליגה: ${predictedWinner} מדורגת גבוה יותר.`,
+              "זוהי הערכת מערכת לפי מיקום הקבוצות בטבלה — לא קו הימורים ולא המלצת הימור.",
+            ]
+          : [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף.",
+            ],
       };
     });
 }
@@ -2982,10 +3010,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
   const s365today = (scores365Events || []).filter(e => e.date === today);
   console.info(`[today-fallback] live football=${liveFootballToday.length} basketball=${liveBasketballToday.length} scores365today=${s365today.length}`);
   const fallbackFootball = liveFootballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID).slice(0, BOARD_PICK_LIMIT)
+    ? build365ScheduledRows(scores365Events, today, WINNER_FOOTBALL_ID, standingsMap365).slice(0, BOARD_PICK_LIMIT)
     : [];
   const fallbackBasketball = liveBasketballToday.length === 0
-    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID).slice(0, BOARD_PICK_LIMIT)
+    ? build365ScheduledRows(scores365Events, today, WINNER_BASKETBALL_ID, standingsMap365).slice(0, BOARD_PICK_LIMIT)
     : [];
   console.info(`[today-fallback] fallbackFootball=${fallbackFootball.length} fallbackBasketball=${fallbackBasketball.length}`);
   const liveTodayPicks = [...liveFootballToday, ...liveBasketballToday, ...fallbackFootball, ...fallbackBasketball];
@@ -3204,6 +3232,52 @@ function getTeamStakeFromStandings(standings, competitorId) {
     }
   }
   return null; // team not found — keep by default
+}
+
+// Predict a likely winner for a game whose betting line has not opened yet, using the
+// 365Scores league table. The schedule row and the table come from the same 365Scores
+// source, so competitors match by id (no cross-language name guessing). Returns null for
+// cups / unreadable tables, or when the two sides are too close to call.
+function predictWinnerFromStandings(standings, home, away) {
+  if (!standings?.length) return null;
+  const locate = (team) => {
+    if (!team) return null;
+    for (const group of standings) {
+      const rows = group.rows || [];
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        const byId = team.id != null && String(r.competitor?.id) === String(team.id);
+        const byName = team.name && normalizeMatchName(r.competitor?.name) === normalizeMatchName(team.name);
+        if (byId || byName) {
+          const position = Number.isFinite(Number(r.position)) ? Number(r.position) : i + 1;
+          const points = Number.isFinite(Number(r.points)) ? Number(r.points) : null;
+          return { name: cleanText(r.competitor?.name) || cleanText(team.name), position, points };
+        }
+      }
+    }
+    return null;
+  };
+  const h = locate(home);
+  const a = locate(away);
+  if (!h || !a) return null;
+  let favorite, basis;
+  if (h.points != null && a.points != null && h.points !== a.points) {
+    favorite = h.points > a.points ? h : a;
+    basis = "points";
+  } else if (h.position !== a.position) {
+    favorite = h.position < a.position ? h : a;
+    basis = "position";
+  } else {
+    return null; // level on the table — don't guess a winner
+  }
+  return {
+    winner: favorite.name,          // name as it appears in the table
+    favoriteSide: favorite === h ? "home" : "away", // let the caller use its own team labels
+    basis,
+    gap: Math.abs(h.position - a.position),
+    homeRank: h.position,
+    awayRank: a.position,
+  };
 }
 
 // ── The Odds API integration ─────────────────────────────────────────────────
@@ -4243,5 +4317,6 @@ module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.scoreBreakdown = scoreBreakdown;
 module.exports.selectSupplementRows = selectSupplementRows;
 module.exports.countRecommendedPicks = countRecommendedPicks;
+module.exports.predictWinnerFromStandings = predictWinnerFromStandings;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
 module.exports.MIN_RECS_PER_DAY = MIN_RECS_PER_DAY;
