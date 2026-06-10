@@ -6,7 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { buildWinnerFeedPayload, buildOddsApiFeed, buildSofascoreFeed } = require("../api/winner-feed");
+const { buildWinnerFeedPayload, buildOddsApiFeed, buildSofascoreFeed, buildPinnacleFeed } = require("../api/winner-feed");
 
 function countRecommendations(rows = []) {
   return rows.filter((row) => row.recommended || (row.odds && !row.outsideRange)).length;
@@ -49,18 +49,29 @@ async function main() {
       console.log("SofaScore succeeded, picks:", picksCount(payload));
     } catch (sfErr) {
       console.warn("SofaScore fallback failed:", sfErr.message);
-      if (process.env.ODDS_API_KEY) {
-        console.log("Trying The Odds API...");
-        try {
-          payload = await buildOddsApiFeed();
-          console.log("Odds API succeeded, picks:", picksCount(payload));
-        } catch (oddsErr) {
-          console.warn("Odds API fallback failed:", oddsErr.message);
-          console.log("Keeping Winner payload (noOddsYet rows).");
-        }
-      } else {
-        console.warn("ODDS_API_KEY not set — snapshot will have noOddsYet rows only.");
+    }
+  }
+  if (picksCount(payload) === 0) {
+    console.log("Trying Pinnacle...");
+    try {
+      payload = await buildPinnacleFeed();
+      console.log("Pinnacle succeeded, picks:", picksCount(payload));
+    } catch (pinErr) {
+      console.warn("Pinnacle fallback failed:", pinErr.message);
+    }
+  }
+  if (picksCount(payload) === 0) {
+    if (process.env.ODDS_API_KEY) {
+      console.log("Trying The Odds API...");
+      try {
+        payload = await buildOddsApiFeed();
+        console.log("Odds API succeeded, picks:", picksCount(payload));
+      } catch (oddsErr) {
+        console.warn("Odds API fallback failed:", oddsErr.message);
+        console.log("Keeping payload (noOddsYet rows).");
       }
+    } else {
+      console.warn("All sources failed — ODDS_API_KEY not set either.");
     }
   }
 

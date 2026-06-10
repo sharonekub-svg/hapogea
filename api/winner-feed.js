@@ -3478,11 +3478,16 @@ async function sfScheduled(sport, date) {
   catch { return []; }
 }
 async function sfEventOdds(eventId) {
-  for (const pid of [1, 2, 16, 11]) {
-    try {
+  // Try all known provider IDs in parallel — faster, higher hit rate
+  const PROVIDER_IDS = [1, 2, 3, 4, 5, 6, 8, 11, 14, 16, 17, 21, 26, 29, 30];
+  const results = await Promise.allSettled(
+    PROVIDER_IDS.map(async (pid) => {
       const data = await sfApiFetch(`/event/${eventId}/odds/${pid}/featured`);
-      if (data?.markets?.length) return data;
-    } catch {}
+      return data?.markets?.length ? data : null;
+    })
+  );
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value) return r.value;
   }
   return null;
 }
@@ -3698,6 +3703,209 @@ async function buildSofascoreFeed() {
     reuvenSchedule: [], audit: {}, trackingResults: [], faq: [],
   };
 }
+// ── Pinnacle Guest API Feed ───────────────────────────────────────────────────
+// Public guest endpoint — no API key needed, works from most IPs.
+const PINNACLE_BASE = "https://guest.api.arcadia.pinnacle.com/0.1";
+const PINNACLE_HDR = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  Accept: "application/json",
+  "Accept-Language": "en-US,en;q=0.9",
+  Referer: "https://www.pinnacle.com/",
+  Origin: "https://www.pinnacle.com",
+};
+async function pinnacleGet(path) {
+  return fetchJson(`${PINNACLE_BASE}${path}`, {
+    headers: PINNACLE_HDR,
+    retryAttempts: 1,
+    retryBaseDelay: 400,
+  });
+}
+// sportId: soccer=29, basketball=4
+async function pinnacleLeagues(sportId) {
+  try {
+    const data = await pinnacleGet(`/leagues?sportId=${sportId}`);
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+}
+async function pinnacleFixtures(leagueId) {
+  try {
+    const data = await pinnacleGet(`/leagues/${leagueId}/matchups?handicapGroup=0`);
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+}
+async function pinnacleOdds(leagueId) {
+  try {
+    const data = await pinnacleGet(`/leagues/${leagueId}/markets/straight`);
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+}
+
+function pinnacleMatchupToRow(matchup, oddsMap, sportId, today) {
+  const home = cleanText(matchup.participants?.find(p => p.alignment === "home")?.name || matchup.home || "");
+  const away = cleanText(matchup.participants?.find(p => p.alignment === "away")?.name || matchup.away || "");
+  if (!home || !away) return null;
+  if (matchup.type !== "matchup" && matchup.type !== undefined && matchup.type !== null) return null;
+
+  const startTime = matchup.startTime || matchup.cutoffTime;
+  if (!startTime) return null;
+  const startDate = new Date(startTime);
+  const ilParts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jerusalem",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(startDate).map(p => [p.type, p.value])
+  );
+  const day = `${ilParts.year}-${ilParts.month}-${ilParts.day}`;
+  const time = `${ilParts.hour}:${ilParts.minute}`;
+  if (day !== today && day !== israelDate(1)) return null;
+
+  const matchupId = matchup.id;
+  const mktData = oddsMap.get(matchupId);
+  const isFootball = sportId === WINNER_FOOTBALL_ID;
+
+  let homeOdds = null, drawOdds = null, awayOdds = null;
+  if (mktData) {
+    for (const mkt of mktData) {
+      if (mkt.key !== "moneyline" && mkt.key !== "s;0;m") continue;
+      for (const price of mkt.prices || []) {
+        const des = String(price.designation || "").toLowerCase();
+        const o = Number(price.price);
+        if (!o || o < 1.01) continue;
+        if (des === "home") homeOdds = o;
+        else if (des === "draw") drawOdds = o;
+        else if (des === "away") awayOdds = o;
+      }
+      if (homeOdds && awayOdds) break;
+    }
+  }
+
+  const leagueName = cleanText(matchup.league?.name || matchup.competition?.name || (isFootball ? "כדורגל" : "כדורסל"));
+  const baseRow = {
+    id: `pin-${matchupId}`,
+    eventId: String(matchupId),
+    source: "Pinnacle",
+    day, time, sport: isFootball ? "כדורגל" : "כדורסל",
+    sportId, league: leagueName, country: "",
+    match: `${home} - ${away}`, home, away,
+    liveScore: "", result: "", actualWinner: null,
+    matchPhase: "scheduled", status: "ממתין", bettingStatus: "available",
+    resultKey: `${sportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
+    verifiedAt: new Date().toISOString(),
+  };
+
+  if (!homeOdds || !awayOdds) return null;
+
+  const allCandidates = isFootball
+    ? [{ name: home, odds: homeOdds }, drawOdds ? { name: "תיקו", odds: drawOdds } : null, { name: away, odds: awayOdds }].filter(Boolean)
+    : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
+
+  const teamCandidates = allCandidates.filter(c => c.name !== "תיקו");
+  if (!teamCandidates.length) return null;
+  const inRange = teamCandidates.filter(c => c.odds >= 1.20 && c.odds <= 2.50);
+  const pool = inRange.length > 0 ? inRange : teamCandidates;
+  const pick = [...pool].sort((a, b) => a.odds - b.odds)[0];
+  const prob = 1 / pick.odds;
+  const score = Math.round(prob * 100);
+  const isFav = allCandidates.every(c => c.name === pick.name || c.odds >= pick.odds);
+  const oppSummary = allCandidates.filter(c => c.name !== pick.name).map(c => `${c.name} ${c.odds.toFixed(2)}`).join(", ");
+
+  return {
+    ...baseRow,
+    pick: pick.name, pickTeam: pick.name, winnerPick: pick.name,
+    odds: pick.odds, oddsRaw: pick.odds,
+    homeOdds, drawOdds: drawOdds || null, awayOdds,
+    probability: prob, normalizedProbability: prob,
+    recommendationScore: score, score,
+    recommended: inRange.length > 0,
+    outsideRange: inRange.length === 0,
+    riskLevel: score >= 70 ? "נמוך" : score >= 50 ? "בינוני" : "גבוה",
+    explanation: [`מקור: Pinnacle — ${leagueName}`, isFav ? `${pick.name} הפייבוריט (${pick.odds.toFixed(2)})${oppSummary ? ` — ${oppSummary}` : ""}.` : `${pick.name} (${pick.odds.toFixed(2)}) — קרוב לטווח האידיאלי.`],
+    signals: [`${pick.name} @${pick.odds.toFixed(2)} (Pinnacle)`],
+  };
+}
+
+async function buildPinnacleFeed() {
+  const today    = israelDate(0);
+  const tomorrow = israelDate(1);
+
+  // Popular league IDs known to be active
+  const SOCCER_LEAGUES   = [1980, 1456, 2627, 2791, 207, 208, 578, 1983, 2623, 2417, 3558, 4663, 2417];
+  const BBALL_LEAGUES    = [487, 2714, 3036, 3573, 3041];
+
+  const [soccerLeagueList, bballLeagueList] = await Promise.all([
+    pinnacleLeagues(29),
+    pinnacleLeagues(4),
+  ]);
+
+  // Filter to leagues with games — pick up to 25 by activity
+  const activeSoccer = soccerLeagueList
+    .filter(l => l.matchupCount > 0)
+    .sort((a, b) => (b.matchupCount || 0) - (a.matchupCount || 0))
+    .slice(0, 25);
+  const activeBball = bballLeagueList
+    .filter(l => l.matchupCount > 0)
+    .sort((a, b) => (b.matchupCount || 0) - (a.matchupCount || 0))
+    .slice(0, 15);
+
+  const allRows = [];
+
+  async function processLeagues(leagues, sportId) {
+    const BATCH = 8;
+    for (let i = 0; i < leagues.length; i += BATCH) {
+      const batch = leagues.slice(i, i + BATCH);
+      const [fixBatch, oddsBatch] = await Promise.all([
+        Promise.allSettled(batch.map(l => pinnacleFixtures(l.id))),
+        Promise.allSettled(batch.map(l => pinnacleOdds(l.id))),
+      ]);
+      for (let j = 0; j < batch.length; j++) {
+        const league = batch[j];
+        const fixtures = fixBatch[j].status === "fulfilled" ? fixBatch[j].value : [];
+        const odds     = oddsBatch[j].status === "fulfilled" ? oddsBatch[j].value : [];
+
+        // Build odds lookup by matchup ID
+        const oddsMap = new Map();
+        for (const mkt of odds) {
+          const mid = mkt.matchupId;
+          if (!mid) continue;
+          if (!oddsMap.has(mid)) oddsMap.set(mid, []);
+          oddsMap.get(mid).push(mkt);
+        }
+
+        for (const matchup of fixtures) {
+          if (matchup.parentId) continue; // skip period props
+          const row = pinnacleMatchupToRow({ ...matchup, league }, oddsMap, sportId, today);
+          if (row) allRows.push(row);
+        }
+      }
+      if (i + BATCH < leagues.length) await sleep(100);
+    }
+  }
+
+  await Promise.all([
+    processLeagues(activeSoccer, WINNER_FOOTBALL_ID),
+    processLeagues(activeBball, WINNER_BASKETBALL_ID),
+  ]);
+
+  if (allRows.length === 0) throw new Error("Pinnacle: no odds rows found");
+
+  const sorted = rows => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
+  const todayRows    = sorted(allRows.filter(r => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+
+  const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
+  const yesterdayTab = snapshotNorm.tabs?.yesterday || { label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] } };
+
+  return {
+    ok: true, generatedAt: new Date().toISOString(), oddsSource: "Pinnacle",
+    tabs: {
+      yesterday: { ...yesterdayTab, date: israelDate(-1) },
+      today:     { label: "היום", date: today,    sports: splitBySport(todayRows) },
+      tomorrow:  { label: "מחר",  date: tomorrow, sports: splitBySport(tomorrowRows) },
+    },
+    reuvenSchedule: [], audit: {}, trackingResults: [], faq: [],
+  };
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Remove picks whose scheduled start time has passed by more than 15 minutes.
@@ -3888,7 +4096,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
-      // Snapshot is stale — try SofaScore, then Odds API.
+      // Snapshot is stale — try SofaScore → Pinnacle → Odds API.
       let fallbackOk = false;
       try {
         console.warn("[winner-feed] Snapshot stale — trying SofaScore");
@@ -3899,12 +4107,21 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       }
       if (!fallbackOk) {
         try {
+          console.warn("[winner-feed] Snapshot stale — trying Pinnacle");
+          payload = await buildPinnacleFeed();
+          fallbackOk = true;
+        } catch (pinErr) {
+          console.warn("[winner-feed] Pinnacle failed:", pinErr?.message);
+        }
+      }
+      if (!fallbackOk) {
+        try {
           payload = await buildOddsApiFeed();
           fallbackOk = true;
         } catch (oddsError) {
           console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
           payload = {
-            ...markStaleDatePayload(snapshotNorm1, "טעינת Winner, SofaScore ו-The Odds API נכשלו וה-snapshot המקומי שייך לתאריך אחר."),
+            ...markStaleDatePayload(snapshotNorm1, "טעינת Winner, SofaScore, Pinnacle ו-The Odds API נכשלו וה-snapshot המקומי שייך לתאריך אחר."),
             ok: true,
             fallback: true,
             fallbackReason: "כל מקורות הנתונים לא זמינים.",
@@ -3940,7 +4157,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
 
   console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
-    // Try SofaScore first (no API key needed, already works from Vercel), then fall back to ODDS_API
+    // Try SofaScore → Pinnacle → Odds API in order
     let supplementFeed = null;
     try {
       console.warn("[winner-feed] needsOdds — trying SofaScore supplement");
@@ -3948,6 +4165,15 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       console.warn("[winner-feed] SofaScore supplement OK");
     } catch (sfErr) {
       console.warn("[winner-feed] SofaScore supplement failed:", sfErr?.message);
+    }
+    if (!supplementFeed) {
+      try {
+        console.warn("[winner-feed] needsOdds — trying Pinnacle supplement");
+        supplementFeed = await buildPinnacleFeed();
+        console.warn("[winner-feed] Pinnacle supplement OK");
+      } catch (pinErr) {
+        console.warn("[winner-feed] Pinnacle supplement failed:", pinErr?.message);
+      }
     }
     if (!supplementFeed && ODDS_API_KEY) {
       try {
@@ -3958,7 +4184,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
       }
     } else if (!supplementFeed && !ODDS_API_KEY) {
-      console.warn("[winner-feed] needsOdds=true but both SofaScore and ODDS_API_KEY unavailable");
+      console.warn("[winner-feed] needsOdds=true but SofaScore, Pinnacle and ODDS_API_KEY all unavailable");
       payload = { ...payload, _oddsApiStatus: "key_missing" };
     }
     if (supplementFeed) {
@@ -4186,6 +4412,7 @@ module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
 module.exports.buildOddsApiFeed = buildOddsApiFeed;
 module.exports.buildSofascoreFeed = buildSofascoreFeed;
+module.exports.buildPinnacleFeed = buildPinnacleFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.scoreBreakdown = scoreBreakdown;
 module.exports.TARGET_PICKS_PER_SPORT = TARGET_PICKS_PER_SPORT;
