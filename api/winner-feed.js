@@ -8,10 +8,10 @@ const ODDS_API_BASE = "https://api.the-odds-api.com/v4";
 
 // ── The Odds API quota controls — defaults sized for the FREE tier (500 req/month).
 // Each /odds call costs (regions × markets) credits; /scores with daysFrom costs ~2.
-// With these defaults a single daily cron build spends ~11 credits (~330/month).
+// With these defaults a single daily cron build spends ~16 credits (~480/month).
 // Raise these via env vars only on a paid plan.
 const ODDS_API_REGIONS        = process.env.ODDS_API_REGIONS || "eu";   // was "uk,eu,us" → 3× the cost
-const ODDS_API_MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 8);
+const ODDS_API_MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 12);
 const ODDS_API_MAX_BASKETBALL = Number(process.env.ODDS_API_MAX_BASKETBALL || 3);
 const ODDS_API_LIVE_ENABLED   = process.env.ODDS_API_LIVE === "1";      // off → live feed serves the cron snapshot, spends 0 credits
 const ODDS_API_SCORES_ENABLED = process.env.ODDS_API_SCORES === "1";    // off → results come from free 365Scores/SofaScore
@@ -22,14 +22,31 @@ const APISPORTS_BBALL    = "https://v1.basketball.api-sports.io";
 // Full league pool — discoverActiveSports() filters to only leagues with upcoming events,
 // so off-season leagues cost 0 extra API requests.
 const ODDS_API_SPORTS = [
-  // מונדיאל ותחרויות בינלאומיות — קריטי לאזור הזמן יוני 2026
+  // מונדיאל — הכי חשוב (יוני 2026)
   { key: "soccer_fifa_world_cup",                label: "מונדיאל 2026",            sportId: 240 },
+  // ליגות פעילות קיץ — צפון אמריקה וסקנדינביה (משחקי ערב ימי חול, הכי סביר להיות פעיל)
+  { key: "soccer_usa_mls",                       label: "MLS",                       sportId: 240 },
+  { key: "soccer_mexico_ligamx",                label: "ליגה MX",                   sportId: 240 },
+  { key: "soccer_sweden_allsvenskan",           label: "שבדית ראשונה",               sportId: 240 },
+  { key: "soccer_norway_eliteserien",           label: "נורבגית ראשונה",             sportId: 240 },
+  { key: "soccer_denmark_superliga",            label: "דנית ראשונה",                sportId: 240 },
+  { key: "soccer_finland_veikkausliiga",        label: "פינית ראשונה",               sportId: 240 },
+  // דרום אמריקה — קופות וליגות (שוטף כל השנה)
+  { key: "soccer_conmebol_copa_libertadores",    label: "קופה ליברטדורס",          sportId: 240 },
+  { key: "soccer_conmebol_copa_sudamericana",    label: "קופה סודאמריקאנה",        sportId: 240 },
+  { key: "soccer_brazil_campeonato",             label: "ברזילאית ראשונה",          sportId: 240 },
+  { key: "soccer_brazil_serie_b",               label: "ברזילאית שנייה",            sportId: 240 },
+  { key: "soccer_argentina_primera_division",    label: "ארגנטינאית ראשונה",       sportId: 240 },
+  // ← slice(0, 12) עוצר כאן בדרך כלל
+  { key: "soccer_colombia_primera_a",           label: "קולומביאנית ראשונה",       sportId: 240 },
+  { key: "soccer_chile_primera_division",       label: "צ'יליאנית ראשונה",         sportId: 240 },
+  // תחרויות בינלאומיות (פחות נפוצות בימי חול)
   { key: "soccer_conmebol_copa_america",         label: "קופה אמריקה",             sportId: 240 },
   { key: "soccer_uefa_nations_league",           label: "ליגת האומות (UEFA)",      sportId: 240 },
   { key: "soccer_conmebol_wc_qualifying",        label: "מוקדמות מונדיאל CONMEBOL", sportId: 240 },
   { key: "soccer_concacaf_nations_league",       label: "ליגת האומות CONCACAF",    sportId: 240 },
   { key: "soccer_africa_cup_of_nations",         label: "גביע אפריקה",             sportId: 240 },
-  // 5 ליגות אירופה הגדולות — כולל פלייאוף / סיום עונה
+  // ליגות אירופה הגדולות — כולל פלייאוף / סיום עונה
   { key: "soccer_epl",                           label: "פרמייר ליג",              sportId: 240 },
   { key: "soccer_spain_la_liga",                 label: "לה ליגה",                 sportId: 240 },
   { key: "soccer_germany_bundesliga",            label: "בונדסליגה",               sportId: 240 },
@@ -41,33 +58,18 @@ const ODDS_API_SPORTS = [
   { key: "soccer_england_league1",               label: "ליג 1 (אנגליה)",         sportId: 240 },
   // סקוטלנד
   { key: "soccer_scotland_premiership",          label: "פרמייר ספורט (סקוטלנד)", sportId: 240 },
-  // דרום אמריקה — קופות (שלישי/חמישי) וליגות (שוטף כל השנה)
-  { key: "soccer_conmebol_copa_libertadores",    label: "קופה ליברטדורס",          sportId: 240 },
-  { key: "soccer_conmebol_copa_sudamericana",    label: "קופה סודאמריקאנה",        sportId: 240 },
-  { key: "soccer_brazil_campeonato",             label: "ברזילאית ראשונה",          sportId: 240 },
-  { key: "soccer_brazil_serie_b",               label: "ברזילאית שנייה",            sportId: 240 },
-  { key: "soccer_argentina_primera_division",    label: "ארגנטינאית ראשונה",       sportId: 240 },
-  { key: "soccer_colombia_primera_a",           label: "קולומביאנית ראשונה",       sportId: 240 },
-  { key: "soccer_chile_primera_division",       label: "צ'יליאנית ראשונה",         sportId: 240 },
-  // צפון אמריקה (אביב–סתיו)
-  { key: "soccer_usa_mls",                       label: "MLS",                       sportId: 240 },
+  // צפון אמריקה — ליגה שנייה
   { key: "soccer_usa_usl_championship",         label: "USL Championship",          sportId: 240 },
-  { key: "soccer_mexico_ligamx",                label: "ליגה MX",                   sportId: 240 },
   // אירופה — גביעים ו-UEFA
   { key: "soccer_uefa_champs_league",            label: "ליגת האלופות",              sportId: 240 },
   { key: "soccer_uefa_europa_league",            label: "ליגה אירופית",              sportId: 240 },
   { key: "soccer_uefa_europa_conference_league", label: "ליגת הקונפרנס",            sportId: 240 },
-  // ליגות אירופאיות שמסיימות/פלייאוף במאי
+  // ליגות אירופאיות שמסיימות/פלייאוף
   { key: "soccer_turkey_super_league",          label: "טורקית ראשונה",              sportId: 240 },
   { key: "soccer_greece_super_league",          label: "יוונית ראשונה",              sportId: 240 },
   { key: "soccer_portugal_primeira_liga",       label: "פורטוגלית ראשונה",          sportId: 240 },
   { key: "soccer_israel_premier_league",        label: "ליגת העל",                   sportId: 240 },
   { key: "soccer_belgium_first_div",            label: "בלגית ראשונה",               sportId: 240 },
-  // סקנדינביה (אפריל–נובמבר — פעיל בימי חול)
-  { key: "soccer_sweden_allsvenskan",           label: "שבדית ראשונה",               sportId: 240 },
-  { key: "soccer_norway_eliteserien",           label: "נורבגית ראשונה",             sportId: 240 },
-  { key: "soccer_denmark_superliga",            label: "דנית ראשונה",                sportId: 240 },
-  { key: "soccer_finland_veikkausliiga",        label: "פינית ראשונה",               sportId: 240 },
   // אסיה (מרץ–נובמבר — לרוב שלישי/שישי)
   { key: "soccer_south_korea_kleague1",         label: "K-League",                  sportId: 240 },
   { key: "soccer_japan_j_league",               label: "J-League",                  sportId: 240 },
