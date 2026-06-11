@@ -8093,6 +8093,16 @@
             card.appendChild(overlay);
           }
         });
+        // Free cards float to the top of the feed — every unlocked tip shows
+        // above the locked premium cards, regardless of kickoff time order.
+        const isFreeCard = (card) => {
+          const isBasketball = String(card.dataset.sport || '').trim() === String(227);
+          return (isBasketball ? bbFree : fbFree).has(card);
+        };
+        const firstLocked = allCards.find((card) => !isFreeCard(card));
+        if (firstLocked) {
+          allCards.filter(isFreeCard).forEach((card) => cards.insertBefore(card, firstLocked));
+        }
         const lockedCount = cards.querySelectorAll('.premium-lock-overlay').length;
         if (lockedCount > 0) {
           const banner = document.createElement('div');
