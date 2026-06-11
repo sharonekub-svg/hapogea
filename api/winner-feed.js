@@ -93,7 +93,7 @@ const SOFT_ODDS_MAX = 2.00;
 // Hard ceiling for ANY displayed pick, on every source path: a game whose
 // pick odds exceed this never reaches the board (finished games keep showing
 // their tracked result; games without open lines are unaffected).
-const HARD_MAX_PICK_ODDS = 2.2;
+const HARD_MAX_PICK_ODDS = 2.1;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
