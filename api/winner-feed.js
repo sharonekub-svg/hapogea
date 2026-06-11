@@ -3253,15 +3253,23 @@ async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
 // League quality for pick ordering: the board should lead with the World Cup
 // and recognised top leagues, not 1.10-odds favourites from youth/4th-tier
 // leagues that happen to score high on implied probability.
-function leaguePriorityScore(name) {
+function leaguePriorityScore(name, country) {
   const n = String(name || "").toLowerCase();
+  const c = String(country || "").toLowerCase();
   if (!n) return 30;
-  if (/u-?\d{2}|youth|junior|reserve|academy|amateur|friendl|women|feminin|נשים|נוער|מילואים|ידידות/.test(n)) return 5;
-  if (/3\.\s?division|division [234]|[23]\.\s?liga|liga [23]\b|serie [cd]\b|third|esiliiga|ykkösliiga|ettan|landesliga|oberliga|regionalliga|leumit football/.test(n)) return 12;
-  if (/world cup|מונדיאל|euro 20|copa america|champions league|ליגת האלופות|europa league|conference league|nations league|libertadores|sudamericana/.test(n)) return 100;
-  if (/premier league|premiership|primera|la liga|bundesliga\b|serie a\b|ligue 1|eredivisie|süper lig|super lig|liga ?mx|mls\b|brasileir[ao]o? a|allsvenskan|eliteserien|veikkausliiga|j1|k league 1|ליגת העל|winner league|euroleague|eurocup|acb\b|lnb\b|bsl\b|bbl\b|vtb\b|greek basket|lega basket|liga leumit|wnba/.test(n)) return 70;
-  if (/championship|serie b\b|2\. bundesliga|ligue 2|segunda|league one|league two|superettan|obos|first division|premier division/.test(n)) return 40;
-  if (/cup|copa|pokal|coupe|coppa|גביע|trophy/.test(n)) return 45;
+  if (/u-?\d{2}|youth|junior|reserve|academy|amateur|friendl|women|feminin|damallsven|frauen|femen|ladies|נשים|נוער|מילואים|ידידות/.test(n)) return 5;
+  if (/3\.\s?division|division [234]|[23]\.\s?liga|liga [23]\b|serie [cd]\b|third|esiliiga|ykkösliiga|kakkonen|ettan\b|landesliga|oberliga|regionalliga/.test(n)) return 12;
+  if (/world cup|מונדיאל|euro 20|copa america|champions league|ליגת האלופות|europa league|conference league|nations league|libertadores|sudamericana|euroleague|eurocup|wnba/.test(n)) return 100;
+  // Generic top-flight names (Premier League, Primera, LNB, NBL…) exist in
+  // dozens of countries — only trust them when the source provides a major
+  // country (or no country at all: curated Hebrew labels from The Odds API).
+  const majorCountry = !country ||
+    /england|spain|germany|italy|france|brazil|argentina|netherlands|portugal|usa|united states|mexico|israel|turkey|greece|belgium|scotland|world|europe|international|sweden|norway|denmark|finland|japan|south korea|australia|lithuania|croatia|serbia|czech/.test(c);
+  if (/premier league|premiership|primera division|la liga|bundesliga\b|serie a\b|ligue 1|eredivisie|süper lig|super lig|liga ?mx|mls\b|brasileir[ao]o? a|allsvenskan|eliteserien|veikkausliiga|j1|k league 1|ליגת העל|winner league|acb\b|lnb\b|nbl\b|bsl\b|bbl\b|vtb\b|greek basket|lega basket|liga leumit|ligat ha'?al/.test(n)) {
+    return majorCountry ? 70 : 30;
+  }
+  if (/championship|serie b\b|2\. bundesliga|ligue 2|segunda|league one|league two|superettan|obos|first division|premier division/.test(n)) return majorCountry ? 40 : 25;
+  if (/cup|copa|pokal|coupe|coppa|גביע|trophy/.test(n)) return majorCountry ? 45 : 25;
   return 30;
 }
 
@@ -3357,7 +3365,8 @@ function oddsApiEventToRow(event, sportMeta, sourceName = "The Odds API") {
     sport:              isFootball ? "כדורגל" : "כדורסל",
     sportId:            sportMeta.sportId,
     league:             sportMeta.label,
-    leaguePriority:     leaguePriorityScore(sportMeta.label),
+    country:            sportMeta.country || "",
+    leaguePriority:     leaguePriorityScore(sportMeta.label, sportMeta.country),
     match:              `${home} - ${away}`,
     home,
     away,
@@ -3571,7 +3580,11 @@ async function apiSportsFootballOddsRows(dateKey) {
           ...(drawOdds ? [{ name: "Draw", price: drawOdds }] : []),
           { name: awayEn, price: awayOdds },
         ] }] }],
-      }, { label: fixture.league?.name || "כדורגל", sportId: WINNER_FOOTBALL_ID }, "API-Sports");
+      }, {
+        label: fixture.league?.name || "כדורגל",
+        country: fixture.league?.country || "",
+        sportId: WINNER_FOOTBALL_ID,
+      }, "API-Sports");
       if (row) rows.push(row);
     }
   }
@@ -3598,7 +3611,9 @@ async function apiSportsBasketballOddsRows(days) {
   const games = days
     .flatMap((day) =>
       byDay.get(day)
-        .sort((a, b) => leaguePriorityScore(b.league?.name) - leaguePriorityScore(a.league?.name))
+        .sort((a, b) =>
+          leaguePriorityScore(b.league?.name, b.country?.name) -
+          leaguePriorityScore(a.league?.name, a.country?.name))
         .slice(0, perDay)
     )
     .slice(0, MAX_GAMES);
@@ -3638,7 +3653,11 @@ async function apiSportsBasketballOddsRows(days) {
           { name: game.teams.home.name, price: homeOdds },
           { name: game.teams.away.name, price: awayOdds },
         ] }] }],
-      }, { label: game.league?.name || "כדורסל", sportId: WINNER_BASKETBALL_ID }, "API-Sports");
+      }, {
+        label: game.league?.name || "כדורסל",
+        country: game.country?.name || "",
+        sportId: WINNER_BASKETBALL_ID,
+      }, "API-Sports");
       if (row) rows.push(row);
     }
   }
@@ -3737,7 +3756,8 @@ async function getAggregatedOddsRows() {
   // Union with the day's earlier rows: a pick that was already on the board
   // stays there even after its game drops out of source responses.
   let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
-  rows = rows.filter((r) => r.day >= today);
+  // No-value favourites (1.01–1.14) make the board look amateur — drop them.
+  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
   if (!rows.length) {
     throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
   }
@@ -3759,7 +3779,7 @@ async function buildAggregatedOddsFeed() {
   // Quality-first selection with league variety: max 2 football picks per
   // league so one obscure division can't fill the board.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r))].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
     const perLeague = new Map();
     const out = [];
     for (const row of sorted) {
