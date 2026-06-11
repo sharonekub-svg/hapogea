@@ -2681,6 +2681,7 @@ function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
   const sorted = (rows || [])
     .filter((row) => {
       if (!row.recommended || !row.odds) return false;
+      if (Number(row.odds) > HARD_MAX_PICK_ODDS) return false;
       if (!["ממתין", "live", "ht"].includes(row.status) && row.status) return false;
       if (row.matchPhase === "final") return false;
       // Hide only if the match window is fully over (200 min covers 90+ET+processing)
@@ -3499,8 +3500,9 @@ async function buildOddsApiFeed() {
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
   const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const withinCap = (r) => r.matchPhase === "final" || r.noOddsYet || Number(r.odds ?? r.oddsRaw) <= HARD_MAX_PICK_ODDS;
+  const pickedToday    = sortByScore(todayRows.filter(noNba).filter(withinCap)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba).filter(withinCap)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
@@ -4071,8 +4073,9 @@ async function buildSofascoreFeed() {
   if (allRows.length === 0) throw new Error("SofaScore: no odds rows found");
 
   const sorted = (rows) => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter((r) => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const withinCap2 = (r) => r.matchPhase === "final" || r.noOddsYet || Number(r.odds ?? r.oddsRaw) <= HARD_MAX_PICK_ODDS;
+  const todayRows    = sorted(allRows.filter((r) => r.day === today).filter(withinCap2)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow).filter(withinCap2)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
@@ -4280,8 +4283,9 @@ async function buildPinnacleFeed() {
   if (allRows.length === 0) throw new Error("Pinnacle: no odds rows found");
 
   const sorted = rows => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter(r => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const withinCap3 = r => r.matchPhase === "final" || r.noOddsYet || Number(r.odds ?? r.oddsRaw) <= HARD_MAX_PICK_ODDS;
+  const todayRows    = sorted(allRows.filter(r => r.day === today).filter(withinCap3)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow).filter(withinCap3)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || { label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] } };
