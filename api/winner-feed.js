@@ -4619,7 +4619,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         .sort(
           (a, b) =>
             Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
-            (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0)
+            comparePickRows(a, b)
         );
     }
   }
