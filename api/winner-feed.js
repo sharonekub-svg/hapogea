@@ -2592,16 +2592,29 @@ function compactTrackingRow(row) {
 
 const WC_LEAGUE_RE = /world.cup|מונדיאל|fifa.*world|coupe.*du.*monde/i;
 const noWC = (row) => !WC_LEAGUE_RE.test(row.league || "") && !WC_LEAGUE_RE.test(row.tournament || "");
-const withinHardOddsCap = (row) =>
-  row.matchPhase === "final" || row.noOddsYet ||
-  !Number.isFinite(Number(row.odds ?? row.oddsRaw)) ||
-  Number(row.odds ?? row.oddsRaw) <= HARD_MAX_PICK_ODDS;
+// Games stay on the board, but a pick with odds above the cap loses its
+// recommendation — shown as a plain fixture without betting advice.
+function demoteHighOddsPick(row) {
+  if (row.matchPhase === "final" || row.noOddsYet) return row;
+  const odds = Number(row.odds ?? row.oddsRaw);
+  if (!Number.isFinite(odds) || odds <= HARD_MAX_PICK_ODDS) return row;
+  return {
+    ...row,
+    recommended: false,
+    outsideRange: true,
+    oddsRaw: odds,
+    odds: null,
+    probability: null,
+    score: 0,
+    recommendationScore: 0,
+  };
+}
 
 function splitBySport(rows) {
-  const filtered = rows.filter(withinHardOddsCap).filter(noWC);
+  const processed = rows.filter(noWC).map(demoteHighOddsPick);
   return {
-    football:   filtered.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
-    basketball: filtered.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
+    football:   processed.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
+    basketball: processed.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
   };
 }
 
@@ -3767,7 +3780,7 @@ async function getAggregatedOddsRows() {
   // stays there even after its game drops out of source responses.
   let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
   // No-value favourites (1.01–1.14) make the board look amateur — drop them.
-  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS);
+  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
   if (!rows.length) {
     throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
   }
@@ -3790,7 +3803,7 @@ async function buildAggregatedOddsFeed() {
   // football league win their slots, then remaining slots are topped up
   // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS)].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
     const football = [];
     const basketball = [];
     const skippedFootball = [];
