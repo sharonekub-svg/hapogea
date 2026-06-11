@@ -295,7 +295,7 @@ const CACHE_TTL_MS = {
   tomorrow: 60 * 60 * 1000,
   full: 5 * 60 * 1000,
 };
-const memoryCache = globalThis.__WINNER_FEED_CACHE_V4__ || (globalThis.__WINNER_FEED_CACHE_V4__ = new Map());
+const memoryCache = globalThis.__WINNER_FEED_CACHE_V3__ || (globalThis.__WINNER_FEED_CACHE_V3__ = new Map());
 // Persists across warm Lambda invocations — avoids re-fetching logos for the same teams
 const globalLogoCache = globalThis.__LOGO_CACHE__ || (globalThis.__LOGO_CACHE__ = new Map());
 
@@ -381,7 +381,7 @@ function israelNowParts(date = new Date()) {
 
 function cacheKeyForToday() {
   const today = israelDate(0);
-  return `winner-feed:v6:${today}`;
+  return `winner-feed:v5:${today}`;
 }
 
 function isFreshCache(entry, maxAgeMs) {
@@ -3704,7 +3704,7 @@ async function buildApiSportsOddsRows() {
 // the TTL window reuses them instead of hammering quotas. If all sources die
 // later in the day (quota burn, IP blocks), the same-day rows keep serving.
 const FALLBACK_ODDS_TTL_MS = Number(process.env.FALLBACK_ODDS_TTL_MINUTES || 480) * 60 * 1000;
-const ODDS_ROWS_KV_PREFIX = "fallback-odds-rows:v2:";
+const ODDS_ROWS_KV_PREFIX = "fallback-odds-rows:v1:";
 let FORCE_ODDS_REFRESH = false;
 
 function feedOpenRows(feed) {
