@@ -3688,6 +3688,191 @@ async function buildApiSportsOddsRows() {
   return [...football, ...basketball];
 }
 
+// ── 365Scores odds source ─────────────────────────────────────────────────────
+// webws.365scores.com is the one host that keeps answering Vercel's IPs (the
+// whole schedule already comes from it), and with userCountryId=6 the odds it
+// returns are Winner's own Israeli pre-match line — the closest any fallback
+// gets to the product's "real Winner odds" requirement.
+function s365BookmakerName(data) {
+  const bms = data?.bookmakers;
+  if (Array.isArray(bms) && bms[0]?.name) return String(bms[0].name);
+  if (bms && typeof bms === "object") {
+    const first = Object.values(bms)[0];
+    if (first?.name) return String(first.name);
+  }
+  return "";
+}
+
+function s365OddsOptions(game) {
+  const line = game?.mainOdds || game?.odds || null;
+  const options = Array.isArray(line?.options) ? line.options : [];
+  return options
+    .map((o) => {
+      const raw = o?.rate?.decimal ?? (typeof o?.rate === "number" ? o.rate : null) ?? o?.decimal;
+      const rate = Number(raw);
+      const num = Number(o?.num);
+      return { num: Number.isFinite(num) ? num : null, rate };
+    })
+    .filter((o) => Number.isFinite(o.rate) && o.rate > 1.01 && o.rate < 100);
+}
+
+function s365GameToOddsRow(game, winnerSportId, bookmakerName) {
+  const home = cleanText(game.homeCompetitor?.name);
+  const away = cleanText(game.awayCompetitor?.name);
+  if (!home || !away) return null;
+  const league = cleanText(game.competitionDisplayName);
+  if (/\bNBA\b/i.test(league)) return null;
+  // Pre-match odds only: statusGroup 3/4 = live/final on 365Scores
+  if (Number(game.statusGroup) >= 3) return null;
+  const start = game.startTime ? new Date(game.startTime) : null;
+  if (!start || Number.isNaN(start.getTime())) return null;
+  const ilParts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jerusalem",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(start).map((p) => [p.type, p.value])
+  );
+  const day  = `${ilParts.year}-${ilParts.month}-${ilParts.day}`;
+  const time = `${ilParts.hour}:${ilParts.minute}`;
+
+  const isFootball = Number(winnerSportId) === WINNER_FOOTBALL_ID;
+  const opts = s365OddsOptions(game);
+  // Football needs the full 1X2 line — 2 options would be a different market.
+  if (isFootball && opts.length !== 3) return null;
+  if (!isFootball && opts.length < 2) return null;
+
+  const byNum = (n) => opts.find((o) => o.num === n)?.rate || null;
+  let homeOdds = null, drawOdds = null, awayOdds = null;
+  if (opts.every((o) => o.num !== null)) {
+    homeOdds = byNum(1);
+    if (isFootball) { drawOdds = byNum(2); awayOdds = byNum(3); }
+    else awayOdds = byNum(2);
+  } else if (isFootball) {
+    [homeOdds, drawOdds, awayOdds] = [opts[0].rate, opts[1].rate, opts[2].rate];
+  } else {
+    homeOdds = opts[0].rate;
+    awayOdds = opts[opts.length - 1].rate;
+  }
+  if (!homeOdds || !awayOdds) return null;
+
+  const allCandidates = isFootball
+    ? [
+        { name: home, odds: homeOdds },
+        drawOdds ? { name: "תיקו", odds: drawOdds } : null,
+        { name: away, odds: awayOdds },
+      ].filter(Boolean)
+    : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
+
+  const TARGET_MIN = 1.20, TARGET_MAX = 2.80, TARGET_ODDS = 1.65;
+  const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
+  const hasInRange = inRange.length > 0;
+  const pool = hasInRange ? inRange : allCandidates;
+  const pick = [...pool].sort((a, b) => Math.abs(a.odds - TARGET_ODDS) - Math.abs(b.odds - TARGET_ODDS))[0];
+  const prob = 1 / pick.odds;
+  const impliedPct = Math.round(prob * 100);
+  const score = Math.round(prob * 100);
+  const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
+  const oppSummary = allCandidates
+    .filter((c) => c.name !== pick.name)
+    .map((c) => `${c.name} ${c.odds.toFixed(2)}`)
+    .join(", ");
+  const country = cleanText(game.competition?.countryName || "");
+  const explanation = [
+    `מקור: 365Scores${bookmakerName ? ` (קו ${bookmakerName})` : ""} — ${league}${country ? ` (${country})` : ""}`,
+    isFav
+      ? `${pick.name} הפייבוריט (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%)${oppSummary ? ` — ${oppSummary}` : ""}.`
+      : `${pick.name} (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%) — הבחירה הקרובה ביותר לטווח האידיאלי${oppSummary ? `. חלופות: ${oppSummary}` : ""}.`,
+    "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים.",
+  ];
+
+  const homeId = game.homeCompetitor?.id;
+  const awayId = game.awayCompetitor?.id;
+  const competitionId = game.competition?.id || game.competitionId;
+  return {
+    id:                 `s365-${game.id}`,
+    eventId:            String(game.id),
+    eventId365:         String(game.id),
+    source:             "365Scores",
+    day,
+    time,
+    sport:              isFootball ? "כדורגל" : "כדורסל",
+    sportId:            winnerSportId,
+    league:             league || (isFootball ? "כדורגל" : "כדורסל"),
+    country,
+    leaguePriority:     leaguePriorityScore(league, country),
+    match:              `${home} - ${away}`,
+    home,
+    away,
+    pick:               pick.name,
+    pickTeam:           pick.name,
+    winnerPick:         pick.name,
+    odds:               pick.odds,
+    oddsRaw:            pick.odds,
+    homeOdds:           homeOdds || null,
+    drawOdds:           drawOdds || null,
+    awayOdds:           awayOdds || null,
+    probability:        prob,
+    normalizedProbability: prob,
+    recommendationScore: score,
+    score,
+    recommended:        hasInRange,
+    outsideRange:       !hasInRange,
+    status:             "ממתין",
+    matchPhase:         "scheduled",
+    bettingStatus:      "available",
+    riskLevel:          score >= 70 ? "נמוך" : score >= 50 ? "בינוני" : "גבוה",
+    explanation,
+    signals:            [explanation[1]],
+    resultKey:          `${winnerSportId}:${day}:${normalizeMatchName(home)}:${normalizeMatchName(away)}`,
+    verifiedAt:         new Date().toISOString(),
+    homeLogoUrl:        homeId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/${homeId}` : null,
+    awayLogoUrl:        awayId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/${awayId}` : null,
+    leagueLogoUrl:      competitionId ? `https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/${competitionId}` : null,
+  };
+}
+
+async function build365ScoresOddsRows() {
+  const days = [israelDate(0), israelDate(1)];
+  const sports = [
+    [SCORES365_FOOTBALL_ID, WINNER_FOOTBALL_ID, "football"],
+    [SCORES365_BASKETBALL_ID, WINNER_BASKETBALL_ID, "basketball"],
+  ];
+  const rows = [];
+  for (const day of days) {
+    for (const [sportId365, winnerSportId, refererSport] of sports) {
+      const params = new URLSearchParams({
+        langId: "2",
+        timezoneName: "Asia/Jerusalem",
+        userCountryId: "6",
+        appTypeId: "5",
+        sports: String(sportId365),
+        startDate: scores365Date(day),
+        endDate: scores365Date(day),
+        showOdds: "true",
+        withMainOdds: "true",
+      });
+      const data = await fetchJson(`https://webws.365scores.com/web/games/?${params}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          Origin: "https://www.365scores.com",
+          Referer: `https://www.365scores.com/he/${refererSport}`,
+          Accept: "application/json",
+        },
+        retryAttempts: 2,
+        retryBaseDelay: 800,
+      }).catch(() => null);
+      const bookmakerName = s365BookmakerName(data);
+      for (const game of data?.games || []) {
+        const row = s365GameToOddsRow(game, winnerSportId, bookmakerName);
+        if (row) rows.push(row);
+      }
+    }
+  }
+  if (!rows.length) throw new Error("365Scores: no odds rows found");
+  return rows;
+}
+
 // ── Aggregated daily odds layer ───────────────────────────────────────────────
 // THE fix for the recurring "games but no picks" mornings: every odds source
 // is tried in order, the day's rows persist in KV, and every feed rebuild in
@@ -3761,6 +3946,7 @@ async function getAggregatedOddsRows() {
       console.warn(`[odds-layer] ${name} failed: ${errors[name]}`);
     }
   };
+  await trySource("365Scores",    build365ScoresOddsRows);
   await trySource("SofaScore",    async () => feedOpenRows(await buildSofascoreFeed()));
   await trySource("Pinnacle",     async () => feedOpenRows(await buildPinnacleFeed()));
   await trySource("API-Sports",   buildApiSportsOddsRows);
@@ -3772,7 +3958,7 @@ async function getAggregatedOddsRows() {
   // No-value favourites (1.01–1.14) make the board look amateur — drop them.
   rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
   if (!rows.length) {
-    throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
+    throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 500));
   }
   const entry = {
     fetchedAt: collected.length ? Date.now() : Number(cached?.fetchedAt || Date.now()),
@@ -4537,7 +4723,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       console.warn(`[winner-feed] odds layer OK: ${supplementFeed?._oddsLayer?.source} rows=${supplementFeed?._oddsLayer?.rowCount} fromKv=${supplementFeed?._oddsLayer?.fromKv}`);
     } catch (aggErr) {
       console.error("[winner-feed] aggregated odds supplement failed:", aggErr?.message);
-      payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: aggErr?.message?.slice(0, 220) };
+      payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: aggErr?.message?.slice(0, 560) };
     }
     if (supplementFeed) {
       try {
@@ -4828,6 +5014,7 @@ module.exports.buildApiSportsOddsRows = buildApiSportsOddsRows;
 module.exports.buildAggregatedOddsFeed = buildAggregatedOddsFeed;
 module.exports.getAggregatedOddsRows = getAggregatedOddsRows;
 module.exports.buildSofascoreFeed = buildSofascoreFeed;
+module.exports.build365ScoresOddsRows = build365ScoresOddsRows;
 module.exports.buildPinnacleFeed = buildPinnacleFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
 module.exports.scoreBreakdown = scoreBreakdown;
