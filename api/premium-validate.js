@@ -50,6 +50,8 @@ module.exports = async function handler(req, res) {
   const STATIC_CODES = {
     "6PQLCU4M": { plan: "monthly", expiresAt: 1783555200000, email: "kubovskys@gmail.com" },
     "Q338GRT6": { plan: "weekly",  expiresAt: 1781567999000, email: "liordavid8590@gmail.com" },
+    // Universal sport code: any email, football+basketball only, 7 AI msgs/day, no World Cup
+    "SPORT7":   { plan: "sport",   expiresAt: 1812096000000 }, // expires 2027-06-01
   };
   if (STATIC_CODES[code]) {
     const s = STATIC_CODES[code];

@@ -5491,6 +5491,7 @@
   <script>
     const PREMIUM_LS_KEY = 'hapogea_premium_v3';
     const PREMIUM_EXP_KEY = 'hapogea_premium_exp_v3';
+    const PREMIUM_PLAN_KEY = 'hapogea_premium_plan_v3';
     const AI_FREE_KEY = 'hapogea_ai_free_used_v1';
     // Reset free + premium counters if it's a new day
     (function resetAiFreeDaily() {
@@ -5525,6 +5526,7 @@
         if (data.ok) {
           localStorage.setItem(PREMIUM_LS_KEY, 'active');
           if (data.expiresAt) localStorage.setItem(PREMIUM_EXP_KEY, String(data.expiresAt));
+          if (data.plan) localStorage.setItem(PREMIUM_PLAN_KEY, data.plan);
           state.isPremium = true;
           render();
           closePremiumModal();
@@ -5545,9 +5547,20 @@
       if (!exp) return null;
       return Math.max(1, Math.ceil((exp - Date.now()) / 86400000));
     }
+    function getPremiumPlan() {
+      if (!isPremiumUser()) return null;
+      return localStorage.getItem(PREMIUM_PLAN_KEY) || 'premium';
+    }
+    // Returns true only for plans that include World Cup access
+    function isPremiumWC() {
+      const plan = getPremiumPlan();
+      if (!plan) return false;
+      return plan !== 'sport'; // "sport" plan excludes WC; all others include it
+    }
     function deactivatePremium() {
       localStorage.removeItem(PREMIUM_LS_KEY);
       localStorage.removeItem(PREMIUM_EXP_KEY);
+      localStorage.removeItem(PREMIUM_PLAN_KEY);
       state.isPremium = false;
       state.reubenFreeUsed = 0;
       render();
@@ -6549,8 +6562,8 @@
           </div>
         </div>`;
 
-      // Premium-locked (everything except מקסיקו vs דרום אפריקה): blur the pick, keep the card look
-      if (item.premium && !state.isPremium) {
+      // Premium-locked WC picks: sport plan does NOT unlock WC; only full premium does
+      if (item.premium && !(typeof isPremiumWC === 'function' ? isPremiumWC() : state.isPremium)) {
         return `
           <article class="card no-pick" data-status="${status.cls}" data-wc="1" style="position:relative;overflow:hidden">
             ${head}
@@ -8402,8 +8415,7 @@
         meta.textContent = `📅 מוצגים משחקי מחר (אין משחקים פתוחים להיום) · ${tmCount} עם יתרון סטטיסטי. ${sourceMode}${isRefreshing ? " · מתעדכן..." : ""}`;
       }
 
-      // Premium lock: free users see 2 cards per sport, chosen from games
-      // between 10:00–23:00 so early-morning games don't consume the free slots.
+      // Premium lock: free users see 2 cards per sport; "sport" plan and above unlock all.
       if (!state.isPremium) {
         const allCards = [...cards.querySelectorAll('article.card')];
         // Score each card: daytime window 10:00–23:00 scores 1, outside scores 0.
@@ -11187,8 +11199,9 @@ function AiMessage({m,idx,onToggle,onRephrase}) {
   );
 }
 
-const AI_FREE_LIMIT = 1;      // free users: 1 message per day
-const AI_PREMIUM_LIMIT = 100; // premium users: 100 messages per day
+const AI_FREE_LIMIT = 1;       // free users: 1 message per day
+const AI_SPORT_LIMIT = 7;      // "sport" plan: 7 messages per day
+const AI_PREMIUM_LIMIT = 100;  // full premium: 100 messages per day
 
 // AI usage is tracked PER USER and resets at midnight (Israel local date).
 // This guarantees every account gets its own daily allowance — a brand-new
@@ -11223,12 +11236,17 @@ function AiApp() {
   const atBottom = React.useRef(true);
   const runRef = React.useRef(0);
   const isPrem = () => typeof isPremiumUser === 'function' && isPremiumUser();
+  const getAiLimit = () => {
+    if (!isPrem()) return AI_FREE_LIMIT;
+    const plan = typeof getPremiumPlan === 'function' ? getPremiumPlan() : 'premium';
+    return plan === 'sport' ? AI_SPORT_LIMIT : AI_PREMIUM_LIMIT;
+  };
   const isLoggedIn = !!user;
   // Per-user daily AI usage ({date, free, prem}), resets automatically at midnight.
   const [usage, setUsage] = React.useState(() => readAiUsage(user));
   // Reload usage when the signed-in account changes — each account has its own quota.
   React.useEffect(() => { setUsage(readAiUsage(user)); }, [user && user.id]);
-  const isAiLocked = isPrem() ? usage.prem >= AI_PREMIUM_LIMIT : usage.free >= AI_FREE_LIMIT;
+  const isAiLocked = isPrem() ? usage.prem >= getAiLimit() : usage.free >= AI_FREE_LIMIT;
   // Count one successful message. Re-reads first so a midnight rollover resets cleanly.
   const bumpUsage = React.useCallback(() => {
     const fresh = readAiUsage(user);
@@ -11242,7 +11260,7 @@ function AiApp() {
     if (!isLoggedIn) { typeof HapAuth !== "undefined" && HapAuth.openModal(); return true; }
     const fresh = readAiUsage(user);
     setUsage(fresh);
-    const locked = isPrem() ? fresh.prem >= AI_PREMIUM_LIMIT : fresh.free >= AI_FREE_LIMIT;
+    const locked = isPrem() ? fresh.prem >= getAiLimit() : fresh.free >= AI_FREE_LIMIT;
     if (locked) { openPremiumModal && openPremiumModal(); return true; }
     return false;
   };
