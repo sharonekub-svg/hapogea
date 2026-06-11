@@ -5566,6 +5566,12 @@
       render();
     }
     function openPremiumModal() {
+      // Premium requires a signed-in account (Google) — codes are bound to the
+      // user's email, so anonymous users are sent to the login modal first.
+      if (!window.HAP_USER) {
+        if (typeof HapAuth !== 'undefined' && HapAuth.openModal) HapAuth.openModal();
+        return;
+      }
       document.getElementById('premiumModal').classList.remove('hidden');
       const emailField = document.getElementById('premiumEmailInput');
       if (emailField && !emailField.value && window.HAP_USER?.email) {
