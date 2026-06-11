@@ -11213,7 +11213,12 @@ function AiMessage({m,idx,onToggle,onRephrase}) {
 }
 
 const AI_FREE_LIMIT = 1;      // free users: 1 message per day
-const AI_PREMIUM_LIMIT = 100; // premium users: 100 messages per day
+const AI_SPORT_LIMIT = 7;     // "sport" plan (SPORT7 code): 7 messages per day
+const AI_PREMIUM_LIMIT = 100; // full premium: 100 messages per day
+function getAiPremiumLimit() {
+  const plan = typeof getPremiumPlan === 'function' ? getPremiumPlan() : 'premium';
+  return plan === 'sport' ? AI_SPORT_LIMIT : AI_PREMIUM_LIMIT;
+}
 
 // AI usage is tracked PER USER and resets at midnight (Israel local date).
 // This guarantees every account gets its own daily allowance — a brand-new
@@ -11253,7 +11258,7 @@ function AiApp() {
   const [usage, setUsage] = React.useState(() => readAiUsage(user));
   // Reload usage when the signed-in account changes — each account has its own quota.
   React.useEffect(() => { setUsage(readAiUsage(user)); }, [user && user.id]);
-  const isAiLocked = isPrem() ? usage.prem >= AI_PREMIUM_LIMIT : usage.free >= AI_FREE_LIMIT;
+  const isAiLocked = isPrem() ? usage.prem >= getAiPremiumLimit() : usage.free >= AI_FREE_LIMIT;
   // Count one successful message. Re-reads first so a midnight rollover resets cleanly.
   const bumpUsage = React.useCallback(() => {
     const fresh = readAiUsage(user);
@@ -11267,7 +11272,7 @@ function AiApp() {
     if (!isLoggedIn) { typeof HapAuth !== "undefined" && HapAuth.openModal(); return true; }
     const fresh = readAiUsage(user);
     setUsage(fresh);
-    const locked = isPrem() ? fresh.prem >= AI_PREMIUM_LIMIT : fresh.free >= AI_FREE_LIMIT;
+    const locked = isPrem() ? fresh.prem >= getAiPremiumLimit() : fresh.free >= AI_FREE_LIMIT;
     if (locked) { openPremiumModal && openPremiumModal(); return true; }
     return false;
   };
