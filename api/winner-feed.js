@@ -90,6 +90,7 @@ const ODDS_MIN = 1.40;
 const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
+const HARD_MAX_PICK_ODDS = 2.1;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
@@ -2589,10 +2590,18 @@ function compactTrackingRow(row) {
   };
 }
 
+const WC_LEAGUE_RE = /world.cup|מונדיאל|fifa.*world|coupe.*du.*monde/i;
+const noWC = (row) => !WC_LEAGUE_RE.test(row.league || "") && !WC_LEAGUE_RE.test(row.tournament || "");
+const withinHardOddsCap = (row) =>
+  row.matchPhase === "final" || row.noOddsYet ||
+  !Number.isFinite(Number(row.odds ?? row.oddsRaw)) ||
+  Number(row.odds ?? row.oddsRaw) <= HARD_MAX_PICK_ODDS;
+
 function splitBySport(rows) {
+  const filtered = rows.filter(withinHardOddsCap).filter(noWC);
   return {
-    football:   rows.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
-    basketball: rows.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
+    football:   filtered.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
+    basketball: filtered.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
   };
 }
 
@@ -3486,8 +3495,8 @@ async function buildOddsApiFeed() {
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
   const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedToday    = sortByScore(todayRows.filter(noNba).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
@@ -3780,7 +3789,7 @@ async function buildAggregatedOddsFeed() {
   // football league win their slots, then remaining slots are topped up
   // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS)].sort(comparePickRows);
     const football = [];
     const basketball = [];
     const skippedFootball = [];
@@ -4057,8 +4066,8 @@ async function buildSofascoreFeed() {
   if (allRows.length === 0) throw new Error("SofaScore: no odds rows found");
 
   const sorted = (rows) => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter((r) => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const todayRows    = sorted(allRows.filter((r) => r.day === today).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
@@ -4266,8 +4275,8 @@ async function buildPinnacleFeed() {
   if (allRows.length === 0) throw new Error("Pinnacle: no odds rows found");
 
   const sorted = rows => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter(r => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const todayRows    = sorted(allRows.filter(r => r.day === today).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || { label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] } };
