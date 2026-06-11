@@ -6932,37 +6932,50 @@
       const banner = document.getElementById("wcToggle");
       if (banner) banner.setAttribute("aria-expanded", String(state.wcOpen));
 
+      // Always show today's games only
+      const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in Israel timezone approximation
+      const todayFixtures = WC2026_FIXTURES.filter(f => f.date === todayStr);
+
       if (!state.wcOpen) {
         wcStopCountdown();
-        // Show 3 upcoming fixtures as a teaser
-        const upcoming = WC2026_FIXTURES.filter(f => !f.status || f.status === 'ממתין').slice(0, 3);
+        if (todayFixtures.length === 0) {
+          // No games today — show message
+          const next = WC2026_FIXTURES.find(f => f.date > todayStr);
+          const nextLabel = next ? (() => { const [yr,mo,dy]=next.date.split('-'); return `${dy}.${mo}.${yr}`; })() : '';
+          target.innerHTML = `
+            <div class="wc-head">
+              <div>
+                <h3>מונדיאל 2026 — משחקי היום</h3>
+                <p style="color:rgba(255,255,255,.45)">${next ? `אין משחקים היום · המשחק הבא: ${nextLabel}` : 'אין משחקים נוספים'}</p>
+              </div>
+            </div>`;
+          return;
+        }
         target.innerHTML = `
           <div class="wc-head">
             <div>
-              <h3>מונדיאל 2026 — לוח משחקים</h3>
-              <p>לחץ על הבאנר למרכז הטורניר המלא עם ${WC2026_FIXTURES.length} משחקים, דגלים ויחסי ווינר.</p>
+              <h3>מונדיאל 2026 — משחקי היום</h3>
+              <p>${todayFixtures.length} משחקים היום</p>
             </div>
-            <span class="pill">${WC2026_FIXTURES.length} משחקים · 48 נבחרות</span>
+            <span class="pill">${todayFixtures.length} משחקים</span>
           </div>
           <div class="wc-match-grid">
-            ${upcoming.map(wcFixtureCard).join('')}
+            ${todayFixtures.map(wcFixtureCard).join('')}
           </div>`;
         wcBindTilt(target);
         return;
       }
 
-      // All unique groups, sorted A→L
-      const allGroups = [...new Set(WC2026_FIXTURES.map(f => f.stage))].filter(Boolean).sort((a, b) => {
-        const la = a.slice(-1), lb = b.slice(-1);
-        return la.localeCompare(lb);
-      });
+      // Expanded view — today's games only, grouped by stage/group
+      const allGroups = [...new Set(todayFixtures.map(f => f.stage))].filter(Boolean).sort((a, b) => a.slice(-1).localeCompare(b.slice(-1)));
       if (!state.wcActiveGroup) state.wcActiveGroup = '__all__';
       const activeGroup = state.wcActiveGroup;
 
-      // Group letter grid
-      const groupLetterGrid = allGroups.map(g => {
-        const letter = g.replace(/[^A-Za-z]/g, '') || g.slice(-1);
-        const count = WC2026_FIXTURES.filter(f => f.stage === g).length;
+      // Group letter grid (only groups that have games today)
+      const groupLetterGrid = ['__all__', ...allGroups].map(g => {
+        const isAll = g === '__all__';
+        const count = isAll ? todayFixtures.length : todayFixtures.filter(f => f.stage === g).length;
+        const letter = isAll ? 'הכל' : (g.replace(/[^A-Za-z]/g, '') || g.slice(-1));
         return `<button class="wc-group-pill${g === activeGroup ? ' active' : ''}" data-wc-group="${escapeHtml(g)}" type="button">
           <span class="wc-group-pill-letter">${escapeHtml(letter)}</span>
           <span class="wc-group-pill-count">${count} משחקים</span>
@@ -6970,30 +6983,17 @@
       }).join('');
 
       let matchesHtml = '';
-      if (activeGroup === '__all__') {
-        // Group by date
-        const byDate = new Map();
-        WC2026_FIXTURES.forEach(f => {
-          if (!byDate.has(f.date)) byDate.set(f.date, []);
-          byDate.get(f.date).push(f);
-        });
-        const todayStr = new Date().toISOString().slice(0, 10);
-        matchesHtml = [...byDate.entries()].map(([date, games]) => {
-          const [yr, mo, dy] = date.split('-');
-          const isToday = date === todayStr;
-          const label = isToday ? `📅 היום · ${dy}.${mo}` : `${dy}.${mo}.${yr}`;
-          return `
-            <div class="wc-date-header">
-              <span class="wc-date-header-label${isToday ? ' wc-date-header-today' : ''}">${label}</span>
-              <div class="wc-date-header-line"></div>
-            </div>
-            <div class="wc-match-grid">${games.map(wcFixtureCard).join('')}</div>`;
-        }).join('');
+      if (todayFixtures.length === 0) {
+        const next = WC2026_FIXTURES.find(f => f.date > todayStr);
+        const nextLabel = next ? (() => { const [yr,mo,dy]=next.date.split('-'); return `${dy}.${mo}.${yr}`; })() : '';
+        matchesHtml = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,.35);font:500 14px Heebo,sans-serif">${next ? `אין משחקים היום · המשחק הבא: ${nextLabel}` : 'אין משחקים נוספים'}</div>`;
+      } else if (activeGroup === '__all__') {
+        matchesHtml = `<div class="wc-match-grid">${todayFixtures.map(wcFixtureCard).join('')}</div>`;
       } else {
-        const groupFixtures = WC2026_FIXTURES.filter(f => f.stage === activeGroup);
+        const groupFixtures = todayFixtures.filter(f => f.stage === activeGroup);
         matchesHtml = groupFixtures.length
           ? `<div class="wc-match-grid">${groupFixtures.map(wcFixtureCard).join('')}</div>`
-          : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בבית זה</div>`;
+          : `<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font:500 13px Heebo,sans-serif">אין משחקים בבית זה היום</div>`;
       }
 
       target.innerHTML = `
