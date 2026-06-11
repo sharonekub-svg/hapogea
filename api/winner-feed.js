@@ -4370,6 +4370,20 @@ function normalizeFallbackRows(payload) {
     }
   }
 
+  // Odds ceiling applies to snapshot rows too — open picks above the cap are
+  // dropped (finished games keep showing their tracked result).
+  for (const tabKey of ["today", "tomorrow"]) {
+    const tab = copy.tabs?.[tabKey];
+    if (!tab) continue;
+    for (const sport of Object.keys(tab.sports || {})) {
+      tab.sports[sport] = (tab.sports[sport] || []).filter((r) =>
+        r.matchPhase === "final" || r.noOddsYet ||
+        !Number.isFinite(Number(r.odds ?? r.oddsRaw)) ||
+        Number(r.odds ?? r.oddsRaw) <= HARD_MAX_PICK_ODDS
+      );
+    }
+  }
+
   // Normalize row fields
   for (const tab of Object.values(copy.tabs || {})) {
     for (const rows of Object.values(tab.sports || {})) {
