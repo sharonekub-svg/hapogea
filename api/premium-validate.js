@@ -46,9 +46,8 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, plan: "premium" });
   }
 
-  // Single-use sport code: any email may redeem it, but only ONCE — the first
-  // redemption binds the code to that email (KV), and every other email is
-  // rejected afterwards. Football+basketball, 7 AI msgs/day, no World Cup.
+  // Universal sport code: any email, no single-use restriction.
+  // Football+basketball, 7 AI msgs/day, no World Cup, expires 2027-06-01.
   if (code === "SPORT7") {
     const expiresAt = 1812096000000; // 2027-06-01
     if (Date.now() > expiresAt) {
@@ -57,22 +56,6 @@ module.exports = async function handler(req, res) {
     if (!email) {
       return res.status(200).json({ ok: false, error: "יש להתחבר עם האימייל שלך לפני שימוש בקוד זה" });
     }
-    const claimRaw = await kvGet("premium:claim:SPORT7").catch(() => null);
-    if (claimRaw) {
-      let claim = {};
-      try { claim = JSON.parse(claimRaw); } catch { claim = {}; }
-      // Already redeemed — only the original redeemer may validate again
-      if ((claim.email || "").toLowerCase() !== email) {
-        return res.status(200).json({ ok: false, error: "קוד כבר נוצל" });
-      }
-      return res.status(200).json({ ok: true, expiresAt, plan: "sport" });
-    }
-    // First redemption — bind the code to this email
-    await kvSet(
-      "premium:claim:SPORT7",
-      JSON.stringify({ email, usedAt: new Date().toISOString() }),
-      365 * 24 * 3600
-    ).catch(() => {});
     return res.status(200).json({ ok: true, expiresAt, plan: "sport" });
   }
 
