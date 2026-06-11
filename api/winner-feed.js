@@ -3535,7 +3535,7 @@ async function apiSportsFootballOddsRows(dateKey) {
   if (!fixtureById.size) return [];
 
   // Date-level odds endpoint (bet=1 → 1X2 Match Winner), ~10 fixtures per page
-  const MAX_PAGES = Number(process.env.APISPORTS_ODDS_MAX_PAGES || 5);
+  const MAX_PAGES = Number(process.env.APISPORTS_ODDS_MAX_PAGES || 8);
   const first = await fetchApiSports(`${APISPORTS_FOOTBALL}/odds?date=${dateKey}&bet=1&page=1`);
   if (!first?.response?.length) return [];
   const totalPages = Math.min(Number(first?.paging?.total || 1), MAX_PAGES);
@@ -3596,7 +3596,7 @@ async function apiSportsBasketballOddsRows(days) {
   // quota, split the budget across days, and spend it on the best leagues
   // first so today can't starve tomorrow (and junk can't starve the Winner
   // League / Euroleague / WNBA games).
-  const MAX_GAMES = Number(process.env.APISPORTS_BBALL_ODDS_MAX || 10);
+  const MAX_GAMES = Number(process.env.APISPORTS_BBALL_ODDS_MAX || 20);
   const byDay = new Map(days.map((d) => [d, []]));
   for (const day of days) {
     const data = await fetchApiSports(`${APISPORTS_BBALL}/games?date=${day}`);
@@ -3680,7 +3680,7 @@ async function buildApiSportsOddsRows() {
 // is tried in order, the day's rows persist in KV, and every feed rebuild in
 // the TTL window reuses them instead of hammering quotas. If all sources die
 // later in the day (quota burn, IP blocks), the same-day rows keep serving.
-const FALLBACK_ODDS_TTL_MS = Number(process.env.FALLBACK_ODDS_TTL_MINUTES || 360) * 60 * 1000;
+const FALLBACK_ODDS_TTL_MS = Number(process.env.FALLBACK_ODDS_TTL_MINUTES || 480) * 60 * 1000;
 const ODDS_ROWS_KV_PREFIX = "fallback-odds-rows:v1:";
 let FORCE_ODDS_REFRESH = false;
 
@@ -3718,7 +3718,7 @@ function hasEnoughOddsRows(rows) {
   const today = israelDate(0);
   const count = (sportId) =>
     rows.filter((r) => r.day === today && Number(r.sportId) === sportId).length;
-  return count(WINNER_FOOTBALL_ID) >= 5 && count(WINNER_BASKETBALL_ID) >= 2;
+  return count(WINNER_FOOTBALL_ID) >= 10 && count(WINNER_BASKETBALL_ID) >= 4;
 }
 
 async function getAggregatedOddsRows() {
@@ -3776,23 +3776,32 @@ async function buildAggregatedOddsFeed() {
   const today = israelDate(0);
   const tomorrow = israelDate(1);
   const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  // Quality-first selection with league variety: max 2 football picks per
-  // league so one obscure division can't fill the board.
+  // Quality-first selection with league variety: the first 2 picks per
+  // football league win their slots, then remaining slots are topped up
+  // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
     const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
+    const football = [];
+    const basketball = [];
+    const skippedFootball = [];
     const perLeague = new Map();
-    const out = [];
     for (const row of sorted) {
-      if (Number(row.sportId) === WINNER_FOOTBALL_ID) {
-        const league = String(row.league || "").toLowerCase();
-        const used = perLeague.get(league) || 0;
-        if (used >= 2) continue;
-        perLeague.set(league, used + 1);
+      if (Number(row.sportId) === WINNER_BASKETBALL_ID) {
+        if (basketball.length < TARGET_PICKS_PER_SPORT) basketball.push(row);
+        continue;
       }
-      out.push(row);
-      if (out.length >= TARGET_PICKS_PER_SPORT * 2) break;
+      if (football.length >= TARGET_PICKS_PER_SPORT) continue;
+      const league = String(row.league || "").toLowerCase();
+      const used = perLeague.get(league) || 0;
+      if (used >= 2) { skippedFootball.push(row); continue; }
+      perLeague.set(league, used + 1);
+      football.push(row);
     }
-    return out;
+    for (const row of skippedFootball) {
+      if (football.length >= TARGET_PICKS_PER_SPORT) break;
+      football.push(row);
+    }
+    return [...football, ...basketball];
   };
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
@@ -4606,28 +4615,35 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     }
   }
 
-  // Hard-cap football to 5 per day. Real picks (with odds) are kept first;
-  // noOddsYet placeholders only fill leftover slots — never displace a real pick.
+  // Per-sport display caps. Real picks (with odds) are kept first; noOddsYet
+  // placeholders only fill leftover slots — never displace a real pick.
   // Basketball: no NBA on the board (placeholders included), per product rules.
+  const FOOTBALL_DISPLAY_CAP   = Number(process.env.FOOTBALL_DISPLAY_CAP || 15);
+  const BASKETBALL_DISPLAY_CAP = Number(process.env.BASKETBALL_DISPLAY_CAP || 15);
+  const capSportRows = (rows, cap) => {
+    if (!Array.isArray(rows) || rows.length <= cap) return rows;
+    const real = rows.filter((r) => !r.noOddsYet);
+    const placeholders = rows.filter((r) => r.noOddsYet);
+    return [
+      ...real.slice(0, cap),
+      ...placeholders.slice(0, Math.max(0, cap - Math.min(real.length, cap))),
+    ];
+  };
   for (const tabKey of ["today", "tomorrow"]) {
     const tab = payload.tabs?.[tabKey];
     if (!tab?.sports) continue;
-    if (Array.isArray(tab.sports.football) && tab.sports.football.length > 5) {
-      const real = tab.sports.football.filter((r) => !r.noOddsYet);
-      const placeholders = tab.sports.football.filter((r) => r.noOddsYet);
-      tab.sports.football = [
-        ...real.slice(0, 5),
-        ...placeholders.slice(0, Math.max(0, 5 - Math.min(real.length, 5))),
-      ];
-    }
+    tab.sports.football = capSportRows(tab.sports.football, FOOTBALL_DISPLAY_CAP);
     if (Array.isArray(tab.sports.basketball)) {
-      tab.sports.basketball = tab.sports.basketball
-        .filter((r) => !/\bNBA\b/i.test(r.league || ""))
-        .sort(
-          (a, b) =>
-            Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
-            comparePickRows(a, b)
-        );
+      tab.sports.basketball = capSportRows(
+        tab.sports.basketball
+          .filter((r) => !/\bNBA\b/i.test(r.league || ""))
+          .sort(
+            (a, b) =>
+              Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
+              comparePickRows(a, b)
+          ),
+        BASKETBALL_DISPLAY_CAP
+      );
     }
   }
 
