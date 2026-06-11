@@ -4669,8 +4669,18 @@ module.exports = async function handler(req, res) {
   try {
     const force = String(req?.query?.force || "").toLowerCase() === "1";
     FORCE_ODDS_REFRESH = String(req?.query?.forceodds || "").toLowerCase() === "1";
+    console.warn("[winner-feed] default path start force=%s forceodds=%s", force, FORCE_ODDS_REFRESH);
     const payload = await buildCachedWinnerFeedPayload({ force });
-    res.status(200).json(payload);
+    let body;
+    try {
+      body = JSON.stringify(payload);
+    } catch (serErr) {
+      console.error("[winner-feed] payload serialization failed:", serErr?.message);
+      throw serErr;
+    }
+    console.warn("[winner-feed] default path done, body bytes=%d cache=%s", body.length, payload?.cache?.status);
+    res.status(200).setHeader("Content-Type", "application/json; charset=utf-8");
+    res.end(body);
   } catch (error) {
     try {
       const cached = await kvGet(cacheKeyForToday());
