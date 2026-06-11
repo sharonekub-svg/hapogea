@@ -3929,7 +3929,12 @@ async function getAggregatedOddsRows() {
   let cached = null;
   try { cached = await kvGet(kvKey); } catch { /* memory fallback inside kvGet */ }
   const age = cached?.fetchedAt ? Date.now() - Number(cached.fetchedAt) : Infinity;
-  if (!forceFresh && cached?.rows?.length && age < FALLBACK_ODDS_TTL_MS) {
+  // A full board sleeps for the whole TTL. An incomplete one (e.g. Winner
+  // hasn't opened basketball lines yet) re-polls the sources every half hour
+  // so the board fills as lines open through the day.
+  const RETRY_INCOMPLETE_MS = 30 * 60 * 1000;
+  const cacheSatisfies = cached?.rows?.length ? hasEnoughOddsRows(cached.rows) : false;
+  if (!forceFresh && cached?.rows?.length && age < FALLBACK_ODDS_TTL_MS && (cacheSatisfies || age < RETRY_INCOMPLETE_MS)) {
     return { ...cached, fromKv: true };
   }
 
