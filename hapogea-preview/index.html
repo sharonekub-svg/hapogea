@@ -4857,81 +4857,81 @@
     }
     .wc-parade-item:hover img { transform: scale(1.35) rotate(-3deg); }
     .wc-parade-item span { font: 700 11px Heebo, sans-serif; color: rgba(255,255,255,.62); white-space: nowrap; }
-    /* — Next-match spotlight — */
+    /* — Next-match spotlight (clean, readable) — */
     .wc-spotlight {
-      position: relative; border-radius: 22px; padding: 1.5px; overflow: hidden;
-      background: linear-gradient(120deg, rgba(255,200,87,.0), rgba(255,200,87,.65), rgba(85,214,255,.65), rgba(255,200,87,0));
-      background-size: 300% 300%;
-      animation: wcSpotBorder 6s linear infinite;
+      position: relative; border-radius: 20px; overflow: hidden;
+      padding: 20px 16px 16px;
+      background: linear-gradient(168deg, #14264e, #0d1832 78%);
+      border: 1px solid rgba(255,200,87,.38);
+      box-shadow: 0 20px 46px -24px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.07);
     }
-    @keyframes wcSpotBorder { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
-    .wc-spotlight-in {
-      position: relative; border-radius: 21px; padding: 20px 18px 18px; overflow: hidden;
-      background:
-        radial-gradient(110% 90% at 85% -10%, rgba(255,200,87,.16), transparent 50%),
-        radial-gradient(100% 80% at 10% 110%, rgba(37,99,235,.4), transparent 55%),
-        linear-gradient(150deg, #101d3a, #0c1730 70%);
+    .wc-spotlight::before {
+      content: ""; position: absolute; top: -70px; left: 15%; right: 15%; height: 130px;
+      background: radial-gradient(55% 100% at 50% 0, rgba(255,200,87,.2), transparent 75%);
+      pointer-events: none;
     }
-    .wc-spotlight-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-    .wc-spot-kicker {
-      display: inline-flex; align-items: center; gap: 7px;
-      font: 800 11.5px JetBrains Mono, monospace; letter-spacing: 1.6px; color: #ffc857;
-      text-transform: uppercase;
-    }
-    .wc-spot-kicker .spark { animation: wcSparkle 1.6s ease-in-out infinite; }
-    @keyframes wcSparkle { 50% { opacity: .35; transform: scale(.8) rotate(20deg); } }
+    .wc-spot-head { display: flex; flex-direction: column; align-items: center; gap: 9px; margin-bottom: 16px; text-align: center; }
+    .wc-spot-title { display: inline-flex; align-items: center; gap: 7px; font: 900 15.5px Heebo, sans-serif; color: #ffc857; }
     .wc-spot-when {
-      font: 800 12px Heebo, sans-serif; color: #d8e6ff;
-      padding: 6px 12px; border-radius: 999px;
-      background: rgba(85,214,255,.12); border: 1px solid rgba(85,214,255,.3);
+      font: 800 13.5px Heebo, sans-serif; color: #f2f7ff;
+      padding: 7px 18px; border-radius: 999px;
+      background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.18);
     }
-    .wc-spot-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
-    .wc-spot-side { display: flex; flex-direction: column; align-items: center; gap: 9px; min-width: 0; }
+    .wc-spot-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; }
+    .wc-spot-side {
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 9px;
+      min-width: 0; padding: 14px 8px 12px; border-radius: 16px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    }
+    .wc-spot-side.picked {
+      background: linear-gradient(180deg, rgba(255,200,87,.17), rgba(255,200,87,.05));
+      border-color: rgba(255,200,87,.6);
+      box-shadow: 0 10px 28px -16px rgba(255,200,87,.65);
+    }
     .wc-spot-side .wc-flag { width: auto; height: auto; }
     .wc-spot-side img {
-      width: 76px; height: 53px; object-fit: cover; border-radius: 10px;
+      width: 64px; height: 45px; object-fit: cover; border-radius: 9px;
       border: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 14px 30px -12px rgba(0,0,0,.8);
-      animation: wcFlagIn .6s cubic-bezier(.2,1.4,.4,1) both;
+      box-shadow: 0 10px 24px -10px rgba(0,0,0,.8);
     }
-    .wc-spot-side.away img { animation-delay: .12s; }
-    @keyframes wcFlagIn { from { opacity: 0; transform: translateY(14px) scale(.7); } }
-    .wc-spot-side b { font: 900 16.5px/1.2 Heebo, sans-serif; color: #fff; text-align: center; }
-    .wc-spot-side.picked b { color: #ffc857; }
-    .wc-spot-side .crown { font-size: 13px; margin-top: -4px; }
-    .wc-spot-vs { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .wc-spot-vs .bolt {
-      font: 900 22px/1 Heebo, sans-serif; color: #55d6ff;
-      text-shadow: 0 0 22px rgba(85,214,255,.85);
-      animation: wcVsGlow 2.4s ease-in-out infinite;
+    .wc-spot-side b { font: 900 16px/1.25 Heebo, sans-serif; color: #fff; text-align: center; }
+    .wc-spot-tag {
+      font: 800 10.5px Heebo, sans-serif; color: #221603;
+      background: linear-gradient(135deg, #ffd982, #ffc857);
+      padding: 4px 11px; border-radius: 999px; white-space: nowrap;
+      box-shadow: 0 4px 12px -4px rgba(255,200,87,.7);
     }
-    @keyframes wcVsGlow { 50% { text-shadow: 0 0 6px rgba(85,214,255,.35); } }
-    .wc-spot-vs small { font: 700 10px JetBrains Mono, monospace; color: rgba(255,255,255,.45); letter-spacing: 1px; }
+    .wc-spot-vs {
+      align-self: center; width: 46px; height: 46px; border-radius: 50%;
+      display: grid; place-items: center;
+      font: 900 13.5px JetBrains Mono, monospace; color: #eaf2ff;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 6px 18px -8px rgba(0,0,0,.7);
+    }
     .wc-spot-pick {
-      margin-top: 16px; padding: 12px 14px; border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255,200,87,.14), rgba(255,200,87,.05));
-      border: 1px solid rgba(255,200,87,.35);
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      margin-top: 14px; padding: 13px 15px; border-radius: 14px;
+      background: rgba(255,200,87,.09); border: 1px solid rgba(255,200,87,.32);
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .wc-spot-pick .who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .wc-spot-pick .who small { font: 800 10.5px JetBrains Mono, monospace; letter-spacing: 1.4px; color: rgba(255,200,87,.85); }
-    .wc-spot-pick .who b { font: 900 17px Heebo, sans-serif; color: #fff; }
-    .wc-spot-conf { flex: 1 1 150px; min-width: 130px; }
-    .wc-spot-conf .lbl { display: flex; justify-content: space-between; font: 700 10.5px Heebo, sans-serif; color: rgba(255,255,255,.6); margin-bottom: 5px; }
-    .wc-spot-conf .lbl b { color: #ffc857; font-size: 12px; }
-    .wc-spot-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; }
+    .wc-spot-pick .row1 { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .wc-spot-pick .row1 small { font: 800 11.5px Heebo, sans-serif; color: rgba(255,200,87,.95); }
+    .wc-spot-pick .row1 b { font: 900 18px Heebo, sans-serif; color: #fff; }
+    .wc-spot-pick .row2 { display: flex; align-items: center; gap: 10px; }
+    .wc-spot-bar { flex: 1; height: 9px; border-radius: 999px; background: rgba(255,255,255,.13); overflow: hidden; }
     .wc-spot-bar i {
       display: block; height: 100%; border-radius: inherit; width: 0;
-      background: linear-gradient(90deg, #ffc857, #55d6ff);
-      box-shadow: 0 0 14px rgba(255,200,87,.6);
+      background: linear-gradient(90deg, #ffc857, #ffe2a1);
+      box-shadow: 0 0 12px rgba(255,200,87,.55);
       transition: width 1s cubic-bezier(.2,.9,.3,1) .15s;
     }
-    .wc-spot-venue { margin-top: 12px; font: 600 11.5px Heebo, sans-serif; color: rgba(255,255,255,.55); display: flex; align-items: center; gap: 6px; }
+    .wc-spot-pct { font: 800 12.5px Heebo, sans-serif; color: #ffc857; white-space: nowrap; }
+    .wc-spot-venue { margin-top: 12px; font: 600 12px Heebo, sans-serif; color: rgba(255,255,255,.6); display: flex; align-items: center; justify-content: center; gap: 6px; text-align: center; }
     .wc-spot-lock {
-      margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      padding: 12px 14px; border-radius: 14px; flex-wrap: wrap;
+      margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 13px 15px; border-radius: 14px; flex-wrap: wrap; text-align: center;
       background: rgba(255,255,255,.06); border: 1px dashed rgba(255,200,87,.4);
-      font: 800 13px Heebo, sans-serif; color: rgba(255,255,255,.8);
+      font: 800 13px Heebo, sans-serif; color: rgba(255,255,255,.85);
     }
     /* — Tournament progress — */
     .wc-progress { padding: 16px 14px 10px; border-radius: 18px; background: var(--panel, rgba(255,255,255,.04)); border: 1px solid rgba(255,200,87,.16); overflow-x: auto; }
@@ -4994,7 +4994,7 @@
     }
     @keyframes wcBannerShine { 0%, 55% { left: -60%; } 85%, 100% { left: 130%; } }
     /* — Light theme adjustments — */
-    body[data-theme="light"] .wc-spotlight-in { background: linear-gradient(150deg, #14264d, #0f1d3c 70%); }
+    body[data-theme="light"] .wc-spotlight { background: linear-gradient(168deg, #14264d, #0f1d3c 78%); }
     body[data-theme="light"] .wc-progress { background: rgba(20,40,84,.06); border-color: rgba(20,40,84,.18); }
     body[data-theme="light"] .wc-prog-step span { color: rgba(20,30,60,.55); }
     body[data-theme="light"] .wc-prog-step em { color: rgba(20,30,60,.8); }
@@ -5011,10 +5011,10 @@
     /* — Reduced motion: calm everything — */
     @media (prefers-reduced-motion: reduce) {
       .wc-hub-hero::before, .wc-orb, .wc-trophy, .wc-hub-title,
-      .wc-parade-track, .wc-spotlight, .wc-live-chip, .wc-live-chip .dot,
-      .wc-spot-vs .bolt, .wc-spot-kicker .spark, .wc-banner::after,
+      .wc-parade-track, .wc-live-chip, .wc-live-chip .dot, .wc-banner::after,
       .wc-prog-step.now .wc-prog-dot, .wc-confetti i { animation: none !important; }
       .wc-tilt { transform: none !important; }
+      .wc-spot-bar i { transition: none !important; }
     }
 
   </style>
@@ -6677,7 +6677,7 @@
                 ${why}
               </div>
             </div>
-            ${item.venue ? `<div class="card-section" style="padding:8px 11px;font-size:11px;color:var(--muted)">📍 ${escapeHtml(item.venue)}</div>` : ''}
+            ${item.venue ? `<div class="card-section" style="padding:8px 11px;font-size:11px;color:var(--muted)">📍 ${escapeHtml(wcVenueHe(item.venue))}</div>` : ''}
           </div>
         </article>`;
     }
@@ -6739,52 +6739,85 @@
       return open[0] || WC2026_FIXTURES[0];
     }
 
+    // Host venues in Hebrew — the English stadium strings confused users
+    const WC_VENUES_HE = [
+      ["Estadio Azteca", "אצטדיון אצטקה, מקסיקו סיטי"],
+      ["Guadalajara", "אצטדיון גוודלחרה, מקסיקו"],
+      ["BBVA", "אצטדיון BBVA, מונטריי"],
+      ["BMO Field", "BMO פילד, טורונטו"],
+      ["BC Place", "BC פלייס, ונקובר"],
+      ["Levi's", "ליווייס סטדיום, סן פרנסיסקו"],
+      ["Gillette", "ג'ילט סטדיום, בוסטון"],
+      ["MetLife", "מטלייף סטדיום, ניו יורק"],
+      ["SoFi", "סופיי סטדיום, לוס אנג'לס"],
+      ["Lincoln Financial", "לינקולן פייננשל פילד, פילדלפיה"],
+      ["NRG", "NRG סטדיום, יוסטון"],
+      ["Lumen", "לומן פילד, סיאטל"],
+      ["Hard Rock", "הארד רוק סטדיום, מיאמי"],
+      ["Mercedes-Benz", "מרצדס-בנץ סטדיום, אטלנטה"],
+      ["Arrowhead", "אראוהד סטדיום, קנזס סיטי"],
+      ["AT&T", "AT&T סטדיום, דאלאס"],
+    ];
+    function wcVenueHe(venue) {
+      const s = String(venue || "");
+      for (const [en, he] of WC_VENUES_HE) if (s.includes(en)) return he;
+      return s;
+    }
+
     function wcSpotlightMarkup() {
       const item = wcNextFixture();
       if (!item) return "";
       const today = wcTodayISO();
       const isToday = item.date === today;
       const [, mo, dy] = item.date.split("-");
-      const when = isToday
-        ? `🔥 הערב · ${item.time || "מקסיקו סיטי"}`
-        : `📅 ${dy}.${mo}${item.time ? " · " + item.time : ""}`;
+      // Kickoff time: fixtures carry no per-game time except the opener,
+      // whose time we know from the official kickoff ISO.
+      const isOpener = item === WC2026_FIXTURES[0];
+      const timeStr = item.time || (isOpener
+        ? new Intl.DateTimeFormat("he-IL", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(WC_2026.kickoffISO))
+        : "");
+      const when = [
+        isToday ? "🔥 היום" : `📅 ${dy}.${mo}`,
+        timeStr,
+        item.stage || "",
+      ].filter(Boolean).join(" · ");
       const pickedHome = item.pick === "home" || item.pick === "1" || item.pick === item.hc;
       const pickedDraw = item.pick === "draw" || item.pick === "X" || item.pick === "x";
-      const pickName = pickedDraw ? "תיקו" : (item.pick === "away" || item.pick === "2" || item.pick === item.ac) ? item.away : item.home;
+      const pickedAway = !pickedHome && !pickedDraw;
+      const pickName = pickedDraw ? "תיקו" : pickedAway ? item.away : item.home;
       const conf = Number(item.conf) || null;
       const locked = item.premium && !state.isPremium;
+      const tag = '<span class="wc-spot-tag">✓ ההמלצה שלנו</span>';
       const pickBlock = locked
-        ? `<div class="wc-spot-lock"><span>🔒 הבחירה של הפוגע למשחק הזה — בפרימיום</span><button class="lock-btn" onclick="openPremiumModal()" style="padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font:800 13px Heebo,sans-serif;background:linear-gradient(135deg,#ffc857,#d05c1a);color:#1a1205">שדרג עכשיו</button></div>`
+        ? `<div class="wc-spot-lock"><span>🔒 ההמלצה למשחק הזה זמינה למנויי פרימיום</span><button class="lock-btn" onclick="openPremiumModal()" style="padding:9px 18px;border-radius:10px;border:none;cursor:pointer;font:800 13px Heebo,sans-serif;background:linear-gradient(135deg,#ffd982,#ffc857);color:#221603">שדרג עכשיו</button></div>`
         : `<div class="wc-spot-pick">
-            <div class="who"><small>✦ הפוגע בוחר</small><b>${escapeHtml(pickName)}</b></div>
-            <div class="wc-spot-conf">
-              <div class="lbl"><span>רמת ביטחון</span><b>${conf != null ? conf + "%" : "—"}</b></div>
+            <div class="row1"><small>✦ הפוגע בוחר</small><b>${escapeHtml(pickName)}${pickedDraw ? "" : " לניצחון"}</b></div>
+            <div class="row2">
               <div class="wc-spot-bar"><i data-conf="${conf || 0}"></i></div>
+              <span class="wc-spot-pct">${conf != null ? conf + "% ביטחון" : ""}</span>
             </div>
           </div>`;
       return `
         <div class="wc-spotlight">
-          <div class="wc-spotlight-in">
-            <div class="wc-spotlight-top">
-              <span class="wc-spot-kicker"><span class="spark">✦</span> המשחק הבא בטורניר</span>
-              <span class="wc-spot-when">${when}</span>
-            </div>
-            <div class="wc-spot-teams">
-              <div class="wc-spot-side home ${pickedHome && !locked ? "picked" : ""}">
-                ${wcFlagImg(item.hc)}
-                <b>${escapeHtml(item.home)}</b>
-                ${pickedHome && !locked ? '<span class="crown">👑</span>' : ""}
-              </div>
-              <div class="wc-spot-vs"><span class="bolt">⚡VS</span><small>${escapeHtml(item.stage || "")}</small></div>
-              <div class="wc-spot-side away ${!pickedHome && !pickedDraw && !locked ? "picked" : ""}">
-                ${wcFlagImg(item.ac)}
-                <b>${escapeHtml(item.away)}</b>
-                ${!pickedHome && !pickedDraw && !locked ? '<span class="crown">👑</span>' : ""}
-              </div>
-            </div>
-            ${pickBlock}
-            ${item.venue ? `<div class="wc-spot-venue">📍 ${escapeHtml(item.venue)}</div>` : ""}
+          <div class="wc-spot-head">
+            <span class="wc-spot-title">⚽ המשחק הבא במונדיאל</span>
+            <span class="wc-spot-when">${escapeHtml(when)}</span>
           </div>
+          <div class="wc-spot-teams">
+            <div class="wc-spot-side ${pickedHome && !locked ? "picked" : ""}">
+              ${wcFlagImg(item.hc)}
+              <b>${escapeHtml(item.home)}</b>
+              ${pickedHome && !locked ? tag : ""}
+            </div>
+            <div class="wc-spot-vs">VS</div>
+            <div class="wc-spot-side ${pickedAway && !locked ? "picked" : ""}">
+              ${wcFlagImg(item.ac)}
+              <b>${escapeHtml(item.away)}</b>
+              ${pickedAway && !locked ? tag : ""}
+            </div>
+          </div>
+          ${pickBlock}
+          ${item.venue ? `<div class="wc-spot-venue">📍 ${escapeHtml(wcVenueHe(item.venue))}</div>` : ""}
         </div>`;
     }
 
