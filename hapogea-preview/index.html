@@ -9077,24 +9077,34 @@
     }
 
     function allOddsBarMarkup(row) {
+      const isBasketball = Number(row.sportId) === 227;
+      const pickedOdds = Number(row.odds || row.oddsRaw);
+      const pickText = String(row.pick || row.winnerPick || "").trim();
+      function cell(label, val, isPicked) {
+        const mark = isPicked ? ' class="all-odds-cell all-odds-picked"' : ' class="all-odds-cell"';
+        return `<span${mark}><span class="all-odds-label">${escapeHtml(label)}</span><b>${formatOdds(val)}</b></span>`;
+      }
+      // Aggregated-layer rows: flat homeOdds / drawOdds / awayOdds fields
       const h = Number(row.homeOdds);
       const d = Number(row.drawOdds);
       const a = Number(row.awayOdds);
-      if (!Number.isFinite(h) || !Number.isFinite(a)) return "";
-      const isBasketball = Number(row.sportId) === 227;
-      const pickedOdds = Number(row.odds || row.oddsRaw);
-      function cell(label, val, isPicked) {
-        const mark = isPicked ? ' class="all-odds-picked"' : '';
-        return `<span class="all-odds-cell"${mark}><span class="all-odds-label">${label}</span><b>${formatOdds(val)}</b></span>`;
+      if (Number.isFinite(h) && Number.isFinite(a)) {
+        const matched = (v) => Number.isFinite(pickedOdds) && Math.abs(v - pickedOdds) < 0.01;
+        let cells = cell(row.home || "1", h, matched(h));
+        if (!isBasketball && Number.isFinite(d)) cells += cell("תיקו", d, matched(d));
+        cells += cell(row.away || "2", a, matched(a));
+        return `<div class="all-odds-bar">${cells}</div>`;
       }
-      const homeLabel = row.home ? escapeHtml(row.home.split(" ").slice(-1)[0]) : "1";
-      const awayLabel = row.away ? escapeHtml(row.away.split(" ").slice(-1)[0]) : "2";
-      const homePicked = Number.isFinite(pickedOdds) && Math.abs(h - pickedOdds) < 0.01;
-      const awayPicked = Number.isFinite(pickedOdds) && Math.abs(a - pickedOdds) < 0.01;
-      const drawPicked = Number.isFinite(d) && Number.isFinite(pickedOdds) && Math.abs(d - pickedOdds) < 0.01;
-      let cells = cell(homeLabel, h, homePicked);
-      if (!isBasketball && Number.isFinite(d)) cells += cell("תיקו", d, drawPicked);
-      cells += cell(awayLabel, a, awayPicked);
+      // Winner rows: oddsBook with full outcomes list for the picked market
+      const outcomes = (row.oddsBook?.outcomes || []).filter((o) => Number.isFinite(Number(o.odds)));
+      if (outcomes.length < 2 || outcomes.length > 3) return "";
+      const cells = outcomes.map((o) => {
+        const desc = String(o.desc || "").trim();
+        const isDraw = desc.toLowerCase() === "x" || desc === "תיקו";
+        const label = isDraw ? "תיקו" : (o.team || desc);
+        const isPicked = pickText && (desc === pickText || (o.team && o.team === pickText));
+        return cell(label, Number(o.odds), !!isPicked);
+      }).join("");
       return `<div class="all-odds-bar">${cells}</div>`;
     }
 
