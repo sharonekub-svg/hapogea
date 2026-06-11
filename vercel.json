@@ -5,7 +5,7 @@
   "framework": null,
   "installCommand": "echo skip",
   "functions": {
-    "api/winner-feed.js": { "maxDuration": 30 },
+    "api/winner-feed.js": { "maxDuration": 60 },
     "api/winner-cron.js": { "maxDuration": 30 },
     "api/recommendation-bot.js": { "maxDuration": 60 },
     "api/recommendation-stats.js": { "maxDuration": 60 },
