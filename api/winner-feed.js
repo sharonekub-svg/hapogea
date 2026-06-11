@@ -4561,6 +4561,13 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
                   const he = (name) => ODDS_API_TEAM_HE[name] || translateEnTeamToHe(String(name || "")) || name;
                   return `${normalizeMatchName(he(r.home))}:${normalizeMatchName(he(r.away))}`;
                 };
+                // Same game from two sources (snapshot "מונדיאל 2026" vs
+                // API-Sports "World Cup"): keep the existing real row, skip
+                // the fresh duplicate.
+                const existingRealKeys = new Set(
+                  (existingRows || []).filter((r) => !r.noOddsYet).map(matchKey)
+                );
+                fresh = fresh.filter((r) => !existingRealKeys.has(matchKey(r)));
                 const freshKeys = new Set(fresh.map(matchKey));
                 const kept = (existingRows || []).filter(
                   (r) => !(r.noOddsYet && freshKeys.has(matchKey(r)))
