@@ -5524,8 +5524,8 @@
       const btn = document.querySelector('#premiumModal button[data-submit]');
       if (btn) { btn.disabled = true; btn.textContent = 'בודק...'; }
       try {
-        const fieldEmail = (document.getElementById('premiumEmailInput')?.value || "").trim().toLowerCase();
-        const userEmail = fieldEmail || (window.HAP_USER?.email || "").trim().toLowerCase();
+        // Email comes from the signed-in Google account only — no manual field
+        const userEmail = (window.HAP_USER?.email || "").trim().toLowerCase();
         const res = await fetch('/api/premium-validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -5575,17 +5575,13 @@
       render();
     }
     function openPremiumModal() {
-      // Premium requires a signed-in account (Google) — codes are bound to the
-      // user's email, so anonymous users are sent to the login modal first.
+      // Premium requires a signed-in account — anonymous users get the Google
+      // login gate (terms + privacy consent), with no "skip" option.
       if (!window.HAP_USER) {
-        if (typeof HapAuth !== 'undefined' && HapAuth.openModal) HapAuth.openModal();
+        if (typeof HapAuth !== 'undefined' && HapAuth.openGate) HapAuth.openGate();
         return;
       }
       document.getElementById('premiumModal').classList.remove('hidden');
-      const emailField = document.getElementById('premiumEmailInput');
-      if (emailField && !emailField.value && window.HAP_USER?.email) {
-        emailField.value = window.HAP_USER.email;
-      }
     }
     function closePremiumModal() {
       document.getElementById('premiumModal').classList.add('hidden');
@@ -10232,6 +10228,14 @@
       }
       function gateError(msg) { const e = document.getElementById("gateError"); if (e) e.textContent = msg || ""; }
 
+      // Gate opened from a premium button: Google + terms/privacy only —
+      // the "continue without signing in" option is hidden.
+      function openGate() {
+        const skip = document.getElementById("gateSkipBtn");
+        if (skip) skip.style.display = "none";
+        showGate(true);
+      }
+
       async function signInWithGoogle() {
         if (!sb) { gateError("שגיאה: Supabase לא נטען — רענן את הדף"); return; }
         gateError("");
@@ -10496,7 +10500,7 @@
         try { if (sessionStorage.getItem('hapogea_gate_skipped') === '1') { _gateSkipped = true; return; } } catch {}
         showGate(true);
       }
-      return { current, openModal, closeModal, openOrMenu, switchTab, submit, sendOtp, verifyOtp, backToEmail, gateSendOtp, gateVerifyOtp, gateBackToEmail, signOut, init, signInWithGoogle, skipGate, triggerGateCheck };
+      return { current, openModal, closeModal, openOrMenu, switchTab, submit, sendOtp, verifyOtp, backToEmail, gateSendOtp, gateVerifyOtp, gateBackToEmail, signOut, init, signInWithGoogle, skipGate, triggerGateCheck, openGate };
     })();
     window.HapAuth = HapAuth;
 
@@ -10802,7 +10806,6 @@
         <li><span class="pm-feat-icon">✦</span> לוח מונדיאל 2026 + ניתוחים מלאים</li>
       </ul>
       <input id="premiumCodeInput" class="pm-input" type="text" placeholder="קוד פרימיום" autocomplete="off">
-      <input id="premiumEmailInput" class="pm-input" type="email" placeholder="האימייל שלך (אם הקוד מחייב)" autocomplete="email" style="margin-top:8px">
       <p id="premiumCodeError" class="pm-error"></p>
       <button class="pm-submit" data-submit onclick="
         const errEl = document.getElementById('premiumCodeError');
