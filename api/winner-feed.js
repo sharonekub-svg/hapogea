@@ -3745,9 +3745,11 @@ function s365GameToOddsRow(game, winnerSportId, bookmakerName) {
   const byNum = (n) => opts.find((o) => o.num === n)?.rate || null;
   let homeOdds = null, drawOdds = null, awayOdds = null;
   if (opts.every((o) => o.num !== null)) {
-    homeOdds = byNum(1);
+    // Basketball moneylines have shown up both as nums [1,2] and [1,3] —
+    // fall back to first/last by position rather than dropping the game.
+    homeOdds = byNum(1) ?? opts[0].rate;
     if (isFootball) { drawOdds = byNum(2); awayOdds = byNum(3); }
-    else awayOdds = byNum(2);
+    else awayOdds = byNum(2) ?? byNum(3) ?? opts[opts.length - 1].rate;
   } else if (isFootball) {
     [homeOdds, drawOdds, awayOdds] = [opts[0].rate, opts[1].rate, opts[2].rate];
   } else {
@@ -4940,6 +4942,48 @@ module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=86400");
   // 30 requests per IP per minute — feed is heavily cached so this is generous
   if (rateLimit(req, res, { max: 30, windowMs: 60_000 })) return;
+
+  // ?s365probe=1 — diagnostic: raw 365Scores mainOdds shapes per sport, so a
+  // broken odds mapping can be debugged from the wire format itself.
+  if (String(req?.query?.s365probe || "") === "1") {
+    try {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      const out = {};
+      for (const [sportId365, label] of [[SCORES365_FOOTBALL_ID, "football"], [SCORES365_BASKETBALL_ID, "basketball"]]) {
+        const params = new URLSearchParams({
+          langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6", appTypeId: "5",
+          sports: String(sportId365),
+          startDate: scores365Date(israelDate(0)), endDate: scores365Date(israelDate(0)),
+          showOdds: "true", withMainOdds: "true",
+        });
+        const data = await fetchJson(`https://webws.365scores.com/web/games/?${params}`, {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            Origin: "https://www.365scores.com",
+            Referer: "https://www.365scores.com/he",
+            Accept: "application/json",
+          },
+          retryAttempts: 1,
+        }).catch((e) => ({ _err: String(e?.message || e).slice(0, 200) }));
+        const games = data?.games || [];
+        const withOdds = games.filter((g) => g?.mainOdds || g?.odds);
+        out[label] = {
+          error: data?._err || null,
+          totalGames: games.length,
+          gamesWithOdds: withOdds.length,
+          bookmakers: data?.bookmakers ?? null,
+          samples: withOdds.slice(0, 4).map((g) => ({
+            match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
+            statusGroup: g.statusGroup,
+            mainOdds: g.mainOdds ?? g.odds,
+          })),
+        };
+      }
+      return res.status(200).json(out);
+    } catch (err) {
+      return res.status(500).json({ error: "s365probe error", message: err.message });
+    }
+  }
 
   // ?format=picks — ranked picks for football + basketball
   if (String(req?.query?.format || "").toLowerCase() === "picks") {
