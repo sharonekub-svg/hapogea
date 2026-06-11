@@ -12577,69 +12577,6 @@
             "logoVerified": true
           },
           {
-            "id": "odds-cad7c979c04734d04342ba592d0931f8",
-            "eventId": "cad7c979c04734d04342ba592d0931f8",
-            "source": "The Odds API",
-            "utcDay": "2026-06-11",
-            "day": "2026-06-11",
-            "time": "20:00",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "Superettan - Sweden",
-            "match": "Helsingborgs IF - Landskrona BoIS",
-            "home": "Helsingborgs IF",
-            "away": "Landskrona BoIS",
-            "pick": "Helsingborgs IF",
-            "pickTeam": "Helsingborgs IF",
-            "winnerPick": "Helsingborgs IF",
-            "odds": 2.45,
-            "oddsRaw": 2.45,
-            "homeOdds": 2.45,
-            "drawOdds": 3.25,
-            "awayOdds": 2.5,
-            "probability": 0.4081632653061224,
-            "normalizedProbability": 0.4081632653061224,
-            "recommendationScore": 41,
-            "score": 41,
-            "recommended": true,
-            "outsideRange": false,
-            "status": "ממתין",
-            "matchPhase": "scheduled",
-            "bettingStatus": "available",
-            "riskLevel": "גבוה",
-            "explanation": [
-              "מקור: The Odds API — Superettan - Sweden",
-              "Helsingborgs IF הוא הפייבוריט (2.45, הסתברות 41%) — תיקו 3.25, Landskrona BoIS 2.50.",
-              "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
-            ],
-            "signals": [
-              "Helsingborgs IF הוא הפייבוריט (2.45, הסתברות 41%) — תיקו 3.25, Landskrona BoIS 2.50."
-            ],
-            "resultKey": "240:2026-06-11:helsingborgs if:landskrona bois",
-            "verifiedAt": "2026-06-10T17:26:29.040Z",
-            "homeAsset": {
-              "name": "Helsingborgs IF",
-              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPkg8L3RleHQ+PC9zdmc+",
-              "initials": "H",
-              "logoSource": "generated team badge",
-              "logoTier": 1
-            },
-            "awayAsset": {
-              "name": "Landskrona BoIS",
-              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA1MCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjUwIiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48cGF0aCBkPSJNMjIgMyBMMzkgMTEgTDM5IDI4IFEzOSA0MSAyMiA0NyBRNSA0MSA1IDI4IEw1IDExIFoiIGZpbGw9IiMxODIwMjciLz48cGF0aCBkPSJNMjIgOCBMMzUgMTQgTDM1IDI4IFEzNSAzOCAyMiA0MyBROSAzOCA5IDI4IEw5IDE0IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlhYTZhZiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPjx0ZXh0IHg9IjIyIiB5PSIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGVlZjIiPkw8L3RleHQ+PC9zdmc+",
-              "initials": "L",
-              "logoSource": "generated team badge",
-              "logoTier": 1
-            },
-            "leagueAsset": {
-              "name": "Superettan - Sweden",
-              "logo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCA0NCI+PHJlY3Qgd2lkdGg9IjQ0IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiMxMDE2MWIiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIxNyIgZmlsbD0iIzE4MjAyNyIvPjxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiM4ZmI2YzkiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz48dGV4dCB4PSIyMiIgeT0iMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZThlZWYyIj5TPC90ZXh0Pjwvc3ZnPg==",
-              "initials": "S",
-              "logoSource": "generated league badge"
-            },
-            "logoVerified": true
-          },
-          {
             "id": "odds-58c45c4094e355835444bbd2c6548d51",
             "eventId": "58c45c4094e355835444bbd2c6548d51",
             "source": "The Odds API",
