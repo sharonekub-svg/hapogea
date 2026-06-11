@@ -63,7 +63,8 @@ const ODDS_API_SPORTS = [
   { key: "soccer_japan_j_league",               label: "J-League",                  sportId: 240 },
   { key: "soccer_china_superleague",            label: "סינית ראשונה",               sportId: 240 },
   { key: "soccer_australia_aleague",            label: "A-League",                  sportId: 240 },
-  // כדורסל — כל הליגות הגדולות בעולם
+  // כדורסל — כל הליגות הגדולות בעולם (WNBA ראשונה — פעילה כל הקיץ, NBA מסונן בכל מקרה)
+  { key: "basketball_wnba",                      label: "WNBA",                      sportId: 227 },
   { key: "basketball_nba",                       label: "NBA",                       sportId: 227 },
   { key: "basketball_nbl",                       label: "NBL (אוסטרליה)",            sportId: 227 },
   { key: "basketball_euroleague",                label: "יורוליג",                   sportId: 227 },
@@ -3227,13 +3228,16 @@ async function discoverActiveSports() {
   }
 }
 
+// Quota economics: every /odds request costs (regions × markets) credits.
+// "eu" alone keeps the cost at 1 credit/request and still includes Pinnacle,
+// bet365, Unibet and William Hill — enough coverage for soccer AND WNBA.
+const ODDS_API_REGIONS = process.env.ODDS_API_REGIONS || "eu";
 async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
   // The Odds API requires UTC (Z) format — timezone offsets cause 422.
-  // Use uk,eu,us regions for broad coverage across European, American and South-American leagues.
   const url =
     `${ODDS_API_BASE}/sports/${sportKey}/odds` +
     `?apiKey=${ODDS_API_KEY}` +
-    `&regions=uk,eu,us&markets=h2h&dateFormat=iso&oddsFormat=decimal` +
+    `&regions=${ODDS_API_REGIONS}&markets=h2h&dateFormat=iso&oddsFormat=decimal` +
     `&commenceTimeFrom=${dateFrom}T00:00:00Z` +
     `&commenceTimeTo=${dateTo}T23:59:59Z`;
   try {
@@ -3246,7 +3250,7 @@ async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
   }
 }
 
-function oddsApiEventToRow(event, sportMeta) {
+function oddsApiEventToRow(event, sportMeta, sourceName = "The Odds API") {
   const bookmaker =
     event.bookmakers?.find((b) => ["bet365", "unibet", "williamhill", "betfair"].includes(b.key)) ||
     event.bookmakers?.[0];
@@ -3313,7 +3317,7 @@ function oddsApiEventToRow(event, sportMeta) {
   const pickHe = ODDS_API_TEAM_HE[pick.name] || pick.name;
   const isFav = allCandidates.every((c) => c.name === pick.name || c.odds >= pick.odds);
   const explanation = [
-    `מקור: The Odds API — ${sportMeta.label}`,
+    `מקור: ${sourceName} — ${sportMeta.label}`,
     isFav
       ? `${pickHe} הוא הפייבוריט (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%)${oppSummary ? ` — ${oppSummary}` : ""}.`
       : `${pickHe} (${pick.odds.toFixed(2)}, הסתברות ${impliedPct}%) — הבחירה הקרובה ביותר לטווח האידיאלי${oppSummary ? `. חלופות: ${oppSummary}` : ""}.`,
@@ -3323,7 +3327,7 @@ function oddsApiEventToRow(event, sportMeta) {
   return {
     id:                 `odds-${event.id}`,
     eventId:            event.id,
-    source:             "The Odds API",
+    source:             sourceName,
     utcDay,
     day,
     time,
@@ -3361,6 +3365,18 @@ function oddsApiEventToRow(event, sportMeta) {
 async function buildOddsApiFeed() {
   if (!ODDS_API_KEY) throw new Error("ODDS_API_KEY not set");
 
+  // Daily credit budget — a free key has only 500 credits/month, and the old
+  // behaviour (every sport × 3 regions on every rebuild) burned a fresh key
+  // within hours. Track spend per Israel-day in KV and refuse to overspend;
+  // the aggregated odds layer keeps serving the day's earlier rows instead.
+  const ODDS_API_DAILY_BUDGET = Number(process.env.ODDS_API_DAILY_BUDGET || 40);
+  const budgetKey = `oddsapi-spend:${israelDate(0)}`;
+  let spentToday = 0;
+  try { spentToday = Number((await kvGet(budgetKey))?.n || 0); } catch { /* no KV — memory fallback */ }
+  if (spentToday >= ODDS_API_DAILY_BUDGET) {
+    throw new Error(`Odds API daily budget exhausted (${spentToday}/${ODDS_API_DAILY_BUDGET})`);
+  }
+
   // Discover ALL active sports from The Odds API (1 request).
   // Merge with our curated list (for Hebrew labels), then add any
   // active soccer/basketball sports not in the list — friendlies,
@@ -3382,6 +3398,16 @@ async function buildOddsApiFeed() {
   } else {
     sportsToQuery = ODDS_API_SPORTS;
   }
+  // Cap per build: curated order puts World Cup / internationals first, so the
+  // slice keeps the leagues that matter. NBA keys are dropped before spending
+  // credits on them (product rule: no NBA on the board; WNBA stays).
+  const isNbaKey = (k) => k === "basketball_nba" || k === "basketball_nba_championship_winner" || k === "basketball_nba_preseason";
+  const MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 12);
+  const MAX_BASKETBALL = Number(process.env.ODDS_API_MAX_BASKETBALL || 5);
+  sportsToQuery = [
+    ...sportsToQuery.filter((s) => s.key.startsWith("soccer_")).slice(0, MAX_SOCCER),
+    ...sportsToQuery.filter((s) => s.key.startsWith("basketball_") && !isNbaKey(s.key)).slice(0, MAX_BASKETBALL),
+  ];
 
   const today    = israelDate(0);
   const tomorrow = israelDate(1);
@@ -3415,6 +3441,8 @@ async function buildOddsApiFeed() {
     }
     if (i + BATCH < sportsToQuery.length) await sleep(300);
   }
+  // Record credit spend (1 credit per request with a single region)
+  try { await kvSet(budgetKey, { n: spentToday + sportsToQuery.length }, 48 * 3600); } catch { /* best effort */ }
 
   const sortByScore = (rows) =>
     [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
@@ -3453,6 +3481,277 @@ async function buildOddsApiFeed() {
     audit:          {},
     trackingResults:[],
     faq:            [],
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── API-Sports pre-match odds (uses the same FOOTBALL_KEY as the results) ────
+// Key-based API with no IP blocking — works from Vercel where Winner/SofaScore/
+// Pinnacle are blocked, and covers leagues The Odds API lacks (incl. exotic
+// football + most basketball leagues). Free plan: 100 requests/day per sport.
+async function apiSportsFootballOddsRows(dateKey) {
+  // One request: all fixtures of the day (team names + kickoff, pre-match only)
+  const fx = await fetchApiSports(`${APISPORTS_FOOTBALL}/fixtures?date=${dateKey}`);
+  const fixtureById = new Map();
+  for (const item of fx?.response || []) {
+    const id = Number(item.fixture?.id);
+    const status = item.fixture?.status?.short || "NS";
+    if (!id || !["NS", "TBD"].includes(status)) continue;
+    fixtureById.set(id, item);
+  }
+  if (!fixtureById.size) return [];
+
+  // Date-level odds endpoint (bet=1 → 1X2 Match Winner), ~10 fixtures per page
+  const MAX_PAGES = Number(process.env.APISPORTS_ODDS_MAX_PAGES || 5);
+  const first = await fetchApiSports(`${APISPORTS_FOOTBALL}/odds?date=${dateKey}&bet=1&page=1`);
+  if (!first?.response?.length) return [];
+  const totalPages = Math.min(Number(first?.paging?.total || 1), MAX_PAGES);
+  const pages = [first];
+  if (totalPages > 1) {
+    const rest = await Promise.allSettled(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        fetchApiSports(`${APISPORTS_FOOTBALL}/odds?date=${dateKey}&bet=1&page=${i + 2}`))
+    );
+    for (const r of rest) if (r.status === "fulfilled" && r.value) pages.push(r.value);
+  }
+
+  const rows = [];
+  for (const page of pages) {
+    for (const item of page?.response || []) {
+      const fixture = fixtureById.get(Number(item.fixture?.id));
+      if (!fixture) continue;
+      const homeEn = fixture.teams?.home?.name;
+      const awayEn = fixture.teams?.away?.name;
+      if (!homeEn || !awayEn) continue;
+      const bet =
+        item.bookmakers?.[0]?.bets?.find((b) => Number(b.id) === 1) ||
+        item.bookmakers?.[0]?.bets?.[0];
+      const values = bet?.values || [];
+      const oddOf = (re) => {
+        const n = Number(values.find((v) => re.test(String(v.value || "")))?.odd);
+        return Number.isFinite(n) && n > 1 ? n : null;
+      };
+      const homeOdds = oddOf(/^(home|1)$/i);
+      const drawOdds = oddOf(/^(draw|x)$/i);
+      const awayOdds = oddOf(/^(away|2)$/i);
+      if (!homeOdds || !awayOdds) continue;
+      // Synthesize an Odds API-shaped event so the shared pick model
+      // (range filter, 1.65 sweet spot, Hebrew explanation) applies as-is.
+      const row = oddsApiEventToRow({
+        id: `apisports-f-${item.fixture?.id}`,
+        commence_time: new Date(fixture.fixture?.date).toISOString(),
+        home_team: homeEn,
+        away_team: awayEn,
+        bookmakers: [{ key: "apisports", markets: [{ key: "h2h", outcomes: [
+          { name: homeEn, price: homeOdds },
+          ...(drawOdds ? [{ name: "Draw", price: drawOdds }] : []),
+          { name: awayEn, price: awayOdds },
+        ] }] }],
+      }, { label: fixture.league?.name || "כדורגל", sportId: WINNER_FOOTBALL_ID }, "API-Sports");
+      if (row) rows.push(row);
+    }
+  }
+  return rows;
+}
+
+async function apiSportsBasketballOddsRows(days) {
+  // Basketball odds are per-game requests — cap them to protect the daily quota
+  const MAX_GAMES = Number(process.env.APISPORTS_BBALL_ODDS_MAX || 10);
+  const candidates = [];
+  for (const day of days) {
+    const data = await fetchApiSports(`${APISPORTS_BBALL}/games?date=${day}`);
+    for (const game of data?.response || []) {
+      if ((game.status?.short || "") !== "NS") continue;
+      if (/\bNBA\b/i.test(game.league?.name || "")) continue;
+      if (!game.teams?.home?.name || !game.teams?.away?.name) continue;
+      candidates.push(game);
+    }
+  }
+  const games = candidates.slice(0, MAX_GAMES);
+  const rows = [];
+  const BATCH = 5;
+  for (let i = 0; i < games.length; i += BATCH) {
+    const batch = games.slice(i, i + BATCH);
+    const fetched = await Promise.allSettled(
+      batch.map((g) => fetchApiSports(`${APISPORTS_BBALL}/odds?game=${g.id}`))
+    );
+    for (let j = 0; j < batch.length; j++) {
+      const game = batch[j];
+      const bookmakers = fetched[j].status === "fulfilled"
+        ? fetched[j].value?.response?.[0]?.bookmakers || []
+        : [];
+      let homeOdds = null, awayOdds = null;
+      for (const bm of bookmakers) {
+        const bet =
+          (bm.bets || []).find((b) => /home\/away|money ?line|winner|2 ?way/i.test(String(b.name || ""))) ||
+          (bm.bets || []).find((b) => (b.values || []).length === 2);
+        const values = bet?.values || [];
+        const oddOf = (re) => {
+          const n = Number(values.find((v) => re.test(String(v.value || "")))?.odd);
+          return Number.isFinite(n) && n > 1 ? n : null;
+        };
+        homeOdds = oddOf(/^(home|1)$/i);
+        awayOdds = oddOf(/^(away|2)$/i);
+        if (homeOdds && awayOdds) break;
+      }
+      if (!homeOdds || !awayOdds) continue;
+      const row = oddsApiEventToRow({
+        id: `apisports-b-${game.id}`,
+        commence_time: new Date(game.date).toISOString(),
+        home_team: game.teams.home.name,
+        away_team: game.teams.away.name,
+        bookmakers: [{ key: "apisports", markets: [{ key: "h2h", outcomes: [
+          { name: game.teams.home.name, price: homeOdds },
+          { name: game.teams.away.name, price: awayOdds },
+        ] }] }],
+      }, { label: game.league?.name || "כדורסל", sportId: WINNER_BASKETBALL_ID }, "API-Sports");
+      if (row) rows.push(row);
+    }
+  }
+  return rows;
+}
+
+async function buildApiSportsOddsRows() {
+  if (!FOOTBALL_API_KEY) throw new Error("FOOTBALL_KEY not set");
+  const days = [israelDate(0), israelDate(1)];
+  const [football, basketball] = await Promise.all([
+    Promise.allSettled(days.map((d) => apiSportsFootballOddsRows(d))).then((results) =>
+      results.flatMap((r) => (r.status === "fulfilled" ? r.value : []))),
+    apiSportsBasketballOddsRows(days).catch(() => []),
+  ]);
+  return [...football, ...basketball];
+}
+
+// ── Aggregated daily odds layer ───────────────────────────────────────────────
+// THE fix for the recurring "games but no picks" mornings: every odds source
+// is tried in order, the day's rows persist in KV, and every feed rebuild in
+// the TTL window reuses them instead of hammering quotas. If all sources die
+// later in the day (quota burn, IP blocks), the same-day rows keep serving.
+const FALLBACK_ODDS_TTL_MS = Number(process.env.FALLBACK_ODDS_TTL_MINUTES || 360) * 60 * 1000;
+const ODDS_ROWS_KV_PREFIX = "fallback-odds-rows:v1:";
+let FORCE_ODDS_REFRESH = false;
+
+function feedOpenRows(feed) {
+  const out = [];
+  for (const dayKey of ["today", "tomorrow"]) {
+    const tab = feed?.tabs?.[dayKey];
+    for (const sportKey of ["football", "basketball"]) {
+      for (const row of tab?.sports?.[sportKey] || []) {
+        if (row && row.odds && !row.noOddsYet) out.push(row);
+      }
+    }
+  }
+  return out;
+}
+
+function oddsRowKey(row) {
+  const he = (name) => ODDS_API_TEAM_HE[name] || translateEnTeamToHe(String(name || "")) || name;
+  return `${row.day}:${row.sportId}:${normalizeMatchName(he(row.home))}:${normalizeMatchName(he(row.away))}`;
+}
+
+function dedupeOddsRows(rows) {
+  const seen = new Set();
+  const out = [];
+  for (const row of rows) {
+    const key = oddsRowKey(row);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(row);
+  }
+  return out;
+}
+
+function hasEnoughOddsRows(rows) {
+  const today = israelDate(0);
+  const count = (sportId) =>
+    rows.filter((r) => r.day === today && Number(r.sportId) === sportId).length;
+  return count(WINNER_FOOTBALL_ID) >= 5 && count(WINNER_BASKETBALL_ID) >= 2;
+}
+
+async function getAggregatedOddsRows() {
+  const today = israelDate(0);
+  const kvKey = ODDS_ROWS_KV_PREFIX + today;
+  const forceFresh = FORCE_ODDS_REFRESH;
+  FORCE_ODDS_REFRESH = false;
+  let cached = null;
+  try { cached = await kvGet(kvKey); } catch { /* memory fallback inside kvGet */ }
+  const age = cached?.fetchedAt ? Date.now() - Number(cached.fetchedAt) : Infinity;
+  if (!forceFresh && cached?.rows?.length && age < FALLBACK_ODDS_TTL_MS) {
+    return { ...cached, fromKv: true };
+  }
+
+  const collected = [];
+  const sources = [];
+  const errors = {};
+  const trySource = async (name, fn) => {
+    if (hasEnoughOddsRows(collected)) return;
+    try {
+      const rows = (await fn()) || [];
+      if (rows.length) { collected.push(...rows); sources.push(name); }
+      else errors[name] = "0 rows";
+      console.warn(`[odds-layer] ${name}: ${rows.length} rows`);
+    } catch (e) {
+      errors[name] = String(e?.message || e).slice(0, 160);
+      console.warn(`[odds-layer] ${name} failed: ${errors[name]}`);
+    }
+  };
+  await trySource("SofaScore",    async () => feedOpenRows(await buildSofascoreFeed()));
+  await trySource("Pinnacle",     async () => feedOpenRows(await buildPinnacleFeed()));
+  await trySource("API-Sports",   buildApiSportsOddsRows);
+  await trySource("The Odds API", async () => feedOpenRows(await buildOddsApiFeed()));
+
+  // Union with the day's earlier rows: a pick that was already on the board
+  // stays there even after its game drops out of source responses.
+  let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
+  rows = rows.filter((r) => r.day >= today);
+  if (!rows.length) {
+    throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
+  }
+  const entry = {
+    fetchedAt: collected.length ? Date.now() : Number(cached?.fetchedAt || Date.now()),
+    rows,
+    source: sources.join(" + ") || cached?.source || "",
+    errors,
+  };
+  try { await kvSet(kvKey, entry, 48 * 3600); } catch { /* memory cache holds it */ }
+  return { ...entry, fromKv: false, staleSources: collected.length === 0 };
+}
+
+async function buildAggregatedOddsFeed() {
+  const layer = await getAggregatedOddsRows();
+  const today = israelDate(0);
+  const tomorrow = israelDate(1);
+  const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
+  const dayRows = (day) =>
+    [...layer.rows.filter((r) => r.day === day && noNba(r))]
+      .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0))
+      .slice(0, TARGET_PICKS_PER_SPORT * 2);
+
+  const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
+  const yesterdayTab = snapshotNorm.tabs?.yesterday || {
+    label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] },
+  };
+  if (yesterdayTab.sports?.basketball) {
+    yesterdayTab.sports.basketball = yesterdayTab.sports.basketball.filter(noNba);
+  }
+
+  return {
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    oddsSource: layer.source || "Fallback Odds",
+    _oddsLayer: {
+      source: layer.source,
+      fetchedAt: layer.fetchedAt,
+      fromKv: !!layer.fromKv,
+      rowCount: layer.rows.length,
+      errors: layer.errors || null,
+    },
+    tabs: {
+      yesterday: { ...yesterdayTab, date: israelDate(-1) },
+      today:     { label: "היום", date: today,    sports: splitBySport(dayRows(today)) },
+      tomorrow:  { label: "מחר",  date: tomorrow, sports: splitBySport(dayRows(tomorrow)) },
+    },
+    reuvenSchedule: [], audit: {}, trackingResults: [], faq: [],
   };
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -4096,38 +4395,20 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     if (payloadMatchesIsraelDates(snapshotNorm1)) {
       payload = { ...snapshotNorm1, ok: true, oddsSource: "Winner Snapshot", liveError: "buildWinnerFeedPayload threw" };
     } else {
-      // Snapshot is stale — try SofaScore → Pinnacle → Odds API.
-      let fallbackOk = false;
+      // Snapshot is stale — aggregated odds layer (SofaScore → Pinnacle →
+      // API-Sports → The Odds API, with same-day KV persistence).
       try {
-        console.warn("[winner-feed] Snapshot stale — trying SofaScore");
-        payload = await buildSofascoreFeed();
-        fallbackOk = true;
-      } catch (sfErr) {
-        console.warn("[winner-feed] SofaScore failed:", sfErr?.message);
-      }
-      if (!fallbackOk) {
-        try {
-          console.warn("[winner-feed] Snapshot stale — trying Pinnacle");
-          payload = await buildPinnacleFeed();
-          fallbackOk = true;
-        } catch (pinErr) {
-          console.warn("[winner-feed] Pinnacle failed:", pinErr?.message);
-        }
-      }
-      if (!fallbackOk) {
-        try {
-          payload = await buildOddsApiFeed();
-          fallbackOk = true;
-        } catch (oddsError) {
-          console.error("[winner-feed] buildOddsApiFeed also threw:", oddsError?.message);
-          payload = {
-            ...markStaleDatePayload(snapshotNorm1, "טעינת Winner, SofaScore, Pinnacle ו-The Odds API נכשלו וה-snapshot המקומי שייך לתאריך אחר."),
-            ok: true,
-            fallback: true,
-            fallbackReason: "כל מקורות הנתונים לא זמינים.",
-            oddsError: oddsError.message,
-          };
-        }
+        console.warn("[winner-feed] Snapshot stale — using aggregated odds layer");
+        payload = await buildAggregatedOddsFeed();
+      } catch (oddsError) {
+        console.error("[winner-feed] aggregated odds layer threw:", oddsError?.message);
+        payload = {
+          ...markStaleDatePayload(snapshotNorm1, "טעינת Winner וכל מקורות היחסים נכשלה וה-snapshot המקומי שייך לתאריך אחר."),
+          ok: true,
+          fallback: true,
+          fallbackReason: "כל מקורות הנתונים לא זמינים.",
+          oddsError: oddsError.message,
+        };
       }
     }
   }
@@ -4157,35 +4438,16 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
 
   console.warn(`[winner-feed] needsOdds=${needsOdds} staleDate=${payload.staleDate} today=${todayCount} tomorrow=${tomorrowCount} key=${ODDS_API_KEY ? "set" : "missing"}`);
   if (needsOdds) {
-    // Try SofaScore → Pinnacle → Odds API in order
+    // Aggregated odds layer: SofaScore → Pinnacle → API-Sports → The Odds API,
+    // KV-cached per day so rebuilds don't burn quotas and a single morning
+    // success keeps picks on the board all day.
     let supplementFeed = null;
     try {
-      console.warn("[winner-feed] needsOdds — trying SofaScore supplement");
-      supplementFeed = await buildSofascoreFeed();
-      console.warn("[winner-feed] SofaScore supplement OK");
-    } catch (sfErr) {
-      console.warn("[winner-feed] SofaScore supplement failed:", sfErr?.message);
-    }
-    if (!supplementFeed) {
-      try {
-        console.warn("[winner-feed] needsOdds — trying Pinnacle supplement");
-        supplementFeed = await buildPinnacleFeed();
-        console.warn("[winner-feed] Pinnacle supplement OK");
-      } catch (pinErr) {
-        console.warn("[winner-feed] Pinnacle supplement failed:", pinErr?.message);
-      }
-    }
-    if (!supplementFeed && ODDS_API_KEY) {
-      try {
-        console.warn("[winner-feed] Falling back to Odds API supplement");
-        supplementFeed = await buildOddsApiFeed();
-      } catch (oddsErr) {
-        console.error("[winner-feed] Odds API supplement also failed:", oddsErr?.message);
-        payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: oddsErr?.message?.slice(0, 200) };
-      }
-    } else if (!supplementFeed && !ODDS_API_KEY) {
-      console.warn("[winner-feed] needsOdds=true but SofaScore, Pinnacle and ODDS_API_KEY all unavailable");
-      payload = { ...payload, _oddsApiStatus: "key_missing" };
+      supplementFeed = await buildAggregatedOddsFeed();
+      console.warn(`[winner-feed] odds layer OK: ${supplementFeed?._oddsLayer?.source} rows=${supplementFeed?._oddsLayer?.rowCount} fromKv=${supplementFeed?._oddsLayer?.fromKv}`);
+    } catch (aggErr) {
+      console.error("[winner-feed] aggregated odds supplement failed:", aggErr?.message);
+      payload = { ...payload, _oddsApiStatus: "error", _oddsApiError: aggErr?.message?.slice(0, 220) };
     }
     if (supplementFeed) {
       try {
@@ -4260,7 +4522,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
         }
         const srcName = oddsFeed.oddsSource || "SofaScore";
         console.info("[winner-feed] %s supplement returned today=%d tomorrow=%d, usedOdds=%s", srcName, oddsCountByDay.today ?? 0, oddsCountByDay.tomorrow ?? 0, usedOdds);
-        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay };
+        payload = { ...payload, _oddsApiStatus: "ok", _oddsApiCount: oddsCountByDay, _oddsLayer: oddsFeed._oddsLayer || null };
         if (usedOdds) payload = { ...payload, tabs: newTabs, oddsSource: srcName };
       } catch (supplementErr) {
         console.error("[winner-feed] supplement merge error:", supplementErr?.message);
@@ -4406,6 +4668,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const force = String(req?.query?.force || "").toLowerCase() === "1";
+    FORCE_ODDS_REFRESH = String(req?.query?.forceodds || "").toLowerCase() === "1";
     const payload = await buildCachedWinnerFeedPayload({ force });
     res.status(200).json(payload);
   } catch (error) {
@@ -4447,6 +4710,9 @@ module.exports = async function handler(req, res) {
 module.exports.buildWinnerFeedPayload = buildWinnerFeedPayload;
 module.exports.buildCachedWinnerFeedPayload = buildCachedWinnerFeedPayload;
 module.exports.buildOddsApiFeed = buildOddsApiFeed;
+module.exports.buildApiSportsOddsRows = buildApiSportsOddsRows;
+module.exports.buildAggregatedOddsFeed = buildAggregatedOddsFeed;
+module.exports.getAggregatedOddsRows = getAggregatedOddsRows;
 module.exports.buildSofascoreFeed = buildSofascoreFeed;
 module.exports.buildPinnacleFeed = buildPinnacleFeed;
 module.exports.getOddsApiScores = getOddsApiScores;
