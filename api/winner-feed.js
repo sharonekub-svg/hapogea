@@ -2592,26 +2592,16 @@ function compactTrackingRow(row) {
 
 const WC_LEAGUE_RE = /world.cup|מונדיאל|fifa.*world|coupe.*du.*monde/i;
 const noWC = (row) => !WC_LEAGUE_RE.test(row.league || "") && !WC_LEAGUE_RE.test(row.tournament || "");
-// Games stay on the board, but a pick with odds above the cap loses its
-// recommendation — shown as a plain fixture without betting advice.
-function demoteHighOddsPick(row) {
-  if (row.matchPhase === "final" || row.noOddsYet) return row;
+// A game whose OUR pick odds exceed the cap is removed from the board
+// entirely. Finished games and games without open lines are untouched.
+function withinHardOddsCap(row) {
+  if (row.matchPhase === "final" || row.noOddsYet) return true;
   const odds = Number(row.odds ?? row.oddsRaw);
-  if (!Number.isFinite(odds) || odds <= HARD_MAX_PICK_ODDS) return row;
-  return {
-    ...row,
-    recommended: false,
-    outsideRange: true,
-    oddsRaw: odds,
-    odds: null,
-    probability: null,
-    score: 0,
-    recommendationScore: 0,
-  };
+  return !Number.isFinite(odds) || odds <= HARD_MAX_PICK_ODDS;
 }
 
 function splitBySport(rows) {
-  const processed = rows.filter(noWC).map(demoteHighOddsPick);
+  const processed = rows.filter(noWC).filter(withinHardOddsCap);
   return {
     football:   processed.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
     basketball: processed.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
