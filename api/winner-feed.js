@@ -90,7 +90,7 @@ const ODDS_MIN = 1.40;
 const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
-const HARD_MAX_PICK_ODDS = 2.1;
+const HARD_MAX_PICK_ODDS = 2.09; // strictly below 2.1 — 2.1 and above are excluded
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
