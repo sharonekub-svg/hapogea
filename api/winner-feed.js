@@ -91,6 +91,7 @@ const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
 const HARD_MAX_PICK_ODDS = 2.09; // strictly below 2.1 — 2.1 and above are excluded
+const HARD_MIN_PICK_ODDS = 1.21; // strictly above 1.2 — 1.2 and below are excluded
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
@@ -2592,12 +2593,13 @@ function compactTrackingRow(row) {
 
 const WC_LEAGUE_RE = /world.cup|מונדיאל|fifa.*world|coupe.*du.*monde/i;
 const noWC = (row) => !WC_LEAGUE_RE.test(row.league || "") && !WC_LEAGUE_RE.test(row.tournament || "");
-// A game whose OUR pick odds exceed the cap is removed from the board
-// entirely. Finished games and games without open lines are untouched.
+// A game whose OUR pick odds fall outside the hard window (above the cap or
+// at/below the no-value floor) is removed from the board entirely.
+// Finished games and games without open lines are untouched.
 function withinHardOddsCap(row) {
   if (row.matchPhase === "final" || row.noOddsYet) return true;
   const odds = Number(row.odds ?? row.oddsRaw);
-  return !Number.isFinite(odds) || odds <= HARD_MAX_PICK_ODDS;
+  return !Number.isFinite(odds) || (odds <= HARD_MAX_PICK_ODDS && odds >= HARD_MIN_PICK_ODDS);
 }
 
 function splitBySport(rows) {
@@ -2681,6 +2683,7 @@ function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
     .filter((row) => {
       if (!row.recommended || !row.odds) return false;
       if (Number(row.odds) > HARD_MAX_PICK_ODDS) return false;
+      if (Number(row.odds) < HARD_MIN_PICK_ODDS) return false;
       if (!["ממתין", "live", "ht"].includes(row.status) && row.status) return false;
       if (row.matchPhase === "final") return false;
       // Hide only if the match window is fully over (200 min covers 90+ET+processing)
@@ -3962,8 +3965,8 @@ async function getAggregatedOddsRows() {
   // Union with the day's earlier rows: a pick that was already on the board
   // stays there even after its game drops out of source responses.
   let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
-  // No-value favourites (1.01–1.14) make the board look amateur — drop them.
-  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
+  // No-value favourites (1.2 and below) make the board look amateur — drop them.
+  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= HARD_MIN_PICK_ODDS);
   if (!rows.length) {
     throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 500));
   }
@@ -3986,7 +3989,7 @@ async function buildAggregatedOddsFeed() {
   // football league win their slots, then remaining slots are topped up
   // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= HARD_MIN_PICK_ODDS)].sort(comparePickRows);
     const football = [];
     const basketball = [];
     const skippedFootball = [];
