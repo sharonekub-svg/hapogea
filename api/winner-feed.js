@@ -90,6 +90,10 @@ const ODDS_MIN = 1.40;
 const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
+// Hard ceiling for ANY displayed pick, on every source path: a game whose
+// pick odds exceed this never reaches the board (finished games keep showing
+// their tracked result; games without open lines are unaffected).
+const HARD_MAX_PICK_ODDS = 2.2;
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
@@ -2589,10 +2593,19 @@ function compactTrackingRow(row) {
   };
 }
 
+// Every tab is assembled through here — enforce the 2.2 odds ceiling once,
+// for all source paths (Winner, SofaScore, Pinnacle, API-Sports, Odds API).
+function withinHardOddsCap(row) {
+  if (row.matchPhase === "final" || row.noOddsYet) return true;
+  const odds = Number(row.odds ?? row.oddsRaw);
+  return !Number.isFinite(odds) || odds <= HARD_MAX_PICK_ODDS;
+}
+
 function splitBySport(rows) {
+  const capped = rows.filter(withinHardOddsCap);
   return {
-    football:   rows.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
-    basketball: rows.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
+    football:   capped.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
+    basketball: capped.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
   };
 }
 
@@ -3757,7 +3770,8 @@ async function getAggregatedOddsRows() {
   // stays there even after its game drops out of source responses.
   let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
   // No-value favourites (1.01–1.14) make the board look amateur — drop them.
-  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
+  // High-risk picks above 2.2 are dropped too (HARD_MAX_PICK_ODDS).
+  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS);
   if (!rows.length) {
     throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
   }
@@ -3780,7 +3794,7 @@ async function buildAggregatedOddsFeed() {
   // football league win their slots, then remaining slots are topped up
   // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= 1.15)].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS)].sort(comparePickRows);
     const football = [];
     const basketball = [];
     const skippedFootball = [];
