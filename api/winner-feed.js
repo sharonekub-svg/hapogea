@@ -4980,12 +4980,54 @@ module.exports = async function handler(req, res) {
           totalGames: games.length,
           gamesWithOdds: withOdds.length,
           bookmakers: data?.bookmakers ?? null,
-          samples: withOdds.slice(0, 4).map((g) => ({
+          gamesList: games.slice(0, 10).map((g) => ({
+            id: g.id,
+            match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
+            league: g.competitionDisplayName,
+            statusGroup: g.statusGroup,
+            startTime: g.startTime,
+          })),
+          samples: withOdds.slice(0, 2).map((g) => ({
             match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
             statusGroup: g.statusGroup,
             mainOdds: g.mainOdds ?? g.odds,
           })),
         };
+        // Scoreboard came back odds-less — check whether the game-center
+        // endpoint carries the line instead (suspected for basketball).
+        if (!withOdds.length) {
+          const candidates = games.filter((g) => Number(g.statusGroup) < 3).slice(0, 3);
+          const gameCenter = [];
+          for (const g of candidates) {
+            const gcParams = new URLSearchParams({
+              langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6", appTypeId: "5",
+              gameId: String(g.id),
+            });
+            const gc = await fetchJson(`https://webws.365scores.com/web/game/?${gcParams}`, {
+              headers: {
+                "User-Agent": "Mozilla/5.0",
+                Origin: "https://www.365scores.com",
+                Referer: "https://www.365scores.com/he",
+                Accept: "application/json",
+              },
+              retryAttempts: 1,
+            }).catch((e) => ({ _err: String(e?.message || e).slice(0, 160) }));
+            const game = gc?.game || null;
+            const oddsKeys = game ? Object.keys(game).filter((k) => /odd|bet|line/i.test(k)) : [];
+            gameCenter.push({
+              id: g.id,
+              match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
+              error: gc?._err || null,
+              topKeys: gc && !gc._err ? Object.keys(gc) : null,
+              gameKeys: game ? Object.keys(game) : null,
+              oddsKeys,
+              oddsSample: oddsKeys.length
+                ? JSON.stringify(Object.fromEntries(oddsKeys.map((k) => [k, game[k]]))).slice(0, 4000)
+                : null,
+            });
+          }
+          out[label].gameCenter = gameCenter;
+        }
       }
       return res.status(200).json(out);
     } catch (err) {
