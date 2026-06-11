@@ -4745,6 +4745,278 @@
       font: 700 12px Heebo,sans-serif; color: rgba(85,214,255,.85);
     }
 
+    /* ============ WC2026 MEGA UX ============ */
+    /* — Cinematic hero — */
+    .wc-hub-hero {
+      padding: 34px 22px 30px;
+      border-radius: 24px;
+      isolation: isolate;
+      background:
+        radial-gradient(120% 90% at 50% -20%, rgba(85,214,255,.22), transparent 55%),
+        radial-gradient(90% 70% at 12% 110%, rgba(208,92,26,.5), transparent 55%),
+        radial-gradient(70% 60% at 88% 108%, rgba(255,200,87,.28), transparent 60%),
+        linear-gradient(160deg, #0b1f44 0%, #14336e 45%, #1d49a6 100%);
+      box-shadow: 0 24px 60px -28px rgba(13,38,89,.85), inset 0 1px 0 rgba(255,255,255,.14);
+    }
+    .wc-hub-hero::before {
+      content: "";
+      position: absolute; inset: -55%;
+      background: conic-gradient(from 0deg,
+        transparent 0 8%, rgba(255,255,255,.07) 11%, transparent 14%,
+        transparent 46%, rgba(85,214,255,.09) 50%, transparent 54%,
+        transparent 78%, rgba(255,200,87,.10) 82%, transparent 86%);
+      animation: wcBeams 26s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .wc-hub-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1.4px);
+      background-size: 22px 22px;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes wcBeams { to { transform: rotate(1turn); } }
+    .wc-orb {
+      position: absolute; border-radius: 50%; filter: blur(34px); opacity: .5;
+      pointer-events: none; z-index: -1;
+    }
+    .wc-orb.o1 { width: 220px; height: 220px; background: #2563EB; top: -70px; right: -60px; animation: wcOrb 11s ease-in-out infinite alternate; }
+    .wc-orb.o2 { width: 180px; height: 180px; background: #d05c1a; bottom: -80px; left: -50px; animation: wcOrb 13s ease-in-out -3s infinite alternate; }
+    .wc-orb.o3 { width: 130px; height: 130px; background: #55d6ff; bottom: -40px; right: 22%; opacity: .35; animation: wcOrb 9s ease-in-out -6s infinite alternate; }
+    @keyframes wcOrb { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(14px,-18px,0) scale(1.12); } }
+    .wc-trophy {
+      font-size: 44px; line-height: 1; display: inline-block; margin-bottom: 6px;
+      filter: drop-shadow(0 6px 18px rgba(255,200,87,.55));
+      animation: wcTrophyFloat 4.5s ease-in-out infinite;
+    }
+    @keyframes wcTrophyFloat {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50%      { transform: translateY(-9px) rotate(3deg); }
+    }
+    .wc-hub-title {
+      font: 900 clamp(30px, 6vw, 44px)/1.08 Heebo, Assistant, sans-serif;
+      background: linear-gradient(92deg, #fff 8%, #ffc857 38%, #55d6ff 64%, #fff 92%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      animation: wcTitleShimmer 7s ease-in-out infinite;
+    }
+    @keyframes wcTitleShimmer { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+    .wc-count { gap: 8px; }
+    .wc-count-cell {
+      min-width: 64px; padding: 12px 8px; border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.17), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,200,87,.36);
+      box-shadow: 0 10px 26px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .wc-count-cell b { font-size: 28px; text-shadow: 0 2px 14px rgba(85,214,255,.45); }
+    .wc-count-cell b.tick { animation: wcTick .45s ease; }
+    @keyframes wcTick { 0% { transform: translateY(-7px) scale(1.18); opacity: .25; } 100% { transform: none; opacity: 1; } }
+    .wc-live-chip {
+      display: none; margin: 14px auto 2px; width: max-content;
+      align-items: center; gap: 8px; padding: 8px 18px; border-radius: 999px;
+      background: linear-gradient(135deg, rgba(220,38,38,.32), rgba(220,38,38,.16));
+      border: 1px solid rgba(248,113,113,.65);
+      font: 900 14px Heebo, sans-serif; color: #fecaca; letter-spacing: .5px;
+      box-shadow: 0 0 0 0 rgba(248,113,113,.45);
+      animation: wcLivePulse 1.8s ease-out infinite;
+    }
+    .wc-count.wc-count-live ~ .wc-live-chip, .wc-live-chip.on { display: inline-flex; }
+    .wc-live-chip .dot { width: 9px; height: 9px; border-radius: 50%; background: #f87171; animation: wcLiveDot 1.1s ease-in-out infinite; }
+    @keyframes wcLiveDot { 50% { opacity: .25; transform: scale(.7); } }
+    @keyframes wcLivePulse { 0% { box-shadow: 0 0 0 0 rgba(248,113,113,.4); } 100% { box-shadow: 0 0 0 16px rgba(248,113,113,0); } }
+    /* — Confetti — */
+    .wc-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 3; }
+    .wc-confetti i {
+      position: absolute; top: -14px; width: 8px; height: 13px; border-radius: 2px;
+      opacity: 0; animation: wcConfetti 3.4s ease-in forwards;
+    }
+    @keyframes wcConfetti {
+      0%   { opacity: 0; transform: translate3d(0,-16px,0) rotate(0); }
+      8%   { opacity: 1; }
+      100% { opacity: 0; transform: translate3d(var(--dx, 14px), 420px, 0) rotate(640deg); }
+    }
+    /* — Flag parade — */
+    .wc-parade {
+      position: relative; overflow: hidden; margin-top: 18px; padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,.14);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    }
+    .wc-parade-track { display: flex; gap: 18px; width: max-content; animation: wcParade 70s linear infinite; }
+    .wc-parade:hover .wc-parade-track { animation-play-state: paused; }
+    @keyframes wcParade { to { transform: translateX(50%); } }
+    .wc-parade-item { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+    .wc-parade-item img {
+      width: 30px; height: 21px; object-fit: cover; border-radius: 4px; display: block;
+      box-shadow: 0 3px 10px rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.28);
+      transition: transform .2s ease;
+    }
+    .wc-parade-item:hover img { transform: scale(1.35) rotate(-3deg); }
+    .wc-parade-item span { font: 700 11px Heebo, sans-serif; color: rgba(255,255,255,.62); white-space: nowrap; }
+    /* — Next-match spotlight — */
+    .wc-spotlight {
+      position: relative; border-radius: 22px; padding: 1.5px; overflow: hidden;
+      background: linear-gradient(120deg, rgba(255,200,87,.0), rgba(255,200,87,.65), rgba(85,214,255,.65), rgba(255,200,87,0));
+      background-size: 300% 300%;
+      animation: wcSpotBorder 6s linear infinite;
+    }
+    @keyframes wcSpotBorder { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+    .wc-spotlight-in {
+      position: relative; border-radius: 21px; padding: 20px 18px 18px; overflow: hidden;
+      background:
+        radial-gradient(110% 90% at 85% -10%, rgba(255,200,87,.16), transparent 50%),
+        radial-gradient(100% 80% at 10% 110%, rgba(37,99,235,.4), transparent 55%),
+        linear-gradient(150deg, #101d3a, #0c1730 70%);
+    }
+    .wc-spotlight-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .wc-spot-kicker {
+      display: inline-flex; align-items: center; gap: 7px;
+      font: 800 11.5px JetBrains Mono, monospace; letter-spacing: 1.6px; color: #ffc857;
+      text-transform: uppercase;
+    }
+    .wc-spot-kicker .spark { animation: wcSparkle 1.6s ease-in-out infinite; }
+    @keyframes wcSparkle { 50% { opacity: .35; transform: scale(.8) rotate(20deg); } }
+    .wc-spot-when {
+      font: 800 12px Heebo, sans-serif; color: #d8e6ff;
+      padding: 6px 12px; border-radius: 999px;
+      background: rgba(85,214,255,.12); border: 1px solid rgba(85,214,255,.3);
+    }
+    .wc-spot-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+    .wc-spot-side { display: flex; flex-direction: column; align-items: center; gap: 9px; min-width: 0; }
+    .wc-spot-side .wc-flag { width: auto; height: auto; }
+    .wc-spot-side img {
+      width: 76px; height: 53px; object-fit: cover; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 30px -12px rgba(0,0,0,.8);
+      animation: wcFlagIn .6s cubic-bezier(.2,1.4,.4,1) both;
+    }
+    .wc-spot-side.away img { animation-delay: .12s; }
+    @keyframes wcFlagIn { from { opacity: 0; transform: translateY(14px) scale(.7); } }
+    .wc-spot-side b { font: 900 16.5px/1.2 Heebo, sans-serif; color: #fff; text-align: center; }
+    .wc-spot-side.picked b { color: #ffc857; }
+    .wc-spot-side .crown { font-size: 13px; margin-top: -4px; }
+    .wc-spot-vs { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .wc-spot-vs .bolt {
+      font: 900 22px/1 Heebo, sans-serif; color: #55d6ff;
+      text-shadow: 0 0 22px rgba(85,214,255,.85);
+      animation: wcVsGlow 2.4s ease-in-out infinite;
+    }
+    @keyframes wcVsGlow { 50% { text-shadow: 0 0 6px rgba(85,214,255,.35); } }
+    .wc-spot-vs small { font: 700 10px JetBrains Mono, monospace; color: rgba(255,255,255,.45); letter-spacing: 1px; }
+    .wc-spot-pick {
+      margin-top: 16px; padding: 12px 14px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,200,87,.14), rgba(255,200,87,.05));
+      border: 1px solid rgba(255,200,87,.35);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .wc-spot-pick .who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .wc-spot-pick .who small { font: 800 10.5px JetBrains Mono, monospace; letter-spacing: 1.4px; color: rgba(255,200,87,.85); }
+    .wc-spot-pick .who b { font: 900 17px Heebo, sans-serif; color: #fff; }
+    .wc-spot-conf { flex: 1 1 150px; min-width: 130px; }
+    .wc-spot-conf .lbl { display: flex; justify-content: space-between; font: 700 10.5px Heebo, sans-serif; color: rgba(255,255,255,.6); margin-bottom: 5px; }
+    .wc-spot-conf .lbl b { color: #ffc857; font-size: 12px; }
+    .wc-spot-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; }
+    .wc-spot-bar i {
+      display: block; height: 100%; border-radius: inherit; width: 0;
+      background: linear-gradient(90deg, #ffc857, #55d6ff);
+      box-shadow: 0 0 14px rgba(255,200,87,.6);
+      transition: width 1s cubic-bezier(.2,.9,.3,1) .15s;
+    }
+    .wc-spot-venue { margin-top: 12px; font: 600 11.5px Heebo, sans-serif; color: rgba(255,255,255,.55); display: flex; align-items: center; gap: 6px; }
+    .wc-spot-lock {
+      margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border-radius: 14px; flex-wrap: wrap;
+      background: rgba(255,255,255,.06); border: 1px dashed rgba(255,200,87,.4);
+      font: 800 13px Heebo, sans-serif; color: rgba(255,255,255,.8);
+    }
+    /* — Tournament progress — */
+    .wc-progress { padding: 16px 14px 10px; border-radius: 18px; background: var(--panel, rgba(255,255,255,.04)); border: 1px solid rgba(255,200,87,.16); overflow-x: auto; }
+    .wc-progress-track { display: flex; align-items: flex-start; min-width: 520px; }
+    .wc-prog-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+    .wc-prog-step::before {
+      content: ""; position: absolute; top: 8px; right: 50%; width: 100%; height: 3px;
+      background: rgba(255,255,255,.12);
+    }
+    .wc-prog-step:first-child::before { display: none; }
+    .wc-prog-step.done::before { background: linear-gradient(90deg, rgba(255,200,87,.85), rgba(255,200,87,.4)); }
+    .wc-prog-dot {
+      position: relative; z-index: 1; width: 17px; height: 17px; border-radius: 50%;
+      background: #1a2c52; border: 2.5px solid rgba(255,255,255,.3);
+    }
+    .wc-prog-step.done .wc-prog-dot { background: #ffc857; border-color: #ffc857; box-shadow: 0 0 0 3px rgba(255,200,87,.18); }
+    .wc-prog-step.now .wc-prog-dot {
+      background: #55d6ff; border-color: #fff;
+      box-shadow: 0 0 0 0 rgba(85,214,255,.55);
+      animation: wcNowPulse 1.7s ease-out infinite;
+    }
+    @keyframes wcNowPulse { 100% { box-shadow: 0 0 0 12px rgba(85,214,255,0); } }
+    .wc-prog-step span { font: 800 10.5px JetBrains Mono, monospace; color: rgba(255,255,255,.5); }
+    .wc-prog-step em { font: 800 11.5px Heebo, sans-serif; font-style: normal; color: rgba(255,255,255,.75); white-space: nowrap; }
+    .wc-prog-step.now em { color: #55d6ff; }
+    .wc-prog-step.done em { color: rgba(255,200,87,.9); }
+    /* — Facts v2 — */
+    .wc-fact { transition: transform .2s ease, box-shadow .2s ease; }
+    .wc-fact:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(85,214,255,.55); }
+    .wc-fact b { font-variant-numeric: tabular-nums; }
+    /* — Cards: tilt + sheen — */
+    .wc-tilt { transform: perspective(950px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .18s ease, box-shadow .18s ease; will-change: transform; }
+    article.card[data-wc] { position: relative; overflow: hidden; }
+    article.card[data-wc]::after {
+      content: ""; position: absolute; top: 0; bottom: 0; left: -70%; width: 45%;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.10), transparent);
+      transform: skewX(-18deg); pointer-events: none; transition: left .6s ease; z-index: 2;
+    }
+    article.card[data-wc]:hover::after { left: 130%; }
+    article.card[data-wc]:hover { box-shadow: 0 22px 44px -20px rgba(37,99,235,.55); }
+    /* — Date headers / group pills v2 — */
+    .wc-date-header { position: sticky; top: 4px; z-index: 5; }
+    .wc-date-header-label {
+      backdrop-filter: blur(8px);
+      background: linear-gradient(135deg, rgba(20,40,84,.92), rgba(13,27,58,.92)) !important;
+      border: 1px solid rgba(255,200,87,.3) !important;
+      box-shadow: 0 8px 20px -10px rgba(0,0,0,.6);
+    }
+    .wc-date-header-today { border-color: rgba(85,214,255,.65) !important; color: #55d6ff !important; }
+    .wc-group-pill { transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+    .wc-group-pill:hover { transform: translateY(-2px) scale(1.04); }
+    .wc-group-pill.active { box-shadow: 0 10px 24px -12px rgba(255,200,87,.7); }
+    /* — Banner shine — */
+    .wc-banner { position: relative; overflow: hidden; }
+    .wc-banner::after {
+      content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 38%;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.13), transparent);
+      transform: skewX(-16deg); pointer-events: none;
+      animation: wcBannerShine 5.5s ease-in-out infinite;
+    }
+    @keyframes wcBannerShine { 0%, 55% { left: -60%; } 85%, 100% { left: 130%; } }
+    /* — Light theme adjustments — */
+    body[data-theme="light"] .wc-spotlight-in { background: linear-gradient(150deg, #14264d, #0f1d3c 70%); }
+    body[data-theme="light"] .wc-progress { background: rgba(20,40,84,.06); border-color: rgba(20,40,84,.18); }
+    body[data-theme="light"] .wc-prog-step span { color: rgba(20,30,60,.55); }
+    body[data-theme="light"] .wc-prog-step em { color: rgba(20,30,60,.8); }
+    body[data-theme="light"] .wc-prog-dot { background: #c8d4ec; border-color: rgba(20,40,84,.35); }
+    /* — Mobile — */
+    @media (max-width: 640px) {
+      .wc-hub-hero { padding: 26px 14px 22px; }
+      .wc-spot-side img { width: 58px; height: 41px; }
+      .wc-spot-side b { font-size: 14px; }
+      .wc-count-cell { min-width: 56px; padding: 10px 5px; }
+      .wc-count-cell b { font-size: 23px; }
+      .wc-parade-track { animation-duration: 50s; }
+    }
+    /* — Reduced motion: calm everything — */
+    @media (prefers-reduced-motion: reduce) {
+      .wc-hub-hero::before, .wc-orb, .wc-trophy, .wc-hub-title,
+      .wc-parade-track, .wc-spotlight, .wc-live-chip, .wc-live-chip .dot,
+      .wc-spot-vs .bolt, .wc-spot-kicker .spark, .wc-banner::after,
+      .wc-prog-step.now .wc-prog-dot, .wc-confetti i { animation: none !important; }
+      .wc-tilt { transform: none !important; }
+    }
+
   </style>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -6444,21 +6716,120 @@
       return `<span class="wc-flag"><img src="https://flagcdn.com/w80/${cc}.png" alt="" loading="lazy"></span>`;
     }
 
+    // Timeline stages with real ISO dates — drives the live progress tracker
+    const WC_2026_STAGE_DATES = [
+      { iso: "2026-06-11", date: "11.6", label: "פתיחה" },
+      { iso: "2026-06-27", date: "27.6", label: "סיום הבתים" },
+      { iso: "2026-07-03", date: "3.7",  label: "שלב 32" },
+      { iso: "2026-07-07", date: "7.7",  label: "שמינית גמר" },
+      { iso: "2026-07-11", date: "11.7", label: "רבע גמר" },
+      { iso: "2026-07-15", date: "15.7", label: "חצי גמר" },
+      { iso: "2026-07-19", date: "19.7", label: "גמר" },
+    ];
+
+    function wcTodayISO() {
+      return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" });
+    }
+
+    function wcNextFixture() {
+      const today = wcTodayISO();
+      const open = WC2026_FIXTURES
+        .filter((f) => f.date >= today && !(f.status && f.status !== "ממתין"))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      return open[0] || WC2026_FIXTURES[0];
+    }
+
+    function wcSpotlightMarkup() {
+      const item = wcNextFixture();
+      if (!item) return "";
+      const today = wcTodayISO();
+      const isToday = item.date === today;
+      const [, mo, dy] = item.date.split("-");
+      const when = isToday
+        ? `🔥 הערב · ${item.time || "מקסיקו סיטי"}`
+        : `📅 ${dy}.${mo}${item.time ? " · " + item.time : ""}`;
+      const pickedHome = item.pick === "home" || item.pick === "1" || item.pick === item.hc;
+      const pickedDraw = item.pick === "draw" || item.pick === "X" || item.pick === "x";
+      const pickName = pickedDraw ? "תיקו" : (item.pick === "away" || item.pick === "2" || item.pick === item.ac) ? item.away : item.home;
+      const conf = Number(item.conf) || null;
+      const locked = item.premium && !state.isPremium;
+      const pickBlock = locked
+        ? `<div class="wc-spot-lock"><span>🔒 הבחירה של הפוגע למשחק הזה — בפרימיום</span><button class="lock-btn" onclick="openPremiumModal()" style="padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font:800 13px Heebo,sans-serif;background:linear-gradient(135deg,#ffc857,#d05c1a);color:#1a1205">שדרג עכשיו</button></div>`
+        : `<div class="wc-spot-pick">
+            <div class="who"><small>✦ הפוגע בוחר</small><b>${escapeHtml(pickName)}</b></div>
+            <div class="wc-spot-conf">
+              <div class="lbl"><span>רמת ביטחון</span><b>${conf != null ? conf + "%" : "—"}</b></div>
+              <div class="wc-spot-bar"><i data-conf="${conf || 0}"></i></div>
+            </div>
+          </div>`;
+      return `
+        <div class="wc-spotlight">
+          <div class="wc-spotlight-in">
+            <div class="wc-spotlight-top">
+              <span class="wc-spot-kicker"><span class="spark">✦</span> המשחק הבא בטורניר</span>
+              <span class="wc-spot-when">${when}</span>
+            </div>
+            <div class="wc-spot-teams">
+              <div class="wc-spot-side home ${pickedHome && !locked ? "picked" : ""}">
+                ${wcFlagImg(item.hc)}
+                <b>${escapeHtml(item.home)}</b>
+                ${pickedHome && !locked ? '<span class="crown">👑</span>' : ""}
+              </div>
+              <div class="wc-spot-vs"><span class="bolt">⚡VS</span><small>${escapeHtml(item.stage || "")}</small></div>
+              <div class="wc-spot-side away ${!pickedHome && !pickedDraw && !locked ? "picked" : ""}">
+                ${wcFlagImg(item.ac)}
+                <b>${escapeHtml(item.away)}</b>
+                ${!pickedHome && !pickedDraw && !locked ? '<span class="crown">👑</span>' : ""}
+              </div>
+            </div>
+            ${pickBlock}
+            ${item.venue ? `<div class="wc-spot-venue">📍 ${escapeHtml(item.venue)}</div>` : ""}
+          </div>
+        </div>`;
+    }
+
+    function wcParadeMarkup() {
+      const seen = new Set();
+      const items = [];
+      for (const f of WC2026_FIXTURES) {
+        for (const [code, name] of [[f.hc, f.home], [f.ac, f.away]]) {
+          if (!code || seen.has(code)) continue;
+          seen.add(code);
+          items.push(`<span class="wc-parade-item"><img src="https://flagcdn.com/w40/${escapeHtml(String(code).toLowerCase())}.png" alt="" loading="lazy"><span>${escapeHtml(name)}</span></span>`);
+        }
+      }
+      const strip = items.join("");
+      return `<div class="wc-parade" aria-hidden="true"><div class="wc-parade-track">${strip}${strip}</div></div>`;
+    }
+
+    function wcProgressMarkup() {
+      const today = wcTodayISO();
+      let nowIdx = -1;
+      WC_2026_STAGE_DATES.forEach((s, i) => { if (s.iso <= today) nowIdx = i; });
+      const steps = WC_2026_STAGE_DATES.map((s, i) => {
+        const cls = i < nowIdx ? "done" : i === nowIdx ? "now" : "";
+        return `<div class="wc-prog-step ${cls}"><span class="wc-prog-dot"></span><span>${escapeHtml(s.date)}</span><em>${escapeHtml(s.label)}</em></div>`;
+      }).join("");
+      return `<div class="wc-progress"><div class="wc-progress-track">${steps}</div></div>`;
+    }
+
     function worldCupHubMarkup() {
       const f = WC_2026;
       const facts = f.facts.map((x) =>
-        `<div class="wc-fact"><b>${escapeHtml(x.value)}</b><span>${escapeHtml(x.label)}</span></div>`).join("");
+        `<div class="wc-fact"><b data-count="${escapeHtml(x.value)}">0</b><span>${escapeHtml(x.label)}</span></div>`).join("");
       const hosts = f.hosts.map((h) =>
         `<div class="wc-host">${wcFlagImg(h.code)}<span>${escapeHtml(h.name)}</span></div>`).join("");
-      const timeline = f.timeline.map((s) =>
-        `<li class="wc-tl-item"><span class="wc-tl-dot"></span><span class="wc-tl-date">${escapeHtml(s.date)}</span><span class="wc-tl-label">${escapeHtml(s.label)}</span></li>`).join("");
+      const started = new Date(f.kickoffISO).getTime() <= Date.now();
       return `
         <div class="wc-hub">
           <div class="wc-hub-hero">
+            <span class="wc-orb o1"></span><span class="wc-orb o2"></span><span class="wc-orb o3"></span>
+            <div class="wc-confetti" id="wcConfetti"></div>
+            <span class="wc-trophy">🏆</span>
             <div class="wc-hub-badge">FIFA World Cup 2026</div>
             <h2 class="wc-hub-title">${escapeHtml(f.title)}</h2>
             <p class="wc-hub-sub">${escapeHtml(f.subtitle)}</p>
-            <div class="wc-count" id="wcCountdown" data-target="${escapeHtml(f.kickoffISO)}">
+            <div class="wc-count" id="wcCountdown" data-target="${escapeHtml(f.kickoffISO)}" ${started ? 'style="display:none"' : ""}>
               <div class="wc-count-cell"><b data-c="d">--</b><span>ימים</span></div>
               <div class="wc-count-sep">:</div>
               <div class="wc-count-cell"><b data-c="h">--</b><span>שעות</span></div>
@@ -6467,12 +6838,89 @@
               <div class="wc-count-sep">:</div>
               <div class="wc-count-cell"><b data-c="s">--</b><span>שניות</span></div>
             </div>
+            <span class="wc-live-chip ${started ? "on" : ""}"><span class="dot"></span> המונדיאל בעיצומו · 11.6–19.7</span>
             <div class="wc-count-cap">${escapeHtml(f.kickoffLabel)}</div>
+            ${wcParadeMarkup()}
           </div>
+          ${wcSpotlightMarkup()}
+          ${wcProgressMarkup()}
           <div class="wc-facts">${facts}</div>
           <div class="wc-hosts-wrap"><span class="wc-hosts-title">מארחות</span><div class="wc-hosts">${hosts}</div></div>
-          <ol class="wc-timeline">${timeline}</ol>
         </div>`;
+    }
+
+    // Count-up animation for the hero fact numbers
+    function wcAnimateCounts(root) {
+      const els = root.querySelectorAll(".wc-fact b[data-count]");
+      const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      els.forEach((el) => {
+        const target = parseInt(el.getAttribute("data-count"), 10);
+        if (!Number.isFinite(target) || reduced) { el.textContent = el.getAttribute("data-count"); return; }
+        const t0 = performance.now();
+        const dur = 950;
+        const step = (t) => {
+          const p = Math.min(1, (t - t0) / dur);
+          el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }
+
+    // One celebratory confetti burst per session (skipped for reduced motion)
+    function wcFireConfetti(root) {
+      try {
+        if (sessionStorage.getItem("wcConfettiFired")) return;
+        if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const box = root.querySelector("#wcConfetti");
+        if (!box) return;
+        const colors = ["#ffc857", "#55d6ff", "#ffffff", "#d05c1a", "#7dd3fc", "#fde68a"];
+        let html = "";
+        for (let i = 0; i < 36; i++) {
+          const left = Math.random() * 100;
+          const delay = Math.random() * 1.4;
+          const dx = Math.round(Math.random() * 90 - 45);
+          const color = colors[i % colors.length];
+          const scale = (0.7 + Math.random() * 0.9).toFixed(2);
+          html += `<i style="left:${left.toFixed(1)}%;background:${color};animation-delay:${delay.toFixed(2)}s;--dx:${dx}px;transform:scale(${scale})"></i>`;
+        }
+        box.innerHTML = html;
+        sessionStorage.setItem("wcConfettiFired", "1");
+        setTimeout(() => { box.innerHTML = ""; }, 5200);
+      } catch { /* sessionStorage unavailable — skip the burst */ }
+    }
+
+    // Subtle 3D tilt on hover-capable devices only
+    function wcBindTilt(root) {
+      if (!window.matchMedia) return;
+      if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      root.querySelectorAll("article.card[data-wc]").forEach((card) => {
+        card.classList.add("wc-tilt");
+        card.addEventListener("pointermove", (ev) => {
+          const r = card.getBoundingClientRect();
+          const px = (ev.clientX - r.left) / r.width - 0.5;
+          const py = (ev.clientY - r.top) / r.height - 0.5;
+          card.style.setProperty("--ry", (px * 7).toFixed(2) + "deg");
+          card.style.setProperty("--rx", (-py * 7).toFixed(2) + "deg");
+        });
+        card.addEventListener("pointerleave", () => {
+          card.style.setProperty("--rx", "0deg");
+          card.style.setProperty("--ry", "0deg");
+        });
+      });
+    }
+
+    function wcAfterRender(root) {
+      wcAnimateCounts(root);
+      wcFireConfetti(root);
+      wcBindTilt(root);
+      // Confidence bar fill (next frame so the width transition runs)
+      requestAnimationFrame(() => {
+        root.querySelectorAll(".wc-spot-bar i[data-conf]").forEach((bar) => {
+          bar.style.width = Math.max(0, Math.min(100, Number(bar.getAttribute("data-conf")))) + "%";
+        });
+      });
     }
 
     function wcUpdateCountdown() {
@@ -6484,7 +6932,17 @@
       const h = Math.floor(diff / 3600000); diff -= h * 3600000;
       const m = Math.floor(diff / 60000); diff -= m * 60000;
       const s = Math.floor(diff / 1000);
-      const set = (k, v) => { const n = el.querySelector('[data-c="' + k + '"]'); if (n) n.textContent = String(v).padStart(2, "0"); };
+      const set = (k, v) => {
+        const n = el.querySelector('[data-c="' + k + '"]');
+        if (!n) return;
+        const next = String(v).padStart(2, "0");
+        if (n.textContent !== next) {
+          n.textContent = next;
+          n.classList.remove("tick");
+          void n.offsetWidth; // restart the tick animation
+          n.classList.add("tick");
+        }
+      };
       set("d", d); set("h", h); set("m", m); set("s", s);
       if (target - Date.now() <= 0) el.classList.add("wc-count-live");
       return true;
@@ -6585,6 +7043,7 @@
           <div class="wc-match-grid">
             ${upcoming.map(wcFixtureCard).join('')}
           </div>`;
+        wcBindTilt(target);
         return;
       }
 
@@ -6650,6 +7109,7 @@
         ${matchesHtml}
       `;
       wcStartCountdown();
+      wcAfterRender(target);
       requestAnimationFrame(() => { target.classList.add("wc-body-in"); });
     }
 
