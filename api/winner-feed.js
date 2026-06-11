@@ -3250,6 +3250,29 @@ async function fetchOddsApiSport(sportKey, dateFrom, dateTo) {
   }
 }
 
+// League quality for pick ordering: the board should lead with the World Cup
+// and recognised top leagues, not 1.10-odds favourites from youth/4th-tier
+// leagues that happen to score high on implied probability.
+function leaguePriorityScore(name) {
+  const n = String(name || "").toLowerCase();
+  if (!n) return 30;
+  if (/u-?\d{2}|youth|junior|reserve|academy|amateur|friendl|women|feminin|נשים|נוער|מילואים|ידידות/.test(n)) return 5;
+  if (/3\.\s?division|division [234]|[23]\.\s?liga|liga [23]\b|serie [cd]\b|third|esiliiga|ykkösliiga|ettan|landesliga|oberliga|regionalliga|leumit football/.test(n)) return 12;
+  if (/world cup|מונדיאל|euro 20|copa america|champions league|ליגת האלופות|europa league|conference league|nations league|libertadores|sudamericana/.test(n)) return 100;
+  if (/premier league|premiership|primera|la liga|bundesliga\b|serie a\b|ligue 1|eredivisie|süper lig|super lig|liga ?mx|mls\b|brasileir[ao]o? a|allsvenskan|eliteserien|veikkausliiga|j1|k league 1|ליגת העל|winner league|euroleague|eurocup|acb\b|lnb\b|bsl\b|bbl\b|vtb\b|greek basket|lega basket|liga leumit|wnba/.test(n)) return 70;
+  if (/championship|serie b\b|2\. bundesliga|ligue 2|segunda|league one|league two|superettan|obos|first division|premier division/.test(n)) return 40;
+  if (/cup|copa|pokal|coupe|coppa|גביע|trophy/.test(n)) return 45;
+  return 30;
+}
+
+function comparePickRows(a, b) {
+  return (
+    (b.leaguePriority ?? 30) - (a.leaguePriority ?? 30) ||
+    Number(!!a.outsideRange) - Number(!!b.outsideRange) ||
+    (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0)
+  );
+}
+
 function oddsApiEventToRow(event, sportMeta, sourceName = "The Odds API") {
   const bookmaker =
     event.bookmakers?.find((b) => ["bet365", "unibet", "williamhill", "betfair"].includes(b.key)) ||
@@ -3334,6 +3357,7 @@ function oddsApiEventToRow(event, sportMeta, sourceName = "The Odds API") {
     sport:              isFootball ? "כדורגל" : "כדורסל",
     sportId:            sportMeta.sportId,
     league:             sportMeta.label,
+    leaguePriority:     leaguePriorityScore(sportMeta.label),
     match:              `${home} - ${away}`,
     home,
     away,
@@ -3555,19 +3579,29 @@ async function apiSportsFootballOddsRows(dateKey) {
 }
 
 async function apiSportsBasketballOddsRows(days) {
-  // Basketball odds are per-game requests — cap them to protect the daily quota
+  // Basketball odds are per-game requests — cap them to protect the daily
+  // quota, split the budget across days, and spend it on the best leagues
+  // first so today can't starve tomorrow (and junk can't starve the Winner
+  // League / Euroleague / WNBA games).
   const MAX_GAMES = Number(process.env.APISPORTS_BBALL_ODDS_MAX || 10);
-  const candidates = [];
+  const byDay = new Map(days.map((d) => [d, []]));
   for (const day of days) {
     const data = await fetchApiSports(`${APISPORTS_BBALL}/games?date=${day}`);
     for (const game of data?.response || []) {
       if ((game.status?.short || "") !== "NS") continue;
       if (/\bNBA\b/i.test(game.league?.name || "")) continue;
       if (!game.teams?.home?.name || !game.teams?.away?.name) continue;
-      candidates.push(game);
+      byDay.get(day).push(game);
     }
   }
-  const games = candidates.slice(0, MAX_GAMES);
+  const perDay = Math.ceil(MAX_GAMES / Math.max(days.length, 1));
+  const games = days
+    .flatMap((day) =>
+      byDay.get(day)
+        .sort((a, b) => leaguePriorityScore(b.league?.name) - leaguePriorityScore(a.league?.name))
+        .slice(0, perDay)
+    )
+    .slice(0, MAX_GAMES);
   const rows = [];
   const BATCH = 5;
   for (let i = 0; i < games.length; i += BATCH) {
@@ -3722,10 +3756,24 @@ async function buildAggregatedOddsFeed() {
   const today = israelDate(0);
   const tomorrow = israelDate(1);
   const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const dayRows = (day) =>
-    [...layer.rows.filter((r) => r.day === day && noNba(r))]
-      .sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0))
-      .slice(0, TARGET_PICKS_PER_SPORT * 2);
+  // Quality-first selection with league variety: max 2 football picks per
+  // league so one obscure division can't fill the board.
+  const dayRows = (day) => {
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r))].sort(comparePickRows);
+    const perLeague = new Map();
+    const out = [];
+    for (const row of sorted) {
+      if (Number(row.sportId) === WINNER_FOOTBALL_ID) {
+        const league = String(row.league || "").toLowerCase();
+        const used = perLeague.get(league) || 0;
+        if (used >= 2) continue;
+        perLeague.set(league, used + 1);
+      }
+      out.push(row);
+      if (out.length >= TARGET_PICKS_PER_SPORT * 2) break;
+    }
+    return out;
+  };
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
@@ -4490,7 +4538,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
               // the odds-less placeholders, leaving the board without any tips.
               const mergeSportRows = (existingRows, fresh) => {
                 const matchKey = (r) => {
-                  const he = (name) => ODDS_API_TEAM_HE[name] || name;
+                  const he = (name) => ODDS_API_TEAM_HE[name] || translateEnTeamToHe(String(name || "")) || name;
                   return `${normalizeMatchName(he(r.home))}:${normalizeMatchName(he(r.away))}`;
                 };
                 const freshKeys = new Set(fresh.map(matchKey));
@@ -4500,7 +4548,7 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
                 return [...kept, ...fresh].sort(
                   (a, b) =>
                     Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
-                    (b.recommendationScore || b.score || 0) - (a.recommendationScore || a.score || 0)
+                    comparePickRows(a, b)
                 );
               };
               newTabs[dayKey] = {
