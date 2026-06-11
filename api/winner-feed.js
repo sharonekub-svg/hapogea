@@ -2677,6 +2677,7 @@ function finalOpenRows(rows, limit = TARGET_PICKS_PER_SPORT) {
   const sorted = (rows || [])
     .filter((row) => {
       if (!row.recommended || !row.odds) return false;
+      if (Number(row.odds) > HARD_MAX_PICK_ODDS) return false;
       if (!["ממתין", "live", "ht"].includes(row.status) && row.status) return false;
       if (row.matchPhase === "final") return false;
       // Hide only if the match window is fully over (200 min covers 90+ET+processing)
@@ -3766,7 +3767,7 @@ async function getAggregatedOddsRows() {
   // stays there even after its game drops out of source responses.
   let rows = dedupeOddsRows([...collected, ...(cached?.rows || [])]);
   // No-value favourites (1.01–1.14) make the board look amateur — drop them.
-  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15);
+  rows = rows.filter((r) => r.day >= today && Number(r.odds) >= 1.15 && Number(r.odds) <= HARD_MAX_PICK_ODDS);
   if (!rows.length) {
     throw new Error("odds-layer: no rows from any source — " + JSON.stringify(errors).slice(0, 220));
   }
