@@ -5081,28 +5081,44 @@ module.exports = async function handler(req, res) {
       const out = { listError: data?._err || null, gamesWithLine: withLine.length, games: [] };
       const base = "https://webws.365scores.com/web";
       const common = `appTypeId=5&langId=2&timezoneName=${encodeURIComponent("Asia/Jerusalem")}&userCountryId=6`;
+      const summarizeLines = (arr) => (arr || []).map((line) => ({
+        lineTypeId: line.lineTypeId ?? line.lineType?.id,
+        lineTypeName: line.lineType?.name || line.lineTypeName || line.title,
+        bookmaker: line.bookmaker?.name,
+        options: (line.options || []).map((o) => ({
+          num: o.num, name: o.name, rate: o.rate?.decimal ?? o.rate, lead: o.lead,
+        })),
+      }));
       for (const g of games) {
-        const r = await fetchJson(`${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withMainOdds=true`, {
-          headers: s365Headers, retryAttempts: 1,
-        }).catch((e) => ({ _err: String(e?.message || e).slice(0, 120) }));
-        const game = r?.game || {};
-        const lines = (game.bestOdds || game.betLines || []).map((line) => ({
-          lineTypeId: line.lineTypeId,
-          lineTypeName: line.lineType?.name,
-          bookmaker: line.bookmaker?.name,
-          trend: line.trend,
-          options: (line.options || []).map((o) => ({
-            num: o.num, name: o.name, rate: o.rate?.decimal ?? o.rate, lead: o.lead,
-          })),
-        }));
-        out.games.push({
-          id: g.id,
-          match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
-          error: r?._err || null,
-          lineTypesIds: game.lineTypesIds || null,
-          lineCount: lines.length,
-          lines,
-        });
+        const tries = {};
+        for (const [label, url] of [
+          ["game+lines", `${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withFullOdds=true&withExpandedOdds=true`],
+          ["predictions", `${base}/predictions/?${common}&games=${g.id}`],
+          ["game/predictions", `${base}/game/predictions/?${common}&gameId=${g.id}`],
+          ["odds", `${base}/odds/?${common}&gameIds=${g.id}`],
+          ["game/odds", `${base}/game/odds/?${common}&gameId=${g.id}`],
+        ]) {
+          const r = await fetchJson(url, { headers: s365Headers, retryAttempts: 1 })
+            .catch((e) => ({ _err: String(e?.message || e) }));
+          if (r?._err) { tries[label] = `ERR ${r._err.slice(-80)}`; continue; }
+          // Collect any lineType/odds shaped arrays anywhere in the payload
+          const found = [];
+          const walk = (node, depth) => {
+            if (!node || depth > 5) return;
+            if (Array.isArray(node)) {
+              if (node.length && node[0] && typeof node[0] === "object" && ("lineTypeId" in node[0] || "lineType" in node[0] || "options" in node[0])) {
+                found.push(...summarizeLines(node));
+              } else node.forEach((x) => walk(x, depth + 1));
+            } else if (typeof node === "object") {
+              Object.values(node).forEach((v) => walk(v, depth + 1));
+            }
+          };
+          walk(r, 0);
+          tries[label] = found.length
+            ? JSON.stringify(found).slice(0, 1500)
+            : `no-lines keys=${Object.keys(r || {}).join(",").slice(0, 150)}`;
+        }
+        out.games.push({ id: g.id, match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`, tries });
       }
       return res.status(200).json(out);
     } catch (error) {
