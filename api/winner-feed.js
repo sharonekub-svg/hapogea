@@ -1688,6 +1688,36 @@ const OVER25_ODDS_MAX = 1.95;
 const OVER25_MIN_PROBABILITY = 0.55;
 const OVER25_PICK_LIMIT = 6;
 
+// Remove the bookmaker margin and take whichever side the market leans to.
+// Returns null when neither side clears the probability/odds gates.
+function chooseOver25Side(overOdds, underOdds) {
+  const impliedTotal = 1 / overOdds + 1 / underOdds;
+  if (!(impliedTotal > 0)) return null;
+  const overProbability = (1 / overOdds) / impliedTotal;
+  const pickOver = overProbability >= 0.5;
+  const odds = pickOver ? overOdds : underOdds;
+  const oppositeOdds = pickOver ? underOdds : overOdds;
+  const probability = pickOver ? overProbability : 1 - overProbability;
+  if (odds < OVER25_ODDS_MIN || odds > OVER25_ODDS_MAX) return null;
+  if (probability < OVER25_MIN_PROBABILITY) return null;
+  return {
+    pickOver,
+    odds,
+    oppositeOdds,
+    probability,
+    overround: Math.max(0, impliedTotal - 1),
+    pickLabel: pickOver ? "מעל 2.5" : "מתחת 2.5",
+  };
+}
+
+function over25Signals(side) {
+  return [
+    `יחס Winner ל${side.pickLabel}: ${side.odds.toFixed(2)} (הצד השני: ${side.oppositeOdds.toFixed(2)})`,
+    `הסתברות מנוכת מרווח ל${side.pickOver ? "שלושה שערים ומעלה" : "עד שני שערים"}: ${Math.round(side.probability * 100)} אחוז`,
+    "נבחר כי השוק מתמחר נטייה ברורה לכיוון הזה — לא ניחוש",
+  ];
+}
+
 function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
   const byEvent = new Map();
   for (const market of markets) {
@@ -1711,18 +1741,9 @@ function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
     }
     if (!over || !under) continue;
 
-    // Remove the bookmaker margin, then take whichever side the market leans to
-    const impliedTotal = 1 / over.odds + 1 / under.odds;
-    if (!(impliedTotal > 0)) continue;
-    const overProbability = (1 / over.odds) / impliedTotal;
-    const pickOver = overProbability >= 0.5;
-    const side = pickOver ? over : under;
-    const other = pickOver ? under : over;
-    const probability = pickOver ? overProbability : 1 - overProbability;
-    if (side.odds < OVER25_ODDS_MIN || side.odds > OVER25_ODDS_MAX) continue;
-    if (probability < OVER25_MIN_PROBABILITY) continue;
-
-    const pickLabel = pickOver ? "מעל 2.5" : "מתחת 2.5";
+    const side = chooseOver25Side(over.odds, under.odds);
+    if (!side) continue;
+    const { pickOver, odds: sideOdds, oppositeOdds, probability, overround, pickLabel } = side;
     const teams = splitTeams(market.desc);
     const row = {
       id: `over25-${market.eId}`,
@@ -1741,15 +1762,11 @@ function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
       line: 2.5,
       pick: pickLabel,
       direction: pickOver ? "over" : "under",
-      odds: side.odds,
-      oppositeOdds: other.odds,
+      odds: sideOdds,
+      oppositeOdds,
       probability,
-      overround: Math.max(0, impliedTotal - 1),
-      signals: [
-        `יחס Winner ל${pickLabel}: ${side.odds.toFixed(2)} (הצד השני: ${other.odds.toFixed(2)})`,
-        `הסתברות מנוכת מרווח ל${pickOver ? "שלושה שערים ומעלה" : "עד שני שערים"}: ${Math.round(probability * 100)} אחוז`,
-        "נבחר כי השוק מתמחר נטייה ברורה לכיוון הזה — לא ניחוש",
-      ],
+      overround,
+      signals: over25Signals(side),
     };
     const current = byEvent.get(market.eId);
     if (!current || row.probability > current.probability) byEvent.set(market.eId, row);
@@ -3780,6 +3797,89 @@ async function buildApiSportsOddsRows() {
 // whole schedule already comes from it), and with userCountryId=6 the odds it
 // returns are Winner's own Israeli pre-match line — the closest any fallback
 // gets to the product's "real Winner odds" requirement.
+// ── Over/under 2.5 via the 365Scores game-center ────────────────────────────
+// When the Winner line is IP-blocked from Vercel, the game-center
+// promotedPredictions still carry Winner's own goal line (bookmakerId 1,
+// lineTypeId 3) — the same real Winner rates through the one reachable host.
+async function fetch365GoalLine(gameId365) {
+  const params = new URLSearchParams({
+    appTypeId: "5", langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6",
+    gameId: String(gameId365),
+  });
+  const data = await fetchJson(`https://webws.365scores.com/web/game/?${params}`, {
+    headers: {
+      "User-Agent": "Mozilla/5.0",
+      Origin: "https://www.365scores.com",
+      Referer: "https://www.365scores.com/he",
+      Accept: "application/json",
+    },
+    retryAttempts: 1,
+  }).catch(() => null);
+  const predictions = data?.game?.promotedPredictions?.predictions || [];
+  for (const prediction of predictions) {
+    const odds = prediction?.odds;
+    if (!odds || Number(odds.lineTypeId) !== 3) continue;
+    const lineValue = Number(odds.internalOptionValue ?? parseOverUnderLine(prediction.title || ""));
+    if (lineValue !== 2.5) continue;
+    let over = null;
+    let under = null;
+    for (const option of odds.options || []) {
+      const rate = Number(option?.rate?.decimal);
+      if (!Number.isFinite(rate) || rate <= 1.01) continue;
+      const name = cleanText(option.name);
+      if (name.includes("מעל")) over = rate;
+      else if (name.includes("מתחת")) under = rate;
+    }
+    if (over && under) return { over, under, bookmaker: cleanText(odds.bookmaker?.name || "") };
+  }
+  return null;
+}
+
+async function build365Over25Picks(rows, dateKey, limit = OVER25_PICK_LIMIT) {
+  const candidates = (rows || [])
+    .filter((row) => row.eventId365 && Number(row.sportId) === WINNER_FOOTBALL_ID && !row.noOddsYet)
+    .slice(0, 12); // board is capped at 15; bound the game-center fan-out
+  if (!candidates.length) return [];
+  const picks = [];
+  // Small parallel batches — don't hammer the one host that still answers us
+  for (let i = 0; i < candidates.length; i += 4) {
+    const batch = candidates.slice(i, i + 4);
+    const lines = await Promise.all(batch.map((row) => fetch365GoalLine(row.eventId365)));
+    batch.forEach((row, idx) => {
+      const line = lines[idx];
+      if (!line) return;
+      const side = chooseOver25Side(line.over, line.under);
+      if (!side) return;
+      picks.push({
+        id: `over25-${row.eventId365}`,
+        eventId: String(row.eventId365),
+        source: line.bookmaker || "Winner",
+        day: dateKey,
+        time: row.time || "",
+        sport: "כדורגל",
+        sportId: WINNER_FOOTBALL_ID,
+        league: row.league || "",
+        country: row.country || "",
+        match: row.match || `${row.home} - ${row.away}`,
+        home: row.home || "",
+        away: row.away || "",
+        market: "מעל/מתחת 2.5 שערים",
+        line: 2.5,
+        pick: side.pickLabel,
+        direction: side.pickOver ? "over" : "under",
+        odds: side.odds,
+        oppositeOdds: side.oppositeOdds,
+        probability: side.probability,
+        overround: side.overround,
+        signals: over25Signals(side),
+      });
+    });
+  }
+  return picks
+    .sort((a, b) => b.probability - a.probability || a.odds - b.odds)
+    .slice(0, limit);
+}
+
 function s365BookmakerName(data) {
   const bms = data?.bookmakers;
   if (Array.isArray(bms) && bms[0]?.name) return String(bms[0].name);
@@ -4972,6 +5072,29 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
       fallbackReason: snapshot.fallbackReason || "payload date mismatch",
     };
   }
+  // Fill the over/under 2.5 section from the 365Scores game-center when the
+  // direct Winner line didn't supply it (typically when Winner is IP-blocked).
+  // Runs inside the rebuild path, so the result is cached with the payload.
+  try {
+    const o25 = payload.over25 || {};
+    const needsToday = !(o25.today && o25.today.length);
+    const needsTomorrow = !(o25.tomorrow && o25.tomorrow.length);
+    if (needsToday || needsTomorrow) {
+      const [todayPicks, tomorrowPicks] = await Promise.all([
+        needsToday
+          ? build365Over25Picks(payload.tabs?.today?.sports?.football, payload.tabs?.today?.date)
+          : Promise.resolve(o25.today),
+        needsTomorrow
+          ? build365Over25Picks(payload.tabs?.tomorrow?.sports?.football, payload.tabs?.tomorrow?.date)
+          : Promise.resolve(o25.tomorrow),
+      ]);
+      payload.over25 = { today: todayPicks || [], tomorrow: tomorrowPicks || [] };
+      console.info(`[winner-feed] over25 365-fill: today=${payload.over25.today.length} tomorrow=${payload.over25.tomorrow.length}`);
+    }
+  } catch (o25Error) {
+    console.warn("[winner-feed] over25 365-fill error:", o25Error?.message);
+  }
+
   const entry = { cachedAt: Date.now(), payload };
   await kvSet(key, entry, 24 * 60 * 60);
   return {
