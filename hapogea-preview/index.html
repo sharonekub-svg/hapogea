@@ -1659,6 +1659,37 @@
       font-size: 12px; color: var(--muted); line-height: 1.5;
       border-top: 1px solid rgba(255,255,255,.07); padding-top: 8px;
     }
+    /* ── Over 2.5 goals strip ──────────────────────────────── */
+    .o25-strip {
+      margin-bottom: 16px; border-radius: 16px; overflow: hidden;
+      border: 1.5px solid rgba(21,128,61,.28);
+      background: linear-gradient(135deg, rgba(21,128,61,.06), rgba(21,128,61,.02)), #FFFFFF;
+      box-shadow: 0 2px 14px rgba(33,31,27,.06);
+    }
+    .o25-head {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 14px; font: 900 14px Heebo, sans-serif; color: #15803D;
+      border-bottom: 1px solid rgba(21,128,61,.15);
+    }
+    .o25-head small { font: 700 11px Heebo, sans-serif; color: #6E675C; margin-inline-start: auto; }
+    .o25-list { display: grid; }
+    .o25-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+    }
+    .o25-item + .o25-item { border-top: 1px solid rgba(33,31,27,.06); }
+    .o25-time { font: 800 12px JetBrains Mono, monospace; color: #6E675C; min-width: 40px; }
+    .o25-match { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .o25-teams { font: 800 13px Heebo, sans-serif; color: #211F1B; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .o25-league { font: 600 11px Heebo, sans-serif; color: #A39B8C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .o25-odds {
+      display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+      padding: 6px 12px; border-radius: 10px;
+      background: rgba(21,128,61,.08); border: 1.5px solid rgba(21,128,61,.30);
+    }
+    .o25-odds b { font: 900 16px/1 Heebo, sans-serif; color: #0F5C2C; }
+    .o25-odds small { font: 800 9px Heebo, sans-serif; color: rgba(15,92,44,.6); }
+    .o25-prob { font: 800 12px Heebo, sans-serif; color: #15803D; min-width: 38px; text-align: center; flex-shrink: 0; }
     /* Green tint on pick section of recommended cards */
     .has-pick .pick-section {
       background: rgba(49,209,135,.07);
@@ -8479,7 +8510,29 @@
       const tomorrowBanner = tomorrowFallback
         ? `<div class="fallback-banner" style="margin-bottom:12px">📅 ${tomorrowFallbackReason} — מוצגים משחקי <b>מחר</b></div>`
         : "";
-      cards.innerHTML = banners + tomorrowBanner + (visibleRows.length
+      // Over 2.5 goals daily strip — football, today/tomorrow only
+      let over25Html = "";
+      if ((state.sportTab === "football" || state.sportTab === "all") && (state.day === "today" || state.day === "tomorrow")) {
+        const o25Day = tomorrowFallback ? "tomorrow" : state.day;
+        const o25 = (state.feed?.over25?.[o25Day] || []).filter(p => p.odds);
+        if (o25.length) {
+          over25Html = `<div class="o25-strip">
+            <div class="o25-head">⚽ מעל 2.5 שערים · המלצות ${o25Day === "today" ? "היום" : "מחר"}<small>לפי יחסי ווינר בלבד</small></div>
+            <div class="o25-list">${o25.map(p => `
+              <div class="o25-item" title="${escapeHtml((p.signals || []).join(" · "))}">
+                <span class="o25-time">${escapeHtml(p.time || "")}</span>
+                <div class="o25-match">
+                  <span class="o25-teams">${escapeHtml(p.home || "")} – ${escapeHtml(p.away || "")}</span>
+                  <span class="o25-league">${escapeHtml(p.league || "")}</span>
+                </div>
+                <span class="o25-prob">${Math.round((p.probability || 0) * 100)}%</span>
+                <div class="o25-odds"><b>${Number(p.odds).toFixed(2)}</b><small>מעל 2.5</small></div>
+              </div>`).join("")}
+            </div>
+          </div>`;
+        }
+      }
+      cards.innerHTML = banners + tomorrowBanner + over25Html + (visibleRows.length
         ? visibleRows.map(rowCard).join("")
         : `<div class="empty">${
             pendingCount > 0

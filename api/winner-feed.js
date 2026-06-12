@@ -1679,6 +1679,79 @@ function rejectionReasons(row) {
   return reasons;
 }
 
+// ── Over 2.5 goals daily picks ───────────────────────────────────────────────
+// Scans Winner football "מעל/מתחת" goal markets on the 2.5 line, removes the
+// bookmaker margin, and keeps only games where the market clearly leans to
+// goals — so the section shows a short list of good, specific matches.
+const OVER25_ODDS_MIN = 1.35;
+const OVER25_ODDS_MAX = 1.95;
+const OVER25_MIN_PROBABILITY = 0.55;
+const OVER25_PICK_LIMIT = 6;
+
+function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
+  const byEvent = new Map();
+  for (const market of markets) {
+    if (Number(market.sId) !== WINNER_FOOTBALL_ID) continue;
+    if (winnerDateToIso(market.e_date) !== dateKey) continue;
+    const title = cleanText(market.mp);
+    if (!title.includes("מעל/מתחת")) continue;
+    // Full-game goal totals only — skip corners/cards/half markets
+    if (/קרנות|כרטיסים|מחצית|רבע|הארכ|עבירות|נבדל/.test(title)) continue;
+
+    let over = null;
+    let under = null;
+    for (const outcome of market.outcomes || []) {
+      const desc = cleanText(outcome.desc);
+      const line = parseOverUnderLine(desc);
+      if (line !== 2.5) continue;
+      const odds = decimal(outcome.price);
+      if (!odds) continue;
+      if (desc.includes("מעל")) over = { odds };
+      else if (desc.includes("מתחת")) under = { odds };
+    }
+    if (!over || !under) continue;
+
+    // Remove the bookmaker margin to get the true market probability for Over
+    const impliedTotal = 1 / over.odds + 1 / under.odds;
+    const overProbability = impliedTotal > 0 ? (1 / over.odds) / impliedTotal : 0;
+    if (over.odds < OVER25_ODDS_MIN || over.odds > OVER25_ODDS_MAX) continue;
+    if (overProbability < OVER25_MIN_PROBABILITY) continue;
+
+    const teams = splitTeams(market.desc);
+    const row = {
+      id: `over25-${market.eId}`,
+      eventId: String(market.eId),
+      source: "Winner",
+      day: dateKey,
+      time: winnerHour(market.m_hour),
+      sport: SPORTS[market.sId],
+      sportId: market.sId,
+      league: cleanText(market.league),
+      country: cleanText(market.country),
+      match: cleanText(market.desc),
+      home: teams.home,
+      away: teams.away,
+      market: title,
+      line: 2.5,
+      pick: "מעל 2.5",
+      odds: over.odds,
+      underOdds: under.odds,
+      probability: overProbability,
+      overround: Math.max(0, impliedTotal - 1),
+      signals: [
+        `יחס Winner למעל 2.5: ${over.odds.toFixed(2)} (מתחת: ${under.odds.toFixed(2)})`,
+        `הסתברות מנוכת מרווח לשלושה שערים ומעלה: ${Math.round(overProbability * 100)} אחוז`,
+        "נבחר כי השוק מתמחר נטייה ברורה לשערים — לא ניחוש",
+      ],
+    };
+    const current = byEvent.get(market.eId);
+    if (!current || row.probability > current.probability) byEvent.set(market.eId, row);
+  }
+  return [...byEvent.values()]
+    .sort((a, b) => b.probability - a.probability || a.odds - b.odds)
+    .slice(0, limit);
+}
+
 function buildCurrentPicks(markets, dateKey, limit = TARGET_PICKS_PER_SPORT, resultsByEvent = new Map(), sportIdFilter = null, standingsMap365 = new Map()) {
   const events = new Map();
 
@@ -3074,6 +3147,10 @@ async function buildWinnerFeedPayload({ withLogos = true } = {}) {
     targetPicksPerSport: TARGET_PICKS_PER_SPORT,
     lineStats,
     trackingResults,
+    over25: {
+      today: buildOver25Picks(markets, today),
+      tomorrow: buildOver25Picks(markets, tomorrow),
+    },
     reuvenSchedule: buildReuvenSchedule(markets, today, 31),
     debugAudit: {
       today: splitBySport(auditOpenRows(todayEnrichedRows, todayFinalRows)),
