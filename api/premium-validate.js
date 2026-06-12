@@ -46,16 +46,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, plan: "premium" });
   }
 
-  // Universal sport code: any signed-in email, football+basketball, 7 AI msgs/day, no World Cup.
+  // SPORT7 code — cancelled, no longer valid
   if (code === "SPORT7") {
-    const expiresAt = 1812096000000; // 2027-06-01
-    if (Date.now() > expiresAt) {
-      return res.status(200).json({ ok: false, error: "קוד פג תוקף" });
-    }
-    if (!email) {
-      return res.status(200).json({ ok: false, error: "יש להתחבר עם גוגל לפני שימוש בקוד זה" });
-    }
-    return res.status(200).json({ ok: true, expiresAt, plan: "sport" });
+    return res.status(200).json({ ok: false, error: "קוד בוטל" });
   }
 
   // Static issued codes

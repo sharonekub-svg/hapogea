@@ -5600,6 +5600,8 @@
     const AI_FREE_KEY = 'hapogea_ai_free_used_v1';
     // Purge legacy v1/v2 flags — they had no expiry and unlocked everything forever
     (function() { try { localStorage.removeItem('hapogea_premium_v1'); localStorage.removeItem('hapogea_premium_v2'); } catch {} })();
+    // Purge cancelled SPORT7 ('sport' plan) — code revoked
+    (function() { try { if (localStorage.getItem('hapogea_premium_plan_v3') === 'sport') { localStorage.removeItem('hapogea_premium_v3'); localStorage.removeItem('hapogea_premium_exp_v3'); localStorage.removeItem('hapogea_premium_plan_v3'); } } catch {} })();
     // Reset free + premium counters if it's a new day
     (function resetAiFreeDaily() {
       try {
