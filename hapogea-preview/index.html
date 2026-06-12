@@ -5109,7 +5109,7 @@
       </div>
 
       <!-- Yesterday's hit rate -->
-      <div class="lp-yday-card" id="lpYdayCard" style="display:none" title="אחוז הפגיעה של ההמלצות שנסגרו אתמול">
+      <div class="lp-yday-card" id="lpYdayCard" title="אחוז הפגיעה של ההמלצות שנסגרו אתמול">
         <div class="lp-yday-ring"><div class="lp-yday-num" id="lpYdayRate">—</div></div>
         <div class="lp-yday-body">
           <div class="lp-yday-label">אחוז פגיעה אתמול</div>
@@ -10847,29 +10847,32 @@
 
     // Yesterday's hit-rate box on the landing hero (manual_results in Supabase)
     async function updateLpYdayHitRate() {
-      const card = document.getElementById("lpYdayCard");
+      const card  = document.getElementById("lpYdayCard");
       if (!card) return;
+      const numEl = document.getElementById("lpYdayRate");
+      const subEl = document.getElementById("lpYdaySub");
+      const setEmpty = (msg) => {
+        if (numEl) { numEl.textContent = "—"; numEl.style.color = "#A39B8C"; }
+        if (subEl) subEl.textContent = msg;
+      };
       try {
         const sb = (typeof _mrSbClient === "function") ? _mrSbClient() : null;
-        if (!sb) return;
+        if (!sb) { setEmpty("אין נתונים לאתמול"); return; }
         const d = new Date(); d.setDate(d.getDate() - 1);
         const yday = d.toISOString().split("T")[0];
         const { data, error } = await sb.from("manual_results").select("status").eq("game_date", yday);
-        if (error || !Array.isArray(data)) return;
+        if (error || !Array.isArray(data)) { setEmpty("אין נתונים לאתמול"); return; }
         const hits   = data.filter(r => r.status === "פגע").length;
         const misses = data.filter(r => r.status === "נפל").length;
         const settled = hits + misses;
-        if (settled === 0) return; // keep hidden when nothing settled yesterday
+        if (settled === 0) { setEmpty("אין נתונים לאתמול"); return; }
         const rate = Math.round((hits / settled) * 100);
-        const numEl = document.getElementById("lpYdayRate");
-        const subEl = document.getElementById("lpYdaySub");
         if (numEl) {
           numEl.textContent = rate + "%";
           numEl.style.color = rate >= 60 ? "#15803D" : rate >= 50 ? "#ca8a04" : "#DC2626";
         }
         if (subEl) subEl.textContent = `${hits}/${settled} פגיעות`;
-        card.style.display = "";
-      } catch (_) { /* keep hidden on error */ }
+      } catch (_) { setEmpty("אין נתונים לאתמול"); }
     }
     // Run once the Supabase client is likely ready (manual-results init runs ~1500ms)
     if (document.readyState === "loading") {
