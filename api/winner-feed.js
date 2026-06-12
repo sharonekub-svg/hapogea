@@ -5090,35 +5090,28 @@ module.exports = async function handler(req, res) {
         })),
       }));
       for (const g of games) {
-        const tries = {};
-        for (const [label, url] of [
-          ["game+lines", `${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withFullOdds=true&withExpandedOdds=true`],
-          ["predictions", `${base}/predictions/?${common}&games=${g.id}`],
-          ["game/predictions", `${base}/game/predictions/?${common}&gameId=${g.id}`],
-          ["odds", `${base}/odds/?${common}&gameIds=${g.id}`],
-          ["game/odds", `${base}/game/odds/?${common}&gameId=${g.id}`],
-        ]) {
-          const r = await fetchJson(url, { headers: s365Headers, retryAttempts: 1 })
-            .catch((e) => ({ _err: String(e?.message || e) }));
-          if (r?._err) { tries[label] = `ERR ${r._err.slice(-80)}`; continue; }
-          // Collect any lineType/odds shaped arrays anywhere in the payload
-          const found = [];
-          const walk = (node, depth) => {
-            if (!node || depth > 5) return;
-            if (Array.isArray(node)) {
-              if (node.length && node[0] && typeof node[0] === "object" && ("lineTypeId" in node[0] || "lineType" in node[0] || "options" in node[0])) {
-                found.push(...summarizeLines(node));
-              } else node.forEach((x) => walk(x, depth + 1));
-            } else if (typeof node === "object") {
-              Object.values(node).forEach((v) => walk(v, depth + 1));
-            }
-          };
-          walk(r, 0);
-          tries[label] = found.length
-            ? JSON.stringify(found).slice(0, 1500)
-            : `no-lines keys=${Object.keys(r || {}).join(",").slice(0, 150)}`;
-        }
-        out.games.push({ id: g.id, match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`, tries });
+        const r = await fetchJson(`${base}/game/?${common}&gameId=${g.id}&withBetLines=true`, {
+          headers: s365Headers, retryAttempts: 1,
+        }).catch((e) => ({ _err: String(e?.message || e).slice(-100) }));
+        // Find the raw object that holds the over/under card and dump it whole
+        let rawOU = null;
+        let ouPath = "";
+        const walk = (node, path, depth) => {
+          if (rawOU || !node || depth > 6) return;
+          if (Array.isArray(node)) { node.forEach((x, i) => walk(x, `${path}[${i}]`, depth + 1)); return; }
+          if (typeof node !== "object") return;
+          const self = JSON.stringify(node) || "";
+          if (self.includes("מעל/מתחת") && self.length < 4000) { rawOU = self; ouPath = path; return; }
+          for (const [k, v] of Object.entries(node)) walk(v, `${path}.${k}`, depth + 1);
+        };
+        walk(r, "$", 0);
+        out.games.push({
+          id: g.id,
+          match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
+          error: r?._err || null,
+          ouPath,
+          rawOU: rawOU ? rawOU.slice(0, 3500) : null,
+        });
       }
       return res.status(200).json(out);
     } catch (error) {
