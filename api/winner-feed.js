@@ -1679,10 +1679,10 @@ function rejectionReasons(row) {
   return reasons;
 }
 
-// ── Over 2.5 goals daily picks ───────────────────────────────────────────────
+// ── Over/Under 2.5 goals daily picks ────────────────────────────────────────
 // Scans Winner football "מעל/מתחת" goal markets on the 2.5 line, removes the
-// bookmaker margin, and keeps only games where the market clearly leans to
-// goals — so the section shows a short list of good, specific matches.
+// bookmaker margin, and recommends whichever side (over or under) the market
+// clearly leans to — a short list of good, specific matches each day.
 const OVER25_ODDS_MIN = 1.35;
 const OVER25_ODDS_MAX = 1.95;
 const OVER25_MIN_PROBABILITY = 0.55;
@@ -1711,12 +1711,18 @@ function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
     }
     if (!over || !under) continue;
 
-    // Remove the bookmaker margin to get the true market probability for Over
+    // Remove the bookmaker margin, then take whichever side the market leans to
     const impliedTotal = 1 / over.odds + 1 / under.odds;
-    const overProbability = impliedTotal > 0 ? (1 / over.odds) / impliedTotal : 0;
-    if (over.odds < OVER25_ODDS_MIN || over.odds > OVER25_ODDS_MAX) continue;
-    if (overProbability < OVER25_MIN_PROBABILITY) continue;
+    if (!(impliedTotal > 0)) continue;
+    const overProbability = (1 / over.odds) / impliedTotal;
+    const pickOver = overProbability >= 0.5;
+    const side = pickOver ? over : under;
+    const other = pickOver ? under : over;
+    const probability = pickOver ? overProbability : 1 - overProbability;
+    if (side.odds < OVER25_ODDS_MIN || side.odds > OVER25_ODDS_MAX) continue;
+    if (probability < OVER25_MIN_PROBABILITY) continue;
 
+    const pickLabel = pickOver ? "מעל 2.5" : "מתחת 2.5";
     const teams = splitTeams(market.desc);
     const row = {
       id: `over25-${market.eId}`,
@@ -1733,15 +1739,16 @@ function buildOver25Picks(markets, dateKey, limit = OVER25_PICK_LIMIT) {
       away: teams.away,
       market: title,
       line: 2.5,
-      pick: "מעל 2.5",
-      odds: over.odds,
-      underOdds: under.odds,
-      probability: overProbability,
+      pick: pickLabel,
+      direction: pickOver ? "over" : "under",
+      odds: side.odds,
+      oppositeOdds: other.odds,
+      probability,
       overround: Math.max(0, impliedTotal - 1),
       signals: [
-        `יחס Winner למעל 2.5: ${over.odds.toFixed(2)} (מתחת: ${under.odds.toFixed(2)})`,
-        `הסתברות מנוכת מרווח לשלושה שערים ומעלה: ${Math.round(overProbability * 100)} אחוז`,
-        "נבחר כי השוק מתמחר נטייה ברורה לשערים — לא ניחוש",
+        `יחס Winner ל${pickLabel}: ${side.odds.toFixed(2)} (הצד השני: ${other.odds.toFixed(2)})`,
+        `הסתברות מנוכת מרווח ל${pickOver ? "שלושה שערים ומעלה" : "עד שני שערים"}: ${Math.round(probability * 100)} אחוז`,
+        "נבחר כי השוק מתמחר נטייה ברורה לכיוון הזה — לא ניחוש",
       ],
     };
     const current = byEvent.get(market.eId);

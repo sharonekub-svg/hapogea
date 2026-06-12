@@ -1689,6 +1689,9 @@
     }
     .o25-odds b { font: 900 16px/1 Heebo, sans-serif; color: #0F5C2C; }
     .o25-odds small { font: 800 9px Heebo, sans-serif; color: rgba(15,92,44,.6); }
+    .o25-odds.o25-under { background: rgba(37,99,235,.08); border-color: rgba(37,99,235,.30); }
+    .o25-odds.o25-under b { color: #1D4ED8; }
+    .o25-odds.o25-under small { color: rgba(29,78,216,.6); }
     .o25-prob { font: 800 12px Heebo, sans-serif; color: #15803D; min-width: 38px; text-align: center; flex-shrink: 0; }
     /* Green tint on pick section of recommended cards */
     .has-pick .pick-section {
@@ -8517,7 +8520,7 @@
         const o25 = (state.feed?.over25?.[o25Day] || []).filter(p => p.odds);
         if (o25.length) {
           over25Html = `<div class="o25-strip">
-            <div class="o25-head">⚽ מעל 2.5 שערים · המלצות ${o25Day === "today" ? "היום" : "מחר"}<small>לפי יחסי ווינר בלבד</small></div>
+            <div class="o25-head">⚽ מעל/מתחת 2.5 שערים · המלצות ${o25Day === "today" ? "היום" : "מחר"}<small>לפי יחסי ווינר בלבד</small></div>
             <div class="o25-list">${o25.map(p => `
               <div class="o25-item" title="${escapeHtml((p.signals || []).join(" · "))}">
                 <span class="o25-time">${escapeHtml(p.time || "")}</span>
@@ -8526,7 +8529,7 @@
                   <span class="o25-league">${escapeHtml(p.league || "")}</span>
                 </div>
                 <span class="o25-prob">${Math.round((p.probability || 0) * 100)}%</span>
-                <div class="o25-odds"><b>${Number(p.odds).toFixed(2)}</b><small>מעל 2.5</small></div>
+                <div class="o25-odds${p.direction === "under" ? " o25-under" : ""}"><b>${Number(p.odds).toFixed(2)}</b><small>${escapeHtml(p.pick || "מעל 2.5")}</small></div>
               </div>`).join("")}
             </div>
           </div>`;
