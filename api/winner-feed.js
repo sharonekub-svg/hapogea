@@ -90,8 +90,8 @@ const ODDS_MIN = 1.40;
 const ODDS_MAX = 1.85;
 const SOFT_ODDS_MIN = 1.25;
 const SOFT_ODDS_MAX = 2.00;
-const HARD_MAX_PICK_ODDS = 2.09; // strictly below 2.1 — 2.1 and above are excluded
-const HARD_MIN_PICK_ODDS = 1.21; // strictly above 1.2 — 1.2 and below are excluded
+const HARD_MAX_PICK_ODDS = 2.00; // maximum pick odds — anything above 2.0 is excluded
+const HARD_MIN_PICK_ODDS = 1.30; // minimum pick odds — anything below 1.3 is excluded
 const MIN_PREMIUM_ROWS_PER_DAY = 15;
 // Basketball 2-way markets have different odds structure than football 3-way
 const BASKETBALL_ODDS_MIN = 1.20;
@@ -2591,11 +2591,11 @@ function compactTrackingRow(row) {
   };
 }
 
-const WC_LEAGUE_RE = /world.cup|מונדיאל|fifa.*world|coupe.*du.*monde/i;
-const noWC = (row) => !WC_LEAGUE_RE.test(row.league || "") && !WC_LEAGUE_RE.test(row.tournament || "");
 // A game whose OUR pick odds fall outside the hard window (above the cap or
 // at/below the no-value floor) is removed from the board entirely.
 // Finished games and games without open lines are untouched.
+// World Cup games are welcome on the football board like any other league —
+// the hard odds window is the only quality gate.
 function withinHardOddsCap(row) {
   if (row.matchPhase === "final" || row.noOddsYet) return true;
   const odds = Number(row.odds ?? row.oddsRaw);
@@ -2603,7 +2603,7 @@ function withinHardOddsCap(row) {
 }
 
 function splitBySport(rows) {
-  const processed = rows.filter(noWC).filter(withinHardOddsCap);
+  const processed = rows.filter(withinHardOddsCap);
   return {
     football:   processed.filter((row) => Number(row.sportId) === WINNER_FOOTBALL_ID),
     basketball: processed.filter((row) => Number(row.sportId) === WINNER_BASKETBALL_ID),
@@ -3345,7 +3345,7 @@ function oddsApiEventToRow(event, sportMeta, sourceName = "The Odds API") {
 
   // Wide range: captures strong favourites (≥1.20) through mild underdogs (≤2.80).
   // Narrower Winner-style range [1.35–1.70] would miss many valid picks.
-  const TARGET_MIN = 1.20, TARGET_MAX = 2.80;
+  const TARGET_MIN = HARD_MIN_PICK_ODDS, TARGET_MAX = HARD_MAX_PICK_ODDS;
   const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
   const hasInRange = inRange.length > 0;
   const pool = hasInRange ? inRange : allCandidates;
@@ -3502,8 +3502,8 @@ async function buildOddsApiFeed() {
   const tomorrowDate = tomorrowRows.length > 0 ? tomorrow : israelDate(1);
 
   const noNba = (r) => !/\bNBA\b/i.test(r.league || "");
-  const pickedToday    = sortByScore(todayRows.filter(noNba).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const pickedTomorrow = sortByScore(tomorrowRows.filter(noNba).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedToday    = sortByScore(todayRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const pickedTomorrow  = sortByScore(tomorrowRows.filter(noNba)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   // Snapshot for yesterday only — filter out NBA
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
@@ -3769,7 +3769,7 @@ function s365GameToOddsRow(game, winnerSportId, bookmakerName) {
       ].filter(Boolean)
     : [{ name: home, odds: homeOdds }, { name: away, odds: awayOdds }];
 
-  const TARGET_MIN = 1.20, TARGET_MAX = 2.80, TARGET_ODDS = 1.65;
+  const TARGET_MIN = HARD_MIN_PICK_ODDS, TARGET_MAX = HARD_MAX_PICK_ODDS, TARGET_ODDS = 1.65;
   const inRange = allCandidates.filter((c) => c.odds >= TARGET_MIN && c.odds <= TARGET_MAX);
   const hasInRange = inRange.length > 0;
   const pool = hasInRange ? inRange : allCandidates;
@@ -3989,7 +3989,7 @@ async function buildAggregatedOddsFeed() {
   // football league win their slots, then remaining slots are topped up
   // from the skipped games — variety first, volume second.
   const dayRows = (day) => {
-    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && noWC(r) && Number(r.odds) >= HARD_MIN_PICK_ODDS)].sort(comparePickRows);
+    const sorted = [...layer.rows.filter((r) => r.day === day && noNba(r) && Number(r.odds) >= HARD_MIN_PICK_ODDS && Number(r.odds) <= HARD_MAX_PICK_ODDS)].sort(comparePickRows);
     const football = [];
     const basketball = [];
     const skippedFootball = [];
@@ -4175,7 +4175,7 @@ function sfEventToRow(ev, oddsData, sfSport, day) {
   // Never pick draw — only teams
   const teamCandidates = allCandidates.filter((c) => c.name !== "תיקו");
   if (teamCandidates.length === 0) return null;
-  const inRange = teamCandidates.filter((c) => c.odds >= 1.20 && c.odds <= 2.50);
+  const inRange = teamCandidates.filter((c) => c.odds >= HARD_MIN_PICK_ODDS && c.odds <= HARD_MAX_PICK_ODDS);
   const pool = inRange.length > 0 ? inRange : teamCandidates;
   const pick = [...pool].sort((a, b) => a.odds - b.odds)[0]; // lowest odds = favourite
   const prob = 1 / pick.odds;
@@ -4266,8 +4266,8 @@ async function buildSofascoreFeed() {
   if (allRows.length === 0) throw new Error("SofaScore: no odds rows found");
 
   const sorted = (rows) => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter((r) => r.day === today).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const todayRows    = sorted(allRows.filter((r) => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter((r) => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || {
@@ -4387,7 +4387,7 @@ function pinnacleMatchupToRow(matchup, oddsMap, sportId, today) {
 
   const teamCandidates = allCandidates.filter(c => c.name !== "תיקו");
   if (!teamCandidates.length) return null;
-  const inRange = teamCandidates.filter(c => c.odds >= 1.20 && c.odds <= 2.50);
+  const inRange = teamCandidates.filter(c => c.odds >= HARD_MIN_PICK_ODDS && c.odds <= HARD_MAX_PICK_ODDS);
   const pool = inRange.length > 0 ? inRange : teamCandidates;
   const pick = [...pool].sort((a, b) => a.odds - b.odds)[0];
   const prob = 1 / pick.odds;
@@ -4475,8 +4475,8 @@ async function buildPinnacleFeed() {
   if (allRows.length === 0) throw new Error("Pinnacle: no odds rows found");
 
   const sorted = rows => [...rows].sort((a, b) => (b.recommendationScore || 0) - (a.recommendationScore || 0));
-  const todayRows    = sorted(allRows.filter(r => r.day === today).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
-  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow).filter(noWC)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const todayRows    = sorted(allRows.filter(r => r.day === today)).slice(0, TARGET_PICKS_PER_SPORT * 2);
+  const tomorrowRows = sorted(allRows.filter(r => r.day === tomorrow)).slice(0, TARGET_PICKS_PER_SPORT * 2);
 
   const snapshotNorm = normalizeFallbackRows(SNAPSHOT);
   const yesterdayTab = snapshotNorm.tabs?.yesterday || { label: "אתמול", date: israelDate(-1), sports: { football: [], basketball: [] } };
@@ -4843,14 +4843,13 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     if (!tab?.sports) continue;
     tab.sports.football = capSportRows(tab.sports.football, FOOTBALL_DISPLAY_CAP);
     if (Array.isArray(tab.sports.basketball)) {
+      // Basketball cards must always carry a recommendation — schedule
+      // placeholders and pick-less result rows stay off the board.
       tab.sports.basketball = capSportRows(
         tab.sports.basketball
           .filter((r) => !/\bNBA\b/i.test(r.league || ""))
-          .sort(
-            (a, b) =>
-              Number(!!a.noOddsYet) - Number(!!b.noOddsYet) ||
-              comparePickRows(a, b)
-          ),
+          .filter((r) => !r.noOddsYet && (r.pick || r.winnerPick))
+          .sort(comparePickRows),
         BASKETBALL_DISPLAY_CAP
       );
     }
