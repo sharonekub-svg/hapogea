@@ -6494,6 +6494,21 @@
           else if (outcome.key === "miss") lost++;
           else if (outcome.key === "pending") pending++;
         });
+
+        // Fold in the Over/Under 2.5 goals picks (football strip) — their
+        // manual פגע/נפל results live outside the regular feed rows.
+        if (state.sportTab === "football" || state.sportTab === "all") {
+          const ouPicks = (state.feed?.over25?.[state.day] || []).filter(p => p.home && p.away);
+          for (const p of ouPicks) {
+            const mr = (typeof _mrFindOuRow === "function") ? _mrFindOuRow(p.home, p.away) : null;
+            const st = mr && mr.status;
+            if (st === "פגע") won++;
+            else if (st === "נפל") lost++;
+            else if (st === "נסגר") { /* closed — not a settled pick */ }
+            else pending++;
+          }
+        }
+
         const settled = won + lost;
         hitRate = settled ? Math.round((won / settled) * 100) : 0;
       }
