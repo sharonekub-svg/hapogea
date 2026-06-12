@@ -5622,12 +5622,12 @@
     }
 
     // ── Admin panel ──────────────────────────────────────────────────────────
-    const ADMIN_EMAIL = 'kubovskys@gmail.com';
+    const ADMIN_EMAILS = ['kubovskys@gmail.com', 'hpwg4927@gmail.com'];
     function syncAdminBtn() {
       const btn = document.getElementById('adminTriggerBtn');
       if (!btn) return;
       const user = window.HAP_USER;
-      btn.style.display = (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL) ? 'block' : 'none';
+      btn.style.display = (user && user.email && ADMIN_EMAILS.includes(user.email.toLowerCase())) ? 'block' : 'none';
     }
     document.addEventListener('hap:userchange', syncAdminBtn);
     // Also check on load (user may already be signed in from previous session)
@@ -9460,7 +9460,7 @@
       SB_URL:  "https://qhqpooyczcxrckthwnue.supabase.co",
       SB_KEY:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocXBvb3ljemN4cmNrdGh3bnVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTMzODUsImV4cCI6MjA5NTc4OTM4NX0.y9UuFGJoaFzb8MjcLUoUX9Hh2Ptou6VcPg9Tdh4unTA",
       client:  null,
-      ADMIN_EMAILS: ["sharonekub@gmail.com", "liorkiro85@gmail.com"],
+      ADMIN_EMAILS: ["sharonekub@gmail.com", "liorkiro85@gmail.com", "hpwg4927@gmail.com"],
     };
 
     function _mrIsAdmin() {
