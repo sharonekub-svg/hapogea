@@ -5082,28 +5082,26 @@ module.exports = async function handler(req, res) {
       const base = "https://webws.365scores.com/web";
       const common = `appTypeId=5&langId=2&timezoneName=${encodeURIComponent("Asia/Jerusalem")}&userCountryId=6`;
       for (const g of games) {
-        const tries = {};
-        for (const path of [
-          `${base}/game/odds/?${common}&gameId=${g.id}`,
-          `${base}/games/odds/?${common}&games=${g.id}`,
-          `${base}/betLines/?${common}&gameId=${g.id}`,
-          `${base}/game/betLines/?${common}&gameId=${g.id}`,
-          `${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withMainOdds=true`,
-        ]) {
-          const r = await fetchJson(path, { headers: s365Headers, retryAttempts: 1 })
-            .catch((e) => ({ _err: String(e?.message || e).slice(0, 120) }));
-          const key = path.replace(base, "").slice(0, 60);
-          if (r?._err) { tries[key] = `ERR ${r._err}`; continue; }
-          const body = JSON.stringify(r) || "";
-          // Surface bet-line shaped content if present, else a trimmed body
-          const hit = /lineType|betLine|odds/i.test(body);
-          tries[key] = `${hit ? "HAS-ODDS-ISH " : ""}${body.slice(0, 1800)}`;
-        }
+        const r = await fetchJson(`${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withMainOdds=true`, {
+          headers: s365Headers, retryAttempts: 1,
+        }).catch((e) => ({ _err: String(e?.message || e).slice(0, 120) }));
+        const game = r?.game || {};
+        const lines = (game.bestOdds || game.betLines || []).map((line) => ({
+          lineTypeId: line.lineTypeId,
+          lineTypeName: line.lineType?.name,
+          bookmaker: line.bookmaker?.name,
+          trend: line.trend,
+          options: (line.options || []).map((o) => ({
+            num: o.num, name: o.name, rate: o.rate?.decimal ?? o.rate, lead: o.lead,
+          })),
+        }));
         out.games.push({
           id: g.id,
           match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
-          mainOdds: JSON.stringify(g.mainOdds || g.odds)?.slice(0, 400),
-          tries,
+          error: r?._err || null,
+          lineTypesIds: game.lineTypesIds || null,
+          lineCount: lines.length,
+          lines,
         });
       }
       return res.status(200).json(out);
