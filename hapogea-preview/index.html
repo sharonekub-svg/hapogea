@@ -3938,6 +3938,23 @@
       .lp-today-card { flex-direction: column; gap: 10px; padding: 14px 16px; }
       .lp-today-label { font-size: 12px; }
     }
+    /* Yesterday's hit-rate box */
+    .lp-yday-card {
+      margin-top: 14px; display: inline-flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-radius: 18px;
+      background: rgba(255,255,255,.72); backdrop-filter: blur(10px);
+      border: 1px solid rgba(33,31,27,.10);
+      box-shadow: 0 2px 16px rgba(33,31,27,.07);
+    }
+    .lp-yday-ring {
+      width: 64px; height: 64px; flex: none; border-radius: 14px;
+      display: grid; place-items: center;
+      background: #FAF8F4; border: 1.5px solid rgba(33,31,27,.10);
+    }
+    .lp-yday-num { font: 900 22px/1 JetBrains Mono, Heebo, monospace; color: #211F1B; }
+    .lp-yday-body { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .lp-yday-label { font: 700 13px Heebo,sans-serif; color: #211F1B; }
+    .lp-yday-sub { font: 600 12px Heebo,sans-serif; color: #A39B8C; }
     .lp-btn-primary {
       padding: 15px 32px; border-radius: 12px; border: none;
       background: #211F1B; color: #FAF8F4;
@@ -5088,6 +5105,15 @@
               <span class="lp-today-sport-sub">המלצות</span>
             </div>
           </button>
+        </div>
+      </div>
+
+      <!-- Yesterday's hit rate -->
+      <div class="lp-yday-card" id="lpYdayCard" style="display:none" title="אחוז הפגיעה של ההמלצות שנסגרו אתמול">
+        <div class="lp-yday-ring"><div class="lp-yday-num" id="lpYdayRate">—</div></div>
+        <div class="lp-yday-body">
+          <div class="lp-yday-label">אחוז פגיעה אתמול</div>
+          <div class="lp-yday-sub" id="lpYdaySub">טוען…</div>
         </div>
       </div>
 
@@ -10818,6 +10844,39 @@
     // Run after feed loads (feed may already be cached)
     document.addEventListener("feedLoaded", updateLpTodayCounts);
     if (state.feed) updateLpTodayCounts();
+
+    // Yesterday's hit-rate box on the landing hero (manual_results in Supabase)
+    async function updateLpYdayHitRate() {
+      const card = document.getElementById("lpYdayCard");
+      if (!card) return;
+      try {
+        const sb = (typeof _mrSbClient === "function") ? _mrSbClient() : null;
+        if (!sb) return;
+        const d = new Date(); d.setDate(d.getDate() - 1);
+        const yday = d.toISOString().split("T")[0];
+        const { data, error } = await sb.from("manual_results").select("status").eq("game_date", yday);
+        if (error || !Array.isArray(data)) return;
+        const hits   = data.filter(r => r.status === "פגע").length;
+        const misses = data.filter(r => r.status === "נפל").length;
+        const settled = hits + misses;
+        if (settled === 0) return; // keep hidden when nothing settled yesterday
+        const rate = Math.round((hits / settled) * 100);
+        const numEl = document.getElementById("lpYdayRate");
+        const subEl = document.getElementById("lpYdaySub");
+        if (numEl) {
+          numEl.textContent = rate + "%";
+          numEl.style.color = rate >= 60 ? "#15803D" : rate >= 50 ? "#ca8a04" : "#DC2626";
+        }
+        if (subEl) subEl.textContent = `${hits}/${settled} פגיעות`;
+        card.style.display = "";
+      } catch (_) { /* keep hidden on error */ }
+    }
+    // Run once the Supabase client is likely ready (manual-results init runs ~1500ms)
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => setTimeout(updateLpYdayHitRate, 1800));
+    } else {
+      setTimeout(updateLpYdayHitRate, 1800);
+    }
 
     // Fix iOS virtual keyboard covering the AI composer
     if (window.visualViewport) {
