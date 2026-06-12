@@ -5055,6 +5055,57 @@ module.exports = async function handler(req, res) {
   // 30 requests per IP per minute — feed is heavily cached so this is generous
   if (rateLimit(req, res, { max: 30, windowMs: 60_000 })) return;
 
+  // ?o25probe=1 — diagnostic: does the 365Scores game-center carry over/under
+  // lines? Dumps every odds/bet-line shaped key for a few of today's games.
+  if (String(req?.query?.o25probe || "") === "1") {
+    try {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      const params = new URLSearchParams({
+        langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6", appTypeId: "5",
+        sports: String(SCORES365_FOOTBALL_ID),
+        startDate: scores365Date(israelDate(0)), endDate: scores365Date(israelDate(0)),
+        showOdds: "true", withMainOdds: "true",
+      });
+      const s365Headers = {
+        "User-Agent": "Mozilla/5.0",
+        Origin: "https://www.365scores.com",
+        Referer: "https://www.365scores.com/he",
+        Accept: "application/json",
+      };
+      const data = await fetchJson(`https://webws.365scores.com/web/games/?${params}`, {
+        headers: s365Headers, retryAttempts: 1,
+      }).catch((e) => ({ _err: String(e?.message || e).slice(0, 200) }));
+      const games = (data?.games || []).filter((g) => Number(g.statusGroup) < 3).slice(0, 3);
+      const out = { listError: data?._err || null, candidates: games.length, games: [] };
+      for (const g of games) {
+        const gcParams = new URLSearchParams({
+          langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6", appTypeId: "5",
+          gameId: String(g.id),
+        });
+        const gc = await fetchJson(`https://webws.365scores.com/web/game/?${gcParams}`, {
+          headers: s365Headers, retryAttempts: 1,
+        }).catch((e) => ({ _err: String(e?.message || e).slice(0, 160) }));
+        const game = gc?.game || gc || {};
+        const oddsKeys = {};
+        for (const [k, v] of Object.entries(game)) {
+          if (!/odd|bet|line/i.test(k)) continue;
+          oddsKeys[k] = JSON.stringify(v)?.slice(0, 2500);
+        }
+        out.games.push({
+          id: g.id,
+          match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
+          gcError: gc?._err || null,
+          topLevelKeys: Object.keys(gc || {}),
+          gameKeys: Object.keys(game),
+          oddsKeys,
+        });
+      }
+      return res.status(200).json(out);
+    } catch (error) {
+      return res.status(200).json({ probeError: String(error?.message || error) });
+    }
+  }
+
   // ?s365probe=1 — diagnostic: raw 365Scores mainOdds shapes per sport, so a
   // broken odds mapping can be debugged from the wire format itself.
   if (String(req?.query?.s365probe || "") === "1") {
