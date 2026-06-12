@@ -32,10 +32,14 @@ module.exports = async (req, res) => {
     timeZone: "Asia/Jerusalem", day: "numeric", month: "long", year: "numeric",
   });
 
+  const isOuGame = g => String(g.sport || "") === "over25";
+
   const gameList = games.map((g, i) => {
     const sp = String(g.sport || "");
     const sport = sp.includes("סל") || sp.includes("basket") || sp === "227" ? "כדורסל" : "כדורגל";
-    const pick = g.pickTeam || (g.pick === "draw" ? "תיקו" : g.pick === "home" ? g.home : g.pick === "away" ? g.away : "?");
+    const pick = isOuGame(g)
+      ? `${g.pickTeam || "מעל"} ${g.line || 2.5} גולים`
+      : (g.pickTeam || (g.pick === "draw" ? "תיקו" : g.pick === "home" ? g.home : g.pick === "away" ? g.away : "?"));
     return `${i + 1}. ${g.home} מול ${g.away} (${sport}) — הימור: ${pick}`;
   }).join("\n");
 
@@ -99,7 +103,13 @@ ${gameList}
       let status = "ממתין";
       if (r.finished && r.home_score != null && r.away_score != null) {
         const hs = Number(r.home_score), as = Number(r.away_score);
-        if      (g.pick === "home") status = hs > as  ? "פגע" : "נפל";
+        if (isOuGame(g)) {
+          // Over/Under: compare total goals to the line (default 2.5)
+          const line = Number(g.line) || 2.5;
+          const total = hs + as;
+          const over = String(g.pickTeam || "").includes("מעל");
+          status = over ? (total > line ? "פגע" : "נפל") : (total < line ? "פגע" : "נפל");
+        } else if (g.pick === "home") status = hs > as  ? "פגע" : "נפל";
         else if (g.pick === "away") status = as > hs  ? "פגע" : "נפל";
         else if (g.pick === "draw") status = hs === as ? "פגע" : "נפל";
       }

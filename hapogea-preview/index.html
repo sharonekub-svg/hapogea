@@ -8522,7 +8522,7 @@
           over25Html = `<div class="o25-strip">
             <div class="o25-head">⚽ מעל/מתחת 2.5 שערים · המלצות ${o25Day === "today" ? "היום" : "מחר"}<small>לפי יחסי ווינר בלבד</small></div>
             <div class="o25-list">${o25.map(p => `
-              <div class="o25-item" title="${escapeHtml((p.signals || []).join(" · "))}">
+              <div class="o25-item" data-home="${escapeHtml(p.home || "")}" data-away="${escapeHtml(p.away || "")}" title="${escapeHtml((p.signals || []).join(" · "))}">
                 <span class="o25-time">${escapeHtml(p.time || "")}</span>
                 <div class="o25-match">
                   <span class="o25-teams">${escapeHtml(p.home || "")} – ${escapeHtml(p.away || "")}</span>
@@ -9545,6 +9545,14 @@
       ADMIN_EMAILS: ["sharonekub@gmail.com", "liorkiro85@gmail.com", "hpwg4927@gmail.com"],
     };
 
+    // Over/Under 2.5 picks share a match (home/away) with the regular 1X2 pick,
+    // but the manual_results table is keyed on (home,away,game_date). To keep the
+    // over/under result independent, its row stores the away team with this tag
+    // appended — so it never collides with, or badges, the regular card.
+    const _MR_OU_TAG = " ⟫מעל/מתחת2.5";
+    function _mrIsOuRow(r)   { return typeof r?.away === "string" && r.away.endsWith(_MR_OU_TAG); }
+    function _mrOuBase(away) { return String(away || "").replace(_MR_OU_TAG, ""); }
+
     function _mrIsAdmin() {
       return new URLSearchParams(location.search).has("admin") &&
              _MR.ADMIN_EMAILS.includes(window.HAP_USER?.email?.toLowerCase());
@@ -9588,9 +9596,26 @@
     function _mrFindRow(home, away) {
       let best = null, bestScore = 0;
       for (const row of _MR.rows) {
+        if (_mrIsOuRow(row)) continue; // over/under results never match regular cards
         const s = Math.max(
           (_mrSim(row.home, home) + _mrSim(row.away, away)) / 2,
           (_mrSim(row.home, away) + _mrSim(row.away, home)) / 2
+        );
+        if (s > bestScore) { bestScore = s; best = row; }
+      }
+      return bestScore >= 0.65 ? best : null;
+    }
+
+    // Match only over/under (מעל/מתחת 2.5) results, comparing against the base
+    // away team (tag stripped). Keeps the goals strip independent of the 1X2 cards.
+    function _mrFindOuRow(home, away) {
+      let best = null, bestScore = 0;
+      for (const row of _MR.rows) {
+        if (!_mrIsOuRow(row)) continue;
+        const baseAway = _mrOuBase(row.away);
+        const s = Math.max(
+          (_mrSim(row.home, home) + _mrSim(baseAway, away)) / 2,
+          (_mrSim(row.home, away) + _mrSim(baseAway, home)) / 2
         );
         if (s > bestScore) { bestScore = s; best = row; }
       }
@@ -9648,6 +9673,23 @@
           badge.className = "mr-badge";
           const body = card.querySelector(".card-body") || card;
           body.appendChild(badge);
+        }
+        badge.className = `mr-badge ${lbl.cls}`;
+        badge.textContent = lbl.text;
+        if (row.score) badge.title = `תוצאה: ${row.score}`;
+        badge.dataset.source = "manual";
+      }
+
+      // Over/Under 2.5 goals strip — badge each item from its own (tagged) result
+      for (const item of document.querySelectorAll(".o25-item[data-home][data-away]")) {
+        const row = _mrFindOuRow(item.dataset.home || "", item.dataset.away || "");
+        if (!row) continue;
+        const lbl = _MR_LABELS[row.status] || { text: row.status, cls: "mr-wait" };
+        let badge = item.querySelector(".mr-badge");
+        if (!badge) {
+          badge = document.createElement("div");
+          badge.className = "mr-badge";
+          item.appendChild(badge);
         }
         badge.className = `mr-badge ${lbl.cls}`;
         badge.textContent = lbl.text;
@@ -9723,6 +9765,24 @@
         }
       }
 
+      // Over/Under 2.5 goals picks — managed independently of the 1X2 cards
+      const ouPicks = (state.feed?.over25?.today || []).filter(p => p.home && p.away);
+
+      const ouRowHtml = p => {
+        const dir = p.direction === "over" ? "מעל" : "מתחת";
+        return `
+                <div class="mr-admin-row" data-home="${escapeHtml(p.home)}" data-away="${escapeHtml(p.away)}" data-sport="over25" data-pick="${escapeHtml(p.pick||'')}" data-pick-team="${escapeHtml(dir)}">
+                  <div class="mr-admin-teams">${escapeHtml(p.home)} <span style="color:#64748b">vs</span> ${escapeHtml(p.away)}<span style="color:#22c55e;font-size:11px;margin-right:6px">${escapeHtml(p.pick || (dir + ' 2.5'))} גולים</span></div>
+                  <div class="mr-admin-actions">
+                    <button class="mr-ab mr-ab-hit"  onclick="_mrAdminSet(this,'פגע')">✓ פגע</button>
+                    <button class="mr-ab mr-ab-miss" onclick="_mrAdminSet(this,'נפל')">✗ נפל</button>
+                    <button class="mr-ab mr-ab-wait" onclick="_mrAdminSet(this,'ממתין')">⏳</button>
+                    <button class="mr-ab mr-ab-lock" onclick="_mrAdminSet(this,'נסגר')">🔒</button>
+                    <input class="mr-ab-score" placeholder="תוצאה" maxlength="12">
+                  </div>
+                </div>`;
+      };
+
       const modal = document.createElement("div");
       modal.id = "mrAdminModal";
       modal.innerHTML = `
@@ -9736,7 +9796,7 @@
             </div>
           </div>
           <div class="mr-admin-body" id="mrAdminBody">
-            ${games.length === 0
+            ${(games.length === 0 && ouPicks.length === 0)
               ? `<p style="text-align:center;color:#94a3b8;padding:24px">אין משחקים בפיד כרגע</p>`
               : games.map(g => {
                   const sport = g.sportId === 227 ? "basketball" : "football";
@@ -9752,13 +9812,18 @@
                   </div>
                 </div>`;}).join("")
             }
+            ${ouPicks.length
+              ? `<div class="mr-admin-section">⚽ מעל/מתחת 2.5 גולים</div>` + ouPicks.map(ouRowHtml).join("")
+              : ""}
           </div>
         </div>`;
       document.body.appendChild(modal);
 
       // Pre-fill current statuses
       for (const rowEl of modal.querySelectorAll(".mr-admin-row")) {
-        const existing = _mrFindRow(rowEl.dataset.home, rowEl.dataset.away);
+        const existing = rowEl.dataset.sport === "over25"
+          ? _mrFindOuRow(rowEl.dataset.home, rowEl.dataset.away)
+          : _mrFindRow(rowEl.dataset.home, rowEl.dataset.away);
         if (existing) {
           rowEl.querySelector(".mr-ab-score").value = existing.score || "";
           const cls = { "פגע":"mr-ab-hit","נפל":"mr-ab-miss","ממתין":"mr-ab-wait","נסגר":"mr-ab-lock" }[existing.status];
@@ -9794,7 +9859,9 @@
       const score = row.querySelector(".mr-ab-score").value.trim();
       btn.textContent = "⏳";
       btn.disabled = true;
-      await _mrSave(row.dataset.home, row.dataset.away, row.dataset.sport, status, score);
+      const isOu = row.dataset.sport === "over25";
+      const saveAway = isOu ? row.dataset.away + _MR_OU_TAG : row.dataset.away;
+      await _mrSave(row.dataset.home, saveAway, isOu ? "football" : row.dataset.sport, status, score);
       btn.disabled = false;
       btn.textContent = { "פגע":"✓ פגע","נפל":"✗ נפל","ממתין":"⏳","נסגר":"🔒" }[status] || status;
       showToast({ "פגע":"✅ נשמר — פגע", "נפל":"✅ נשמר — נפל", "ממתין":"✅ נשמר — ממתין", "נסגר":"✅ נשמר — נסגר" }[status] || "✅ נשמר");
@@ -9811,6 +9878,7 @@
         sport:    r.dataset.sport,
         pick:     r.dataset.pick,
         pickTeam: r.dataset.pickTeam || "",
+        ...(r.dataset.sport === "over25" ? { line: 2.5 } : {}),
       }));
       if (btn) { btn.disabled = true; btn.textContent = "⏳ AI מחפש..."; }
       try {
@@ -9824,7 +9892,9 @@
         if (!data.ok) throw new Error(data.error || "AI failed");
         for (const r of (data.results || [])) {
           if (r.home && r.away) {
-            await _mrSave(r.home, r.away, r.sport || "football", r.status, r.score || "");
+            const isOu = r.sport === "over25";
+            const aw = isOu ? r.away + _MR_OU_TAG : r.away;
+            await _mrSave(r.home, aw, isOu ? "football" : (r.sport || "football"), r.status, r.score || "");
           }
         }
         _mrBuildAdminModal();
@@ -9926,6 +9996,12 @@
           direction:rtl;outline:none;
         }
         .mr-ab-score:focus { border-color:rgba(99,102,241,.5); }
+        .mr-admin-section {
+          margin:6px 2px 0;padding-top:10px;border-top:1px dashed rgba(255,255,255,.12);
+          font:800 12px Heebo,sans-serif;color:#22c55e;direction:rtl;text-align:right;
+          letter-spacing:.3px;
+        }
+        .o25-item .mr-badge { margin:4px 0 0; }
       `;
       document.head.appendChild(style);
 
