@@ -5075,29 +5075,35 @@ module.exports = async function handler(req, res) {
       const data = await fetchJson(`https://webws.365scores.com/web/games/?${params}`, {
         headers: s365Headers, retryAttempts: 1,
       }).catch((e) => ({ _err: String(e?.message || e).slice(0, 200) }));
-      const games = (data?.games || []).filter((g) => Number(g.statusGroup) < 3).slice(0, 3);
-      const out = { listError: data?._err || null, candidates: games.length, games: [] };
+      // Prefer games that actually carry a bookmaker line on the scoreboard
+      const withLine = (data?.games || []).filter((g) => Number(g.statusGroup) < 3 && (g.mainOdds || g.odds));
+      const games = withLine.slice(0, 2);
+      const out = { listError: data?._err || null, gamesWithLine: withLine.length, games: [] };
+      const base = "https://webws.365scores.com/web";
+      const common = `appTypeId=5&langId=2&timezoneName=${encodeURIComponent("Asia/Jerusalem")}&userCountryId=6`;
       for (const g of games) {
-        const gcParams = new URLSearchParams({
-          langId: "2", timezoneName: "Asia/Jerusalem", userCountryId: "6", appTypeId: "5",
-          gameId: String(g.id),
-        });
-        const gc = await fetchJson(`https://webws.365scores.com/web/game/?${gcParams}`, {
-          headers: s365Headers, retryAttempts: 1,
-        }).catch((e) => ({ _err: String(e?.message || e).slice(0, 160) }));
-        const game = gc?.game || gc || {};
-        const oddsKeys = {};
-        for (const [k, v] of Object.entries(game)) {
-          if (!/odd|bet|line/i.test(k)) continue;
-          oddsKeys[k] = JSON.stringify(v)?.slice(0, 2500);
+        const tries = {};
+        for (const path of [
+          `${base}/game/odds/?${common}&gameId=${g.id}`,
+          `${base}/games/odds/?${common}&games=${g.id}`,
+          `${base}/betLines/?${common}&gameId=${g.id}`,
+          `${base}/game/betLines/?${common}&gameId=${g.id}`,
+          `${base}/game/?${common}&gameId=${g.id}&withBetLines=true&withMainOdds=true`,
+        ]) {
+          const r = await fetchJson(path, { headers: s365Headers, retryAttempts: 1 })
+            .catch((e) => ({ _err: String(e?.message || e).slice(0, 120) }));
+          const key = path.replace(base, "").slice(0, 60);
+          if (r?._err) { tries[key] = `ERR ${r._err}`; continue; }
+          const body = JSON.stringify(r) || "";
+          // Surface bet-line shaped content if present, else a trimmed body
+          const hit = /lineType|betLine|odds/i.test(body);
+          tries[key] = `${hit ? "HAS-ODDS-ISH " : ""}${body.slice(0, 1800)}`;
         }
         out.games.push({
           id: g.id,
           match: `${g.homeCompetitor?.name} - ${g.awayCompetitor?.name}`,
-          gcError: gc?._err || null,
-          topLevelKeys: Object.keys(gc || {}),
-          gameKeys: Object.keys(game),
-          oddsKeys,
+          mainOdds: JSON.stringify(g.mainOdds || g.odds)?.slice(0, 400),
+          tries,
         });
       }
       return res.status(200).json(out);
