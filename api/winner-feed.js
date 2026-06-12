@@ -4824,6 +4824,27 @@ async function buildCachedWinnerFeedPayload({ force = false } = {}) {
     }
   }
 
+  // Night games belong to tonight's board: an Israeli bettor reads a 03:00
+  // WNBA tip-off as "tonight", not "tomorrow". Move tomorrow's small-hours
+  // (00:00–06:59) basketball picks onto today's board.
+  {
+    const todayBb    = payload.tabs?.today?.sports?.basketball;
+    const tomorrowBb = payload.tabs?.tomorrow?.sports?.basketball;
+    if (Array.isArray(todayBb) && Array.isArray(tomorrowBb)) {
+      const isSmallHours = (r) => /^0[0-6]:\d{2}$/.test(String(r.time || ""));
+      const keyOf = (r) => r.resultKey || r.id;
+      const existing = new Set(todayBb.map(keyOf));
+      const nightPicks = tomorrowBb.filter(
+        (r) => isSmallHours(r) && !r.noOddsYet && (r.pick || r.winnerPick) && !existing.has(keyOf(r))
+      );
+      if (nightPicks.length) {
+        const moved = new Set(nightPicks.map(keyOf));
+        payload.tabs.today.sports.basketball    = [...todayBb, ...nightPicks];
+        payload.tabs.tomorrow.sports.basketball = tomorrowBb.filter((r) => !moved.has(keyOf(r)));
+      }
+    }
+  }
+
   // Per-sport display caps. Real picks (with odds) are kept first; noOddsYet
   // placeholders only fill leftover slots — never displace a real pick.
   // Basketball: no NBA on the board (placeholders included), per product rules.
