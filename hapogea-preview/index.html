@@ -9800,6 +9800,27 @@
       // Over/Under 2.5 goals picks — managed independently of the 1X2 cards
       const ouPicks = (state.feed?.over25?.today || []).filter(p => p.home && p.away);
 
+      // World Cup fixtures — show today's מונדיאל games so their results can be managed
+      const wcToday = wcTodayISO();
+      const wcPicks = (typeof WC2026_FIXTURES !== "undefined" ? WC2026_FIXTURES : [])
+        .filter(f => f.date === wcToday && f.home && f.away);
+
+      const wcRowHtml = f => {
+        const pickTeam = f.pick === "home" ? f.home : f.pick === "away" ? f.away : "";
+        const pickLabel = f.pick === "draw" ? "תיקו" : (pickTeam || "");
+        return `
+                <div class="mr-admin-row" data-home="${escapeHtml(f.home)}" data-away="${escapeHtml(f.away)}" data-sport="football" data-pick="${escapeHtml(f.pick||'')}" data-pick-team="${escapeHtml(pickTeam)}">
+                  <div class="mr-admin-teams">${escapeHtml(f.home)} <span style="color:#64748b">vs</span> ${escapeHtml(f.away)}<span style="color:#f59e0b;font-size:11px;margin-right:6px">${escapeHtml(f.stage || '')}${pickLabel ? ' · ' + escapeHtml(pickLabel) : ''}</span></div>
+                  <div class="mr-admin-actions">
+                    <button class="mr-ab mr-ab-hit"  onclick="_mrAdminSet(this,'פגע')">✓ פגע</button>
+                    <button class="mr-ab mr-ab-miss" onclick="_mrAdminSet(this,'נפל')">✗ נפל</button>
+                    <button class="mr-ab mr-ab-wait" onclick="_mrAdminSet(this,'ממתין')">⏳</button>
+                    <button class="mr-ab mr-ab-lock" onclick="_mrAdminSet(this,'נסגר')">🔒</button>
+                    <input class="mr-ab-score" placeholder="תוצאה" maxlength="12">
+                  </div>
+                </div>`;
+      };
+
       const ouRowHtml = p => {
         const dir = p.direction === "over" ? "מעל" : "מתחת";
         return `
@@ -9828,7 +9849,7 @@
             </div>
           </div>
           <div class="mr-admin-body" id="mrAdminBody">
-            ${(games.length === 0 && ouPicks.length === 0)
+            ${(games.length === 0 && ouPicks.length === 0 && wcPicks.length === 0)
               ? `<p style="text-align:center;color:#94a3b8;padding:24px">אין משחקים בפיד כרגע</p>`
               : games.map(g => {
                   const sport = g.sportId === 227 ? "basketball" : "football";
@@ -9846,6 +9867,9 @@
             }
             ${ouPicks.length
               ? `<div class="mr-admin-section">⚽ מעל/מתחת 2.5 גולים</div>` + ouPicks.map(ouRowHtml).join("")
+              : ""}
+            ${wcPicks.length
+              ? `<div class="mr-admin-section">🏆 מונדיאל 2026</div>` + wcPicks.map(wcRowHtml).join("")
               : ""}
           </div>
         </div>`;
