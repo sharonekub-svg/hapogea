@@ -1693,6 +1693,15 @@
     .o25-odds.o25-under b { color: #1D4ED8; }
     .o25-odds.o25-under small { color: rgba(29,78,216,.6); }
     .o25-prob { font: 800 12px Heebo, sans-serif; color: #15803D; min-width: 38px; text-align: center; flex-shrink: 0; }
+    .o25-lock {
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+      padding: 11px 14px; font: 800 12px Heebo, sans-serif; color: #6E675C; text-align: center;
+      border-top: 1px solid rgba(21,128,61,.15); background: rgba(21,128,61,.04);
+    }
+    .o25-lock-btn {
+      background: none; border: none; cursor: pointer; color: #15803D;
+      font: 800 12px Heebo, sans-serif; text-decoration: underline; padding: 0;
+    }
     /* Green tint on pick section of recommended cards */
     .has-pick .pick-section {
       background: rgba(49,209,135,.07);
@@ -8534,8 +8543,14 @@
       let over25Html = "";
       if ((state.sportTab === "football" || state.sportTab === "all") && (state.day === "today" || state.day === "tomorrow")) {
         const o25Day = tomorrowFallback ? "tomorrow" : state.day;
-        const o25 = (state.feed?.over25?.[o25Day] || []).filter(p => p.odds);
+        const o25All = (state.feed?.over25?.[o25Day] || []).filter(p => p.odds);
+        // Free users see only one over/under game; the rest are premium-locked.
+        const o25 = state.isPremium ? o25All : o25All.slice(0, 1);
+        const o25Locked = o25All.length - o25.length;
         if (o25.length) {
+          const o25LockHtml = o25Locked > 0
+            ? `<div class="o25-lock">🔒 עוד ${o25Locked} משחקי מעל/מתחת זמינים בפרימיום — <button onclick="openPremiumModal()" class="o25-lock-btn">שדרג לפרימיום</button></div>`
+            : "";
           over25Html = `<div class="o25-strip">
             <div class="o25-head">⚽ מעל/מתחת 2.5 שערים · המלצות ${o25Day === "today" ? "היום" : "מחר"}<small>לפי יחסי ווינר בלבד</small></div>
             <div class="o25-list">${o25.map(p => `
@@ -8548,7 +8563,7 @@
                 <span class="o25-prob">${Math.round((p.probability || 0) * 100)}%</span>
                 <div class="o25-odds${p.direction === "under" ? " o25-under" : ""}"><b>${Number(p.odds).toFixed(2)}</b><small>${escapeHtml(p.pick || "מעל 2.5")}</small></div>
               </div>`).join("")}
-            </div>
+            </div>${o25LockHtml}
           </div>`;
         }
       }
