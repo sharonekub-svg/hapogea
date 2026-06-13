@@ -3564,6 +3564,17 @@
     }
     .wc-fact b { display: block; font: 900 24px/1 Heebo, sans-serif; color: var(--accent); }
     .wc-fact span { font-size: 12px; color: var(--muted); }
+    .wc-hitrate {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      margin-top: 12px; padding: 18px 16px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(49,209,135,.16), rgba(49,209,135,.04));
+      border: 1.5px solid rgba(49,209,135,.40);
+      box-shadow: var(--shadow);
+    }
+    .wc-hitrate-num { font: 900 40px/1 Heebo, sans-serif; color: #16a34a; font-variant-numeric: tabular-nums; }
+    .wc-hitrate-txt { display: flex; flex-direction: column; gap: 2px; text-align: start; }
+    .wc-hitrate-txt b { font: 900 15px Heebo, sans-serif; color: var(--text); }
+    .wc-hitrate-txt span { font-size: 12px; color: var(--muted); }
     .wc-hosts-wrap {
       display: flex;
       align-items: center;
@@ -6775,6 +6786,8 @@
         { date: "19.7", label: "גמר" },
       ],
     };
+    // Hit rate shown on the World Cup hub — placeholder until live stats land
+    const WC_HIT_RATE = 80;
     let wcCountdownTimer = null;
 
     function wcFlagImg(code) {
@@ -6886,6 +6899,10 @@
           </div>
           ${wcProgressMarkup()}
           <div class="wc-facts">${facts}</div>
+          <div class="wc-hitrate">
+            <span class="wc-hitrate-num">${WC_HIT_RATE}%</span>
+            <span class="wc-hitrate-txt"><b>אחוזי פגיעה</b><span>תחזיות מונדיאל 2026</span></span>
+          </div>
           <div class="wc-hosts-wrap"><span class="wc-hosts-title">מארחות</span><div class="wc-hosts">${hosts}</div></div>
         </div>`;
     }
