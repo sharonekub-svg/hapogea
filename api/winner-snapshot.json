@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-06-30T06:19:33.893Z",
+  "generatedAt": "2026-06-30T11:15:14.463Z",
   "serverVersion": null,
   "_winnerBlocked": true,
   "_winnerBlockedReason": "fetch https://api.winner.co.il/v2/publicapi/GetCMobileHashes failed after 3 attempts: 403: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" content=\"initial-scale=1.0\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrom",
@@ -20,7 +20,7 @@
     },
     "total": {
       "yesterday": 39,
-      "today": 18,
+      "today": 20,
       "tomorrow": 0
     }
   },
@@ -46,9 +46,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4711954",
@@ -71,9 +71,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4711955",
@@ -96,9 +96,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4736022",
@@ -121,9 +121,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4736961",
@@ -146,9 +146,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4737236",
@@ -171,9 +171,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4739900",
@@ -196,9 +196,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749427",
@@ -221,9 +221,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4669794",
@@ -246,9 +246,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4669797",
@@ -271,9 +271,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4711953",
@@ -296,9 +296,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659218",
@@ -321,9 +321,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659219",
@@ -346,9 +346,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4746273",
@@ -371,9 +371,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659216",
@@ -396,9 +396,9 @@
       "matchMinute": 120,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659217",
@@ -421,9 +421,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4665221",
@@ -446,9 +446,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4715812",
@@ -471,9 +471,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4677784",
@@ -496,9 +496,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4677790",
@@ -521,9 +521,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659215",
@@ -546,9 +546,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659221",
@@ -571,9 +571,9 @@
       "matchMinute": 120,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4711952",
@@ -596,9 +596,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4659214",
@@ -621,9 +621,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4748229",
@@ -646,9 +646,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4655074",
@@ -671,9 +671,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4655077",
@@ -696,9 +696,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4748226",
@@ -721,9 +721,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749487",
@@ -746,9 +746,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4748227",
@@ -771,9 +771,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4748228",
@@ -796,9 +796,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4663505",
@@ -821,9 +821,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4663506",
@@ -846,9 +846,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4703107",
@@ -871,9 +871,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749499",
@@ -896,9 +896,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4719086",
@@ -921,9 +921,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4748205",
@@ -934,7 +934,7 @@
       "time": "18:30",
       "sport": "כדורגל",
       "sportId": 240,
-      "league": "ליגה ראשונה",
+      "league": "ליגה ראשונה - פלייאוף",
       "match": "Gol Gohar - Chadormalu Sc",
       "home": "Gol Gohar",
       "away": "Chadormalu Sc",
@@ -946,9 +946,9 @@
       "matchMinute": 120,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749500",
@@ -971,9 +971,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749512",
@@ -996,9 +996,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749511",
@@ -1021,9 +1021,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749513",
@@ -1046,9 +1046,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749514",
@@ -1071,9 +1071,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4749518",
@@ -1096,9 +1096,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4747696",
@@ -1121,9 +1121,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4652481",
@@ -1146,9 +1146,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4652482",
@@ -1171,9 +1171,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4652485",
@@ -1196,9 +1196,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4736973",
@@ -1221,9 +1221,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4736976",
@@ -1246,9 +1246,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.461Z",
+      "finishedAt": "2026-06-30T11:15:14.461Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.461Z"
     },
     {
       "id": "result-365-4736977",
@@ -1271,9 +1271,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4639620",
@@ -1296,9 +1296,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4639621",
@@ -1321,9 +1321,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4715811",
@@ -1346,9 +1346,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4731881",
@@ -1371,9 +1371,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4748230",
@@ -1396,9 +1396,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4748231",
@@ -1421,9 +1421,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4655075",
@@ -1446,9 +1446,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4749539",
@@ -1471,9 +1471,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4703105",
@@ -1496,9 +1496,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4653749",
@@ -1521,9 +1521,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4662051",
@@ -1546,9 +1546,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4645267",
@@ -1571,9 +1571,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4715817",
@@ -1596,9 +1596,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4748224",
@@ -1621,9 +1621,9 @@
       "matchMinute": 126,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4737228",
@@ -1646,9 +1646,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4711951",
@@ -1671,9 +1671,9 @@
       "matchMinute": 90,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4747697",
@@ -1696,9 +1696,109 @@
       "matchMinute": 125,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
-      "finishedAt": "2026-06-30T06:19:33.889Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.889Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
+    },
+    {
+      "id": "result-365-4742186",
+      "eventId": "365-4742186",
+      "eventId365": "4742186",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "11:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "Premier League",
+      "match": "Ulaanbaatar - Central Stallions FC",
+      "home": "Ulaanbaatar",
+      "away": "Central Stallions FC",
+      "resultKey": "240:2026-06-30:ulaanbaatar:central stallions",
+      "actualWinner": "Central Stallions FC",
+      "result": "2:3",
+      "liveScore": "2:3",
+      "matchPhase": "final",
+      "matchMinute": 90,
+      "status": "נסגר",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
+    },
+    {
+      "id": "result-365-4742185",
+      "eventId": "365-4742185",
+      "eventId365": "4742185",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "14:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "Premier League",
+      "match": "Deren - Khangarid",
+      "home": "Deren",
+      "away": "Khangarid",
+      "resultKey": "240:2026-06-30:deren:khangarid",
+      "actualWinner": "",
+      "result": "1:0",
+      "liveScore": "1:0",
+      "matchPhase": "live",
+      "matchMinute": 16,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4750034",
+      "eventId": "365-4750034",
+      "eventId365": "4750034",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "15:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ידידות מועדונים",
+      "match": "ואלביק - אוברהאוזן",
+      "home": "ואלביק",
+      "away": "אוברהאוזן",
+      "resultKey": "240:2026-06-30:ואלביק:אוברהאוזן",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4750035",
+      "eventId": "365-4750035",
+      "eventId365": "4750035",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "15:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ידידות מועדונים",
+      "match": "אולימפיה גרודידז - פטרלול פלויאסטי",
+      "home": "אולימפיה גרודידז",
+      "away": "פטרלול פלויאסטי",
+      "resultKey": "240:2026-06-30:אולימפיה גרודידז:פטרלול פלויאסטי",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
     },
     {
       "id": "result-365-4539941",
@@ -1721,7 +1821,57 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4539942",
+      "eventId": "365-4539942",
+      "eventId365": "4539942",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "16:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ליגה ראשונה",
+      "match": "Fountain Gate - Singida Black Stars SC",
+      "home": "Fountain Gate",
+      "away": "Singida Black Stars SC",
+      "resultKey": "240:2026-06-30:fountain gate:singida black stars sc",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4539943",
+      "eventId": "365-4539943",
+      "eventId365": "4539943",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "16:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ליגה ראשונה",
+      "match": "Mashujaa Fc - Tanzania Prisons",
+      "home": "Mashujaa Fc",
+      "away": "Tanzania Prisons",
+      "resultKey": "240:2026-06-30:mashujaa:tanzania prisons",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1746,7 +1896,32 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4539945",
+      "eventId": "365-4539945",
+      "eventId365": "4539945",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "16:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ליגה ראשונה",
+      "match": "Coastal Union - Pamba Jiji FC",
+      "home": "Coastal Union",
+      "away": "Pamba Jiji FC",
+      "resultKey": "240:2026-06-30:coastal union:pamba jiji",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1771,7 +1946,32 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": null,
+      "resultVerifiedAt": ""
+    },
+    {
+      "id": "result-365-4543621",
+      "eventId": "365-4543621",
+      "eventId365": "4543621",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "16:00",
+      "sport": "כדורגל",
+      "sportId": 240,
+      "league": "ליגה ראשונה",
+      "match": "Mbeya City - Tabora United",
+      "home": "Mbeya City",
+      "away": "Tabora United",
+      "resultKey": "240:2026-06-30:mbeya city:tabora united",
+      "actualWinner": "",
+      "result": "",
+      "liveScore": "",
+      "matchPhase": "scheduled",
+      "matchMinute": -1,
+      "status": "ממתין",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1796,7 +1996,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1821,7 +2021,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.889Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1846,7 +2046,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1871,7 +2071,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1896,7 +2096,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1921,7 +2121,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1946,7 +2146,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1971,7 +2171,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -1996,7 +2196,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2021,7 +2221,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2046,7 +2246,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2071,7 +2271,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2096,7 +2296,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2106,7 +2306,7 @@
       "eventId365": "4727704",
       "source": "365Scores Results",
       "day": "2026-06-30",
-      "time": "21:00",
+      "time": "21:30",
       "sport": "כדורגל",
       "sportId": 240,
       "league": "גביע - שלב ראשון",
@@ -2121,7 +2321,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2146,7 +2346,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2171,9 +2371,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743183",
@@ -2196,9 +2396,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743184",
@@ -2221,9 +2421,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743185",
@@ -2246,9 +2446,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743186",
@@ -2271,9 +2471,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743187",
@@ -2296,9 +2496,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743188",
@@ -2321,9 +2521,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743189",
@@ -2346,9 +2546,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4743190",
@@ -2371,9 +2571,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
-      "finishedAt": "2026-06-30T06:19:33.890Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.890Z"
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
+      "finishedAt": "2026-06-30T11:15:14.462Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.462Z"
     },
     {
       "id": "result-365-4727705",
@@ -2396,7 +2596,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2421,7 +2621,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2446,7 +2646,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2471,7 +2671,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2496,7 +2696,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2521,7 +2721,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2546,7 +2746,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2571,7 +2771,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2596,7 +2796,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2621,7 +2821,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2646,7 +2846,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2671,7 +2871,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2696,7 +2896,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2721,7 +2921,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2746,7 +2946,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2771,7 +2971,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2796,7 +2996,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2821,7 +3021,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2846,7 +3046,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2871,7 +3071,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2896,7 +3096,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2921,7 +3121,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2946,7 +3146,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2971,7 +3171,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -2996,7 +3196,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3021,7 +3221,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3046,7 +3246,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.890Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3071,7 +3271,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3096,7 +3296,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3121,7 +3321,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3146,7 +3346,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3171,7 +3371,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3196,7 +3396,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3221,7 +3421,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3246,7 +3446,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3271,7 +3471,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3296,7 +3496,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3321,7 +3521,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3346,7 +3546,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3371,7 +3571,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3396,7 +3596,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3421,7 +3621,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3446,7 +3646,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.462Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3471,7 +3671,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3496,7 +3696,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3521,7 +3721,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3546,7 +3746,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3571,7 +3771,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3596,7 +3796,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -3621,9 +3821,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4683784",
@@ -3646,9 +3846,9 @@
       "matchMinute": 4,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4697421",
@@ -3671,9 +3871,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4744882",
@@ -3696,9 +3896,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4743674",
@@ -3721,9 +3921,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4743676",
@@ -3746,9 +3946,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4659767",
@@ -3771,9 +3971,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4743685",
@@ -3796,9 +3996,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4743686",
@@ -3821,9 +4021,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749448",
@@ -3846,9 +4046,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749428",
@@ -3871,9 +4071,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4697422",
@@ -3896,9 +4096,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4746271",
@@ -3921,9 +4121,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749429",
@@ -3946,9 +4146,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749430",
@@ -3971,9 +4171,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749490",
@@ -3996,9 +4196,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749519",
@@ -4021,9 +4221,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749521",
@@ -4046,9 +4246,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749542",
@@ -4071,9 +4271,9 @@
       "matchMinute": 1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4745092",
@@ -4096,9 +4296,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.892Z",
-      "finishedAt": "2026-06-30T06:19:33.892Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.892Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4745093",
@@ -4121,9 +4321,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4745094",
@@ -4146,34 +4346,9 @@
       "matchMinute": 1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
-    },
-    {
-      "id": "result-365-4749888",
-      "eventId": "365-4749888",
-      "eventId365": "4749888",
-      "source": "365Scores Results",
-      "day": "2026-06-30",
-      "time": "02:30",
-      "sport": "כדורסל",
-      "sportId": 227,
-      "league": "Liga Federal - Interconference Playoff - Center - Metropolitan",
-      "match": "Club Ateneo Popular Versailles - Club Unión Y Juventud Bandera",
-      "home": "Club Ateneo Popular Versailles",
-      "away": "Club Unión Y Juventud Bandera",
-      "resultKey": "227:2026-06-30:ateneo popular versailles:unión y juventud bandera",
-      "actualWinner": "Club Ateneo Popular Versailles",
-      "result": "86:80",
-      "liveScore": "86:80",
-      "matchPhase": "final",
-      "matchMinute": "הסתיים",
-      "status": "נסגר",
-      "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749887",
@@ -4196,9 +4371,34 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
+    },
+    {
+      "id": "result-365-4749888",
+      "eventId": "365-4749888",
+      "eventId365": "4749888",
+      "source": "365Scores Results",
+      "day": "2026-06-30",
+      "time": "02:30",
+      "sport": "כדורסל",
+      "sportId": 227,
+      "league": "Liga Federal - Interconference Playoff - Center - Metropolitan",
+      "match": "Club Ateneo Popular Versailles - Club Unión Y Juventud Bandera",
+      "home": "Club Ateneo Popular Versailles",
+      "away": "Club Unión Y Juventud Bandera",
+      "resultKey": "227:2026-06-30:ateneo popular versailles:unión y juventud bandera",
+      "actualWinner": "Club Ateneo Popular Versailles",
+      "result": "86:80",
+      "liveScore": "86:80",
+      "matchPhase": "final",
+      "matchMinute": "הסתיים",
+      "status": "נסגר",
+      "bettingStatus": "closed",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4691535",
@@ -4221,9 +4421,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4697423",
@@ -4246,9 +4446,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4697424",
@@ -4271,9 +4471,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4697425",
@@ -4296,9 +4496,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749267",
@@ -4321,9 +4521,9 @@
       "matchMinute": "הסתיים",
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749889",
@@ -4346,9 +4546,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749891",
@@ -4371,9 +4571,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4749892",
@@ -4396,9 +4596,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4461214",
@@ -4421,9 +4621,9 @@
       "matchMinute": -1,
       "status": "נסגר",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
-      "finishedAt": "2026-06-30T06:19:33.893Z",
-      "resultVerifiedAt": "2026-06-30T06:19:33.893Z"
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
+      "finishedAt": "2026-06-30T11:15:14.463Z",
+      "resultVerifiedAt": "2026-06-30T11:15:14.463Z"
     },
     {
       "id": "result-365-4739963",
@@ -4446,7 +4646,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4471,7 +4671,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4496,7 +4696,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4521,7 +4721,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4546,7 +4746,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4571,7 +4771,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4596,7 +4796,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4621,7 +4821,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4646,7 +4846,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4671,7 +4871,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4696,7 +4896,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4721,7 +4921,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4746,7 +4946,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4771,7 +4971,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4796,7 +4996,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4821,7 +5021,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     },
@@ -4846,7 +5046,7 @@
       "matchMinute": -1,
       "status": "ממתין",
       "bettingStatus": "closed",
-      "verifiedAt": "2026-06-30T06:19:33.893Z",
+      "verifiedAt": "2026-06-30T11:15:14.463Z",
       "finishedAt": null,
       "resultVerifiedAt": ""
     }
@@ -4860,6 +5060,44 @@
     "today": {
       "football": [
         {
+          "id": "sched-365-365-4750034",
+          "eventId": "365-4750034",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות מועדונים",
+          "match": "ואלביק - אוברהאוזן",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
+          "id": "sched-365-365-4750035",
+          "eventId": "365-4750035",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ידידות מועדונים",
+          "match": "אולימפיה גרודידז - פטרלול פלויאסטי",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
           "id": "sched-365-365-4539941",
           "eventId": "365-4539941",
           "day": "2026-06-30",
@@ -4867,6 +5105,44 @@
           "sportId": 240,
           "league": "ליגה ראשונה",
           "match": "עזאם - דודומה",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
+          "id": "sched-365-365-4539942",
+          "eventId": "365-4539942",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Fountain Gate - Singida Black Stars SC",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
+          "id": "sched-365-365-4539943",
+          "eventId": "365-4539943",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Mashujaa Fc - Tanzania Prisons",
           "pick": "",
           "odds": null,
           "score": 0,
@@ -4898,6 +5174,25 @@
           ]
         },
         {
+          "id": "sched-365-365-4539945",
+          "eventId": "365-4539945",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Coastal Union - Pamba Jiji FC",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
           "id": "sched-365-365-4539946",
           "eventId": "365-4539946",
           "day": "2026-06-30",
@@ -4905,6 +5200,25 @@
           "sportId": 240,
           "league": "ליגה ראשונה",
           "match": "JKT Tanzania - יונג אפריקנס",
+          "pick": "",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": true,
+          "reasons": [
+            "accepted"
+          ]
+        },
+        {
+          "id": "sched-365-365-4543621",
+          "eventId": "365-4543621",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "ליגה ראשונה",
+          "match": "Mbeya City - Tabora United",
           "pick": "",
           "odds": null,
           "score": 0,
@@ -5139,9 +5453,11 @@
           "homeLogoSource": "365Scores",
           "awayLogoSource": "365Scores",
           "leagueLogoSource": "365Scores",
-          "accepted": true,
+          "accepted": false,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -5158,9 +5474,11 @@
           "homeLogoSource": "365Scores",
           "awayLogoSource": "365Scores",
           "leagueLogoSource": "365Scores",
-          "accepted": true,
+          "accepted": false,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -5177,9 +5495,11 @@
           "homeLogoSource": "365Scores",
           "awayLogoSource": "365Scores",
           "leagueLogoSource": "365Scores",
-          "accepted": true,
+          "accepted": false,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -5196,9 +5516,11 @@
           "homeLogoSource": "365Scores",
           "awayLogoSource": "365Scores",
           "leagueLogoSource": "365Scores",
-          "accepted": true,
+          "accepted": false,
           "reasons": [
-            "accepted"
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
           ]
         },
         {
@@ -5252,6 +5574,48 @@
           "league": "מונדיאל - 32 האחרונות",
           "match": "הולנד - מרוקו",
           "pick": "תיקו",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4742186",
+          "eventId": "365-4742186",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Premier League",
+          "match": "Ulaanbaatar - Central Stallions FC",
+          "pick": "Central Stallions FC",
+          "odds": null,
+          "score": 0,
+          "homeLogoSource": "365Scores",
+          "awayLogoSource": "365Scores",
+          "leagueLogoSource": "365Scores",
+          "accepted": false,
+          "reasons": [
+            "לא ניתוח פעיל",
+            "אין פייבוריטית אחת מספיק ברורה",
+            "יחס נמוך מדי בלי פער שוק גדול"
+          ]
+        },
+        {
+          "id": "result-365-4742185",
+          "eventId": "365-4742185",
+          "day": "2026-06-30",
+          "sport": "כדורגל",
+          "sportId": 240,
+          "league": "Premier League",
+          "match": "Deren - Khangarid",
+          "pick": "",
           "odds": null,
           "score": 0,
           "homeLogoSource": "365Scores",
@@ -5330,14 +5694,14 @@
           ]
         },
         {
-          "id": "result-365-4749888",
-          "eventId": "365-4749888",
+          "id": "result-365-4749887",
+          "eventId": "365-4749887",
           "day": "2026-06-30",
           "sport": "כדורסל",
           "sportId": 227,
           "league": "Liga Federal - Interconference Playoff - Center - Metropolitan",
-          "match": "Club Ateneo Popular Versailles - Club Unión Y Juventud Bandera",
-          "pick": "Club Ateneo Popular Versailles",
+          "match": "Club Sportivo Escobar - Club Atlético Almagro De Esperanza",
+          "pick": "Club Atlético Almagro De Esperanza",
           "odds": null,
           "score": 0,
           "homeLogoSource": "365Scores",
@@ -5351,14 +5715,14 @@
           ]
         },
         {
-          "id": "result-365-4749887",
-          "eventId": "365-4749887",
+          "id": "result-365-4749888",
+          "eventId": "365-4749888",
           "day": "2026-06-30",
           "sport": "כדורסל",
           "sportId": 227,
           "league": "Liga Federal - Interconference Playoff - Center - Metropolitan",
-          "match": "Club Sportivo Escobar - Club Atlético Almagro De Esperanza",
-          "pick": "Club Atlético Almagro De Esperanza",
+          "match": "Club Ateneo Popular Versailles - Club Unión Y Juventud Bandera",
+          "pick": "Club Ateneo Popular Versailles",
           "odds": null,
           "score": 0,
           "homeLogoSource": "365Scores",
@@ -6123,7 +6487,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "sched-365-365-4655075",
@@ -7265,7 +7630,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749521",
@@ -7352,7 +7718,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749519",
@@ -7439,7 +7806,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749490",
@@ -7526,7 +7894,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749429",
@@ -7613,7 +7982,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4746271",
@@ -7700,7 +8070,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749430",
@@ -7787,7 +8158,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4697422",
@@ -7874,7 +8246,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749428",
@@ -7961,7 +8334,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4743686",
@@ -8048,7 +8422,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4743685",
@@ -8135,7 +8510,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4749448",
@@ -8222,7 +8598,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4659767",
@@ -8309,7 +8686,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4743676",
@@ -8396,7 +8774,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4743674",
@@ -8483,7 +8862,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4683784",
@@ -8570,7 +8950,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4744882",
@@ -8657,7 +9038,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4697421",
@@ -8744,7 +9126,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           },
           {
             "id": "result-365-4748107",
@@ -8831,7 +9214,8 @@
               "logoSource": "365Scores",
               "logoTier": 1
             },
-            "logoVerified": true
+            "logoVerified": true,
+            "pickTeam": ""
           }
         ]
       }
@@ -8842,11 +9226,171 @@
       "sports": {
         "football": [
           {
+            "id": "sched-365-365-4750034",
+            "eventId": "365-4750034",
+            "eventId365": "4750034",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "15:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ידידות מועדונים",
+            "country": "",
+            "match": "ואלביק - אוברהאוזן",
+            "home": "ואלביק",
+            "away": "אוברהאוזן",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/709",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/368",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/321",
+            "resultKey": "240:2026-06-30:ואלביק:אוברהאוזן",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "ואלביק",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/709",
+              "initials": "ו",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "אוברהאוזן",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/368",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ידידות מועדונים",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/321",
+              "initials": "י",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
+            "id": "sched-365-365-4750035",
+            "eventId": "365-4750035",
+            "eventId365": "4750035",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "15:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ידידות מועדונים",
+            "country": "",
+            "match": "אולימפיה גרודידז - פטרלול פלויאסטי",
+            "home": "אולימפיה גרודידז",
+            "away": "פטרלול פלויאסטי",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6253",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7707",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/321",
+            "resultKey": "240:2026-06-30:אולימפיה גרודידז:פטרלול פלויאסטי",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "אולימפיה גרודידז",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/6253",
+              "initials": "א",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "פטרלול פלויאסטי",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/7707",
+              "initials": "פ",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ידידות מועדונים",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/321",
+              "initials": "י",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
             "id": "sched-365-365-4539941",
             "eventId": "365-4539941",
             "eventId365": "4539941",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -8922,11 +9466,171 @@
             }
           },
           {
+            "id": "sched-365-365-4539942",
+            "eventId": "365-4539942",
+            "eventId365": "4539942",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "16:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה ראשונה",
+            "country": "",
+            "match": "Fountain Gate - Singida Black Stars SC",
+            "home": "Fountain Gate",
+            "away": "Singida Black Stars SC",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/71342",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/82536",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+            "resultKey": "240:2026-06-30:fountain gate:singida black stars sc",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "Fountain Gate",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/71342",
+              "initials": "F",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Singida Black Stars SC",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/82536",
+              "initials": "S",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
+            "id": "sched-365-365-4539943",
+            "eventId": "365-4539943",
+            "eventId365": "4539943",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "16:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה ראשונה",
+            "country": "",
+            "match": "Mashujaa Fc - Tanzania Prisons",
+            "home": "Mashujaa Fc",
+            "away": "Tanzania Prisons",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/77576",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20415",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+            "resultKey": "240:2026-06-30:mashujaa:tanzania prisons",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "Mashujaa Fc",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/77576",
+              "initials": "M",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Tanzania Prisons",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20415",
+              "initials": "T",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
             "id": "sched-365-365-4539944",
             "eventId": "365-4539944",
             "eventId365": "4539944",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9002,11 +9706,91 @@
             }
           },
           {
+            "id": "sched-365-365-4539945",
+            "eventId": "365-4539945",
+            "eventId365": "4539945",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "16:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה ראשונה",
+            "country": "",
+            "match": "Coastal Union - Pamba Jiji FC",
+            "home": "Coastal Union",
+            "away": "Pamba Jiji FC",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20414",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/82538",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+            "resultKey": "240:2026-06-30:coastal union:pamba jiji",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "Coastal Union",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20414",
+              "initials": "C",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Pamba Jiji FC",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/82538",
+              "initials": "P",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
             "id": "sched-365-365-4539946",
             "eventId": "365-4539946",
             "eventId365": "4539946",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9082,11 +9866,91 @@
             }
           },
           {
+            "id": "sched-365-365-4543621",
+            "eventId": "365-4543621",
+            "eventId365": "4543621",
+            "source": "365Scores",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
+            "finishedAt": null,
+            "bettingStatus": "available",
+            "resultVerified": false,
+            "day": "2026-06-30",
+            "time": "16:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "ליגה ראשונה",
+            "country": "",
+            "match": "Mbeya City - Tabora United",
+            "home": "Mbeya City",
+            "away": "Tabora United",
+            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20409",
+            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/77579",
+            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+            "resultKey": "240:2026-06-30:mbeya city:tabora united",
+            "market": "",
+            "pick": "",
+            "winnerPick": "",
+            "actualWinner": "",
+            "odds": null,
+            "probability": null,
+            "score": 0,
+            "status": "ממתין",
+            "liveScore": "",
+            "matchPhase": "scheduled",
+            "matchMinute": -1,
+            "result": "",
+            "resultVerifiedAt": "",
+            "signals": [
+              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
+              "המשחק יוצג ברגע שהיחסים יתעדכנו"
+            ],
+            "allMarkets": [
+              {
+                "marketId": null,
+                "title": "1X2",
+                "category": "מנצח",
+                "bettable": false,
+                "best": null,
+                "outcomes": []
+              }
+            ],
+            "explanation": [
+              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
+              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
+            ],
+            "pickTeam": "",
+            "oddsRaw": null,
+            "outsideRange": true,
+            "noOddsYet": true,
+            "normalizedProbability": null,
+            "homeAsset": {
+              "name": "Mbeya City",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/20409",
+              "initials": "M",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "awayAsset": {
+              "name": "Tabora United",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/77579",
+              "initials": "T",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            },
+            "leagueAsset": {
+              "name": "ליגה ראשונה",
+              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7304",
+              "initials": "ל",
+              "logoSource": "365Scores",
+              "logoTier": 1
+            }
+          },
+          {
             "id": "sched-365-365-4548611",
             "eventId": "365-4548611",
             "eventId365": "4548611",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9166,7 +10030,7 @@
             "eventId": "365-4748232",
             "eventId365": "4748232",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9246,7 +10110,7 @@
             "eventId": "365-4663504",
             "eventId365": "4663504",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9326,7 +10190,7 @@
             "eventId": "365-4734724",
             "eventId365": "4734724",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9406,7 +10270,7 @@
             "eventId": "365-4664937",
             "eventId365": "4664937",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9486,7 +10350,7 @@
             "eventId": "365-4684618",
             "eventId365": "4684618",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9566,7 +10430,7 @@
             "eventId": "365-4727703",
             "eventId365": "4727703",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9646,7 +10510,7 @@
             "eventId": "365-4727492",
             "eventId365": "4727492",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9726,7 +10590,7 @@
             "eventId": "365-4748109",
             "eventId365": "4748109",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9806,7 +10670,7 @@
             "eventId": "365-4748233",
             "eventId365": "4748233",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9886,7 +10750,7 @@
             "eventId": "365-4639622",
             "eventId365": "4639622",
             "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
+            "verifiedAt": "2026-06-30T11:15:14.447Z",
             "finishedAt": null,
             "bettingStatus": "available",
             "resultVerified": false,
@@ -9956,326 +10820,6 @@
             "leagueAsset": {
               "name": "ליגה רביעית - מטרופוליטנה - Zone B",
               "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
-              "initials": "ל",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            }
-          },
-          {
-            "id": "sched-365-365-4639630",
-            "eventId": "365-4639630",
-            "eventId365": "4639630",
-            "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
-            "finishedAt": null,
-            "bettingStatus": "available",
-            "resultVerified": false,
-            "day": "2026-06-30",
-            "time": "21:00",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "ליגה רביעית - מטרופוליטנה - Zone B",
-            "country": "",
-            "match": "קלייפול - קנואלס",
-            "home": "קלייפול",
-            "away": "קנואלס",
-            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11897",
-            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11945",
-            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
-            "resultKey": "240:2026-06-30:קלייפול:קנואלס",
-            "market": "",
-            "pick": "",
-            "winnerPick": "",
-            "actualWinner": "",
-            "odds": null,
-            "probability": null,
-            "score": 0,
-            "status": "ממתין",
-            "liveScore": "",
-            "matchPhase": "scheduled",
-            "matchMinute": -1,
-            "result": "",
-            "resultVerifiedAt": "",
-            "signals": [
-              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
-              "המשחק יוצג ברגע שהיחסים יתעדכנו"
-            ],
-            "allMarkets": [
-              {
-                "marketId": null,
-                "title": "1X2",
-                "category": "מנצח",
-                "bettable": false,
-                "best": null,
-                "outcomes": []
-              }
-            ],
-            "explanation": [
-              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
-            ],
-            "pickTeam": "",
-            "oddsRaw": null,
-            "outsideRange": true,
-            "noOddsYet": true,
-            "normalizedProbability": null,
-            "homeAsset": {
-              "name": "קלייפול",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11897",
-              "initials": "ק",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "awayAsset": {
-              "name": "קנואלס",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/11945",
-              "initials": "ק",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "leagueAsset": {
-              "name": "ליגה רביעית - מטרופוליטנה - Zone B",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5591",
-              "initials": "ל",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            }
-          },
-          {
-            "id": "sched-365-365-4744212",
-            "eventId": "365-4744212",
-            "eventId365": "4744212",
-            "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
-            "finishedAt": null,
-            "bettingStatus": "available",
-            "resultVerified": false,
-            "day": "2026-06-30",
-            "time": "21:00",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "APF Primera C",
-            "country": "",
-            "match": "Capitan Figari FBC - Fulgencio Yegros",
-            "home": "Capitan Figari FBC",
-            "away": "Fulgencio Yegros",
-            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/80012",
-            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/29071",
-            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8495",
-            "resultKey": "240:2026-06-30:capitan figari fbc:fulgencio yegros",
-            "market": "",
-            "pick": "",
-            "winnerPick": "",
-            "actualWinner": "",
-            "odds": null,
-            "probability": null,
-            "score": 0,
-            "status": "ממתין",
-            "liveScore": "",
-            "matchPhase": "scheduled",
-            "matchMinute": -1,
-            "result": "",
-            "resultVerifiedAt": "",
-            "signals": [
-              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
-              "המשחק יוצג ברגע שהיחסים יתעדכנו"
-            ],
-            "allMarkets": [
-              {
-                "marketId": null,
-                "title": "1X2",
-                "category": "מנצח",
-                "bettable": false,
-                "best": null,
-                "outcomes": []
-              }
-            ],
-            "explanation": [
-              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
-            ],
-            "pickTeam": "",
-            "oddsRaw": null,
-            "outsideRange": true,
-            "noOddsYet": true,
-            "normalizedProbability": null,
-            "homeAsset": {
-              "name": "Capitan Figari FBC",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/80012",
-              "initials": "C",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "awayAsset": {
-              "name": "Fulgencio Yegros",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/29071",
-              "initials": "F",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "leagueAsset": {
-              "name": "APF Primera C",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/8495",
-              "initials": "A",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            }
-          },
-          {
-            "id": "sched-365-365-4727704",
-            "eventId": "365-4727704",
-            "eventId365": "4727704",
-            "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
-            "finishedAt": null,
-            "bettingStatus": "available",
-            "resultVerified": false,
-            "day": "2026-06-30",
-            "time": "21:00",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "גביע - שלב ראשון",
-            "country": "",
-            "match": "Olimpia De Itá - Sportivo Valois Rivarola",
-            "home": "Olimpia De Itá",
-            "away": "Sportivo Valois Rivarola",
-            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/19731",
-            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/75986",
-            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7127",
-            "resultKey": "240:2026-06-30:olimpia de itá:sportivo valois rivarola",
-            "market": "",
-            "pick": "",
-            "winnerPick": "",
-            "actualWinner": "",
-            "odds": null,
-            "probability": null,
-            "score": 0,
-            "status": "ממתין",
-            "liveScore": "",
-            "matchPhase": "scheduled",
-            "matchMinute": -1,
-            "result": "",
-            "resultVerifiedAt": "",
-            "signals": [
-              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
-              "המשחק יוצג ברגע שהיחסים יתעדכנו"
-            ],
-            "allMarkets": [
-              {
-                "marketId": null,
-                "title": "1X2",
-                "category": "מנצח",
-                "bettable": false,
-                "best": null,
-                "outcomes": []
-              }
-            ],
-            "explanation": [
-              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
-            ],
-            "pickTeam": "",
-            "oddsRaw": null,
-            "outsideRange": true,
-            "noOddsYet": true,
-            "normalizedProbability": null,
-            "homeAsset": {
-              "name": "Olimpia De Itá",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/19731",
-              "initials": "O",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "awayAsset": {
-              "name": "Sportivo Valois Rivarola",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/75986",
-              "initials": "S",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "leagueAsset": {
-              "name": "גביע - שלב ראשון",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/7127",
-              "initials": "ג",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            }
-          },
-          {
-            "id": "sched-365-365-4736023",
-            "eventId": "365-4736023",
-            "eventId365": "4736023",
-            "source": "365Scores",
-            "verifiedAt": "2026-06-30T06:19:33.755Z",
-            "finishedAt": null,
-            "bettingStatus": "available",
-            "resultVerified": false,
-            "day": "2026-06-30",
-            "time": "21:30",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "ליגה שנייה",
-            "country": "",
-            "match": "רסיסטנסיה - Encarnacion",
-            "home": "רסיסטנסיה",
-            "away": "Encarnacion",
-            "homeLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14639",
-            "awayLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/74318",
-            "leagueLogoUrl": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5667",
-            "resultKey": "240:2026-06-30:רסיסטנסיה:encarnacion",
-            "market": "",
-            "pick": "",
-            "winnerPick": "",
-            "actualWinner": "",
-            "odds": null,
-            "probability": null,
-            "score": 0,
-            "status": "ממתין",
-            "liveScore": "",
-            "matchPhase": "scheduled",
-            "matchMinute": -1,
-            "result": "",
-            "resultVerifiedAt": "",
-            "signals": [
-              "קווי הימורים טרם נפתחו בווינר עבור משחק זה",
-              "המשחק יוצג ברגע שהיחסים יתעדכנו"
-            ],
-            "allMarkets": [
-              {
-                "marketId": null,
-                "title": "1X2",
-                "category": "מנצח",
-                "bettable": false,
-                "best": null,
-                "outcomes": []
-              }
-            ],
-            "explanation": [
-              "המשחק קיים במערכת 365Scores אך ווינר טרם פרסם קווי הימורים.",
-              "ווינר פותחים קווים בהדרגה לאורך היום — בדרך כלל כמה שעות לפני הקיקאוף."
-            ],
-            "pickTeam": "",
-            "oddsRaw": null,
-            "outsideRange": true,
-            "noOddsYet": true,
-            "normalizedProbability": null,
-            "homeAsset": {
-              "name": "רסיסטנסיה",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/14639",
-              "initials": "ר",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "awayAsset": {
-              "name": "Encarnacion",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitors/74318",
-              "initials": "E",
-              "logoSource": "365Scores",
-              "logoTier": 1
-            },
-            "leagueAsset": {
-              "name": "ליגה שנייה",
-              "logo": "https://imagecache.365scores.com/image/upload/f_png,w_200,h_200,c_limit/Competitions/5667",
               "initials": "ל",
               "logoSource": "365Scores",
               "logoTier": 1
