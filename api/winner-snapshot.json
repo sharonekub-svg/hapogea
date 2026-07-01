@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-07-01T11:29:59.114Z",
+  "generatedAt": "2026-07-01T16:31:11.623Z",
   "oddsSource": "The Odds API",
   "tabs": {
     "yesterday": {
@@ -1636,7 +1636,52 @@
       "label": "היום",
       "date": "2026-07-01",
       "sports": {
-        "football": [],
+        "football": [
+          {
+            "id": "odds-5ff7744314f224c18d1604ee9cc19263",
+            "eventId": "5ff7744314f224c18d1604ee9cc19263",
+            "source": "The Odds API",
+            "utcDay": "2026-07-01",
+            "day": "2026-07-01",
+            "time": "19:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "מונדיאל 2026",
+            "country": "",
+            "leaguePriority": 100,
+            "match": "England - DR Congo",
+            "home": "England",
+            "away": "DR Congo",
+            "pick": "אנגליה",
+            "pickTeam": "אנגליה",
+            "winnerPick": "אנגליה",
+            "odds": 1.96,
+            "oddsRaw": 1.96,
+            "homeOdds": 1.96,
+            "drawOdds": 3.1,
+            "awayOdds": 4.1,
+            "probability": 0.5102040816326531,
+            "normalizedProbability": 0.5102040816326531,
+            "recommendationScore": 51,
+            "score": 51,
+            "recommended": true,
+            "outsideRange": false,
+            "status": "ממתין",
+            "matchPhase": "scheduled",
+            "bettingStatus": "available",
+            "riskLevel": "בינוני",
+            "explanation": [
+              "מקור: The Odds API — מונדיאל 2026",
+              "אנגליה הוא הפייבוריט (1.96, הסתברות 51%) — תיקו 3.10, DR Congo 4.10.",
+              "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
+            ],
+            "signals": [
+              "אנגליה הוא הפייבוריט (1.96, הסתברות 51%) — תיקו 3.10, DR Congo 4.10."
+            ],
+            "resultKey": "240:2026-07-01:england:dr congo",
+            "verifiedAt": "2026-07-01T16:31:10.351Z"
+          }
+        ],
         "basketball": []
       }
     },
@@ -1687,7 +1732,7 @@
               "ספרד הוא הפייבוריט (1.33, הסתברות 75%) — תיקו 4.80, Austria 9.00."
             ],
             "resultKey": "240:2026-07-02:spain:austria",
-            "verifiedAt": "2026-07-01T11:29:57.878Z"
+            "verifiedAt": "2026-07-01T16:31:10.351Z"
           },
           {
             "id": "odds-9eeb4876001f5a52ce3c3641bd5f1f2f",
@@ -1707,13 +1752,13 @@
             "pick": "ארצות הברית",
             "pickTeam": "ארצות הברית",
             "winnerPick": "ארצות הברית",
-            "odds": 1.36,
-            "oddsRaw": 1.36,
-            "homeOdds": 1.36,
-            "drawOdds": 4.5,
-            "awayOdds": 8.5,
-            "probability": 0.7352941176470588,
-            "normalizedProbability": 0.7352941176470588,
+            "odds": 1.35,
+            "oddsRaw": 1.35,
+            "homeOdds": 1.35,
+            "drawOdds": 4.8,
+            "awayOdds": 8,
+            "probability": 0.7407407407407407,
+            "normalizedProbability": 0.7407407407407407,
             "recommendationScore": 74,
             "score": 74,
             "recommended": true,
@@ -1724,14 +1769,14 @@
             "riskLevel": "נמוך",
             "explanation": [
               "מקור: The Odds API — מונדיאל 2026",
-              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.50, Bosnia & Herzegovina 8.50.",
+              "ארצות הברית הוא הפייבוריט (1.35, הסתברות 74%) — תיקו 4.80, Bosnia & Herzegovina 8.00.",
               "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
             ],
             "signals": [
-              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.50, Bosnia & Herzegovina 8.50."
+              "ארצות הברית הוא הפייבוריט (1.35, הסתברות 74%) — תיקו 4.80, Bosnia & Herzegovina 8.00."
             ],
             "resultKey": "240:2026-07-02:usa:bosnia herzegovina",
-            "verifiedAt": "2026-07-01T11:29:57.877Z"
+            "verifiedAt": "2026-07-01T16:31:10.351Z"
           }
         ],
         "basketball": []
