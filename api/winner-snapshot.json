@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-07-01T06:39:28.961Z",
+  "generatedAt": "2026-07-01T11:29:59.114Z",
   "oddsSource": "The Odds API",
   "tabs": {
     "yesterday": {
@@ -1687,7 +1687,7 @@
               "ספרד הוא הפייבוריט (1.33, הסתברות 75%) — תיקו 4.80, Austria 9.00."
             ],
             "resultKey": "240:2026-07-02:spain:austria",
-            "verifiedAt": "2026-07-01T06:39:27.898Z"
+            "verifiedAt": "2026-07-01T11:29:57.878Z"
           },
           {
             "id": "odds-9eeb4876001f5a52ce3c3641bd5f1f2f",
@@ -1710,8 +1710,8 @@
             "odds": 1.36,
             "oddsRaw": 1.36,
             "homeOdds": 1.36,
-            "drawOdds": 4.6,
-            "awayOdds": 8,
+            "drawOdds": 4.5,
+            "awayOdds": 8.5,
             "probability": 0.7352941176470588,
             "normalizedProbability": 0.7352941176470588,
             "recommendationScore": 74,
@@ -1724,14 +1724,14 @@
             "riskLevel": "נמוך",
             "explanation": [
               "מקור: The Odds API — מונדיאל 2026",
-              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.60, Bosnia & Herzegovina 8.00.",
+              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.50, Bosnia & Herzegovina 8.50.",
               "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
             ],
             "signals": [
-              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.60, Bosnia & Herzegovina 8.00."
+              "ארצות הברית הוא הפייבוריט (1.36, הסתברות 74%) — תיקו 4.50, Bosnia & Herzegovina 8.50."
             ],
             "resultKey": "240:2026-07-02:usa:bosnia herzegovina",
-            "verifiedAt": "2026-07-01T06:39:27.898Z"
+            "verifiedAt": "2026-07-01T11:29:57.877Z"
           }
         ],
         "basketball": []
