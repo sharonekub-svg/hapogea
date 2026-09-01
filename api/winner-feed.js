@@ -3324,17 +3324,26 @@ function getTeamStakeFromStandings(standings, competitorId) {
 
 // In-process cache for the /sports discovery result (6-hour TTL across warm lambdas)
 const oddsDiscoveryCache = globalThis.__ODDS_DISCOVERY_CACHE_V2__ ||
-  (globalThis.__ODDS_DISCOVERY_CACHE_V2__ = { at: 0, sports: null });
+  (globalThis.__ODDS_DISCOVERY_CACHE_V2__ = { at: 0, sports: null, quota: null });
 
 // Returns array of all active sport objects {key, title, active} or null on failure.
+// Also records x-requests-remaining / x-requests-used, which The Odds API returns
+// on every response. That number is what decides how wide this build may go —
+// a free key (500/month) and a 20K key must not use the same league caps.
 async function discoverActiveSports() {
   if (oddsDiscoveryCache.sports && Date.now() - oddsDiscoveryCache.at < 6 * 60 * 60 * 1000) {
     return oddsDiscoveryCache.sports;
   }
   try {
-    const data = await fetchJson(`${ODDS_API_BASE}/sports/?apiKey=${ODDS_API_KEY}`, {
-      retryAttempts: 1, retryBaseDelay: 500,
-    });
+    const response = await fetch(`${ODDS_API_BASE}/sports/?apiKey=${ODDS_API_KEY}`);
+    const text = await response.text();
+    if (!response.ok) return null;
+    const remaining = Number(response.headers.get("x-requests-remaining"));
+    const used      = Number(response.headers.get("x-requests-used"));
+    if (Number.isFinite(remaining)) {
+      oddsDiscoveryCache.quota = { remaining, used: Number.isFinite(used) ? used : null, at: Date.now() };
+    }
+    const data = text ? JSON.parse(text) : null;
     if (!Array.isArray(data)) return null;
     const active = data.filter((s) => s.active);
     oddsDiscoveryCache.sports = active;
@@ -3343,6 +3352,84 @@ async function discoverActiveSports() {
   } catch {
     return null;
   }
+}
+
+// Rough season windows (Israel-local months, 1-12) used only to ORDER leagues
+// when a cap binds. Out-of-season leagues sort last so credits are never spent
+// on a competition that cannot have fixtures this week. An unlisted key is
+// treated as always in season, so adding a new league needs no entry here.
+const SEASON_MONTHS = {
+  // internationals — FIFA windows / tournament months
+  soccer_fifa_world_cup:                [6, 7],
+  soccer_conmebol_copa_america:         [6, 7],
+  soccer_africa_cup_of_nations:         [12, 1, 2],
+  soccer_uefa_nations_league:           [3, 6, 9, 10, 11],
+  soccer_conmebol_wc_qualifying:        [3, 6, 9, 10, 11],
+  soccer_concacaf_nations_league:       [3, 6, 9, 10, 11],
+  // European club calendar (Aug-May)
+  soccer_epl:                           [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_spain_la_liga:                 [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_germany_bundesliga:            [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_italy_serie_a:                 [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_france_ligue_one:              [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_netherlands_eredivisie:        [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_england_championship:          [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_england_league1:               [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_scotland_premiership:          [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_portugal_primeira_liga:        [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_turkey_super_league:           [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_greece_super_league:           [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_belgium_first_div:             [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_israel_premier_league:         [8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_uefa_champs_league:            [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_uefa_europa_league:            [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  soccer_uefa_europa_conference_league: [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  // South America (calendar year)
+  soccer_conmebol_copa_libertadores:    [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_conmebol_copa_sudamericana:    [3, 4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_brazil_campeonato:             [4, 5, 6, 7, 8, 9, 10, 11, 12],
+  soccer_brazil_serie_b:                [4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_chile_primera_division:        [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  soccer_colombia_primera_a:            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  soccer_argentina_primera_division:    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  // North America
+  soccer_usa_mls:                       [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  soccer_usa_usl_championship:          [3, 4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_mexico_ligamx:                 [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12],
+  // Scandinavia (spring-autumn)
+  soccer_sweden_allsvenskan:            [4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_norway_eliteserien:            [4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_finland_veikkausliiga:         [4, 5, 6, 7, 8, 9, 10],
+  soccer_denmark_superliga:             [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+  // Asia / Oceania
+  soccer_japan_j_league:                [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  soccer_south_korea_kleague1:          [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_china_superleague:             [3, 4, 5, 6, 7, 8, 9, 10, 11],
+  soccer_australia_aleague:             [10, 11, 12, 1, 2, 3, 4, 5],
+  // Basketball
+  basketball_wnba:                      [5, 6, 7, 8, 9, 10],
+  basketball_nbl:                       [9, 10, 11, 12, 1, 2, 3],
+  basketball_euroleague:                [9, 10, 11, 12, 1, 2, 3, 4, 5],
+  basketball_eurocup:                   [9, 10, 11, 12, 1, 2, 3, 4],
+  basketball_ncaab:                     [11, 12, 1, 2, 3, 4],
+  basketball_spain_acb:                 [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_france_pro_a:              [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_italy_lba:                 [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_turkey_bsl:                [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_germany_bbl:               [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_greece_basket_league:      [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_russia_vtb:                [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_lithuania_lkl:             [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_czech_nbl:                 [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_poland_tbl:                [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_israel_premier_league:     [9, 10, 11, 12, 1, 2, 3, 4, 5, 6],
+  basketball_cba:                       [10, 11, 12, 1, 2, 3, 4],
+};
+
+function isInSeasonNow(sportKey, month = Number(israelNowParts().month)) {
+  const months = SEASON_MONTHS[sportKey];
+  if (!months) return true; // unknown league — never penalise it
+  return months.includes(month);
 }
 
 // Quota economics: every /odds request costs (regions × markets) credits.
@@ -3519,7 +3606,10 @@ async function buildOddsApiFeed() {
   // behaviour (every sport × 3 regions on every rebuild) burned a fresh key
   // within hours. Track spend per Israel-day in KV and refuse to overspend;
   // the aggregated odds layer keeps serving the day's earlier rows instead.
-  const ODDS_API_DAILY_BUDGET = Number(process.env.ODDS_API_DAILY_BUDGET || 40);
+  // Raised alongside the league caps: a full build is now up to ~45 credits, so
+  // the old ceiling of 40 would have refused the very first build of the day.
+  // The adaptive guard below is the real protection for low-balance keys.
+  const ODDS_API_DAILY_BUDGET = Number(process.env.ODDS_API_DAILY_BUDGET || 300);
   const budgetKey = `oddsapi-spend:${israelDate(0)}`;
   let spentToday = 0;
   try { spentToday = Number((await kvGet(budgetKey))?.n || 0); } catch { /* no KV — memory fallback */ }
@@ -3548,15 +3638,46 @@ async function buildOddsApiFeed() {
   } else {
     sportsToQuery = ODDS_API_SPORTS;
   }
-  // Cap per build: curated order puts World Cup / internationals first, so the
-  // slice keeps the leagues that matter. NBA keys are dropped before spending
-  // credits on them (product rule: no NBA on the board; WNBA stays).
+  // Cap per build. The old behaviour sliced the curated list in array order,
+  // which was written for June 2026 and puts six international competitions at
+  // the head — so in September those ate most of the soccer budget while ~30
+  // in-season club leagues were never queried at all, and basketball's cap of 5
+  // stopped at NCAA/EuroCup before reaching any league that plays in autumn.
+  // Now: drop out-of-season leagues, then order by season before capping.
   const isNbaKey = (k) => k === "basketball_nba" || k === "basketball_nba_championship_winner" || k === "basketball_nba_preseason";
-  const MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 12);
-  const MAX_BASKETBALL = Number(process.env.ODDS_API_MAX_BASKETBALL || 5);
+  const month = Number(israelNowParts().month);
+  const bySeason = (list) => {
+    const inSeason  = list.filter((s) => isInSeasonNow(s.key, month));
+    const offSeason = list.filter((s) => !isInSeasonNow(s.key, month));
+    return [...inSeason, ...offSeason];
+  };
+  let MAX_SOCCER     = Number(process.env.ODDS_API_MAX_SOCCER || 30);
+  let MAX_BASKETBALL = Number(process.env.ODDS_API_MAX_BASKETBALL || 14);
+
+  // Adaptive credit guard. Every /odds call costs (markets × regions) credits;
+  // this build uses one market and one region, so 1 credit per league. A free
+  // key holds 500 credits/month — with the raised caps above that key would be
+  // empty in a week. When the remaining balance is thin, shrink this build to
+  // the share that keeps the key alive until the monthly reset.
+  const quota = oddsDiscoveryCache.quota;
+  let quotaNote = null;
+  if (quota && Number.isFinite(quota.remaining)) {
+    const now       = new Date();
+    const daysInMon = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 0).getUTCDate();
+    const daysLeft  = Math.max(1, daysInMon - now.getUTCDate() + 1);
+    const buildsPerDay = Number(process.env.ODDS_API_BUILDS_PER_DAY || 6);
+    const perBuild  = Math.floor(quota.remaining / daysLeft / buildsPerDay);
+    if (perBuild < MAX_SOCCER + MAX_BASKETBALL) {
+      const share = Math.max(4, perBuild);
+      MAX_SOCCER     = Math.max(3, Math.floor(share * 0.7));
+      MAX_BASKETBALL = Math.max(1, share - MAX_SOCCER);
+      quotaNote = `credit guard: ${quota.remaining} left, ${daysLeft}d to reset — capped to ${MAX_SOCCER}+${MAX_BASKETBALL}`;
+    }
+  }
+
   sportsToQuery = [
-    ...sportsToQuery.filter((s) => s.key.startsWith("soccer_")).slice(0, MAX_SOCCER),
-    ...sportsToQuery.filter((s) => s.key.startsWith("basketball_") && !isNbaKey(s.key)).slice(0, MAX_BASKETBALL),
+    ...bySeason(sportsToQuery.filter((s) => s.key.startsWith("soccer_"))).slice(0, MAX_SOCCER),
+    ...bySeason(sportsToQuery.filter((s) => s.key.startsWith("basketball_") && !isNbaKey(s.key))).slice(0, MAX_BASKETBALL),
   ];
 
   const today    = israelDate(0);
@@ -3622,6 +3743,15 @@ async function buildOddsApiFeed() {
     ok:           true,
     generatedAt:  now,
     oddsSource:   "The Odds API",
+    oddsApiDebug: {
+      leaguesQueried:  sportsToQuery.length,
+      soccerQueried:   sportsToQuery.filter((s) => s.key.startsWith("soccer_")).length,
+      basketQueried:   sportsToQuery.filter((s) => s.key.startsWith("basketball_")).length,
+      creditsRemaining: oddsDiscoveryCache.quota?.remaining ?? null,
+      spentToday:      spentToday + sportsToQuery.length,
+      quotaNote,
+      keys:            sportsToQuery.map((s) => s.key),
+    },
     tabs: {
       yesterday: { ...yesterdayTab, date: israelDate(-1) },
       today:     { label: "היום",  date: today,        sports: splitBySport(pickedToday) },
