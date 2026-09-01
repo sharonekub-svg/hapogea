@@ -5067,7 +5067,6 @@
         <button class="lp-menu-btn" onclick="document.body.classList.contains('app-mode') ? goToLanding() : smoothTo('lp-hero')">בית</button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavFootball" onclick="enterApp();setTimeout(()=>{state.sportTab='football';toggleAiSection();render();syncLpNav();},200)">⚽ כדורגל<span class="nav-sport-count empty" id="navCountFootball"></span></button>
         <button class="lp-menu-btn lp-sport-btn" id="lpNavBasketball" onclick="enterApp();setTimeout(()=>{state.sportTab='basketball';toggleAiSection();render();syncLpNav();},200)">🏀 כדורסל<span class="nav-sport-count basketball empty" id="navCountBasketball"></span></button>
-        <button class="lp-menu-btn lp-sport-btn" id="lpNavWorldCup" onclick="enterApp();setTimeout(()=>{state.sportTab='worldcup';state.wcOpen=true;toggleAiSection();render();syncLpNav();},200)">🏆 מונדיאל</button>
         <button class="lp-menu-btn" id="lpNavAi" onclick="enterApp();setTimeout(()=>{state.sportTab='ai';toggleAiSection();render();syncLpNav();},200)">הפוגע AI</button>
       </div>
       <!-- Landing: Google sign-in + enter button -->
@@ -5105,7 +5104,7 @@
     <section class="lp-hero" id="lp-hero">
       <div class="lp-eyebrow">
         <span class="lp-eyebrow-dot"></span>
-        ניתוחי ספורט חיים · כדורגל · כדורסל · מונדיאל 2026
+        ניתוחי ספורט חיים · כדורגל · כדורסל
       </div>
       <div class="lp-brand-display">הפוגע <span>AI</span></div>
       <h1>ניתוחי ספורט <span>חכמים</span><br>בזמן אמת</h1>
@@ -5153,11 +5152,8 @@
 
       <div class="lp-stats-row">
         <div class="lp-stat-box"><div class="lp-stat-num">40</div><div class="lp-stat-lbl">משחקים ביום</div></div>
-        <div class="lp-stat-box lp-stat-wc" style="background:linear-gradient(135deg,rgba(146,96,10,.18),rgba(180,118,10,.12));border-color:rgba(146,96,10,.50)">
-          <div class="lp-stat-num" id="lpWCDaysNum" style="color:#92600A">9</div>
-          <div class="lp-stat-lbl" style="color:#92600A">ימים למונדיאל 🏆</div>
-        </div>
-        <div class="lp-stat-box"><div class="lp-stat-num">48</div><div class="lp-stat-lbl">נבחרות מונדיאל</div></div>
+        <div class="lp-stat-box"><div class="lp-stat-num">1.40–1.85</div><div class="lp-stat-lbl">טווח יחסים</div></div>
+        <div class="lp-stat-box"><div class="lp-stat-num">3</div><div class="lp-stat-lbl">ימים בלוח</div></div>
         <div class="lp-stat-box"><div class="lp-stat-num" style="color:#15803D">Live</div><div class="lp-stat-lbl">נתוני ווינר</div></div>
       </div>
     </section>
@@ -5166,7 +5162,7 @@
       <div class="lp-section-inner">
         <p class="lp-section-kicker">מה תקבל</p>
         <h2 class="lp-section-h">כל הכלים לניתוח ספורט</h2>
-        <p class="lp-section-p">מנוע ווינר, AI מנתח, לוח מונדיאל ועוד — הכל במקום אחד.</p>
+        <p class="lp-section-p">מנוע ווינר, AI מנתח, לוח שלושת הימים ועוד — הכל במקום אחד.</p>
         <div class="lp-feat-grid">
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(37,99,235,.1)">⚡</div>
@@ -5184,9 +5180,9 @@
             <p class="lp-feat-text">אלגוריתם מדרג משחקים לפי יתרון סטטיסטי מחושב. רואים רק את המשחקים שמצדיקים תשומת לב.</p>
           </div>
           <div class="lp-feat-card">
-            <div class="lp-feat-icon" style="background:rgba(146,96,10,.1)">⚽</div>
-            <h3 class="lp-feat-title">מונדיאל 2026</h3>
-            <p class="lp-feat-text">לוח טורניר מלא עם דגלי נבחרות, שלבי בתים, תאריכים ויחסי ווינר כשזמינים. מקסיקו · קנדה · ארה"ב.</p>
+            <div class="lp-feat-icon" style="background:rgba(146,96,10,.1)">📅</div>
+            <h3 class="lp-feat-title">אתמול · היום · מחר</h3>
+            <p class="lp-feat-text">מעבר בין שלושת הימים בלחיצה. אתמול מציג את הניתוחים שנסגרו מול התוצאה הרשמית — פגע או נפל.</p>
           </div>
           <div class="lp-feat-card">
             <div class="lp-feat-icon" style="background:rgba(85,214,255,.1)">📱</div>
@@ -5236,7 +5232,6 @@
           <div class="lp-premium-feat"><span>✓</span> כל ניתוחי היום</div>
           <div class="lp-premium-feat"><span>✓</span> הפוגע AI ללא הגבלה</div>
           <div class="lp-premium-feat"><span>✓</span> ווינר בזמן אמת</div>
-          <div class="lp-premium-feat"><span>✓</span> מונדיאל 2026</div>
         </div>
         <button class="lp-premium-cta" onclick="enterApp();setTimeout(openPremiumModal,200)">שדרג לפרימיום</button>
       </div>
@@ -5274,13 +5269,11 @@
         </div>
       </div>
       <h1 class="gate-title">הפוגע <span class="gate-ai-text">AI</span></h1>
-      <p class="gate-subtitle">פלטפורמת ניתוח ספורט מתקדמת<br>כדורגל · כדורסל · מונדיאל 2026</p>
+      <p class="gate-subtitle">פלטפורמת ניתוח ספורט מתקדמת<br>כדורגל · כדורסל · ניתוח יומי</p>
       <div class="gate-stats">
         <div class="gate-stat"><span class="gate-stat-icon">⚽</span><span class="gate-stat-label">כדורגל</span></div>
         <div class="gate-stat-div"></div>
         <div class="gate-stat"><span class="gate-stat-icon">🏀</span><span class="gate-stat-label">כדורסל</span></div>
-        <div class="gate-stat-div"></div>
-        <div class="gate-stat"><span class="gate-stat-icon">🌍</span><span class="gate-stat-label">מונדיאל</span></div>
       </div>
       <p class="gate-cta-label">כניסה לפלטפורמה</p>
       <div class="gate-privacy-wrap">
@@ -5337,8 +5330,6 @@
         <div class="ld-stat"><span class="ld-stat-n">⚽</span><span class="ld-stat-l">כדורגל</span></div>
         <div class="ld-stat-sep"></div>
         <div class="ld-stat"><span class="ld-stat-n">🏀</span><span class="ld-stat-l">כדורסל</span></div>
-        <div class="ld-stat-sep"></div>
-        <div class="ld-stat"><span class="ld-stat-n">🌍</span><span class="ld-stat-l">מונדיאל</span></div>
       </div>
     </div>
   </div>
@@ -5400,7 +5391,7 @@
       <div class="hero-main">
         <div class="hero-content">
           <span class="eyebrow">יחסים אמיתיים בלבד · ניתוח סטטיסטי · בלי המצאת נתונים</span>
-          <h2>ניתוחי ספורט בזמן אמת — כדורגל, כדורסל ומונדיאל 2026</h2>
+          <h2>ניתוחי ספורט בזמן אמת — כדורגל וכדורסל</h2>
           <p class="hero-copy">
             הפוגע מציג משחקים עם יתרון סטטיסטי מוכח. בחר ספורט למעלה כדי לצפות בניתוחים מחושבים.
           </p>
@@ -5415,7 +5406,7 @@
       <aside class="hero-side" id="dailyTip"></aside>
     </section>
 
-    <section class="panel wc-strip" id="worldCupSection">
+    <section class="panel wc-strip" id="worldCupSection" style="display:none" aria-hidden="true">
       <div class="wc-banner" id="wcToggle" role="button" tabindex="0" aria-expanded="false" aria-label="פתיחת לוח המונדיאל">
         <!-- decorative rotating football -->
         <div class="wc-ball-deco" aria-hidden="true">
@@ -5464,7 +5455,10 @@
               <div class="sport-page-name" id="sportPageName"></div>
               <p class="sport-page-sub" id="sportPageSub"></p>
             </div>
-            <div class="day-toggle" id="dayToggle" style="display:none">
+            <div class="day-toggle" id="dayToggle">
+              <button class="dt-btn" data-day="yesterday" onclick="setDay('yesterday')">אתמול</button>
+              <button class="dt-btn active" data-day="today" onclick="setDay('today')">היום</button>
+              <button class="dt-btn" data-day="tomorrow" onclick="setDay('tomorrow')">מחר</button>
               <button class="dt-btn live-btn" id="liveTabBtn" onclick="openLiveTab()"><span class="live-dot"></span>לייב</button>
             </div>
           </div>
@@ -8650,6 +8644,30 @@
       timer: null,
     };
 
+    // Switch the board between yesterday / today / tomorrow.
+    // Also exits the live view, which hides the picks board when active.
+    function setDay(day) {
+      if (!["yesterday", "today", "tomorrow"].includes(day)) return;
+      state.day = day;
+      if (typeof _live === "object" && _live && _live.timer) {
+        clearInterval(_live.timer);
+        _live.timer = null;
+      }
+      const liveSection = document.getElementById("liveSection");
+      if (liveSection) liveSection.style.display = "none";
+      const cardsSection = document.getElementById("cards");
+      if (cardsSection) cardsSection.style.display = "";
+      const titleBox = document.getElementById("sectionTitleBox");
+      if (titleBox) titleBox.style.display = "";
+      const statsHeader = document.getElementById("stats-header");
+      if (statsHeader) statsHeader.style.display = "";
+      const pickStats = document.getElementById("pick-stats");
+      if (pickStats) pickStats.style.display = "";
+      render();
+      if (typeof syncPageSections === "function") syncPageSections();
+    }
+    window.setDay = setDay;
+
     function openLiveTab() {
       // Hide picks, show live
       const cardsSection = document.getElementById("cards");
@@ -10356,7 +10374,7 @@
     });
 
     function syncPageSections() {
-      const VALID_TABS = new Set(['football', 'basketball', 'worldcup', 'ai', 'home', 'about', 'reuben']);
+      const VALID_TABS = new Set(['football', 'basketball', 'ai', 'home', 'about', 'reuben']);
       const isNotFound = !VALID_TABS.has(state.sportTab);
       const nfSection = document.getElementById('notFoundSection');
       if (nfSection) nfSection.classList.toggle('visible', isNotFound);
@@ -10370,15 +10388,7 @@
       if (hero) hero.style.display = 'none';
       // World Cup section: only on the dedicated worldcup tab
       const wcSection = document.getElementById('worldCupSection');
-      if (wcSection) {
-        wcSection.style.display = isWC ? '' : 'none';
-        if (isWC) {
-          state.wcOpen = true;
-          wcSection.classList.add('expanded');
-          const wcContent = document.getElementById('wcContent');
-          if (wcContent) wcContent.style.display = '';
-        }
-      }
+      if (wcSection) wcSection.style.display = 'none';
       // Toolbar (day/filter bar) — hide on worldcup dedicated page
       const toolbar = document.querySelector('.toolbar.panel');
       if (toolbar) toolbar.style.display = (isSport && !isWC) ? '' : 'none';
@@ -10400,7 +10410,12 @@
         const nameEl = document.getElementById('sportPageName');
         const subEl = document.getElementById('sportPageSub');
         if (nameEl) nameEl.innerHTML = isWC ? '🏆 מונדיאל 2026' : (state.sportTab === 'football' ? '⚽ כדורגל' : '🏀 כדורסל');
-        if (subEl) subEl.textContent = isWC ? 'לוח המשחקים, תחזיות ויחסי ווינר' : (state.sportTab === 'football' ? 'תחזיות כדורגל ויחסי ווינר — היום' : 'תחזיות כדורסל ויחסי ווינר — היום');
+        const dayWord = state.day === 'yesterday' ? 'אתמול' : state.day === 'tomorrow' ? 'מחר' : 'היום';
+        const dayDate = state.feed?.tabs?.[state.day]?.date || '';
+        const daySuffix = dayDate ? `${dayWord} · ${dayDate.split('-').reverse().join('/')}` : dayWord;
+        if (subEl) subEl.textContent = state.sportTab === 'football'
+          ? `תחזיות כדורגל ויחסי ווינר — ${daySuffix}`
+          : `תחזיות כדורסל ויחסי ווינר — ${daySuffix}`;
       }
       // Stats bar — show on all sport tabs including worldcup
       const statsEl = document.getElementById('stats');
@@ -10971,14 +10986,20 @@
     function updateLpTodayCounts() {
       const feed = state.feed;
       if (!feed) return;
-      const ls = feed.lineStats || {};
-      const fb = ls.football && ls.football.today != null ? ls.football.today : null;
-      const bb = ls.basketball && ls.basketball.today != null ? ls.basketball.today : null;
+      // Count the recommendations actually rendered on the board today.
+      // lineStats counts raw Winner lines, which is 0 whenever Winner is
+      // blocked even though the board is populated from a fallback source.
+      const countRecs = (sport) => {
+        const rows = feed.tabs?.today?.sports?.[sport] || feed.tabs?.today?.[sport] || [];
+        return rows.filter(r => !r.noOddsYet && (r.odds || r.oddsRaw)).length;
+      };
+      const fb = countRecs("football");
+      const bb = countRecs("basketball");
       // Landing hero card
       const fbEl = document.getElementById("lpTodayFootball");
       const bbEl = document.getElementById("lpTodayBasketball");
-      if (fbEl) fbEl.textContent = fb != null ? fb : "—";
-      if (bbEl) bbEl.textContent = bb != null ? bb : "—";
+      if (fbEl) fbEl.textContent = fb;
+      if (bbEl) bbEl.textContent = bb;
       // Top nav badges
       const navFb = document.getElementById("navCountFootball");
       const navBb = document.getElementById("navCountBasketball");
@@ -10992,6 +11013,9 @@
     }
     // Run after feed loads (feed may already be cached)
     document.addEventListener("feedLoaded", updateLpTodayCounts);
+    document.addEventListener("feedLoaded", () => {
+      if (typeof updateLpYdayHitRate === "function") updateLpYdayHitRate();
+    });
     if (state.feed) updateLpTodayCounts();
 
     // Yesterday's hit-rate box on the landing hero (manual_results in Supabase)
@@ -11000,28 +11024,49 @@
       if (!card) return;
       const numEl = document.getElementById("lpYdayRate");
       const subEl = document.getElementById("lpYdaySub");
-      const setEmpty = (msg) => {
-        if (numEl) { numEl.textContent = "—"; numEl.style.color = "#A39B8C"; }
-        if (subEl) subEl.textContent = msg;
-      };
-      try {
-        const sb = (typeof _mrSbClient === "function") ? _mrSbClient() : null;
-        if (!sb) { setEmpty("אין נתונים לאתמול"); return; }
-        const d = new Date(); d.setDate(d.getDate() - 1);
-        const yday = d.toISOString().split("T")[0];
-        const { data, error } = await sb.from("manual_results").select("status").eq("game_date", yday);
-        if (error || !Array.isArray(data)) { setEmpty("אין נתונים לאתמול"); return; }
-        const hits   = data.filter(r => r.status === "פגע").length;
-        const misses = data.filter(r => r.status === "נפל").length;
-        const settled = hits + misses;
-        if (settled === 0) { setEmpty("אין נתונים לאתמול"); return; }
+      const paint = (hits, settled) => {
         const rate = Math.round((hits / settled) * 100);
         if (numEl) {
           numEl.textContent = rate + "%";
           numEl.style.color = rate >= 60 ? "#15803D" : rate >= 50 ? "#ca8a04" : "#DC2626";
         }
         if (subEl) subEl.textContent = `${hits}/${settled} פגיעות`;
-      } catch (_) { setEmpty("אין נתונים לאתמול"); }
+      };
+      // Fallback: settle yesterday straight off the feed rows when the manual
+      // results table has nothing for that date. Keeps the box alive instead of
+      // permanently reading "אין נתונים".
+      const fromFeed = () => {
+        const tabs = state.feed?.tabs || {};
+        const rows = ["football", "basketball"]
+          .flatMap(sp => tabs.yesterday?.sports?.[sp] || tabs.yesterday?.[sp] || [])
+          .filter(r => !r.noOddsYet && (r.odds || r.oddsRaw));
+        let hits = 0, misses = 0;
+        rows.forEach(r => {
+          const o = (typeof rowOutcome === "function") ? rowOutcome(r) : null;
+          if (o && o.key === "hit") hits++;
+          else if (o && o.key === "miss") misses++;
+        });
+        return { hits, settled: hits + misses };
+      };
+      const setEmpty = () => {
+        const f = fromFeed();
+        if (f.settled > 0) { paint(f.hits, f.settled); return; }
+        if (numEl) { numEl.textContent = "—"; numEl.style.color = "#A39B8C"; }
+        if (subEl) subEl.textContent = "אין נתונים לאתמול";
+      };
+      try {
+        const sb = (typeof _mrSbClient === "function") ? _mrSbClient() : null;
+        if (!sb) { setEmpty(); return; }
+        const d = new Date(); d.setDate(d.getDate() - 1);
+        const yday = d.toISOString().split("T")[0];
+        const { data, error } = await sb.from("manual_results").select("status").eq("game_date", yday);
+        if (error || !Array.isArray(data)) { setEmpty(); return; }
+        const hits   = data.filter(r => r.status === "פגע").length;
+        const misses = data.filter(r => r.status === "נפל").length;
+        const settled = hits + misses;
+        if (settled === 0) { setEmpty(); return; }
+        paint(hits, settled);
+      } catch (_) { setEmpty(); }
     }
     // Run once the Supabase client is likely ready (manual-results init runs ~1500ms)
     if (document.readyState === "loading") {
@@ -11087,7 +11132,7 @@
         <li><span class="pm-feat-icon">✦</span> כל ניתוחי היום — ללא חיתוך</li>
         <li><span class="pm-feat-icon">✦</span> הפוגע AI — שיחות ללא הגבלה</li>
         <li><span class="pm-feat-icon">✦</span> יחסי שוק חיים לכל הליגות</li>
-        <li><span class="pm-feat-icon">✦</span> לוח מונדיאל 2026 + ניתוחים מלאים</li>
+        <li><span class="pm-feat-icon">✦</span> לוח אתמול · היום · מחר + ניתוחים מלאים</li>
       </ul>
       <input id="premiumCodeInput" class="pm-input" type="text" placeholder="קוד פרימיום" autocomplete="off">
       <p id="premiumCodeError" class="pm-error"></p>
@@ -11122,7 +11167,6 @@
         <select id="adminPlan">
           <option value="weekly">שבועי (7 ימים)</option>
           <option value="monthly" selected>חודשי (30 ימים)</option>
-          <option value="worldcup">מונדיאל (עד 19/7/2026)</option>
         </select>
       </div>
       <div class="admin-field">
@@ -11815,10 +11859,6 @@ window.AiApp = AiApp;
     <button class="mbn-item" data-page="basketball" aria-label="כדורסל">
       <span class="mbn-item-wrap"><span class="mbn-icon" aria-hidden="true">🏀</span><span class="mbn-badge basketball empty" id="mbnCountBasketball"></span></span>
       <span>כדורסל</span>
-    </button>
-    <button class="mbn-item" data-page="worldcup" aria-label="מונדיאל">
-      <span class="mbn-icon" aria-hidden="true">🏆</span>
-      <span>מונדיאל</span>
     </button>
     <button class="mbn-item" data-page="ai" aria-label="AI">
       <span class="mbn-icon" aria-hidden="true">🤖</span>
