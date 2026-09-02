@@ -1,14 +1,14 @@
 {
   "ok": true,
-  "generatedAt": "2026-09-02T12:41:29.960Z",
+  "generatedAt": "2026-09-02T17:48:55.575Z",
   "oddsSource": "The Odds API",
   "oddsApiDebug": {
     "leaguesQueried": 4,
     "soccerQueried": 3,
     "basketQueried": 1,
-    "creditsRemaining": 228,
+    "creditsRemaining": 184,
     "spentToday": 4,
-    "quotaNote": "credit guard: 228 left, 29d to reset — capped to 3+1",
+    "quotaNote": "credit guard: 184 left, 29d to reset — capped to 3+1",
     "keys": [
       "soccer_uefa_nations_league",
       "soccer_epl",
@@ -1067,7 +1067,7 @@
             "oddsRaw": 1.95,
             "homeOdds": 1.95,
             "drawOdds": 3.4,
-            "awayOdds": 3.7,
+            "awayOdds": 3.8,
             "probability": 0.5128205128205129,
             "normalizedProbability": 0.5128205128205129,
             "recommendationScore": 51,
@@ -1080,14 +1080,14 @@
             "riskLevel": "בינוני",
             "explanation": [
               "מקור: The Odds API — לה ליגה",
-              "ריאל סוסיאדד הוא הפייבוריט (1.95, הסתברות 51%) — תיקו 3.40, Celta Vigo 3.70.",
+              "ריאל סוסיאדד הוא הפייבוריט (1.95, הסתברות 51%) — תיקו 3.40, Celta Vigo 3.80.",
               "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
             ],
             "signals": [
-              "ריאל סוסיאדד הוא הפייבוריט (1.95, הסתברות 51%) — תיקו 3.40, Celta Vigo 3.70."
+              "ריאל סוסיאדד הוא הפייבוריט (1.95, הסתברות 51%) — תיקו 3.40, Celta Vigo 3.80."
             ],
             "resultKey": "240:2026-09-03:real sociedad:celta vigo",
-            "verifiedAt": "2026-09-02T12:41:29.958Z"
+            "verifiedAt": "2026-09-02T17:48:55.571Z"
           }
         ],
         "basketball": []
