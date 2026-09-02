@@ -1,14 +1,14 @@
 {
   "ok": true,
-  "generatedAt": "2026-09-02T07:00:21.353Z",
+  "generatedAt": "2026-09-02T12:41:29.960Z",
   "oddsSource": "The Odds API",
   "oddsApiDebug": {
     "leaguesQueried": 4,
     "soccerQueried": 3,
     "basketQueried": 1,
-    "creditsRemaining": 272,
+    "creditsRemaining": 228,
     "spentToday": 4,
-    "quotaNote": "credit guard: 272 left, 29d to reset — capped to 3+1",
+    "quotaNote": "credit guard: 228 left, 29d to reset — capped to 3+1",
     "keys": [
       "soccer_uefa_nations_league",
       "soccer_epl",
@@ -1087,7 +1087,7 @@
               "ריאל סוסיאדד הוא הפייבוריט (1.95, הסתברות 51%) — תיקו 3.40, Celta Vigo 3.70."
             ],
             "resultKey": "240:2026-09-03:real sociedad:celta vigo",
-            "verifiedAt": "2026-09-02T07:00:21.261Z"
+            "verifiedAt": "2026-09-02T12:41:29.958Z"
           }
         ],
         "basketball": []
