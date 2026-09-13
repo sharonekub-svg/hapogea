@@ -121,13 +121,28 @@ async function withRetry(task, label, { attempts = 3, baseDelay = 2000 } = {}) {
 }
 
 async function fetchJson(url, options = {}) {
+  const { timeoutMs = 8000, signal: callerSignal, ...fetchOptions } = options;
   return withRetry(async () => {
-    const response = await fetch(url, options);
-    const text = await response.text();
-    if (!response.ok) {
-      throw new Error(`${response.status}: ${text.slice(0, 240)}`);
+    // A hung TCP connection (no error, no response — e.g. a datacenter IP being
+    // silently dropped by a WAF) never rejects on its own, so withRetry's own
+    // catch never fires and the request just sits until the platform kills the
+    // whole function (Vercel: FUNCTION_INVOCATION_TIMEOUT / 504) — at which
+    // point none of this file's snapshot/Odds-API fallback code ever runs.
+    // An explicit abort turns "hangs forever" into a normal thrown error the
+    // retry/fallback chain already knows how to handle.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new Error(`timeout after ${timeoutMs}ms`)), timeoutMs);
+    if (callerSignal) callerSignal.addEventListener("abort", () => controller.abort(callerSignal.reason), { once: true });
+    try {
+      const response = await fetch(url, { ...fetchOptions, signal: controller.signal });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${text.slice(0, 240)}`);
+      }
+      return text ? JSON.parse(text) : null;
+    } finally {
+      clearTimeout(timer);
     }
-    return text ? JSON.parse(text) : null;
   }, `fetch ${url}`, { attempts: options.retryAttempts || 3, baseDelay: options.retryBaseDelay || 2000 });
 }
 
@@ -1991,10 +2006,18 @@ function auditOpenRows(rows, acceptedRows) {
     .slice(0, 120);
 }
 
+// Fail fast on the primary Winner calls: the site has a good Odds-API +
+// snapshot fallback chain, so it's better to give up on Winner quickly (one
+// retry, short timeout) and hand off to the fallback than to burn most of
+// the function's time budget retrying a source that may be silently
+// dropping requests from this datacenter's IP range.
+const WINNER_FETCH_OPTS = { timeoutMs: 6000, retryAttempts: 2, retryBaseDelay: 500 };
+
 async function getWinnerLine() {
   const hashMessage = JSON.stringify({ prevCurrentVersion: null, reason: "Initiated" });
   const hashes = await fetchJson("https://api.winner.co.il/v2/publicapi/GetCMobileHashes", {
     headers: winnerHeaders({ HashesMessage: hashMessage }),
+    ...WINNER_FETCH_OPTS,
   });
   const lineMessage = JSON.stringify({
     prevCurrentVersion: null,
@@ -2004,7 +2027,7 @@ async function getWinnerLine() {
   });
   const line = await fetchJson(
     `https://api.winner.co.il/v2/publicapi/GetCMobileLine?lineChecksum=${encodeURIComponent(hashes.lineChecksum)}`,
-    { headers: winnerHeaders({ HashesMessage: lineMessage }) }
+    { headers: winnerHeaders({ HashesMessage: lineMessage }), ...WINNER_FETCH_OPTS }
   );
   return { hashes, markets: line.markets || [] };
 }
@@ -2020,6 +2043,7 @@ async function getResults(startDate, endDate) {
     method: "POST",
     headers: winnerHeaders(),
     body: JSON.stringify(payload),
+    ...WINNER_FETCH_OPTS,
   });
   return data?.results?.events || [];
 }
