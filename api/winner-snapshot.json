@@ -1,14 +1,14 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-01T08:58:57.088Z",
+  "generatedAt": "2026-11-01T18:49:39.300Z",
   "oddsSource": "The Odds API",
   "oddsApiDebug": {
     "leaguesQueried": 4,
     "soccerQueried": 3,
     "basketQueried": 1,
-    "creditsRemaining": 456,
+    "creditsRemaining": 409,
     "spentToday": 4,
-    "quotaNote": "credit guard: 456 left, 30d to reset — capped to 3+1",
+    "quotaNote": "credit guard: 409 left, 30d to reset — capped to 3+1",
     "keys": [
       "soccer_uefa_nations_league",
       "soccer_epl",
@@ -2971,7 +2971,52 @@
       "label": "היום",
       "date": "2026-11-01",
       "sports": {
-        "football": [],
+        "football": [
+          {
+            "id": "odds-3757bcd765c7da1538cdf2785e784038",
+            "eventId": "3757bcd765c7da1538cdf2785e784038",
+            "source": "The Odds API",
+            "utcDay": "2026-11-01",
+            "day": "2026-11-01",
+            "time": "22:00",
+            "sport": "כדורגל",
+            "sportId": 240,
+            "league": "לה ליגה",
+            "country": "",
+            "leaguePriority": 30,
+            "match": "Athletic Bilbao - Real Sociedad",
+            "home": "Athletic Bilbao",
+            "away": "Real Sociedad",
+            "pick": "Athletic Bilbao",
+            "pickTeam": "Athletic Bilbao",
+            "winnerPick": "Athletic Bilbao",
+            "odds": 2,
+            "oddsRaw": 2,
+            "homeOdds": 2,
+            "drawOdds": 3.5,
+            "awayOdds": 3.5,
+            "probability": 0.5,
+            "normalizedProbability": 0.5,
+            "recommendationScore": 50,
+            "score": 50,
+            "recommended": true,
+            "outsideRange": false,
+            "status": "ממתין",
+            "matchPhase": "scheduled",
+            "bettingStatus": "available",
+            "riskLevel": "בינוני",
+            "explanation": [
+              "מקור: The Odds API — לה ליגה",
+              "Athletic Bilbao הוא הפייבוריט (2.00, הסתברות 50%) — תיקו 3.50, Real Sociedad 3.50.",
+              "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
+            ],
+            "signals": [
+              "Athletic Bilbao הוא הפייבוריט (2.00, הסתברות 50%) — תיקו 3.50, Real Sociedad 3.50."
+            ],
+            "resultKey": "240:2026-11-01:athletic bilbao:real sociedad",
+            "verifiedAt": "2026-11-01T18:49:39.299Z"
+          }
+        ],
         "basketball": []
       }
     },
