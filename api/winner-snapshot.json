@@ -1,14 +1,14 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-02T09:12:08.330Z",
+  "generatedAt": "2026-11-02T22:40:15.064Z",
   "oddsSource": "The Odds API",
   "oddsApiDebug": {
     "leaguesQueried": 4,
     "soccerQueried": 3,
     "basketQueried": 1,
-    "creditsRemaining": 362,
+    "creditsRemaining": 315,
     "spentToday": 4,
-    "quotaNote": "credit guard: 362 left, 29d to reset — capped to 3+1",
+    "quotaNote": "credit guard: 315 left, 29d to reset — capped to 3+1",
     "keys": [
       "soccer_uefa_nations_league",
       "soccer_epl",
@@ -19,60 +19,15 @@
   "tabs": {
     "yesterday": {
       "label": "אתמול",
-      "date": "2026-11-01",
+      "date": "2026-11-02",
       "sports": {
-        "football": [
-          {
-            "id": "odds-3757bcd765c7da1538cdf2785e784038",
-            "eventId": "3757bcd765c7da1538cdf2785e784038",
-            "source": "The Odds API",
-            "utcDay": "2026-11-01",
-            "day": "2026-11-01",
-            "time": "22:00",
-            "sport": "כדורגל",
-            "sportId": 240,
-            "league": "לה ליגה",
-            "country": "",
-            "leaguePriority": 30,
-            "match": "Athletic Bilbao - Real Sociedad",
-            "home": "Athletic Bilbao",
-            "away": "Real Sociedad",
-            "pick": "Athletic Bilbao",
-            "pickTeam": "Athletic Bilbao",
-            "winnerPick": "Athletic Bilbao",
-            "odds": 2,
-            "oddsRaw": 2,
-            "homeOdds": 2,
-            "drawOdds": 3.5,
-            "awayOdds": 3.5,
-            "probability": 0.5,
-            "normalizedProbability": 0.5,
-            "recommendationScore": 50,
-            "score": 50,
-            "recommended": true,
-            "outsideRange": false,
-            "status": "ממתין",
-            "matchPhase": "scheduled",
-            "bettingStatus": "available",
-            "riskLevel": "בינוני",
-            "explanation": [
-              "מקור: The Odds API — לה ליגה",
-              "Athletic Bilbao הוא הפייבוריט (2.00, הסתברות 50%) — תיקו 3.50, Real Sociedad 3.50.",
-              "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
-            ],
-            "signals": [
-              "Athletic Bilbao הוא הפייבוריט (2.00, הסתברות 50%) — תיקו 3.50, Real Sociedad 3.50."
-            ],
-            "resultKey": "240:2026-11-01:athletic bilbao:real sociedad",
-            "verifiedAt": "2026-11-01T18:49:39.299Z"
-          }
-        ],
+        "football": [],
         "basketball": []
       }
     },
     "today": {
       "label": "היום",
-      "date": "2026-11-02",
+      "date": "2026-11-03",
       "sports": {
         "football": [],
         "basketball": []
@@ -80,10 +35,55 @@
     },
     "tomorrow": {
       "label": "מחר",
-      "date": "2026-11-03",
+      "date": "2026-11-04",
       "sports": {
         "football": [],
-        "basketball": []
+        "basketball": [
+          {
+            "id": "odds-4415d206254a76f2f9c1ed1492ad4ea6",
+            "eventId": "4415d206254a76f2f9c1ed1492ad4ea6",
+            "source": "The Odds API",
+            "utcDay": "2026-11-04",
+            "day": "2026-11-04",
+            "time": "11:06",
+            "sport": "כדורסל",
+            "sportId": 227,
+            "league": "NBL (אוסטרליה)",
+            "country": "",
+            "leaguePriority": 70,
+            "match": "Brisbane Bullets - Perth Wildcats",
+            "home": "Brisbane Bullets",
+            "away": "Perth Wildcats",
+            "pick": "Perth Wildcats",
+            "pickTeam": "Perth Wildcats",
+            "winnerPick": "Perth Wildcats",
+            "odds": 1.55,
+            "oddsRaw": 1.55,
+            "homeOdds": 2.33,
+            "drawOdds": null,
+            "awayOdds": 1.55,
+            "probability": 0.6451612903225806,
+            "normalizedProbability": 0.6451612903225806,
+            "recommendationScore": 65,
+            "score": 65,
+            "recommended": true,
+            "outsideRange": false,
+            "status": "ממתין",
+            "matchPhase": "scheduled",
+            "bettingStatus": "available",
+            "riskLevel": "בינוני",
+            "explanation": [
+              "מקור: The Odds API — NBL (אוסטרליה)",
+              "Perth Wildcats הוא הפייבוריט (1.55, הסתברות 65%) — Brisbane Bullets 2.33.",
+              "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
+            ],
+            "signals": [
+              "Perth Wildcats הוא הפייבוריט (1.55, הסתברות 65%) — Brisbane Bullets 2.33."
+            ],
+            "resultKey": "227:2026-11-04:brisbane bullets:perth wildcats",
+            "verifiedAt": "2026-11-02T22:40:14.934Z"
+          }
+        ]
       }
     }
   },
