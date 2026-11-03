@@ -1,14 +1,14 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-03T09:18:07.273Z",
+  "generatedAt": "2026-11-03T20:27:41.712Z",
   "oddsSource": "The Odds API",
   "oddsApiDebug": {
     "leaguesQueried": 4,
     "soccerQueried": 3,
     "basketQueried": 1,
-    "creditsRemaining": 268,
+    "creditsRemaining": 221,
     "spentToday": 4,
-    "quotaNote": "credit guard: 268 left, 28d to reset — capped to 3+1",
+    "quotaNote": "credit guard: 221 left, 28d to reset — capped to 3+1",
     "keys": [
       "soccer_uefa_nations_league",
       "soccer_epl",
@@ -57,15 +57,15 @@
             "pick": "Perth Wildcats",
             "pickTeam": "Perth Wildcats",
             "winnerPick": "Perth Wildcats",
-            "odds": 1.47,
-            "oddsRaw": 1.47,
-            "homeOdds": 2.55,
+            "odds": 1.6,
+            "oddsRaw": 1.6,
+            "homeOdds": 2.18,
             "drawOdds": null,
-            "awayOdds": 1.47,
-            "probability": 0.6802721088435374,
-            "normalizedProbability": 0.6802721088435374,
-            "recommendationScore": 68,
-            "score": 68,
+            "awayOdds": 1.6,
+            "probability": 0.625,
+            "normalizedProbability": 0.625,
+            "recommendationScore": 63,
+            "score": 63,
             "recommended": true,
             "outsideRange": false,
             "status": "ממתין",
@@ -74,14 +74,14 @@
             "riskLevel": "בינוני",
             "explanation": [
               "מקור: The Odds API — NBL (אוסטרליה)",
-              "Perth Wildcats הוא הפייבוריט (1.47, הסתברות 68%) — Brisbane Bullets 2.55.",
+              "Perth Wildcats הוא הפייבוריט (1.60, הסתברות 63%) — Brisbane Bullets 2.18.",
               "הניתוח מבוסס על יחסי שוק בלבד; פציעות ונתוני צוות אינם נכללים."
             ],
             "signals": [
-              "Perth Wildcats הוא הפייבוריט (1.47, הסתברות 68%) — Brisbane Bullets 2.55."
+              "Perth Wildcats הוא הפייבוריט (1.60, הסתברות 63%) — Brisbane Bullets 2.18."
             ],
             "resultKey": "227:2026-11-04:brisbane bullets:perth wildcats",
-            "verifiedAt": "2026-11-03T09:18:07.272Z"
+            "verifiedAt": "2026-11-03T20:27:41.629Z"
           }
         ]
       }
